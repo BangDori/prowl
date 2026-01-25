@@ -1,4 +1,3 @@
-import React from 'react';
 import { LaunchdJob } from '../../shared/types';
 import JobCard from './JobCard';
 

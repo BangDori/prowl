@@ -1,4 +1,3 @@
-import React from 'react';
 import { RefreshCw, Settings } from 'lucide-react';
 
 interface HeaderProps {

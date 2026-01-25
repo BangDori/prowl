@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Play, Folder, FileText, Loader2 } from "lucide-react";
 import { LaunchdJob, LogContent } from "../../shared/types";
 import ToggleSwitch from "./ToggleSwitch";

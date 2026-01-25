@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, X } from 'lucide-react';
 import { AppSettings } from '../../shared/types';
 

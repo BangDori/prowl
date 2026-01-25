@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLaunchdJobs } from "./hooks/useLaunchdJobs";
 import { useJobActions } from "./hooks/useJobActions";
 import JobList from "./components/JobList";
