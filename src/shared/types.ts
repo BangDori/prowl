@@ -37,6 +37,15 @@ export interface LogContent {
   lastModified: Date | null;
 }
 
+// 앱 설정
+export interface AppSettings {
+  patterns: string[]; // 감지할 plist 패턴 목록 (예: ['com.claude.', 'com.myapp.'])
+}
+
+export const DEFAULT_SETTINGS: AppSettings = {
+  patterns: [],
+};
+
 // IPC 채널 타입
 export type IpcChannels = {
   'jobs:list': () => Promise<LaunchdJob[]>;
@@ -44,4 +53,6 @@ export type IpcChannels = {
   'jobs:run': (jobId: string) => Promise<JobActionResult>;
   'jobs:logs': (jobId: string, lines?: number) => Promise<LogContent>;
   'jobs:refresh': () => Promise<LaunchdJob[]>;
+  'settings:get': () => Promise<AppSettings>;
+  'settings:set': (settings: AppSettings) => Promise<void>;
 };

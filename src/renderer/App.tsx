@@ -1,16 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLaunchdJobs } from "./hooks/useLaunchdJobs";
 import { useJobActions } from "./hooks/useJobActions";
 import JobList from "./components/JobList";
 import Header from "./components/Header";
+import Settings from "./components/Settings";
+
+type View = "main" | "settings";
 
 export default function App() {
+  const [view, setView] = useState<View>("main");
   const { jobs, loading, error, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);
 
+  const handleBackFromSettings = () => {
+    setView("main");
+    refresh();
+  };
+
+  if (view === "settings") {
+    return <Settings onBack={handleBackFromSettings} />;
+  }
+
   return (
     <div className="min-h-screen bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100">
-      <Header onRefresh={refresh} loading={loading} />
+      <Header
+        onRefresh={refresh}
+        onSettings={() => setView("settings")}
+        loading={loading}
+      />
 
       <main
         className="p-3 pt-0 overflow-y-auto"
@@ -41,7 +58,7 @@ export default function App() {
             <p className="text-3xl mb-2">🔍</p>
             <p>등록된 작업이 없습니다.</p>
             <p className="text-xs mt-1">
-              ~/Library/LaunchAgents/com.claude.*.plist
+              ~/Library/LaunchAgents/
             </p>
           </div>
         ) : (

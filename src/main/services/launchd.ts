@@ -4,10 +4,10 @@ import * as path from 'path';
 import { LaunchdJob, JobActionResult } from '../../shared/types';
 import {
   LAUNCH_AGENTS_DIR,
-  PLIST_PREFIX,
   DEFAULT_ICON,
   DEFAULT_DESCRIPTION,
 } from '../constants';
+import { getPatterns } from './settings';
 import {
   parsePlistFile,
   extractLabel,
@@ -21,13 +21,21 @@ import { getLastRunInfo } from './log-reader';
 import { extractScriptMetadata } from './script-metadata';
 
 /**
- * com.claude.* 패턴의 모든 plist 파일 찾기
+ * 설정된 패턴에 맞는 모든 plist 파일 찾기
+ * 패턴이 없으면 모든 plist 파일 반환
  */
-export function findClaudePlistFiles(): string[] {
+export function findPlistFiles(): string[] {
   try {
+    const patterns = getPatterns();
     const files = fs.readdirSync(LAUNCH_AGENTS_DIR);
+
     return files
-      .filter((f) => f.startsWith(PLIST_PREFIX) && f.endsWith('.plist'))
+      .filter((f) => {
+        if (!f.endsWith('.plist')) return false;
+        // 패턴이 없으면 모든 plist 파일 반환
+        if (patterns.length === 0) return true;
+        return patterns.some((pattern) => f.startsWith(pattern));
+      })
       .map((f) => path.join(LAUNCH_AGENTS_DIR, f));
   } catch (error) {
     console.error('Failed to read LaunchAgents directory:', error);
@@ -37,9 +45,11 @@ export function findClaudePlistFiles(): string[] {
 
 /**
  * launchctl list로 현재 로드된 작업 목록 가져오기
+ * 패턴이 없으면 모든 로드된 작업 반환
  */
 export function getLoadedJobs(): Set<string> {
   try {
+    const patterns = getPatterns();
     const output = execSync('launchctl list', { encoding: 'utf-8' });
     const lines = output.split('\n');
     const loadedLabels = new Set<string>();
@@ -48,7 +58,8 @@ export function getLoadedJobs(): Set<string> {
       const parts = line.split('\t');
       if (parts.length >= 3) {
         const label = parts[2];
-        if (label.startsWith(PLIST_PREFIX)) {
+        // 패턴이 없으면 모든 작업 포함
+        if (patterns.length === 0 || patterns.some((pattern) => label.startsWith(pattern))) {
           loadedLabels.add(label);
         }
       }
@@ -127,10 +138,10 @@ export function toggleJob(plistPath: string, label: string): JobActionResult {
 }
 
 /**
- * 모든 Claude 작업 목록 가져오기
+ * 설정된 패턴에 맞는 모든 작업 목록 가져오기
  */
 export function listAllJobs(): LaunchdJob[] {
-  const plistFiles = findClaudePlistFiles();
+  const plistFiles = findPlistFiles();
   const loadedJobs = getLoadedJobs();
   const jobs: LaunchdJob[] = [];
 

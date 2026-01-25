@@ -2,7 +2,6 @@ import { homedir } from 'os';
 import path from 'path';
 
 export const LAUNCH_AGENTS_DIR = path.join(homedir(), 'Library', 'LaunchAgents');
-export const PLIST_PREFIX = 'com.claude.';
 
 export const WEEKDAY_NAMES: Record<number, string> = {
   0: '일',

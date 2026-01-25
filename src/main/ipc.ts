@@ -6,7 +6,8 @@ import {
   startJob,
 } from './services/launchd';
 import { readLogContent } from './services/log-reader';
-import { LaunchdJob, JobActionResult, LogContent } from '../shared/types';
+import { getSettings, setSettings } from './services/settings';
+import { LaunchdJob, JobActionResult, LogContent, AppSettings } from '../shared/types';
 import { LOG_LINES_DEFAULT } from './constants';
 
 /**
@@ -75,6 +76,19 @@ export function registerIpcHandlers(): void {
         };
       }
       return readLogContent(job.logPath, lines);
+    }
+  );
+
+  // 설정 조회
+  ipcMain.handle('settings:get', async (): Promise<AppSettings> => {
+    return getSettings();
+  });
+
+  // 설정 저장
+  ipcMain.handle(
+    'settings:set',
+    async (_event, settings: AppSettings): Promise<void> => {
+      setSettings(settings);
     }
   );
 }

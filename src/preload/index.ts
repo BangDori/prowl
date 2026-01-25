@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { LaunchdJob, JobActionResult, LogContent } from '../shared/types';
+import { LaunchdJob, JobActionResult, LogContent, AppSettings } from '../shared/types';
 
 /**
  * 렌더러 프로세스에 노출할 API
@@ -29,6 +29,13 @@ const electronAPI = {
     ipcRenderer.on('window:show', handler);
     return () => ipcRenderer.removeListener('window:show', handler);
   },
+
+  // 설정 조회
+  getSettings: (): Promise<AppSettings> => ipcRenderer.invoke('settings:get'),
+
+  // 설정 저장
+  setSettings: (settings: AppSettings): Promise<void> =>
+    ipcRenderer.invoke('settings:set', settings),
 };
 
 // contextBridge로 API 노출
