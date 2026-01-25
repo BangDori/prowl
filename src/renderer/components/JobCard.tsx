@@ -41,9 +41,9 @@ export default function JobCard({
     }
   };
 
-  const handleOpenScript = async () => {
-    if (job.scriptPath) {
-      await window.electronAPI.showInFolder(job.scriptPath);
+  const handleOpenPlist = async () => {
+    if (job.plistPath) {
+      await window.electronAPI.showInFolder(job.plistPath);
     }
   };
 
@@ -141,10 +141,10 @@ export default function JobCard({
           </button>
 
           <button
-            onClick={handleOpenScript}
-            disabled={!job.scriptPath}
+            onClick={handleOpenPlist}
+            disabled={!job.plistPath}
             className="btn-icon text-gray-500 dark:text-gray-400 disabled:opacity-30"
-            title="Finder에서 보기"
+            title="plist 파일 보기"
           >
             <svg
               className="w-4 h-4"
