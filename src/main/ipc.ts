@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import {
   listAllJobs,
   findJobById,
@@ -89,6 +89,14 @@ export function registerIpcHandlers(): void {
     'settings:set',
     async (_event, settings: AppSettings): Promise<void> => {
       setSettings(settings);
+    }
+  );
+
+  // Finder에서 파일 위치 보기
+  ipcMain.handle(
+    'shell:showInFolder',
+    async (_event, filePath: string): Promise<void> => {
+      shell.showItemInFolder(filePath);
     }
   );
 }

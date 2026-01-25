@@ -36,6 +36,10 @@ const electronAPI = {
   // 설정 저장
   setSettings: (settings: AppSettings): Promise<void> =>
     ipcRenderer.invoke('settings:set', settings),
+
+  // Finder에서 파일 위치 보기
+  showInFolder: (filePath: string): Promise<void> =>
+    ipcRenderer.invoke('shell:showInFolder', filePath),
 };
 
 // contextBridge로 API 노출
