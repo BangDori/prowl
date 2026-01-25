@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Play, Folder, FileText, Loader2 } from "lucide-react";
 import { LaunchdJob, LogContent } from "../../shared/types";
 import ToggleSwitch from "./ToggleSwitch";
 import StatusBadge from "./StatusBadge";
@@ -109,34 +110,9 @@ export default function JobCard({
             title={job.isLoaded ? "지금 실행" : "먼저 활성화 필요"}
           >
             {isRunning ? (
-              <svg
-                className="w-4 h-4 animate-spin"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <Play className="w-4 h-4" />
             )}
           </button>
 
@@ -146,19 +122,7 @@ export default function JobCard({
             className="btn-icon text-gray-500 dark:text-gray-400 disabled:opacity-30"
             title="plist 파일 보기"
           >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-              />
-            </svg>
+            <Folder className="w-4 h-4" />
           </button>
 
           <button
@@ -168,40 +132,9 @@ export default function JobCard({
             title="로그 보기"
           >
             {loadingLogs ? (
-              <svg
-                className="w-4 h-4 animate-spin"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                />
-              </svg>
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
+              <FileText className="w-4 h-4" />
             )}
           </button>
         </div>

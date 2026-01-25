@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "electron-store": "^8.1.0",
+    "lucide-react": "^0.563.0",
     "menubar": "^9.4.0",
     "plist": "^3.1.0"
   },

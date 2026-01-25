@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ChevronLeft, X } from 'lucide-react';
 import { AppSettings } from '../../shared/types';
 
 interface SettingsProps {
@@ -78,9 +79,7 @@ export default function Settings({ onBack }: SettingsProps) {
             className="btn-icon text-gray-500 dark:text-gray-400"
             title="뒤로"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <h1 className="text-sm font-semibold">설정</h1>
         </div>
@@ -134,9 +133,7 @@ export default function Settings({ onBack }: SettingsProps) {
                     className="text-gray-400 hover:text-red-500 disabled:opacity-50"
                     title="삭제"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <X className="w-4 h-4" />
                   </button>
                 </li>
               ))}
