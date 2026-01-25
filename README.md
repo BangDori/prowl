@@ -1,6 +1,8 @@
-<h1 align="center">
-  🐱 Prowl
-</h1>
+<p align="center">
+  <img src="assets/prowl-logo.png" width="180" alt="Prowl Logo">
+</p>
+
+<h1 align="center">Prowl</h1>
 
 <p align="center">
   <strong>A cat that watches your background jobs from the macOS menubar</strong>
