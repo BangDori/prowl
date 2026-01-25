@@ -54,14 +54,3 @@ export interface JobCustomization {
 }
 
 export type JobCustomizations = Record<string, JobCustomization>;
-
-// IPC 채널 타입
-export type IpcChannels = {
-  'jobs:list': () => Promise<LaunchdJob[]>;
-  'jobs:toggle': (jobId: string) => Promise<JobActionResult>;
-  'jobs:run': (jobId: string) => Promise<JobActionResult>;
-  'jobs:logs': (jobId: string, lines?: number) => Promise<LogContent>;
-  'jobs:refresh': () => Promise<LaunchdJob[]>;
-  'settings:get': () => Promise<AppSettings>;
-  'settings:set': (settings: AppSettings) => Promise<void>;
-};

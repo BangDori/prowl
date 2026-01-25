@@ -16,5 +16,4 @@ export const WEEKDAY_NAMES: Record<number, string> = {
 export const DEFAULT_ICON = '⚙️';
 export const DEFAULT_DESCRIPTION = '설명 없음';
 
-export const REFRESH_INTERVAL_MS = 10000; // 10초마다 갱신
 export const LOG_LINES_DEFAULT = 50;

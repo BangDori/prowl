@@ -35,22 +35,11 @@ export function getAllJobCustomizations(): JobCustomizations {
   return store.get('jobCustomizations');
 }
 
-export function getJobCustomization(jobId: string): JobCustomization | null {
-  const customizations = store.get('jobCustomizations');
-  return customizations[jobId] || null;
-}
-
 export function setJobCustomization(
   jobId: string,
   customization: JobCustomization
 ): void {
   const customizations = store.get('jobCustomizations');
   customizations[jobId] = customization;
-  store.set('jobCustomizations', customizations);
-}
-
-export function deleteJobCustomization(jobId: string): void {
-  const customizations = store.get('jobCustomizations');
-  delete customizations[jobId];
   store.set('jobCustomizations', customizations);
 }
