@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLaunchdJobs } from "./hooks/useLaunchdJobs";
 import { useJobActions } from "./hooks/useJobActions";
 import JobList from "./components/JobList";
 import Header from "./components/Header";
 import Settings from "./components/Settings";
+import { JobCustomization, JobCustomizations } from "../shared/types";
 
 type View = "main" | "settings";
 
@@ -11,6 +12,24 @@ export default function App() {
   const [view, setView] = useState<View>("main");
   const { jobs, loading, error, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);
+  const [customizations, setCustomizations] = useState<JobCustomizations>({});
+
+  // 커스터마이징 데이터 로드
+  useEffect(() => {
+    window.electronAPI.getJobCustomizations().then(setCustomizations);
+  }, []);
+
+  // 커스터마이징 업데이트
+  const updateCustomization = useCallback(
+    async (jobId: string, customization: JobCustomization) => {
+      await window.electronAPI.setJobCustomization(jobId, customization);
+      setCustomizations((prev) => ({
+        ...prev,
+        [jobId]: customization,
+      }));
+    },
+    []
+  );
 
   const handleBackFromSettings = () => {
     setView("main");
@@ -62,7 +81,12 @@ export default function App() {
             </p>
           </div>
         ) : (
-          <JobList jobs={jobs} actions={actions} />
+          <JobList
+            jobs={jobs}
+            actions={actions}
+            customizations={customizations}
+            onUpdateCustomization={updateCustomization}
+          />
         )}
       </main>
     </div>

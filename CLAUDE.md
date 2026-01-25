@@ -58,19 +58,23 @@ Main Process (Electron)     Renderer Process (React)
 | `jobs:toggle` | 활성화/비활성화 토글 | `JobActionResult` |
 | `jobs:run` | 수동 실행 | `JobActionResult` |
 | `jobs:logs` | 로그 내용 조회 | `LogContent` |
+| `jobs:getCustomizations` | 모든 작업 커스터마이징 조회 | `JobCustomizations` |
+| `jobs:setCustomization` | 작업 커스터마이징 저장 | `void` |
 
-## Script Metadata Format
+## Job Customization
 
-스크립트 파일 상단에 추가하면 자동 인식:
+사용자가 UI에서 직접 작업의 아이콘, 이름, 설명을 편집할 수 있습니다.
+커스터마이징 데이터는 `electron-store`에 저장되며, plist 파일에는 영향을 주지 않습니다.
 
-```bash
-#!/bin/bash
-# @icon 📅
-# @description 매일 아침 리포트 생성
+```typescript
+interface JobCustomization {
+  displayName?: string;  // 사용자 지정 이름
+  icon?: string;         // 사용자 지정 아이콘 (이모지)
+  description?: string;  // 사용자 지정 설명
+}
+
+type JobCustomizations = Record<string, JobCustomization>;
 ```
-
-- `@icon`: 이모지 아이콘 (없으면 ⚙️)
-- `@description`: 작업 설명 (없으면 "설명 없음")
 
 ## launchd plist 경로
 

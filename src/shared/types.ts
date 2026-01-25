@@ -46,6 +46,15 @@ export const DEFAULT_SETTINGS: AppSettings = {
   patterns: [],
 };
 
+// 작업 커스터마이징
+export interface JobCustomization {
+  displayName?: string; // 사용자 지정 이름
+  icon?: string; // 사용자 지정 아이콘 (이모지)
+  description?: string; // 사용자 지정 설명
+}
+
+export type JobCustomizations = Record<string, JobCustomization>;
+
 // IPC 채널 타입
 export type IpcChannels = {
   'jobs:list': () => Promise<LaunchdJob[]>;
