@@ -82,44 +82,6 @@ pnpm package    # DMG 생성
 
 ---
 
-## 🛠 Tech Stack
-
-<p>
-  <img src="https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white" alt="Electron">
-  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind">
-  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
-</p>
-
----
-
-## 📁 Project Structure
-
-```
-prowl/
-├── src/
-│   ├── main/                 # Electron main process
-│   │   ├── services/
-│   │   │   ├── launchd.ts    # launchctl wrapper
-│   │   │   ├── plist-parser.ts
-│   │   │   ├── log-reader.ts
-│   │   │   └── script-metadata.ts
-│   │   ├── tray.ts           # menubar setup
-│   │   └── ipc.ts            # IPC handlers
-│   │
-│   ├── renderer/             # React UI
-│   │   ├── components/
-│   │   └── hooks/
-│   │
-│   └── shared/               # shared types
-│
-└── assets/
-    └── tray-icon.png         # menubar icon
-```
-
----
-
 ## 📜 License
 
 MIT © [BangDori](https://github.com/bangdori)

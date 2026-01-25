@@ -24,7 +24,7 @@ Main Process (Electron)     Renderer Process (React)
 │      ├── launchd.ts │     └─────────────────────┘
 │      ├── plist-parser.ts        ▲
 │      ├── log-reader.ts          │
-│      └── script-metadata.ts     │
+│      └── settings.ts            │
 └─────────────────────┘     ┌─────┴─────┐
          ▲                  │ preload/  │
          │                  │ index.ts  │
@@ -42,12 +42,12 @@ Main Process (Electron)     Renderer Process (React)
 |------|------|
 | `src/main/services/launchd.ts` | launchctl 명령어 래핑 (load/unload/start) |
 | `src/main/services/plist-parser.ts` | plist 파일에서 스케줄/경로 추출 |
-| `src/main/services/script-metadata.ts` | 스크립트에서 `@icon`, `@description` 추출 |
+| `src/main/services/settings.ts` | 앱 설정 및 작업 커스터마이징 저장 |
 | `src/main/services/log-reader.ts` | 로그 파일 읽기, 마지막 실행 정보 추출 |
 | `src/main/ipc.ts` | IPC 핸들러 등록 (jobs:list, jobs:toggle, etc.) |
 | `src/main/tray.ts` | menubar 패키지로 트레이 아이콘 생성 |
 | `src/preload/index.ts` | contextBridge로 electronAPI 노출 |
-| `src/shared/types.ts` | LaunchdJob, JobSchedule 등 공유 타입 |
+| `src/shared/types.ts` | LaunchdJob, JobSchedule, JobCustomization 등 공유 타입 |
 
 ## IPC Channels
 
