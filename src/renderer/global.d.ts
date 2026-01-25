@@ -1,4 +1,11 @@
-import { LaunchdJob, JobActionResult, LogContent, AppSettings } from '../shared/types';
+import {
+  LaunchdJob,
+  JobActionResult,
+  LogContent,
+  AppSettings,
+  JobCustomization,
+  JobCustomizations,
+} from "../shared/types";
 
 export interface ElectronAPI {
   listJobs: () => Promise<LaunchdJob[]>;
@@ -10,6 +17,12 @@ export interface ElectronAPI {
   getSettings: () => Promise<AppSettings>;
   setSettings: (settings: AppSettings) => Promise<void>;
   showInFolder: (filePath: string) => Promise<void>;
+  openExternal: (url: string) => Promise<void>;
+  getJobCustomizations: () => Promise<JobCustomizations>;
+  setJobCustomization: (
+    jobId: string,
+    customization: JobCustomization,
+  ) => Promise<void>;
 }
 
 declare global {

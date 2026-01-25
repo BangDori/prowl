@@ -1,5 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { LaunchdJob, JobActionResult, LogContent, AppSettings } from '../shared/types';
+import {
+  LaunchdJob,
+  JobActionResult,
+  LogContent,
+  AppSettings,
+  JobCustomization,
+  JobCustomizations,
+} from '../shared/types';
 
 /**
  * 렌더러 프로세스에 노출할 API
@@ -40,6 +47,21 @@ const electronAPI = {
   // Finder에서 파일 위치 보기
   showInFolder: (filePath: string): Promise<void> =>
     ipcRenderer.invoke('shell:showInFolder', filePath),
+
+  // 외부 URL 열기
+  openExternal: (url: string): Promise<void> =>
+    ipcRenderer.invoke('shell:openExternal', url),
+
+  // 모든 작업 커스터마이징 조회
+  getJobCustomizations: (): Promise<JobCustomizations> =>
+    ipcRenderer.invoke('jobs:getCustomizations'),
+
+  // 작업 커스터마이징 저장
+  setJobCustomization: (
+    jobId: string,
+    customization: JobCustomization
+  ): Promise<void> =>
+    ipcRenderer.invoke('jobs:setCustomization', jobId, customization),
 };
 
 // contextBridge로 API 노출

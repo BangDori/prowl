@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, X } from 'lucide-react';
-import { AppSettings } from '../../shared/types';
+import { useState, useEffect } from "react";
+import { ChevronLeft, X, Github } from "lucide-react";
 
 interface SettingsProps {
   onBack: () => void;
@@ -8,7 +7,7 @@ interface SettingsProps {
 
 export default function Settings({ onBack }: SettingsProps) {
   const [patterns, setPatterns] = useState<string[]>([]);
-  const [newPattern, setNewPattern] = useState('');
+  const [newPattern, setNewPattern] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -21,7 +20,7 @@ export default function Settings({ onBack }: SettingsProps) {
       const settings = await window.electronAPI.getSettings();
       setPatterns(settings.patterns);
     } catch (error) {
-      console.error('Failed to load settings:', error);
+      console.error("Failed to load settings:", error);
     } finally {
       setLoading(false);
     }
@@ -33,7 +32,7 @@ export default function Settings({ onBack }: SettingsProps) {
       await window.electronAPI.setSettings({ patterns: newPatterns });
       setPatterns(newPatterns);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error("Failed to save settings:", error);
     } finally {
       setSaving(false);
     }
@@ -43,11 +42,11 @@ export default function Settings({ onBack }: SettingsProps) {
     const trimmed = newPattern.trim();
     if (!trimmed) return;
     if (patterns.includes(trimmed)) {
-      setNewPattern('');
+      setNewPattern("");
       return;
     }
     saveSettings([...patterns, trimmed]);
-    setNewPattern('');
+    setNewPattern("");
   };
 
   const removePattern = (index: number) => {
@@ -56,7 +55,7 @@ export default function Settings({ onBack }: SettingsProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       addPattern();
     }
@@ -115,7 +114,9 @@ export default function Settings({ onBack }: SettingsProps) {
           {patterns.length === 0 ? (
             <div className="text-center py-6 text-gray-400 dark:text-gray-500 text-sm">
               <p>등록된 패턴이 없습니다.</p>
-              <p className="text-xs mt-1">패턴이 없으면 모든 작업이 표시됩니다.</p>
+              <p className="text-xs mt-1">
+                패턴이 없으면 모든 작업이 표시됩니다.
+              </p>
             </div>
           ) : (
             <ul className="space-y-1">
@@ -141,6 +142,25 @@ export default function Settings({ onBack }: SettingsProps) {
           )}
         </section>
       </main>
+
+      <footer className="fixed bottom-0 left-0 right-0 bg-surface-light dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 px-3 py-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-400 dark:text-gray-500">
+            추가 기능 제안 및 이슈 제보는 언제나 환영입니다
+          </p>
+          <button
+            onClick={() =>
+              window.electronAPI.openExternal(
+                "https://github.com/BangDori/prowl",
+              )
+            }
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            title="GitHub"
+          >
+            <Github className="w-4 h-4" />
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }

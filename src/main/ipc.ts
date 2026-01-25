@@ -6,8 +6,20 @@ import {
   startJob,
 } from './services/launchd';
 import { readLogContent } from './services/log-reader';
-import { getSettings, setSettings } from './services/settings';
-import { LaunchdJob, JobActionResult, LogContent, AppSettings } from '../shared/types';
+import {
+  getSettings,
+  setSettings,
+  getAllJobCustomizations,
+  setJobCustomization,
+} from './services/settings';
+import {
+  LaunchdJob,
+  JobActionResult,
+  LogContent,
+  AppSettings,
+  JobCustomization,
+  JobCustomizations,
+} from '../shared/types';
 import { LOG_LINES_DEFAULT } from './constants';
 
 /**
@@ -97,6 +109,34 @@ export function registerIpcHandlers(): void {
     'shell:showInFolder',
     async (_event, filePath: string): Promise<void> => {
       shell.showItemInFolder(filePath);
+    }
+  );
+
+  // 외부 URL 열기
+  ipcMain.handle(
+    'shell:openExternal',
+    async (_event, url: string): Promise<void> => {
+      shell.openExternal(url);
+    }
+  );
+
+  // 모든 작업 커스터마이징 조회
+  ipcMain.handle(
+    'jobs:getCustomizations',
+    async (): Promise<JobCustomizations> => {
+      return getAllJobCustomizations();
+    }
+  );
+
+  // 작업 커스터마이징 저장
+  ipcMain.handle(
+    'jobs:setCustomization',
+    async (
+      _event,
+      jobId: string,
+      customization: JobCustomization
+    ): Promise<void> => {
+      setJobCustomization(jobId, customization);
     }
   );
 }
