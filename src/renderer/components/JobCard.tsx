@@ -108,7 +108,7 @@ export default function JobCard({
     <div className="job-card">
       {isEditing ? (
         // 편집 모드
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -117,7 +117,7 @@ export default function JobCard({
                 setEditForm((f) => ({ ...f, icon: e.target.value }))
               }
               placeholder={job.icon}
-              className="w-10 text-center text-xl bg-gray-100 dark:bg-gray-700 rounded px-1 py-0.5"
+              className="w-12 text-center text-xl input-field"
               maxLength={2}
             />
             <input
@@ -127,7 +127,7 @@ export default function JobCard({
                 setEditForm((f) => ({ ...f, displayName: e.target.value }))
               }
               placeholder={job.name}
-              className="flex-1 text-sm bg-gray-100 dark:bg-gray-700 rounded px-2 py-1"
+              className="flex-1 input-field"
             />
           </div>
           <input
@@ -137,19 +137,19 @@ export default function JobCard({
               setEditForm((f) => ({ ...f, description: e.target.value }))
             }
             placeholder={job.description || "설명 입력..."}
-            className="w-full text-xs bg-gray-100 dark:bg-gray-700 rounded px-2 py-1"
+            className="w-full input-field"
           />
-          <div className="flex justify-end gap-1">
+          <div className="flex justify-end gap-2">
             <button
               onClick={cancelEditing}
-              className="btn-icon text-gray-500 hover:text-red-500"
+              className="btn-ghost text-gray-500 hover:text-red-500"
               title="취소"
             >
               <X className="w-4 h-4" />
             </button>
             <button
               onClick={saveEditing}
-              className="btn-icon text-gray-500 hover:text-green-500"
+              className="btn-ghost text-gray-500 hover:text-green-500"
               title="저장"
             >
               <Check className="w-4 h-4" />
@@ -160,23 +160,25 @@ export default function JobCard({
         // 일반 모드
         <>
           {/* 상단: 아이콘, 이름, 토글 */}
-          <div className="flex items-start justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{displayIcon}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{displayIcon}</span>
               <div>
-                <h3 className="font-medium text-sm">{displayName}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                  {displayName}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-500">
                   {job.scheduleText}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <button
                 onClick={startEditing}
                 className="btn-icon text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                 title="편집"
               >
-                <Pencil className="w-3 h-3" />
+                <Pencil className="w-3.5 h-3.5" />
               </button>
               <ToggleSwitch
                 enabled={job.isLoaded}
@@ -186,15 +188,18 @@ export default function JobCard({
             </div>
           </div>
 
-          {/* 중단: 설명 및 마지막 실행 */}
-          <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-            {displayDescription}
-          </p>
+          {/* 중단: 설명 */}
+          {displayDescription && (
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
+              {displayDescription}
+            </p>
+          )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-              <span>마지막 실행:</span>
-              <span>{formatLastRun()}</span>
+          {/* 하단: 마지막 실행 + 액션 버튼 */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-prowl-border">
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-500">
+              <span>마지막 실행</span>
+              <span className="text-gray-700 dark:text-gray-300">{formatLastRun()}</span>
               {job.lastRun && <StatusBadge success={job.lastRun.success} />}
             </div>
 
@@ -203,7 +208,7 @@ export default function JobCard({
               <button
                 onClick={onRun}
                 disabled={!job.isLoaded || isRunning}
-                className="btn-icon text-gray-500 dark:text-gray-400 disabled:opacity-30"
+                className="btn-icon text-gray-400 dark:text-gray-500 disabled:opacity-30"
                 title={job.isLoaded ? "지금 실행" : "먼저 활성화 필요"}
               >
                 {isRunning ? (
@@ -216,7 +221,7 @@ export default function JobCard({
               <button
                 onClick={handleOpenPlist}
                 disabled={!job.plistPath}
-                className="btn-icon text-gray-500 dark:text-gray-400 disabled:opacity-30"
+                className="btn-icon text-gray-400 dark:text-gray-500 disabled:opacity-30"
                 title="plist 파일 보기"
               >
                 <Folder className="w-4 h-4" />
@@ -225,7 +230,7 @@ export default function JobCard({
               <button
                 onClick={handleViewLogs}
                 disabled={!job.logPath || loadingLogs}
-                className="btn-icon text-gray-500 dark:text-gray-400 disabled:opacity-30"
+                className="btn-icon text-gray-400 dark:text-gray-500 disabled:opacity-30"
                 title="로그 보기"
               >
                 {loadingLogs ? (

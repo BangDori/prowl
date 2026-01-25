@@ -14,14 +14,14 @@ export default function LogViewer({
 }: LogViewerProps) {
 
   return (
-    <div className="mt-3 border-t border-gray-200 dark:border-gray-700 pt-3">
+    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-prowl-border">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-gray-500 dark:text-gray-500">
           {lastModified && `마지막 수정: ${formatDateTime(lastModified)}`}
         </span>
         <button
           onClick={onClose}
-          className="btn-icon text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          className="btn-icon text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           title="닫기"
         >
           <X className="w-4 h-4" />

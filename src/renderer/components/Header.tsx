@@ -8,8 +8,11 @@ interface HeaderProps {
 
 export default function Header({ onRefresh, onSettings, loading }: HeaderProps) {
   return (
-    <header className="sticky top-0 bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-gray-700 px-3 py-2 z-10">
-      <div className="flex items-center justify-end">
+    <header className="app-header">
+      <div className="flex items-center justify-between">
+        <h1 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+          Prowl
+        </h1>
         <div className="flex items-center gap-1">
           <button
             onClick={onRefresh}

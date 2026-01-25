@@ -15,9 +15,10 @@ body {
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
+  @apply bg-surface-light dark:bg-surface-dark;
 }
 
-/* 스크롤바 숨기기 (스크롤은 유지) */
+/* 스크롤바 숨기기 */
 ::-webkit-scrollbar {
   display: none;
 }
@@ -27,9 +28,9 @@ body {
   scrollbar-width: none;
 }
 
-/* 토글 스위치 커스텀 */
+/* 토글 스위치 */
 .toggle-switch {
-  @apply relative inline-flex h-5 w-9 items-center rounded-full transition-colors;
+  @apply relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-200;
 }
 
 .toggle-switch-on {
@@ -37,11 +38,11 @@ body {
 }
 
 .toggle-switch-off {
-  @apply bg-gray-300 dark:bg-gray-600;
+  @apply bg-gray-300 dark:bg-prowl-border;
 }
 
 .toggle-switch-knob {
-  @apply inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform;
+  @apply inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200;
 }
 
 .toggle-switch-knob-on {
@@ -54,29 +55,68 @@ body {
 
 /* 버튼 호버 효과 */
 .btn-icon {
-  @apply p-1.5 rounded-md transition-colors;
-  @apply hover:bg-gray-200 dark:hover:bg-gray-700;
-  @apply active:bg-gray-300 dark:active:bg-gray-600;
+  @apply p-1.5 rounded-lg transition-all duration-200;
+  @apply hover:bg-gray-100 dark:hover:bg-prowl-card;
+  @apply active:scale-95;
 }
 
-/* 카드 스타일 */
+.btn-icon:hover {
+  @apply text-gray-700 dark:text-gray-200;
+}
+
+/* 카드 스타일 - 모던 다크 */
 .job-card {
-  @apply bg-card-light dark:bg-card-dark rounded-lg p-3 mb-2;
-  @apply border border-gray-200 dark:border-gray-700;
+  @apply bg-card-light dark:bg-prowl-card rounded-xl p-4;
+  @apply border border-gray-200 dark:border-prowl-border;
   @apply transition-all duration-200;
 }
 
 .job-card:hover {
-  @apply border-gray-300 dark:border-gray-600;
+  @apply border-gray-300 dark:border-prowl-border-hover;
+  @apply dark:shadow-lg;
 }
 
-/* 로그 뷰어 */
+/* 로그 뷰어 - 터미널 스타일 */
 .log-viewer {
   @apply font-mono text-xs leading-relaxed;
-  @apply bg-gray-900 text-gray-100 p-3 rounded-md;
+  @apply bg-black/90 text-green-400 p-4 rounded-lg;
   @apply overflow-auto max-h-64;
+  @apply border border-prowl-border;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* 인풋 필드 */
+.input-field {
+  @apply px-3 py-2 text-sm rounded-lg transition-all duration-200;
+  @apply bg-white dark:bg-prowl-card;
+  @apply border border-gray-300 dark:border-prowl-border;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
+  @apply placeholder:text-gray-400 dark:placeholder:text-gray-600;
+}
+
+/* 버튼 - 프라이머리 */
+.btn-primary {
+  @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
+  @apply bg-blue-500 text-white;
+  @apply hover:bg-blue-600;
+  @apply active:scale-95;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* 버튼 - 고스트 */
+.btn-ghost {
+  @apply px-3 py-1.5 text-sm rounded-lg transition-all duration-200;
+  @apply text-gray-600 dark:text-gray-400;
+  @apply hover:bg-gray-100 dark:hover:bg-prowl-card;
+  @apply hover:text-gray-900 dark:hover:text-gray-200;
+}
+
+/* 태그/뱃지 */
+.tag {
+  @apply inline-flex items-center px-2 py-1 text-xs rounded-md;
+  @apply bg-gray-100 dark:bg-prowl-card text-gray-600 dark:text-gray-400;
+  @apply border border-gray-200 dark:border-prowl-border;
 }
 
 /* 애니메이션 */
@@ -95,5 +135,53 @@ body {
 
 /* 로딩 스켈레톤 */
 .skeleton {
-  @apply bg-gray-200 dark:bg-gray-700 rounded animate-pulse;
+  @apply bg-gray-200 dark:bg-prowl-card rounded-lg;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 섹션 헤더 */
+.section-title {
+  @apply text-xs font-semibold uppercase tracking-wider;
+  @apply text-gray-500 dark:text-gray-500;
+}
+
+/* 서브텍스트 */
+.text-muted {
+  @apply text-gray-500 dark:text-gray-500;
+}
+
+/* 성공/실패 상태 */
+.status-success {
+  @apply text-emerald-500 dark:text-emerald-400;
+}
+
+.status-error {
+  @apply text-red-500 dark:text-red-400;
+}
+
+/* 헤더 */
+.app-header {
+  @apply sticky top-0 z-10 px-4 py-3;
+  @apply bg-surface-light/80 dark:bg-surface-dark/80;
+  @apply backdrop-blur-xl;
+  @apply border-b border-gray-200 dark:border-prowl-border;
+}
+
+/* Empty state */
+.empty-state {
+  @apply text-center py-12;
+  @apply text-gray-400 dark:text-gray-600;
+}
+
+.empty-state-icon {
+  @apply text-5xl mb-3 opacity-50;
 }
