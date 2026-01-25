@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 기본 스타일 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 스크롤바 숨기기 (스크롤은 유지) */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 토글 스위치 커스텀 */
+.toggle-switch {
+  @apply relative inline-flex h-5 w-9 items-center rounded-full transition-colors;
+}
+
+.toggle-switch-on {
+  @apply bg-green-500;
+}
+
+.toggle-switch-off {
+  @apply bg-gray-300 dark:bg-gray-600;
+}
+
+.toggle-switch-knob {
+  @apply inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform;
+}
+
+.toggle-switch-knob-on {
+  @apply translate-x-4;
+}
+
+.toggle-switch-knob-off {
+  @apply translate-x-0.5;
+}
+
+/* 버튼 호버 효과 */
+.btn-icon {
+  @apply p-1.5 rounded-md transition-colors;
+  @apply hover:bg-gray-200 dark:hover:bg-gray-700;
+  @apply active:bg-gray-300 dark:active:bg-gray-600;
+}
+
+/* 카드 스타일 */
+.job-card {
+  @apply bg-card-light dark:bg-card-dark rounded-lg p-3 mb-2;
+  @apply border border-gray-200 dark:border-gray-700;
+  @apply transition-all duration-200;
+}
+
+.job-card:hover {
+  @apply border-gray-300 dark:border-gray-600;
+}
+
+/* 로그 뷰어 */
+.log-viewer {
+  @apply font-mono text-xs leading-relaxed;
+  @apply bg-gray-900 text-gray-100 p-3 rounded-md;
+  @apply overflow-auto max-h-64;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* 애니메이션 */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 1.5s linear infinite;
+}
+
+/* 로딩 스켈레톤 */
+.skeleton {
+  @apply bg-gray-200 dark:bg-gray-700 rounded animate-pulse;
+}
