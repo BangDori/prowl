@@ -14,40 +14,52 @@ pnpm package    # DMG 패키징
 ## Architecture
 
 ```
-Main Process (Electron)     Renderer Process (React)
-┌─────────────────────┐     ┌─────────────────────┐
-│  src/main/          │     │  src/renderer/      │
-│  ├── index.ts       │     │  ├── App.tsx        │
-│  ├── tray.ts        │ IPC │  ├── components/    │
-│  ├── ipc.ts         │◄───►│  └── hooks/         │
-│  └── services/      │     │                     │
-│      ├── launchd.ts │     └─────────────────────┘
-│      ├── plist-parser.ts        ▲
-│      ├── log-reader.ts          │
-│      └── settings.ts            │
-└─────────────────────┘     ┌─────┴─────┐
-         ▲                  │ preload/  │
-         │                  │ index.ts  │
-         ▼                  └───────────┘
-┌─────────────────────┐
-│  ~/Library/         │
-│  LaunchAgents/      │
-│  com.claude.*.plist │
-└─────────────────────┘
+Main Process (Electron)          Renderer Process (React)
+┌────────────────────────┐       ┌─────────────────────┐
+│  src/main/             │       │  src/renderer/      │
+│  ├── index.ts          │       │  ├── App.tsx        │
+│  ├── tray.ts           │  IPC  │  ├── components/    │
+│  ├── ipc.ts            │◄─────►│  ├── hooks/         │
+│  ├── constants.ts      │       │  └── utils/         │
+│  ├── utils/            │       │      └── date.ts    │
+│  │   ├── command.ts    │       └─────────────────────┘
+│  │   └── pattern-matcher.ts           ▲
+│  └── services/         │       ┌──────┴──────┐
+│      ├── launchd.ts    │       │  preload/   │
+│      ├── plist-parser.ts       │  index.ts   │
+│      ├── log-reader.ts │       └─────────────┘
+│      ├── log-analyzer.ts
+│      ├── script-metadata.ts
+│      └── settings.ts   │
+└────────────────────────┘
+         ▲
+         │              ┌─────────────────────┐
+         ▼              │  src/shared/        │
+┌────────────────────┐  │  ├── types.ts       │
+│  ~/Library/        │  │  └── constants.ts   │
+│  LaunchAgents/     │  └─────────────────────┘
+│  *.plist           │
+└────────────────────┘
 ```
 
 ## Key Files
 
 | 파일 | 역할 |
 |------|------|
+| `src/main/constants.ts` | 상수 정의 (매직 넘버, 로그 패턴 등) |
+| `src/main/utils/command.ts` | launchctl 명령어 실행 유틸리티 |
+| `src/main/utils/pattern-matcher.ts` | 패턴 매칭 유틸리티 |
 | `src/main/services/launchd.ts` | launchctl 명령어 래핑 (load/unload/start) |
 | `src/main/services/plist-parser.ts` | plist 파일에서 스케줄/경로 추출 |
+| `src/main/services/log-reader.ts` | 로그 파일 읽기 |
+| `src/main/services/log-analyzer.ts` | 로그 분석 (성공/실패 판단) |
 | `src/main/services/settings.ts` | 앱 설정 및 작업 커스터마이징 저장 |
-| `src/main/services/log-reader.ts` | 로그 파일 읽기, 마지막 실행 정보 추출 |
-| `src/main/ipc.ts` | IPC 핸들러 등록 (jobs:list, jobs:toggle, etc.) |
+| `src/main/ipc.ts` | IPC 핸들러 등록 |
 | `src/main/tray.ts` | menubar 패키지로 트레이 아이콘 생성 |
 | `src/preload/index.ts` | contextBridge로 electronAPI 노출 |
-| `src/shared/types.ts` | LaunchdJob, JobSchedule, JobCustomization 등 공유 타입 |
+| `src/shared/types.ts` | 공유 타입 정의 |
+| `src/shared/constants.ts` | 공유 상수 (main/renderer 공통) |
+| `src/renderer/utils/date.ts` | 날짜/시간 포맷 유틸리티 |
 
 ## IPC Channels
 
@@ -79,7 +91,7 @@ type JobCustomizations = Record<string, JobCustomization>;
 ## launchd plist 경로
 
 - 디렉토리: `~/Library/LaunchAgents/`
-- 패턴: `com.claude.*.plist`
+- 패턴: 설정에서 지정 (기본값: 모든 plist)
 
 ## Build Configuration
 
@@ -112,11 +124,17 @@ interface LaunchdJob {
   lastRun: LastRunInfo | null;
 }
 
-interface JobSchedule {
-  type: 'calendar' | 'interval' | 'keepAlive' | 'unknown';
-  weekdays?: number[];  // 0=일, 1=월, ...
-  hour?: number;
-  minute?: number;
-  intervalSeconds?: number;
-}
+// 판별 유니온 타입
+type JobSchedule =
+  | { type: 'calendar'; weekdays?: number[]; hour?: number; minute?: number }
+  | { type: 'interval'; intervalSeconds: number }
+  | { type: 'keepAlive' }
+  | { type: 'unknown' };
 ```
+
+## Code Organization Principles
+
+- **상수**: 매직 넘버는 `constants.ts`에 정의
+- **유틸리티**: 재사용 가능한 함수는 `utils/` 폴더에 분리
+- **타입 안전성**: `Promise<any>` 대신 구체적인 타입 사용
+- **SRP (단일 책임 원칙)**: 각 함수/모듈은 하나의 책임만 담당

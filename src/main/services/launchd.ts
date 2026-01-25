@@ -1,4 +1,4 @@
-import { execSync, exec } from 'child_process';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { LaunchdJob, JobActionResult } from '../../shared/types';
@@ -19,6 +19,8 @@ import {
 } from './plist-parser';
 import { getLastRunInfo } from './log-reader';
 import { extractScriptMetadata } from './script-metadata';
+import { executeCommand } from '../utils/command';
+import { matchesAnyPattern } from '../utils/pattern-matcher';
 
 /**
  * 설정된 패턴에 맞는 모든 plist 파일 찾기
@@ -30,12 +32,7 @@ export function findPlistFiles(): string[] {
     const files = fs.readdirSync(LAUNCH_AGENTS_DIR);
 
     return files
-      .filter((f) => {
-        if (!f.endsWith('.plist')) return false;
-        // 패턴이 없으면 모든 plist 파일 반환
-        if (patterns.length === 0) return true;
-        return patterns.some((pattern) => f.startsWith(pattern));
-      })
+      .filter((f) => f.endsWith('.plist') && matchesAnyPattern(f, patterns))
       .map((f) => path.join(LAUNCH_AGENTS_DIR, f));
   } catch (error) {
     console.error('Failed to read LaunchAgents directory:', error);
@@ -58,8 +55,7 @@ export function getLoadedJobs(): Set<string> {
       const parts = line.split('\t');
       if (parts.length >= 3) {
         const label = parts[2];
-        // 패턴이 없으면 모든 작업 포함
-        if (patterns.length === 0 || patterns.some((pattern) => label.startsWith(pattern))) {
+        if (matchesAnyPattern(label, patterns)) {
           loadedLabels.add(label);
         }
       }
@@ -84,45 +80,30 @@ export function isJobLoaded(label: string): boolean {
  * 작업 로드 (활성화)
  */
 export function loadJob(plistPath: string): JobActionResult {
-  try {
-    execSync(`launchctl load "${plistPath}"`, { encoding: 'utf-8' });
-    return { success: true, message: '작업이 활성화되었습니다.' };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: `활성화 실패: ${error.message || error}`,
-    };
-  }
+  return executeCommand(`launchctl load "${plistPath}"`, {
+    successMessage: '작업이 활성화되었습니다.',
+    errorPrefix: '활성화 실패',
+  });
 }
 
 /**
  * 작업 언로드 (비활성화)
  */
 export function unloadJob(plistPath: string): JobActionResult {
-  try {
-    execSync(`launchctl unload "${plistPath}"`, { encoding: 'utf-8' });
-    return { success: true, message: '작업이 비활성화되었습니다.' };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: `비활성화 실패: ${error.message || error}`,
-    };
-  }
+  return executeCommand(`launchctl unload "${plistPath}"`, {
+    successMessage: '작업이 비활성화되었습니다.',
+    errorPrefix: '비활성화 실패',
+  });
 }
 
 /**
  * 작업 수동 실행
  */
 export function startJob(label: string): JobActionResult {
-  try {
-    execSync(`launchctl start "${label}"`, { encoding: 'utf-8' });
-    return { success: true, message: '작업이 시작되었습니다.' };
-  } catch (error: any) {
-    return {
-      success: false,
-      message: `실행 실패: ${error.message || error}`,
-    };
-  }
+  return executeCommand(`launchctl start "${label}"`, {
+    successMessage: '작업이 시작되었습니다.',
+    errorPrefix: '실행 실패',
+  });
 }
 
 /**
@@ -130,11 +111,7 @@ export function startJob(label: string): JobActionResult {
  */
 export function toggleJob(plistPath: string, label: string): JobActionResult {
   const loaded = isJobLoaded(label);
-  if (loaded) {
-    return unloadJob(plistPath);
-  } else {
-    return loadJob(plistPath);
-  }
+  return loaded ? unloadJob(plistPath) : loadJob(plistPath);
 }
 
 /**
@@ -154,8 +131,6 @@ export function listAllJobs(): LaunchdJob[] {
     const schedule = extractSchedule(data);
     const logPath = extractLogPath(data);
     const scriptPath = extractScriptPath(data);
-
-    // 스크립트에서 메타데이터 추출 (우선), 없으면 constants에서 가져옴
     const metadata = extractScriptMetadata(scriptPath);
 
     const job: LaunchdJob = {
@@ -176,10 +151,20 @@ export function listAllJobs(): LaunchdJob[] {
     jobs.push(job);
   }
 
-  // 마지막 실행 시간 기준 정렬 (최근 실행이 위로, 실행 기록 없으면 맨 아래)
+  return sortJobsByLastRun(jobs);
+}
+
+/**
+ * 마지막 실행 시간 기준 정렬 (최근 실행이 위로)
+ */
+function sortJobsByLastRun(jobs: LaunchdJob[]): LaunchdJob[] {
   return jobs.sort((a, b) => {
-    const aTime = a.lastRun?.timestamp ? new Date(a.lastRun.timestamp).getTime() : 0;
-    const bTime = b.lastRun?.timestamp ? new Date(b.lastRun.timestamp).getTime() : 0;
+    const aTime = a.lastRun?.timestamp
+      ? new Date(a.lastRun.timestamp).getTime()
+      : 0;
+    const bTime = b.lastRun?.timestamp
+      ? new Date(b.lastRun.timestamp).getTime()
+      : 0;
     return bTime - aTime;
   });
 }

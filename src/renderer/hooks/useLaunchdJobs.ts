@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LaunchdJob } from '../../shared/types';
+import { JOB_POLLING_INTERVAL_MS } from '../../shared/constants';
 
 interface UseLaunchdJobsResult {
   jobs: LaunchdJob[];
@@ -39,8 +40,8 @@ export function useLaunchdJobs(): UseLaunchdJobsResult {
       fetchJobs();
     });
 
-    // 주기적 폴링 (30초)
-    const interval = setInterval(fetchJobs, 30000);
+    // 주기적 폴링
+    const interval = setInterval(fetchJobs, JOB_POLLING_INTERVAL_MS);
 
     return () => {
       unsubscribe();

@@ -13,12 +13,31 @@ export interface LaunchdJob {
   lastRun: LastRunInfo | null;
 }
 
-export interface JobSchedule {
-  type: 'calendar' | 'interval' | 'keepAlive' | 'unknown';
+// 판별 유니온 타입으로 타입 안전성 확보
+export type JobSchedule =
+  | CalendarSchedule
+  | IntervalSchedule
+  | KeepAliveSchedule
+  | UnknownSchedule;
+
+export interface CalendarSchedule {
+  type: 'calendar';
   weekdays?: number[];
   hour?: number;
   minute?: number;
-  intervalSeconds?: number;
+}
+
+export interface IntervalSchedule {
+  type: 'interval';
+  intervalSeconds: number;
+}
+
+export interface KeepAliveSchedule {
+  type: 'keepAlive';
+}
+
+export interface UnknownSchedule {
+  type: 'unknown';
 }
 
 export interface LastRunInfo {

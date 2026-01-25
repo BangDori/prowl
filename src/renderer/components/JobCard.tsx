@@ -1,17 +1,31 @@
-import { useState } from "react";
-import { Play, Folder, FileText, Loader2, Pencil, Check, X } from "lucide-react";
-import { LaunchdJob, LogContent, JobCustomization } from "../../shared/types";
-import ToggleSwitch from "./ToggleSwitch";
-import StatusBadge from "./StatusBadge";
-import LogViewer from "./LogViewer";
+import { useState } from 'react';
+import {
+  Play,
+  Folder,
+  FileText,
+  Loader2,
+  Pencil,
+  Check,
+  X,
+} from 'lucide-react';
+import {
+  LaunchdJob,
+  LogContent,
+  JobCustomization,
+  JobActionResult,
+} from '../../shared/types';
+import ToggleSwitch from './ToggleSwitch';
+import StatusBadge from './StatusBadge';
+import LogViewer from './LogViewer';
+import { formatRelativeTime } from '../utils/date';
 
 interface JobCardProps {
   job: LaunchdJob;
   customization?: JobCustomization;
   isToggling: boolean;
   isRunning: boolean;
-  onToggle: () => Promise<any>;
-  onRun: () => Promise<any>;
+  onToggle: () => Promise<JobActionResult>;
+  onRun: () => Promise<JobActionResult>;
   onViewLogs: () => Promise<LogContent>;
   onUpdateCustomization: (customization: JobCustomization) => Promise<void>;
 }
@@ -86,24 +100,8 @@ export default function JobCard({
   };
 
   const formatLastRun = (): string => {
-    if (!job.lastRun) return "-";
-
-    const now = new Date();
-    const runTime = new Date(job.lastRun.timestamp);
-    const diffMs = now.getTime() - runTime.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "방금 전";
-    if (diffMins < 60) return `${diffMins}분 전`;
-    if (diffHours < 24) return `${diffHours}시간 전`;
-    if (diffDays < 7) return `${diffDays}일 전`;
-
-    return runTime.toLocaleDateString("ko-KR", {
-      month: "short",
-      day: "numeric",
-    });
+    if (!job.lastRun) return '-';
+    return formatRelativeTime(new Date(job.lastRun.timestamp));
   };
 
   return (

@@ -1,6 +1,7 @@
-import { menubar, Menubar } from "menubar";
-import { app, nativeImage, Menu, shell } from "electron";
-import * as path from "path";
+import { menubar, Menubar } from 'menubar';
+import { app, nativeImage, Menu, shell } from 'electron';
+import * as path from 'path';
+import { WINDOW, DEV_SERVER_PORT } from './constants';
 
 let mb: Menubar | null = null;
 
@@ -29,8 +30,8 @@ export function createMenubar(): Menubar {
 
   // 렌더러 URL - 프로덕션에서는 빌드된 파일 사용
   const indexUrl = isDev
-    ? "http://localhost:5173"
-    : `file://${path.join(__dirname, "../renderer/index.html")}`;
+    ? `http://localhost:${DEV_SERVER_PORT}`
+    : `file://${path.join(__dirname, '../renderer/index.html')}`;
 
   console.log("Loading URL:", indexUrl);
 
@@ -41,8 +42,8 @@ export function createMenubar(): Menubar {
     preloadWindow: true,
     showDockIcon: false,
     browserWindow: {
-      width: 400,
-      height: 500,
+      width: WINDOW.WIDTH,
+      height: WINDOW.HEIGHT,
       resizable: false,
       movable: false,
       minimizable: false,

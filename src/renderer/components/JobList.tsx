@@ -1,12 +1,18 @@
-import { LaunchdJob, JobCustomization, JobCustomizations } from '../../shared/types';
+import {
+  LaunchdJob,
+  JobCustomization,
+  JobCustomizations,
+  JobActionResult,
+  LogContent,
+} from '../../shared/types';
 import JobCard from './JobCard';
 
 interface JobActionsHook {
   toggling: string | null;
   running: string | null;
-  toggle: (jobId: string) => Promise<any>;
-  run: (jobId: string) => Promise<any>;
-  getLogs: (jobId: string, lines?: number) => Promise<any>;
+  toggle: (jobId: string) => Promise<JobActionResult>;
+  run: (jobId: string) => Promise<JobActionResult>;
+  getLogs: (jobId: string, lines?: number) => Promise<LogContent>;
 }
 
 interface JobListProps {

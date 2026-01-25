@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { LastRunInfo, LogContent } from '../../shared/types';
 import { LOG_LINES_DEFAULT } from '../constants';
+import { analyzeLogContent } from './log-analyzer';
 
 /**
  * 로그 파일에서 마지막 실행 정보 추출
@@ -15,59 +16,12 @@ export function getLastRunInfo(logPath: string): LastRunInfo | null {
     const content = fs.readFileSync(logPath, 'utf-8');
     const lines = content.trim().split('\n');
 
-    // 마지막 몇 줄에서 성공/실패 패턴 찾기
-    const lastLines = lines.slice(-20).join('\n').toLowerCase();
-
-    // 성공 패턴
-    const successPatterns = [
-      '완료',
-      'complete',
-      'success',
-      'finished',
-      '리포트 완료',
-      'slack 전송 완료',
-    ];
-
-    // 실패 패턴
-    const failurePatterns = [
-      'error',
-      'failed',
-      'exception',
-      '실패',
-      'unable to',
-    ];
-
-    let success = true;
-    let message: string | undefined;
-
-    for (const pattern of failurePatterns) {
-      if (lastLines.includes(pattern)) {
-        success = false;
-        // 에러 메시지 추출 시도
-        const errorLine = lines
-          .slice(-10)
-          .find((l) => l.toLowerCase().includes(pattern));
-        if (errorLine) {
-          message = errorLine.substring(0, 100);
-        }
-        break;
-      }
-    }
-
-    // 명시적 성공 메시지가 있으면 확실히 성공
-    if (!success) {
-      for (const pattern of successPatterns) {
-        if (lastLines.includes(pattern)) {
-          success = true;
-          break;
-        }
-      }
-    }
+    const analysis = analyzeLogContent(lines);
 
     return {
       timestamp: stats.mtime,
-      success,
-      message,
+      success: analysis.success,
+      message: analysis.message,
     };
   } catch (error) {
     console.error(`Failed to read log: ${logPath}`, error);
@@ -93,8 +47,6 @@ export function readLogContent(
     const stats = fs.statSync(logPath);
     const content = fs.readFileSync(logPath, 'utf-8');
     const allLines = content.split('\n');
-
-    // 마지막 N줄만 반환
     const lastLines = allLines.slice(-lines).join('\n');
 
     return {

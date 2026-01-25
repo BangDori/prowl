@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { SCRIPT_METADATA_LINES } from '../constants';
 
 interface ScriptMetadata {
   icon: string | null;
@@ -23,7 +24,7 @@ export function extractScriptMetadata(scriptPath: string): ScriptMetadata {
     }
 
     const content = fs.readFileSync(scriptPath, 'utf-8');
-    const lines = content.split('\n').slice(0, 10); // 상위 10줄만 확인
+    const lines = content.split('\n').slice(0, SCRIPT_METADATA_LINES);
 
     for (const line of lines) {
       // @icon 추출
