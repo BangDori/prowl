@@ -43,6 +43,8 @@
   "build": {
     "appId": "com.bangdori.prowl",
     "productName": "Prowl",
+    "asar": true,
+    "npmRebuild": true,
     "mac": {
       "category": "public.app-category.utilities",
       "icon": "assets/icon.icns",
@@ -52,7 +54,8 @@
     },
     "files": [
       "dist/**/*",
-      "assets/**/*"
+      "assets/**/*",
+      "package.json"
     ],
     "directories": {
       "output": "release"
