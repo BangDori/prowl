@@ -135,15 +135,17 @@ launchctl load ~/Library/prowl/your-job.plist
 3. Full Disk Access 권한이 필요할 수 있습니다
    - `시스템 설정 → 개인정보 보호 및 보안 → 전체 디스크 접근 권한`
 
-### "확인되지 않은 개발자" 경고
+### "손상된 파일" 또는 "확인되지 않은 개발자" 경고
 
-`시스템 설정 → 개인정보 보호 및 보안 → 확인 없이 열기`
+현재 앱이 Apple 공증(Notarization)을 받지 않아 발생합니다.
 
-또는:
+**터미널에서 아래 명령어를 실행하세요:**
 
 ```bash
 xattr -cr /Applications/Prowl.app
 ```
+
+그 후 앱을 다시 실행하면 정상 작동합니다.
 
 ### 앱이 메뉴바에 안 보여요
 
