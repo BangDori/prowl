@@ -35,9 +35,8 @@ Main Process (Electron)          Renderer Process (React)
          │              ┌─────────────────────┐
          ▼              │  src/shared/        │
 ┌────────────────────┐  │  ├── types.ts       │
-│  ~/Library/        │  │  └── constants.ts   │
-│  prowl/     │  └─────────────────────┘
-│  *.plist           │
+│  ~/Library/prowl/  │  │  └── constants.ts   │
+│  *.plist           │  └─────────────────────┘
 └────────────────────┘
 ```
 

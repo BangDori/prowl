@@ -57,6 +57,26 @@ AI 에이전트와 자동화 도구가 늘어나면서 백그라운드에서 조
 
 ---
 
+## 📁 plist 파일 위치
+
+Prowl은 `~/Library/prowl/` 폴더에 있는 plist 파일만 감지합니다.
+
+```bash
+# 폴더가 없다면 생성
+mkdir -p ~/Library/prowl
+
+# plist 파일을 이 폴더에 저장
+cp your-job.plist ~/Library/prowl/
+
+# launchd에 등록
+launchctl load ~/Library/prowl/your-job.plist
+```
+
+> [!IMPORTANT]
+> 기존 `~/Library/LaunchAgents/`가 아닌 `~/Library/prowl/` 폴더를 사용합니다.
+
+---
+
 ## 🛠 Development
 
 ```bash
