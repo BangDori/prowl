@@ -37,7 +37,7 @@ Main Process (Electron)          Renderer Process (React)
          ▼              │  src/shared/        │
 ┌────────────────────┐  │  ├── types.ts       │
 │  ~/Library/        │  │  └── constants.ts   │
-│  LaunchAgents/     │  └─────────────────────┘
+│  prowl/     │  └─────────────────────┘
 │  *.plist           │
 └────────────────────┘
 ```
@@ -90,7 +90,7 @@ type JobCustomizations = Record<string, JobCustomization>;
 
 ## launchd plist 경로
 
-- 디렉토리: `~/Library/LaunchAgents/`
+- 디렉토리: `~/Library/prowl/`
 - 패턴: 설정에서 지정 (기본값: 모든 plist)
 
 ## Build Configuration

@@ -84,10 +84,10 @@ export function createMenubar(): Menubar {
       },
       { type: "separator" },
       {
-        label: "LaunchAgents 폴더 열기",
+        label: "prowl 폴더 열기",
         click: () => {
           shell.openPath(
-            path.join(app.getPath("home"), "Library/LaunchAgents"),
+            path.join(app.getPath("home"), "Library/prowl"),
           );
         },
       },

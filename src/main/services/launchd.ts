@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { LaunchdJob, JobActionResult } from '../../shared/types';
 import {
-  LAUNCH_AGENTS_DIR,
+  PROWL_DIR,
   DEFAULT_ICON,
   DEFAULT_DESCRIPTION,
 } from '../constants';
@@ -29,13 +29,19 @@ import { matchesAnyPattern } from '../utils/pattern-matcher';
 export function findPlistFiles(): string[] {
   try {
     const patterns = getPatterns();
-    const files = fs.readdirSync(LAUNCH_AGENTS_DIR);
+
+    // 디렉토리가 없으면 생성
+    if (!fs.existsSync(PROWL_DIR)) {
+      fs.mkdirSync(PROWL_DIR, { recursive: true });
+    }
+
+    const files = fs.readdirSync(PROWL_DIR);
 
     return files
       .filter((f) => f.endsWith('.plist') && matchesAnyPattern(f, patterns))
-      .map((f) => path.join(LAUNCH_AGENTS_DIR, f));
+      .map((f) => path.join(PROWL_DIR, f));
   } catch (error) {
-    console.error('Failed to read LaunchAgents directory:', error);
+    console.error('Failed to read prowl directory:', error);
     return [];
   }
 }

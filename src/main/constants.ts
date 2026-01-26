@@ -4,7 +4,7 @@ import path from 'path';
 // ============================================
 // 경로 상수
 // ============================================
-export const LAUNCH_AGENTS_DIR = path.join(homedir(), 'Library', 'LaunchAgents');
+export const PROWL_DIR = path.join(homedir(), 'Library', 'prowl');
 
 // ============================================
 // 요일 이름

@@ -88,7 +88,7 @@ export default function Settings({ onBack }: SettingsProps) {
         <section>
           <h2 className="section-title mb-2">감지 패턴</h2>
           <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-            ~/Library/LaunchAgents/ 에서 감지할 plist 파일 패턴을 입력하세요.
+            ~/Library/prowl/ 에서 감지할 plist 파일 패턴을 입력하세요.
           </p>
 
           <div className="flex gap-2 mb-4">

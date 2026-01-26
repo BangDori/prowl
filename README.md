@@ -87,7 +87,7 @@ pnpm package    # DMG 생성
 ### 작업 목록이 비어 있어요
 
 - 설정(⚙️)에서 감지 패턴이 올바른지 확인하세요
-- `~/Library/LaunchAgents/` 디렉토리에 plist 파일이 있어야 합니다
+- `~/Library/prowl/` 디렉토리에 plist 파일이 있어야 합니다
 - 패턴 예시: `com.claude.`, `local.`, `com.mycompany.` (접두사 매칭)
 
 ### 작업이 활성화되지 않아요
@@ -95,7 +95,7 @@ pnpm package    # DMG 생성
 터미널에서 직접 로드해보세요:
 
 ```bash
-launchctl load ~/Library/LaunchAgents/your-job.plist
+launchctl load ~/Library/prowl/your-job.plist
 ```
 
 오류가 나타나면:
@@ -156,7 +156,7 @@ xattr -cr /Applications/Prowl.app
 저장 후 활성화:
 
 ```bash
-launchctl load ~/Library/LaunchAgents/com.yourname.jobname.plist
+launchctl load ~/Library/prowl/com.yourname.jobname.plist
 ```
 
 ---
