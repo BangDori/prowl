@@ -80,9 +80,6 @@ launchctl list | grep com.yourname
 > - PID가 `-`이면 현재 실행 중이 아님
 > - 종료코드 `0`은 마지막 실행 성공
 
-> [!IMPORTANT]
-> 기존 `~/Library/LaunchAgents/`가 아닌 `~/Library/prowl/` 폴더를 사용합니다.
-
 ---
 
 ## 🛠 Development
