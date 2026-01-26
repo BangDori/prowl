@@ -70,7 +70,15 @@ cp your-job.plist ~/Library/prowl/
 
 # launchd에 등록
 launchctl load ~/Library/prowl/your-job.plist
+
+# 등록된 작업 확인
+launchctl list | grep com.yourname
 ```
+
+> [!TIP]
+> `launchctl list` 출력 형식: `PID | 종료코드 | Label`
+> - PID가 `-`이면 현재 실행 중이 아님
+> - 종료코드 `0`은 마지막 실행 성공
 
 > [!IMPORTANT]
 > 기존 `~/Library/LaunchAgents/`가 아닌 `~/Library/prowl/` 폴더를 사용합니다.
