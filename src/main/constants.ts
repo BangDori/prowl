@@ -59,8 +59,3 @@ export const WINDOW = {
 } as const;
 
 export const DEV_SERVER_PORT = 5173;
-
-// ============================================
-// 스크립트 파싱
-// ============================================
-export const SCRIPT_METADATA_LINES = 10;

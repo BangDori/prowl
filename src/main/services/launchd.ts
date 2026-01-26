@@ -18,7 +18,6 @@ import {
   getJobNameFromLabel,
 } from './plist-parser';
 import { getLastRunInfo } from './log-reader';
-import { extractScriptMetadata } from './script-metadata';
 import { executeCommand } from '../utils/command';
 import { matchesAnyPattern } from '../utils/pattern-matcher';
 
@@ -137,14 +136,13 @@ export function listAllJobs(): LaunchdJob[] {
     const schedule = extractSchedule(data);
     const logPath = extractLogPath(data);
     const scriptPath = extractScriptPath(data);
-    const metadata = extractScriptMetadata(scriptPath);
 
     const job: LaunchdJob = {
       id: label,
       label,
       name: jobName,
-      description: metadata.description || DEFAULT_DESCRIPTION,
-      icon: metadata.icon || DEFAULT_ICON,
+      description: DEFAULT_DESCRIPTION,
+      icon: DEFAULT_ICON,
       plistPath,
       scriptPath,
       logPath,

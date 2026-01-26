@@ -29,7 +29,6 @@ Main Process (Electron)          Renderer Process (React)
 │      ├── plist-parser.ts       │  index.ts   │
 │      ├── log-reader.ts │       └─────────────┘
 │      ├── log-analyzer.ts
-│      ├── script-metadata.ts
 │      └── settings.ts   │
 └────────────────────────┘
          ▲
@@ -113,8 +112,8 @@ interface LaunchdJob {
   id: string;           // label과 동일
   label: string;        // com.claude.daily-retrospective
   name: string;         // daily-retrospective
-  description: string;  // 스크립트 @description 또는 기본값
-  icon: string;         // 스크립트 @icon 또는 ⚙️
+  description: string;  // 기본값: "설명 없음" (커스터마이징 가능)
+  icon: string;         // 기본값: ⚙️ (커스터마이징 가능)
   plistPath: string;    // plist 파일 경로
   scriptPath: string;   // 실행 스크립트 경로
   logPath: string | null;
