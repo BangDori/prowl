@@ -23,6 +23,7 @@ export interface ElectronAPI {
     jobId: string,
     customization: JobCustomization,
   ) => Promise<void>;
+  showEmojiPanel: () => Promise<void>;
 }
 
 declare global {

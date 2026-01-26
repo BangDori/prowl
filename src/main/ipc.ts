@@ -1,4 +1,4 @@
-import { ipcMain, shell } from 'electron';
+import { ipcMain, shell, app } from 'electron';
 import {
   listAllJobs,
   findJobById,
@@ -139,4 +139,9 @@ export function registerIpcHandlers(): void {
       setJobCustomization(jobId, customization);
     }
   );
+
+  // 이모지 선택 패널 열기
+  ipcMain.handle('app:showEmojiPanel', async (): Promise<void> => {
+    app.showEmojiPanel();
+  });
 }

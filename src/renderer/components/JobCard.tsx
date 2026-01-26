@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Play,
   Folder,
@@ -49,6 +49,7 @@ export default function JobCard({
     icon: "",
     description: "",
   });
+  const iconInputRef = useRef<HTMLInputElement>(null);
 
   // 표시할 값 (커스터마이징 > 기본값)
   const displayName = customization?.displayName || job.name;
@@ -62,6 +63,11 @@ export default function JobCard({
       description: customization?.description || "",
     });
     setIsEditing(true);
+  };
+
+  const openEmojiPanel = () => {
+    iconInputRef.current?.focus();
+    window.electronAPI.showEmojiPanel();
   };
 
   const cancelEditing = () => {
@@ -111,14 +117,16 @@ export default function JobCard({
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <input
+              ref={iconInputRef}
               type="text"
               value={editForm.icon}
               onChange={(e) =>
                 setEditForm((f) => ({ ...f, icon: e.target.value }))
               }
+              onClick={openEmojiPanel}
               placeholder={job.icon}
-              className="w-12 text-center text-xl input-field"
-              maxLength={2}
+              className="w-12 text-center text-xl input-field cursor-pointer"
+              maxLength={4}
             />
             <input
               type="text"

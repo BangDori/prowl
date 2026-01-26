@@ -62,6 +62,10 @@ const electronAPI = {
     customization: JobCustomization
   ): Promise<void> =>
     ipcRenderer.invoke('jobs:setCustomization', jobId, customization),
+
+  // 이모지 선택 패널 열기
+  showEmojiPanel: (): Promise<void> =>
+    ipcRenderer.invoke('app:showEmojiPanel'),
 };
 
 // contextBridge로 API 노출
