@@ -34,42 +34,42 @@ Main Process (Electron)          Renderer Process (React)
          ▲
          │              ┌─────────────────────┐
          ▼              │  src/shared/        │
-┌────────────────────┐  │  ├── types.ts       │
-│  ~/Library/prowl/  │  │  └── constants.ts   │
-│  *.plist           │  └─────────────────────┘
-└────────────────────┘
+┌─────────────────────────┐  │  ├── types.ts       │
+│  ~/Library/LaunchAgents │  │  └── constants.ts   │
+│  *.plist                │  └─────────────────────┘
+└─────────────────────────┘
 ```
 
 ## Key Files
 
-| 파일 | 역할 |
-|------|------|
-| `src/main/constants.ts` | 상수 정의 (매직 넘버, 로그 패턴 등) |
-| `src/main/utils/command.ts` | launchctl 명령어 실행 유틸리티 |
-| `src/main/utils/pattern-matcher.ts` | 패턴 매칭 유틸리티 |
-| `src/main/services/launchd.ts` | launchctl 명령어 래핑 (load/unload/start) |
-| `src/main/services/plist-parser.ts` | plist 파일에서 스케줄/경로 추출 |
-| `src/main/services/log-reader.ts` | 로그 파일 읽기 |
-| `src/main/services/log-analyzer.ts` | 로그 분석 (성공/실패 판단) |
-| `src/main/services/settings.ts` | 앱 설정 및 작업 커스터마이징 저장 |
-| `src/main/ipc.ts` | IPC 핸들러 등록 |
-| `src/main/tray.ts` | menubar 패키지로 트레이 아이콘 생성 |
-| `src/preload/index.ts` | contextBridge로 electronAPI 노출 |
-| `src/shared/types.ts` | 공유 타입 정의 |
-| `src/shared/constants.ts` | 공유 상수 (main/renderer 공통) |
-| `src/renderer/utils/date.ts` | 날짜/시간 포맷 유틸리티 |
+| 파일                                | 역할                                      |
+| ----------------------------------- | ----------------------------------------- |
+| `src/main/constants.ts`             | 상수 정의 (매직 넘버, 로그 패턴 등)       |
+| `src/main/utils/command.ts`         | launchctl 명령어 실행 유틸리티            |
+| `src/main/utils/pattern-matcher.ts` | 패턴 매칭 유틸리티                        |
+| `src/main/services/launchd.ts`      | launchctl 명령어 래핑 (load/unload/start) |
+| `src/main/services/plist-parser.ts` | plist 파일에서 스케줄/경로 추출           |
+| `src/main/services/log-reader.ts`   | 로그 파일 읽기                            |
+| `src/main/services/log-analyzer.ts` | 로그 분석 (성공/실패 판단)                |
+| `src/main/services/settings.ts`     | 앱 설정 및 작업 커스터마이징 저장         |
+| `src/main/ipc.ts`                   | IPC 핸들러 등록                           |
+| `src/main/tray.ts`                  | menubar 패키지로 트레이 아이콘 생성       |
+| `src/preload/index.ts`              | contextBridge로 electronAPI 노출          |
+| `src/shared/types.ts`               | 공유 타입 정의                            |
+| `src/shared/constants.ts`           | 공유 상수 (main/renderer 공통)            |
+| `src/renderer/utils/date.ts`        | 날짜/시간 포맷 유틸리티                   |
 
 ## IPC Channels
 
-| 채널 | 설명 | 반환 타입 |
-|------|------|----------|
-| `jobs:list` | 모든 작업 목록 | `LaunchdJob[]` |
-| `jobs:refresh` | 작업 목록 새로고침 | `LaunchdJob[]` |
-| `jobs:toggle` | 활성화/비활성화 토글 | `JobActionResult` |
-| `jobs:run` | 수동 실행 | `JobActionResult` |
-| `jobs:logs` | 로그 내용 조회 | `LogContent` |
+| 채널                     | 설명                        | 반환 타입           |
+| ------------------------ | --------------------------- | ------------------- |
+| `jobs:list`              | 모든 작업 목록              | `LaunchdJob[]`      |
+| `jobs:refresh`           | 작업 목록 새로고침          | `LaunchdJob[]`      |
+| `jobs:toggle`            | 활성화/비활성화 토글        | `JobActionResult`   |
+| `jobs:run`               | 수동 실행                   | `JobActionResult`   |
+| `jobs:logs`              | 로그 내용 조회              | `LogContent`        |
 | `jobs:getCustomizations` | 모든 작업 커스터마이징 조회 | `JobCustomizations` |
-| `jobs:setCustomization` | 작업 커스터마이징 저장 | `void` |
+| `jobs:setCustomization`  | 작업 커스터마이징 저장      | `void`              |
 
 ## Job Customization
 
@@ -78,9 +78,9 @@ Main Process (Electron)          Renderer Process (React)
 
 ```typescript
 interface JobCustomization {
-  displayName?: string;  // 사용자 지정 이름
-  icon?: string;         // 사용자 지정 아이콘 (이모지)
-  description?: string;  // 사용자 지정 설명
+  displayName?: string; // 사용자 지정 이름
+  icon?: string; // 사용자 지정 아이콘 (이모지)
+  description?: string; // 사용자 지정 설명
 }
 
 type JobCustomizations = Record<string, JobCustomization>;
@@ -88,7 +88,7 @@ type JobCustomizations = Record<string, JobCustomization>;
 
 ## launchd plist 경로
 
-- 디렉토리: `~/Library/prowl/`
+- 디렉토리: `~/Library/LaunchAgents/`
 - 패턴: 설정에서 지정 (기본값: 모든 plist)
 
 ## Build Configuration
@@ -108,26 +108,26 @@ type JobCustomizations = Record<string, JobCustomization>;
 
 ```typescript
 interface LaunchdJob {
-  id: string;           // label과 동일
-  label: string;        // com.claude.daily-retrospective
-  name: string;         // daily-retrospective
-  description: string;  // 기본값: "설명 없음" (커스터마이징 가능)
-  icon: string;         // 기본값: ⚙️ (커스터마이징 가능)
-  plistPath: string;    // plist 파일 경로
-  scriptPath: string;   // 실행 스크립트 경로
+  id: string; // label과 동일
+  label: string; // com.claude.daily-retrospective
+  name: string; // daily-retrospective
+  description: string; // 기본값: "설명 없음" (커스터마이징 가능)
+  icon: string; // 기본값: ⚙️ (커스터마이징 가능)
+  plistPath: string; // plist 파일 경로
+  scriptPath: string; // 실행 스크립트 경로
   logPath: string | null;
   schedule: JobSchedule;
   scheduleText: string; // "매주 금 11:00"
-  isLoaded: boolean;    // launchctl list에 있는지
+  isLoaded: boolean; // launchctl list에 있는지
   lastRun: LastRunInfo | null;
 }
 
 // 판별 유니온 타입
 type JobSchedule =
-  | { type: 'calendar'; weekdays?: number[]; hour?: number; minute?: number }
-  | { type: 'interval'; intervalSeconds: number }
-  | { type: 'keepAlive' }
-  | { type: 'unknown' };
+  | { type: "calendar"; weekdays?: number[]; hour?: number; minute?: number }
+  | { type: "interval"; intervalSeconds: number }
+  | { type: "keepAlive" }
+  | { type: "unknown" };
 ```
 
 ## Code Organization Principles

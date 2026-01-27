@@ -1,7 +1,7 @@
-import { menubar, Menubar } from 'menubar';
-import { app, nativeImage, Menu, shell } from 'electron';
-import * as path from 'path';
-import { WINDOW, DEV_SERVER_PORT } from './constants';
+import { menubar, Menubar } from "menubar";
+import { app, nativeImage, Menu, shell } from "electron";
+import * as path from "path";
+import { WINDOW, DEV_SERVER_PORT } from "./constants";
 
 let mb: Menubar | null = null;
 
@@ -31,7 +31,7 @@ export function createMenubar(): Menubar {
   // 렌더러 URL - 프로덕션에서는 빌드된 파일 사용
   const indexUrl = isDev
     ? `http://localhost:${DEV_SERVER_PORT}`
-    : `file://${path.join(__dirname, '../renderer/index.html')}`;
+    : `file://${path.join(__dirname, "../renderer/index.html")}`;
 
   console.log("Loading URL:", indexUrl);
 
@@ -84,10 +84,10 @@ export function createMenubar(): Menubar {
       },
       { type: "separator" },
       {
-        label: "prowl 폴더 열기",
+        label: "LaunchAgents 폴더 열기",
         click: () => {
           shell.openPath(
-            path.join(app.getPath("home"), "Library/prowl"),
+            path.join(app.getPath("home"), "Library/LaunchAgents"),
           );
         },
       },

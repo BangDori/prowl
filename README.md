@@ -59,17 +59,16 @@ AI 에이전트와 자동화 도구가 늘어나면서 백그라운드에서 조
 
 ## 📁 plist 파일 위치
 
-Prowl은 `~/Library/prowl/` 폴더에 있는 plist 파일만 감지합니다.
+Prowl은 `~/Library/` 폴더 내의 모든 plist 파일을 재귀 탐색합니다.
+
+일반적으로 launchd 작업은 `~/Library/LaunchAgents/`에 저장합니다:
 
 ```bash
-# 폴더가 없다면 생성
-mkdir -p ~/Library/prowl
-
-# plist 파일을 이 폴더에 저장
-cp your-job.plist ~/Library/prowl/
+# plist 파일을 LaunchAgents에 저장
+cp your-job.plist ~/Library/LaunchAgents/
 
 # launchd에 등록
-launchctl load ~/Library/prowl/your-job.plist
+launchctl load ~/Library/LaunchAgents/your-job.plist
 
 # 등록된 작업 확인
 launchctl list | grep com.yourname
@@ -77,6 +76,7 @@ launchctl list | grep com.yourname
 
 > [!TIP]
 > `launchctl list` 출력 형식: `PID | 종료코드 | Label`
+>
 > - PID가 `-`이면 현재 실행 중이 아님
 > - 종료코드 `0`은 마지막 실행 성공
 
@@ -112,7 +112,7 @@ pnpm package    # DMG 생성
 ### 작업 목록이 비어 있어요
 
 - 설정(⚙️)에서 감지 패턴이 올바른지 확인하세요
-- `~/Library/prowl/` 디렉토리에 plist 파일이 있어야 합니다
+- `~/Library/` 하위 디렉토리에 plist 파일이 있어야 합니다
 - 패턴 예시: `com.claude.`, `local.`, `com.mycompany.` (접두사 매칭)
 
 ### 작업이 활성화되지 않아요
@@ -120,7 +120,7 @@ pnpm package    # DMG 생성
 터미널에서 직접 로드해보세요:
 
 ```bash
-launchctl load ~/Library/prowl/your-job.plist
+launchctl load ~/Library/LaunchAgents/your-job.plist
 ```
 
 오류가 나타나면:
@@ -183,7 +183,7 @@ xattr -cr /Applications/Prowl.app
 저장 후 활성화:
 
 ```bash
-launchctl load ~/Library/prowl/com.yourname.jobname.plist
+launchctl load ~/Library/LaunchAgents/com.yourname.jobname.plist
 ```
 
 ---

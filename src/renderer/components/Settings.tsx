@@ -64,7 +64,9 @@ export default function Settings({ onBack }: SettingsProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-surface-light dark:bg-surface-dark flex items-center justify-center">
-        <div className="text-gray-500 dark:text-gray-500 text-sm">로딩 중...</div>
+        <div className="text-gray-500 dark:text-gray-500 text-sm">
+          로딩 중...
+        </div>
       </div>
     );
   }
@@ -88,7 +90,7 @@ export default function Settings({ onBack }: SettingsProps) {
         <section>
           <h2 className="section-title mb-2">감지 패턴</h2>
           <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-            ~/Library/prowl/ 에서 감지할 plist 파일 패턴을 입력하세요.
+            ~/Library/LaunchAgents/ 에서 감지할 plist 파일 패턴을 입력하세요.
           </p>
 
           <div className="flex gap-2 mb-4">
@@ -113,9 +115,7 @@ export default function Settings({ onBack }: SettingsProps) {
           {patterns.length === 0 ? (
             <div className="empty-state py-8">
               <p className="text-sm mb-1">등록된 패턴이 없습니다</p>
-              <p className="text-xs">
-                패턴이 없으면 모든 작업이 표시됩니다.
-              </p>
+              <p className="text-xs">패턴이 없으면 모든 작업이 표시됩니다.</p>
             </div>
           ) : (
             <ul className="space-y-2">

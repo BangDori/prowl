@@ -28,7 +28,7 @@ export default function App() {
         [jobId]: customization,
       }));
     },
-    []
+    [],
   );
 
   const handleBackFromSettings = () => {
@@ -76,9 +76,7 @@ export default function App() {
           <div className="empty-state">
             <p className="empty-state-icon">🔍</p>
             <p className="text-sm font-medium mb-1">등록된 작업이 없습니다</p>
-            <p className="text-xs">
-              ~/Library/prowl/
-            </p>
+            <p className="text-xs">~/Library/LaunchAgents/</p>
           </div>
         ) : (
           <JobList

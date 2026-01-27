@@ -1,13 +1,13 @@
-import { execSync } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-import { LaunchdJob, JobActionResult } from '../../shared/types';
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import { LaunchdJob, JobActionResult } from "../../shared/types";
 import {
-  PROWL_DIR,
+  LAUNCH_AGENTS_DIR,
   DEFAULT_ICON,
   DEFAULT_DESCRIPTION,
-} from '../constants';
-import { getPatterns } from './settings';
+} from "../constants";
+import { getPatterns } from "./settings";
 import {
   parsePlistFile,
   extractLabel,
@@ -16,31 +16,31 @@ import {
   extractSchedule,
   scheduleToText,
   getJobNameFromLabel,
-} from './plist-parser';
-import { getLastRunInfo } from './log-reader';
-import { executeCommand } from '../utils/command';
-import { matchesAnyPattern } from '../utils/pattern-matcher';
+} from "./plist-parser";
+import { getLastRunInfo } from "./log-reader";
+import { executeCommand } from "../utils/command";
+import { matchesAnyPattern } from "../utils/pattern-matcher";
 
 /**
  * 설정된 패턴에 맞는 모든 plist 파일 찾기
+ * ~/Library/LaunchAgents/ 디렉토리 탐색
  * 패턴이 없으면 모든 plist 파일 반환
  */
 export function findPlistFiles(): string[] {
   try {
     const patterns = getPatterns();
 
-    // 디렉토리가 없으면 생성
-    if (!fs.existsSync(PROWL_DIR)) {
-      fs.mkdirSync(PROWL_DIR, { recursive: true });
+    if (!fs.existsSync(LAUNCH_AGENTS_DIR)) {
+      return [];
     }
 
-    const files = fs.readdirSync(PROWL_DIR);
+    const files = fs.readdirSync(LAUNCH_AGENTS_DIR);
 
     return files
-      .filter((f) => f.endsWith('.plist') && matchesAnyPattern(f, patterns))
-      .map((f) => path.join(PROWL_DIR, f));
+      .filter((f) => f.endsWith(".plist") && matchesAnyPattern(f, patterns))
+      .map((f) => path.join(LAUNCH_AGENTS_DIR, f));
   } catch (error) {
-    console.error('Failed to read prowl directory:', error);
+    console.error("Failed to read LaunchAgents directory:", error);
     return [];
   }
 }
@@ -52,12 +52,12 @@ export function findPlistFiles(): string[] {
 export function getLoadedJobs(): Set<string> {
   try {
     const patterns = getPatterns();
-    const output = execSync('launchctl list', { encoding: 'utf-8' });
-    const lines = output.split('\n');
+    const output = execSync("launchctl list", { encoding: "utf-8" });
+    const lines = output.split("\n");
     const loadedLabels = new Set<string>();
 
     for (const line of lines) {
-      const parts = line.split('\t');
+      const parts = line.split("\t");
       if (parts.length >= 3) {
         const label = parts[2];
         if (matchesAnyPattern(label, patterns)) {
@@ -68,7 +68,7 @@ export function getLoadedJobs(): Set<string> {
 
     return loadedLabels;
   } catch (error) {
-    console.error('Failed to get loaded jobs:', error);
+    console.error("Failed to get loaded jobs:", error);
     return new Set();
   }
 }
@@ -86,8 +86,8 @@ export function isJobLoaded(label: string): boolean {
  */
 export function loadJob(plistPath: string): JobActionResult {
   return executeCommand(`launchctl load "${plistPath}"`, {
-    successMessage: '작업이 활성화되었습니다.',
-    errorPrefix: '활성화 실패',
+    successMessage: "작업이 활성화되었습니다.",
+    errorPrefix: "활성화 실패",
   });
 }
 
@@ -96,8 +96,8 @@ export function loadJob(plistPath: string): JobActionResult {
  */
 export function unloadJob(plistPath: string): JobActionResult {
   return executeCommand(`launchctl unload "${plistPath}"`, {
-    successMessage: '작업이 비활성화되었습니다.',
-    errorPrefix: '비활성화 실패',
+    successMessage: "작업이 비활성화되었습니다.",
+    errorPrefix: "비활성화 실패",
   });
 }
 
@@ -106,8 +106,8 @@ export function unloadJob(plistPath: string): JobActionResult {
  */
 export function startJob(label: string): JobActionResult {
   return executeCommand(`launchctl start "${label}"`, {
-    successMessage: '작업이 시작되었습니다.',
-    errorPrefix: '실행 실패',
+    successMessage: "작업이 시작되었습니다.",
+    errorPrefix: "실행 실패",
   });
 }
 
