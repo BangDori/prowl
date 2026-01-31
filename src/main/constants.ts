@@ -47,3 +47,14 @@ export const WINDOW = {
 } as const;
 
 export const DEV_SERVER_PORT = 5173;
+
+// ============================================
+// 스플래시 윈도우 설정
+// ============================================
+export const SPLASH = {
+  WIDTH: 700,
+  HEIGHT: 550,
+  DISPLAY_DURATION_MS: 4500,
+  ABSORB_DURATION_MS: 600,
+  DISSOLVE_DURATION_MS: 1200,
+} as const;

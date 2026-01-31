@@ -31,8 +31,8 @@ PR 생성 전에 변경사항을 분석하여 package.json 버전을 자동 업�
 | 조건 | 범프 | 예시 |
 |------|------|------|
 | 커밋 본문에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
-| `feat` 타입 커밋 존재 | **minor** | 1.3.0 → 1.4.0 |
-| 그 외 (`fix`, `enhance`, `refactor`, `docs`, `chore`, `test`) | **patch** | 1.3.0 → 1.3.1 |
+| `feat` 타입이고 **사용자에게 노출되는 새 기능** 추가 | **minor** | 1.3.0 → 1.4.0 |
+| 그 외 (`fix`, `enhance`, `refactor`, `docs`, `chore`, `test`, 또는 UI/내부 개선성 `feat`) | **patch** | 1.3.0 → 1.3.1 |
 
 4. 가장 높은 범프 레벨을 선택 (major > minor > patch)
 5. package.json의 `version` 필드를 업데이트
@@ -46,6 +46,7 @@ PR 생성 전에 변경사항을 분석하여 package.json 버전을 자동 업�
 - main 브랜치 대비 커밋이 없으면 버저닝을 건너뛴다
 - 버전 범프 커밋은 PR의 마지막 커밋이어야 한다
 - `git log main..HEAD --format='%s%n%b'`로 제목과 본문 모두 확인하여 BREAKING CHANGE를 탐지한다
+- `feat` 타입이라도 스플래시 화면, 내부 UI 개선, 리팩토링성 변경 등 **사용자에게 새로운 기능으로 노출되지 않는 경우** patch로 처리한다. minor는 새 IPC 채널, 새 화면/페이지, 새 사용자 인터랙션이 추가될 때만 적용한다.
 
 ## 브랜치 컨벤션
 

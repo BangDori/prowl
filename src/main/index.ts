@@ -1,7 +1,9 @@
 import { app } from "electron";
+import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
+import { createSplashWindow, dismissSplash } from "./splash";
 import { createTray } from "./tray";
 
 // 단일 인스턴스 잠금
@@ -15,11 +17,15 @@ if (!gotTheLock) {
     // IPC 핸들러 등록
     registerIpcHandlers();
 
-    // 트레이 생성
-    createTray();
+    // 스플래시 윈도우 표시
+    createSplashWindow();
 
-    // 집중 모드 모니터 초기화
-    updateFocusModeMonitor(getFocusMode());
+    // 스플래시 표시 후 트레이 생성 및 전환
+    setTimeout(async () => {
+      await dismissSplash();
+      createTray();
+      updateFocusModeMonitor(getFocusMode());
+    }, SPLASH.DISPLAY_DURATION_MS);
   });
 
   // 모든 창이 닫혀도 앱 종료하지 않음 (메뉴바 앱이므로)
