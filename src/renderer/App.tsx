@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from "react";
 import { DEFAULT_FOCUS_MODE, type FocusMode } from "../shared/types";
 import BackgroundMonitor from "./components/BackgroundMonitor";
 import FocusModePanel from "./components/FocusModePanel";
-import NightNudgeSplash from "./components/NightNudgeSplash";
 import { useAutoResize } from "./hooks/useAutoResize";
 
 function getHashRoute(): string {
@@ -12,7 +11,6 @@ function getHashRoute(): string {
 export default function App() {
   const [route, setRoute] = useState(getHashRoute);
   const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
-  const [nudgeMessage, setNudgeMessage] = useState<string | null>(null);
   const containerRef = useAutoResize();
 
   useEffect(() => {
@@ -23,12 +21,6 @@ export default function App() {
 
   useEffect(() => {
     window.electronAPI.getFocusMode().then(setFocusMode);
-  }, []);
-
-  useEffect(() => {
-    return window.electronAPI.onFocusNudge((message) => {
-      setNudgeMessage(message);
-    });
   }, []);
 
   const saveFocusMode = useCallback(async (updated: FocusMode) => {
@@ -45,9 +37,6 @@ export default function App() {
       ref={containerRef}
       className="bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100"
     >
-      {nudgeMessage && (
-        <NightNudgeSplash message={nudgeMessage} onDismiss={() => setNudgeMessage(null)} />
-      )}
       {route === "monitor" ? (
         <BackgroundMonitor onBack={closeWindow} />
       ) : route === "quiet-hours" ? (

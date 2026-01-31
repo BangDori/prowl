@@ -24,7 +24,6 @@ export interface ElectronAPI {
   getFocusMode: () => Promise<FocusMode>;
   setFocusMode: (focusMode: FocusMode) => Promise<void>;
   resizeWindow: (height: number) => Promise<void>;
-  onFocusNudge: (callback: (message: string) => void) => () => void;
   quitApp: () => Promise<void>;
 }
 

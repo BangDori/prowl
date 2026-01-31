@@ -67,13 +67,6 @@ const electronAPI = {
   // 윈도우 높이 동적 조정
   resizeWindow: (height: number): Promise<void> => ipcRenderer.invoke("window:resize", height),
 
-  // 집중 모드 알림 수신
-  onFocusNudge: (callback: (message: string) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, message: string) => callback(message);
-    ipcRenderer.on("focusMode:nudge", handler);
-    return () => ipcRenderer.removeListener("focusMode:nudge", handler);
-  },
-
   // 앱 종료
   quitApp: (): Promise<void> => ipcRenderer.invoke("app:quit"),
 };
