@@ -1,6 +1,6 @@
 {
   "name": "prowl",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A cat that watches your background jobs from the macOS menubar",
   "packageManager": "pnpm@10.15.1",
   "main": "dist/main/index.js",
@@ -20,7 +20,8 @@
     "lint:fix": "biome check --write src",
     "format": "biome format --write src",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "electron-store": "^8.1.0",
@@ -40,7 +41,9 @@
     "concurrently": "^8.2.2",
     "electron": "^28.1.0",
     "electron-builder": "^24.9.1",
+    "husky": "^9.1.7",
     "jsdom": "^27.4.0",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.4.32",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -48,6 +51,11 @@
     "typescript": "^5.3.3",
     "vite": "^5.0.10",
     "vitest": "^2.1.9"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "biome check --write"
+    ]
   },
   "build": {
     "appId": "com.bangdori.prowl",

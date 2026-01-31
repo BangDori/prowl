@@ -6,5 +6,6 @@
     "outDir": "dist",
     "rootDir": "src"
   },
-  "include": ["src/main/**/*", "src/shared/**/*", "src/preload/**/*"]
+  "include": ["src/main/**/*", "src/shared/**/*", "src/preload/**/*"],
+  "exclude": ["src/**/*.test.ts"]
 }
