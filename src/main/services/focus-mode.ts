@@ -8,9 +8,10 @@ const FOCUS_CHECK_INTERVAL_MS = 10_000; // 10초마다 PID 변화 체크
 // 감시 대상 프로세스 이름
 const WATCHED_PROCESSES = ["claude"];
 
+const NUDGE_INTERVAL_MS = 5 * 60 * 1000; // 5분마다 알림
+
 let intervalId: ReturnType<typeof setInterval> | null = null;
-// 이전 폴링의 프로세스 PID 스냅샷 (name → Set<pid>)
-let prevProcessPids = new Map<string, Set<number>>();
+let lastNotifiedAt = 0;
 
 function isInFocusTime(startTime: string, endTime: string): boolean {
 	const now = new Date();
@@ -79,41 +80,27 @@ function pickNudgeMessage(): string {
 	return NUDGE_MESSAGES[Math.floor(Math.random() * NUDGE_MESSAGES.length)];
 }
 
-function checkPidChanges(): void {
+function checkProcesses(): void {
 	const focusMode = getFocusMode();
-	if (!focusMode.enabled) {
-		console.log("[focus-mode] disabled, skipping");
-		return;
-	}
-	if (!isInFocusTime(focusMode.startTime, focusMode.endTime)) {
-		console.log("[focus-mode] outside time range, skipping");
-		return;
-	}
+	if (!focusMode.enabled) return;
+	if (!isInFocusTime(focusMode.startTime, focusMode.endTime)) return;
 
-	for (const procName of WATCHED_PROCESSES) {
-		const currentSet = getProcessPids(procName);
-		const prevSet = prevProcessPids.get(procName) ?? new Set();
-		console.log(
-			`[focus-mode] ${procName}: prev=${[...prevSet]} current=${[...currentSet]}`,
-		);
-		for (const pid of currentSet) {
-			if (!prevSet.has(pid)) {
-				console.log(`[focus-mode] new pid detected: ${pid}`);
-				sendNotification("Prowl", pickNudgeMessage());
-				break;
-			}
-		}
-		prevProcessPids.set(procName, currentSet);
-	}
+	const hasProcess = WATCHED_PROCESSES.some(
+		(name) => getProcessPids(name).size > 0,
+	);
+	if (!hasProcess) return;
+
+	const now = Date.now();
+	if (now - lastNotifiedAt < NUDGE_INTERVAL_MS) return;
+
+	lastNotifiedAt = now;
+	sendNotification("Prowl", pickNudgeMessage());
 }
 
 export function startFocusModeMonitor(): void {
 	stopFocusModeMonitor();
-	// 현재 스냅샷 저장 (기존 실행 중인 것은 무시)
-	for (const procName of WATCHED_PROCESSES) {
-		prevProcessPids.set(procName, getProcessPids(procName));
-	}
-	intervalId = setInterval(checkPidChanges, FOCUS_CHECK_INTERVAL_MS);
+	lastNotifiedAt = 0;
+	intervalId = setInterval(checkProcesses, FOCUS_CHECK_INTERVAL_MS);
 }
 
 export function stopFocusModeMonitor(): void {
@@ -121,7 +108,7 @@ export function stopFocusModeMonitor(): void {
 		clearInterval(intervalId);
 		intervalId = null;
 	}
-	prevProcessPids.clear();
+	lastNotifiedAt = 0;
 }
 
 export function updateFocusModeMonitor(focusMode: FocusMode): void {
