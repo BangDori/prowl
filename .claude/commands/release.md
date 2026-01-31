@@ -5,7 +5,7 @@ package.json의 version을 기준으로 릴리스를 생성합니다.
 ## 수행 작업
 
 1. package.json에서 현재 버전 확인 후 **사용자에게 확인 요청**
-2. 사용자 승인 후 `pnpm package` 실행하여 DMG 패키징
+2. 사용자 승인 후 `bun run package` 실행하여 DMG 패키징
 3. `v{version}` 태그 생성 및 push
 4. GitHub Release 생성 (DMG 첨부, **릴리스 노트 직접 작성**)
 
@@ -44,7 +44,7 @@ git log --oneline $(git describe --tags --abbrev=0)..HEAD
 
 ```bash
 # 1. 패키징
-pnpm package
+bun run package
 
 # 2. 태그 생성 및 push
 git tag v{version}

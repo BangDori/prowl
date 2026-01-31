@@ -37,23 +37,17 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Setup Node.js
+      - name: Setup Bun
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Setup pnpm
-        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
-        uses: pnpm/action-setup@v4
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build and package
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
-        run: pnpm package
+        run: bun run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

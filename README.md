@@ -86,10 +86,10 @@ launchctl list | grep com.yourname
 ```bash
 git clone https://github.com/BangDori/prowl.git
 cd prowl
-pnpm install
-pnpm dev        # 개발 모드
-pnpm build      # 프로덕션 빌드
-pnpm package    # DMG 생성
+bun install
+bun run dev        # 개발 모드
+bun run build      # 프로덕션 빌드
+bun run package    # DMG 생성
 ```
 
 ---

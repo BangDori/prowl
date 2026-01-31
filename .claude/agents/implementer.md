@@ -14,8 +14,8 @@
 작업 완료 후 반드시 아래를 순서대로 실행:
 
 ```bash
-pnpm test          # 유닛 테스트 통과
-pnpm build:main    # 타입 체크 + 빌드
+bun run test          # 유닛 테스트 통과
+bun run build:main    # 타입 체크 + 빌드
 ```
 
 실패 시 직접 수정하고 재실행. 통과할 때까지 반복한다.

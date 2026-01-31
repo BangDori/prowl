@@ -15,8 +15,8 @@ while (성공 기준 미달성) {
   1. 실패 원인 분석
   2. 코드 수정
   3. 검증 실행:
-     - pnpm test
-     - pnpm build:main
+     - bun run test
+     - bun run build:main
      - (UI 변경 시) 스크린샷 확인
   4. 실패하면 1로 돌아감
 }
@@ -25,8 +25,8 @@ while (성공 기준 미달성) {
 ## 기본 성공 기준
 
 모든 작업에 공통으로 적용:
-- `pnpm test` — 전체 통과, 0 failures
-- `pnpm build:main` — 타입 에러 없음
+- `bun run test` — 전체 통과, 0 failures
+- `bun run build:main` — 타입 에러 없음
 - 기존 테스트가 깨지지 않음
 
 추가 기준은 `.context/plan.md`에 명시된 것을 따른다.
@@ -40,6 +40,6 @@ while (성공 기준 미달성) {
 
 ## 규칙
 
-- 매 반복마다 `pnpm test` 실행 필수 (생략 금지)
+- 매 반복마다 `bun run test` 실행 필수 (생략 금지)
 - 테스트를 삭제하거나 skip하여 통과시키는 것은 금지
 - 성공 기준 자체를 수정하는 것은 금지

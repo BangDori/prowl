@@ -22,7 +22,7 @@ if [[ "$FILE_PATH" == *.ts || "$FILE_PATH" == *.tsx ]]; then
 fi
 
 # build (타입 체크 - main과 renderer 모두)
-pnpm build:main --noEmit 2>&1
+bun run build:main --noEmit 2>&1
 BUILD_EXIT=$?
 
 if [ $BUILD_EXIT -ne 0 ]; then

@@ -5,10 +5,10 @@ macOS 메뉴바에서 launchd 백그라운드 작업을 관리하는 Electron �
 ## Quick Commands
 
 ```bash
-pnpm dev        # 개발 모드 (main + renderer 동시)
-pnpm build      # 프로덕션 빌드
-pnpm start      # 빌드된 앱 실행
-pnpm package    # DMG 패키징
+bun run dev        # 개발 모드 (main + renderer 동시)
+bun run build      # 프로덕션 빌드
+bun run start      # 빌드된 앱 실행
+bun run package    # DMG 패키징
 ```
 
 ## Architecture
