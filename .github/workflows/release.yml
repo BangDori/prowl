@@ -48,8 +48,6 @@ jobs:
       - name: Setup pnpm
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Install dependencies
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'

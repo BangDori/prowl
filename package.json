@@ -2,6 +2,7 @@
   "name": "prowl",
   "version": "1.4.0",
   "description": "A cat that watches your background jobs from the macOS menubar",
+  "packageManager": "pnpm@10.15.1",
   "main": "dist/main/index.js",
   "type": "commonjs",
   "author": "BangDori",
