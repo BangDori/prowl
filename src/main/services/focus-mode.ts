@@ -60,26 +60,29 @@ function getProcessPids(name: string): Set<number> {
 	}
 }
 
+const NUDGE_MESSAGES = [
+	"오늘도 충분히 해냈다냥. 내일 더 멋진 코드를 위해 충전하라옹.",
+	"지금의 집사도 대단하다냥. 푹 자고 내일 더 빛나라옹.",
+	"여기까지 달려온 것만으로 충분하다냥. 나머지는 내일의 집사에게 맡기라옹.",
+	"오늘의 노력은 이미 충분하다냥. 자고 일어나면 더 좋은 아이디어가 떠오를 거다옹.",
+	"집사의 열정은 인정이다냥. 근데 잠도 실력이라옹.",
+];
+
+function pickNudgeMessage(): string {
+	return NUDGE_MESSAGES[Math.floor(Math.random() * NUDGE_MESSAGES.length)];
+}
+
 function checkPidChanges(): void {
 	const focusMode = getFocusMode();
 	if (!focusMode.enabled) return;
 	if (!isInFocusTime(focusMode.startTime, focusMode.endTime)) return;
-
-	const hour = new Date().getHours();
-	const timeComment =
-		hour < 6
-			? "이 시간까지 깨어있다냥? 집사, 좀 자라옹."
-			: "아직 쉬는 시간이다냥. 무리하지 말라옹.";
 
 	for (const procName of WATCHED_PROCESSES) {
 		const currentSet = getProcessPids(procName);
 		const prevSet = prevProcessPids.get(procName) ?? new Set();
 		for (const pid of currentSet) {
 			if (!prevSet.has(pid)) {
-				sendNotification(
-					"Prowl",
-					`${procName} 프로세스가 감지됐다냥. ${timeComment}`,
-				);
+				sendNotification("Prowl", pickNudgeMessage());
 				break;
 			}
 		}
