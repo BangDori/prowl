@@ -56,13 +56,28 @@ export interface LogContent {
   lastModified: Date | null;
 }
 
+// 집중 모드 설정
+export interface FocusMode {
+  enabled: boolean;
+  startTime: string; // "22:00"
+  endTime: string; // "07:00"
+}
+
+export const DEFAULT_FOCUS_MODE: FocusMode = {
+  enabled: false,
+  startTime: '00:00',
+  endTime: '07:00',
+};
+
 // 앱 설정
 export interface AppSettings {
   patterns: string[]; // 감지할 plist 패턴 목록 (예: ['com.claude.', 'com.myapp.'])
+  focusMode: FocusMode;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   patterns: [],
+  focusMode: DEFAULT_FOCUS_MODE,
 };
 
 // 작업 커스터마이징

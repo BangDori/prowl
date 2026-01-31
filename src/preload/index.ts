@@ -4,6 +4,7 @@ import {
   JobActionResult,
   LogContent,
   AppSettings,
+  FocusMode,
   JobCustomization,
   JobCustomizations,
 } from '../shared/types';
@@ -66,6 +67,13 @@ const electronAPI = {
   // 이모지 선택 패널 열기
   showEmojiPanel: (): Promise<void> =>
     ipcRenderer.invoke('app:showEmojiPanel'),
+
+  // 집중 모드
+  getFocusMode: (): Promise<FocusMode> =>
+    ipcRenderer.invoke('focusMode:get'),
+
+  setFocusMode: (focusMode: FocusMode): Promise<void> =>
+    ipcRenderer.invoke('focusMode:set', focusMode),
 };
 
 // contextBridge로 API 노출

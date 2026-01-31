@@ -74,6 +74,35 @@ export function getLoadedJobs(): Set<string> {
 }
 
 /**
+ * 로드된 작업의 PID 맵 가져오기 (label → pid)
+ * PID가 없거나 '-'이면 0으로 반환
+ */
+export function getLoadedJobPids(): Map<string, number> {
+  try {
+    const patterns = getPatterns();
+    const output = execSync("launchctl list", { encoding: "utf-8" });
+    const lines = output.split("\n");
+    const pidMap = new Map<string, number>();
+
+    for (const line of lines) {
+      const parts = line.split("\t");
+      if (parts.length >= 3) {
+        const label = parts[2];
+        if (matchesAnyPattern(label, patterns)) {
+          const pid = parseInt(parts[0], 10);
+          pidMap.set(label, isNaN(pid) ? 0 : pid);
+        }
+      }
+    }
+
+    return pidMap;
+  } catch (error) {
+    console.error("Failed to get job PIDs:", error);
+    return new Map();
+  }
+}
+
+/**
  * 특정 작업이 로드되어 있는지 확인
  */
 export function isJobLoaded(label: string): boolean {

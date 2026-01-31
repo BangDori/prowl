@@ -1,6 +1,8 @@
 import { app } from 'electron';
 import { createMenubar } from './tray';
 import { registerIpcHandlers } from './ipc';
+import { getFocusMode } from './services/settings';
+import { updateFocusModeMonitor } from './services/focus-mode';
 
 // 단일 인스턴스 잠금
 const gotTheLock = app.requestSingleInstanceLock();
@@ -15,6 +17,9 @@ if (!gotTheLock) {
 
     // 메뉴바 생성
     createMenubar();
+
+    // 집중 모드 모니터 초기화
+    updateFocusModeMonitor(getFocusMode());
   });
 
   // 모든 창이 닫혀도 앱 종료하지 않음 (메뉴바 앱이므로)

@@ -9,14 +9,18 @@ import { readLogContent } from './services/log-reader';
 import {
   getSettings,
   setSettings,
+  getFocusMode,
+  setFocusMode,
   getAllJobCustomizations,
   setJobCustomization,
 } from './services/settings';
+import { updateFocusModeMonitor } from './services/focus-mode';
 import {
   LaunchdJob,
   JobActionResult,
   LogContent,
   AppSettings,
+  FocusMode,
   JobCustomization,
   JobCustomizations,
 } from '../shared/types';
@@ -144,4 +148,18 @@ export function registerIpcHandlers(): void {
   ipcMain.handle('app:showEmojiPanel', async (): Promise<void> => {
     app.showEmojiPanel();
   });
+
+  // 집중 모드 조회
+  ipcMain.handle('focusMode:get', async (): Promise<FocusMode> => {
+    return getFocusMode();
+  });
+
+  // 집중 모드 설정 저장 + 모니터 업데이트
+  ipcMain.handle(
+    'focusMode:set',
+    async (_event, focusMode: FocusMode): Promise<void> => {
+      setFocusMode(focusMode);
+      updateFocusModeMonitor(focusMode);
+    }
+  );
 }

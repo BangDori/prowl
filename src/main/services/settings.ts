@@ -1,7 +1,9 @@
 import Store from 'electron-store';
 import {
   AppSettings,
+  DEFAULT_FOCUS_MODE,
   DEFAULT_SETTINGS,
+  FocusMode,
   JobCustomization,
   JobCustomizations,
 } from '../../shared/types';
@@ -19,7 +21,7 @@ const store = new Store<StoreSchema>({
 });
 
 export function getSettings(): AppSettings {
-  return store.get('settings');
+  return store.get('settings') ?? DEFAULT_SETTINGS;
 }
 
 export function setSettings(settings: AppSettings): void {
@@ -28,6 +30,15 @@ export function setSettings(settings: AppSettings): void {
 
 export function getPatterns(): string[] {
   return getSettings().patterns;
+}
+
+export function getFocusMode(): FocusMode {
+  return getSettings().focusMode ?? DEFAULT_FOCUS_MODE;
+}
+
+export function setFocusMode(focusMode: FocusMode): void {
+  const settings = getSettings();
+  setSettings({ ...settings, focusMode });
 }
 
 // 작업 커스터마이징 관련 함수들

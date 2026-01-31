@@ -3,6 +3,7 @@ import {
   JobActionResult,
   LogContent,
   AppSettings,
+  FocusMode,
   JobCustomization,
   JobCustomizations,
 } from "../shared/types";
@@ -24,6 +25,8 @@ export interface ElectronAPI {
     customization: JobCustomization,
   ) => Promise<void>;
   showEmojiPanel: () => Promise<void>;
+  getFocusMode: () => Promise<FocusMode>;
+  setFocusMode: (focusMode: FocusMode) => Promise<void>;
 }
 
 declare global {
