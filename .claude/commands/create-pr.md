@@ -11,9 +11,38 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 
 1. `git status`와 `git log main..HEAD`로 변경사항 파악
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
-3. 리모트에 push (`git push -u origin HEAD`)
-4. 템플릿에 맞춰 PR 본문 작성
-5. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
+3. **시멘틱 버저닝 (아래 섹션 참조)**
+4. 리모트에 push (`git push -u origin HEAD`)
+5. 템플릿에 맞춰 PR 본문 작성
+6. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
+
+## 시멘틱 버저닝
+
+PR 생성 전에 변경사항을 분석하여 package.json 버전을 자동 업데이트한다.
+
+### 절차
+
+1. `git log main..HEAD --oneline`로 커밋 메시지 수집
+2. 커밋 타입 기반으로 범프 레벨 결정:
+
+| 조건 | 범프 | 예시 |
+|------|------|------|
+| 커밋 본문에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
+| `feat` 타입 커밋 존재 | **minor** | 1.3.0 → 1.4.0 |
+| 그 외 (`fix`, `enhance`, `refactor`, `docs`, `chore`, `test`) | **patch** | 1.3.0 → 1.3.1 |
+
+3. 가장 높은 범프 레벨을 선택 (major > minor > patch)
+4. package.json의 `version` 필드를 업데이트
+5. 별도 커밋 생성:
+   ```
+   chore: bump version to {new_version}
+   ```
+
+### 규칙
+
+- main 브랜치 대비 커밋이 없으면 버저닝을 건너뛴다
+- 버전 범프 커밋은 PR의 마지막 커밋이어야 한다
+- `git log main..HEAD --format='%s%n%b'`로 제목과 본문 모두 확인하여 BREAKING CHANGE를 탐지한다
 
 ## 브랜치 컨벤션
 
