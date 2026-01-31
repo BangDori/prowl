@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Check version change
+        id: version
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+          git show HEAD~1:package.json > /tmp/prev-package.json 2>/dev/null || echo '{"version":"0.0.0"}' > /tmp/prev-package.json
+          PREVIOUS=$(node -p "require('/tmp/prev-package.json').version")
+          if [ "$CURRENT" = "$PREVIOUS" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$CURRENT" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check tag exists
+        if: steps.version.outputs.changed == 'true'
+        id: tag
+        run: |
+          if git ls-remote --tags origin "v${{ steps.version.outputs.version }}" | grep -q .; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Node.js
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and package
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        run: pnpm package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create tag
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            --title "Prowl v${{ steps.version.outputs.version }}" \
+            --generate-notes \
+            release/Prowl-*.dmg
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
