@@ -1,6 +1,6 @@
 {
   "name": "prowl",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "A cat that watches your background jobs from the macOS menubar",
   "packageManager": "pnpm@10.15.1",
   "main": "dist/main/index.js",
@@ -57,9 +57,14 @@
       "biome check --write"
     ]
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BangDori/prowl"
+  },
   "build": {
     "appId": "com.bangdori.prowl",
     "productName": "Prowl",
+    "publish": null,
     "asar": true,
     "npmRebuild": true,
     "mac": {
@@ -72,6 +77,7 @@
     "files": [
       "dist/**/*",
       "assets/**/*",
+      "splash.html",
       "package.json"
     ],
     "directories": {
