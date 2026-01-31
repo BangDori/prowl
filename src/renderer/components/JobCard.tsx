@@ -1,23 +1,10 @@
-import { useState, useRef } from 'react';
-import {
-  Play,
-  Folder,
-  FileText,
-  Loader2,
-  Pencil,
-  Check,
-  X,
-} from 'lucide-react';
-import {
-  LaunchdJob,
-  LogContent,
-  JobCustomization,
-  JobActionResult,
-} from '../../shared/types';
-import ToggleSwitch from './ToggleSwitch';
-import StatusBadge from './StatusBadge';
-import LogViewer from './LogViewer';
-import { formatRelativeTime } from '../utils/date';
+import { Check, FileText, Folder, Loader2, Pencil, Play, X } from "lucide-react";
+import { useState } from "react";
+import type { JobActionResult, JobCustomization, LaunchdJob, LogContent } from "../../shared/types";
+import { formatRelativeTime } from "../utils/date";
+import LogViewer from "./LogViewer";
+import StatusBadge from "./StatusBadge";
+import ToggleSwitch from "./ToggleSwitch";
 
 interface JobCardProps {
   job: LaunchdJob;
@@ -46,28 +33,16 @@ export default function JobCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     displayName: "",
-    icon: "",
-    description: "",
   });
-  const iconInputRef = useRef<HTMLInputElement>(null);
 
   // 표시할 값 (커스터마이징 > 기본값)
   const displayName = customization?.displayName || job.name;
-  const displayIcon = customization?.icon || job.icon;
-  const displayDescription = customization?.description || job.description;
 
   const startEditing = () => {
     setEditForm({
       displayName: customization?.displayName || "",
-      icon: customization?.icon || "",
-      description: customization?.description || "",
     });
     setIsEditing(true);
-  };
-
-  const openEmojiPanel = () => {
-    iconInputRef.current?.focus();
-    window.electronAPI.showEmojiPanel();
   };
 
   const cancelEditing = () => {
@@ -77,8 +52,6 @@ export default function JobCard({
   const saveEditing = async () => {
     await onUpdateCustomization({
       displayName: editForm.displayName || undefined,
-      icon: editForm.icon || undefined,
-      description: editForm.description || undefined,
     });
     setIsEditing(false);
   };
@@ -106,7 +79,7 @@ export default function JobCard({
   };
 
   const formatLastRun = (): string => {
-    if (!job.lastRun) return '-';
+    if (!job.lastRun) return "-";
     return formatRelativeTime(new Date(job.lastRun.timestamp));
   };
 
@@ -115,37 +88,12 @@ export default function JobCard({
       {isEditing ? (
         // 편집 모드
         <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <input
-              ref={iconInputRef}
-              type="text"
-              value={editForm.icon}
-              onChange={(e) =>
-                setEditForm((f) => ({ ...f, icon: e.target.value }))
-              }
-              onClick={openEmojiPanel}
-              placeholder={job.icon}
-              className="w-12 text-center text-xl input-field cursor-pointer"
-              maxLength={4}
-            />
-            <input
-              type="text"
-              value={editForm.displayName}
-              onChange={(e) =>
-                setEditForm((f) => ({ ...f, displayName: e.target.value }))
-              }
-              placeholder={job.name}
-              className="flex-1 input-field"
-            />
-          </div>
           <input
             type="text"
-            value={editForm.description}
-            onChange={(e) =>
-              setEditForm((f) => ({ ...f, description: e.target.value }))
-            }
-            placeholder={job.description || "설명 입력..."}
-            className="w-full input-field"
+            value={editForm.displayName}
+            onChange={(e) => setEditForm((f) => ({ ...f, displayName: e.target.value }))}
+            placeholder={job.name}
+            className="flex-1 input-field"
           />
           <div className="flex justify-end gap-2">
             <button
@@ -167,18 +115,13 @@ export default function JobCard({
       ) : (
         // 일반 모드
         <>
-          {/* 상단: 아이콘, 이름, 토글 */}
+          {/* 상단: 이름, 토글 */}
           <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{displayIcon}</span>
-              <div>
-                <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                  {displayName}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
-                  {job.scheduleText}
-                </p>
-              </div>
+            <div>
+              <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                {displayName}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-500">{job.scheduleText}</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -188,20 +131,9 @@ export default function JobCard({
               >
                 <Pencil className="w-3.5 h-3.5" />
               </button>
-              <ToggleSwitch
-                enabled={job.isLoaded}
-                loading={isToggling}
-                onChange={onToggle}
-              />
+              <ToggleSwitch enabled={job.isLoaded} loading={isToggling} onChange={onToggle} />
             </div>
           </div>
-
-          {/* 중단: 설명 */}
-          {displayDescription && (
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-3 leading-relaxed">
-              {displayDescription}
-            </p>
-          )}
 
           {/* 하단: 마지막 실행 + 액션 버튼 */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-prowl-border">

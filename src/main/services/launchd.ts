@@ -1,25 +1,21 @@
 import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import { LaunchdJob, JobActionResult } from "../../shared/types";
-import {
-  LAUNCH_AGENTS_DIR,
-  DEFAULT_ICON,
-  DEFAULT_DESCRIPTION,
-} from "../constants";
-import { getPatterns } from "./settings";
-import {
-  parsePlistFile,
-  extractLabel,
-  extractScriptPath,
-  extractLogPath,
-  extractSchedule,
-  scheduleToText,
-  getJobNameFromLabel,
-} from "./plist-parser";
-import { getLastRunInfo } from "./log-reader";
+import type { JobActionResult, LaunchdJob } from "../../shared/types";
+import { LAUNCH_AGENTS_DIR } from "../constants";
 import { executeCommand } from "../utils/command";
 import { matchesAnyPattern } from "../utils/pattern-matcher";
+import { getLastRunInfo } from "./log-reader";
+import {
+  extractLabel,
+  extractLogPath,
+  extractSchedule,
+  extractScriptPath,
+  getJobNameFromLabel,
+  parsePlistFile,
+  scheduleToText,
+} from "./plist-parser";
+import { getPatterns } from "./settings";
 
 /**
  * 설정된 패턴에 맞는 모든 plist 파일 찾기
@@ -170,8 +166,6 @@ export function listAllJobs(): LaunchdJob[] {
       id: label,
       label,
       name: jobName,
-      description: DEFAULT_DESCRIPTION,
-      icon: DEFAULT_ICON,
       plistPath,
       scriptPath,
       logPath,
@@ -192,12 +186,8 @@ export function listAllJobs(): LaunchdJob[] {
  */
 function sortJobsByLastRun(jobs: LaunchdJob[]): LaunchdJob[] {
   return jobs.sort((a, b) => {
-    const aTime = a.lastRun?.timestamp
-      ? new Date(a.lastRun.timestamp).getTime()
-      : 0;
-    const bTime = b.lastRun?.timestamp
-      ? new Date(b.lastRun.timestamp).getTime()
-      : 0;
+    const aTime = a.lastRun?.timestamp ? new Date(a.lastRun.timestamp).getTime() : 0;
+    const bTime = b.lastRun?.timestamp ? new Date(b.lastRun.timestamp).getTime() : 0;
     return bTime - aTime;
   });
 }
