@@ -1,5 +1,4 @@
 import { app, ipcMain, shell } from "electron";
-import { WINDOW } from "./constants";
 import type {
   AppSettings,
   FocusMode,
@@ -9,7 +8,7 @@ import type {
   LaunchdJob,
   LogContent,
 } from "../shared/types";
-import { LOG_LINES_DEFAULT } from "./constants";
+import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";

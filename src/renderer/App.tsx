@@ -33,7 +33,10 @@ export default function App() {
   }, []);
 
   return (
-    <div ref={containerRef} className="bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100">
+    <div
+      ref={containerRef}
+      className="bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100"
+    >
       {route === "monitor" ? (
         <BackgroundMonitor onBack={closeWindow} />
       ) : route === "quiet-hours" ? (
