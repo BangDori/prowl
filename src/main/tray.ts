@@ -16,7 +16,7 @@ function getIndexUrl(): string {
 /**
  * 서브페이지 BrowserWindow를 트레이 근처에 열기
  */
-function showSubPage(hash: string): void {
+export function showSubPage(hash: string): void {
   if (subWindow && !subWindow.isDestroyed()) {
     subWindow.loadURL(`${getIndexUrl()}#${hash}`);
     subWindow.show();

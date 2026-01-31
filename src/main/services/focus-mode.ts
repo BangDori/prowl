@@ -41,11 +41,22 @@ function getNotificationIcon(): Electron.NativeImage {
 }
 
 function sendNudgeToRenderer(message: string): void {
-  // dynamic import to avoid circular dependency
-  import("../tray").then(({ getSubWindow }) => {
-    const win = getSubWindow();
-    if (win && !win.isDestroyed()) {
-      win.webContents.send("focusMode:nudge", message);
+  import("../tray").then(({ getSubWindow, showSubPage }) => {
+    let win = getSubWindow();
+    if (!win || win.isDestroyed()) {
+      // 윈도우가 없으면 monitor 페이지를 열고 로드 완료 후 전송
+      showSubPage("monitor");
+      win = getSubWindow();
+      if (win && !win.isDestroyed()) {
+        win.webContents.once("did-finish-load", () => {
+          win!.webContents.send("focusMode:nudge", message);
+        });
+      }
+      return;
+    }
+    win.webContents.send("focusMode:nudge", message);
+    if (!win.isVisible()) {
+      win.show();
     }
   });
 }
