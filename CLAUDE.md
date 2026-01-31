@@ -19,8 +19,9 @@ Main Process (Electron)          Renderer Process (React)
 │  src/main/             │       │  src/renderer/      │
 │  ├── index.ts          │       │  ├── App.tsx        │
 │  ├── tray.ts           │  IPC  │  ├── components/    │
-│  ├── ipc.ts            │◄─────►│  ├── hooks/         │
-│  ├── constants.ts      │       │  └── utils/         │
+│  ├── splash.ts         │◄─────►│  ├── hooks/         │
+│  ├── ipc.ts            │       │  └── utils/         │
+│  ├── constants.ts      │       │
 │  ├── utils/            │       │      └── date.ts    │
 │  │   ├── command.ts    │       └─────────────────────┘
 │  │   └── pattern-matcher.ts           ▲
@@ -44,6 +45,8 @@ Main Process (Electron)          Renderer Process (React)
 
 | 파일                                | 역할                                      |
 | ----------------------------------- | ----------------------------------------- |
+| `splash.html`                       | 스플래시 화면 UI (SVG 고양이 눈 + 타이포그래피) |
+| `src/main/splash.ts`                | 스플래시 윈도우 생성/디졸브/닫기          |
 | `src/main/constants.ts`             | 상수 정의 (매직 넘버, 로그 패턴 등)       |
 | `src/main/utils/command.ts`         | launchctl 명령어 실행 유틸리티            |
 | `src/main/utils/pattern-matcher.ts` | 패턴 매칭 유틸리티                        |
@@ -103,6 +106,7 @@ type JobCustomizations = Record<string, JobCustomization>;
 2. **menubar 패키지**: 트레이 아이콘 클릭 시 팝업 창 자동 표시
 3. **Dock 숨김**: `app.dock?.hide()` (macOS에서 Dock 아이콘 없음)
 4. **단일 인스턴스**: `app.requestSingleInstanceLock()` 사용
+5. **스플래시 화면**: 앱 실행 → 스플래시(4.5초) → 파티클 디졸브 → 트레이 아이콘 표시
 
 ## Types
 
