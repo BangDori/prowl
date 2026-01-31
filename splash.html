@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg-deep: #0A0A0C;
+      --gold: #D4B870;
+      --gold-bright: #E8D5A0;
+      --gold-dim: rgba(212, 184, 112, 0.15);
+      --ice: #A2D2FF;
+      --text: #E8E8EC;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    }
+
+    /* ===== 안개 레이어들 ===== */
+
+    /* 메인 안개 - 화면 전체를 감싸는 어둠 */
+    .fog-base {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%,
+        rgba(10,10,12,0.95) 0%,
+        rgba(10,10,12,0.85) 35%,
+        rgba(10,10,12,0.5) 60%,
+        transparent 80%);
+      opacity: 0;
+      animation: fog-base-in 2s ease-out forwards;
+    }
+
+    /* 안개 조각들 - 피어오르는 느낌 */
+    .fog-layer {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .fog-1 {
+      width: 500px; height: 200px;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(30,28,24,0.5), transparent 70%);
+      animation: fog-rise 2.5s ease-out 0.2s forwards, fog-drift-1 10s ease-in-out 2s infinite;
+    }
+
+    .fog-2 {
+      width: 400px; height: 160px;
+      top: 60%; left: 30%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(ellipse, rgba(212,184,112,0.06), transparent 70%);
+      animation: fog-rise 2.8s ease-out 0.5s forwards, fog-drift-2 12s ease-in-out 2.5s infinite;
+    }
+
+    .fog-3 {
+      width: 350px; height: 140px;
+      top: 40%; right: -10%;
+      background: radial-gradient(ellipse, rgba(162,210,255,0.04), transparent 70%);
+      animation: fog-rise 3s ease-out 0.8s forwards, fog-drift-3 14s ease-in-out 3s infinite;
+    }
+
+    .fog-4 {
+      width: 600px; height: 250px;
+      bottom: 10%; left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(ellipse, rgba(20,18,16,0.4), transparent 65%);
+      animation: fog-rise-up 3s ease-out 0.3s forwards, fog-drift-1 16s ease-in-out 3s infinite;
+    }
+
+    .fog-5 {
+      width: 300px; height: 120px;
+      top: 25%; left: 15%;
+      background: radial-gradient(ellipse, rgba(212,184,112,0.04), transparent 70%);
+      animation: fog-rise 3.5s ease-out 1s forwards, fog-drift-3 11s ease-in-out 3.5s infinite;
+    }
+
+    /* ===== 콘텐츠 ===== */
+
+    .splash {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .eyes-group {
+      position: relative;
+      width: 380px;
+      height: 380px;
+      opacity: 0;
+      filter: blur(10px);
+      transform: scale(0.92);
+      animation: eyes-emerge 2s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+    }
+
+    .eyes-svg {
+      width: 380px;
+      height: 380px;
+    }
+
+    .eye-top-glow {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,184,112,0.2) 0%, transparent 70%);
+      opacity: 0;
+      animation: glow-emerge 1.5s ease-out 1.8s forwards, glow-pulse 3s ease-in-out 3s infinite;
+    }
+
+    .title-svg {
+      width: 320px;
+      height: 60px;
+      opacity: 0;
+      animation: text-in 2s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+    }
+
+    .title-letter {
+      fill: none;
+      stroke: var(--text);
+      stroke-width: 0.8;
+      stroke-dasharray: 300;
+      stroke-dashoffset: 300;
+      opacity: 0;
+    }
+
+    .title-letter-fill {
+      fill: var(--text);
+      opacity: 0;
+    }
+
+    /* 각 글자 순차 드로잉 */
+    .letter-P .title-letter { animation: letter-draw 1.2s ease-out 2.0s forwards; }
+    .letter-P .title-letter-fill { animation: letter-fill 0.6s ease-out 2.8s forwards; }
+    .letter-R .title-letter { animation: letter-draw 1.2s ease-out 2.15s forwards; }
+    .letter-R .title-letter-fill { animation: letter-fill 0.6s ease-out 2.95s forwards; }
+    .letter-O .title-letter { animation: letter-draw 1.2s ease-out 2.3s forwards; }
+    .letter-O .title-letter-fill { animation: letter-fill 0.6s ease-out 3.1s forwards; }
+    .letter-W .title-letter { animation: letter-draw 1.2s ease-out 2.45s forwards; }
+    .letter-W .title-letter-fill { animation: letter-fill 0.6s ease-out 3.25s forwards; }
+    .letter-L .title-letter { animation: letter-draw 1.2s ease-out 2.6s forwards; }
+    .letter-L .title-letter-fill { animation: letter-fill 0.6s ease-out 3.4s forwards; }
+
+    @keyframes letter-draw {
+      0% { stroke-dashoffset: 300; opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 1; }
+    }
+
+    @keyframes letter-fill {
+      0% { opacity: 0; }
+      100% { opacity: 0.9; }
+    }
+
+    /* 세리프 장식 라인 */
+    .serif-line {
+      stroke: var(--gold);
+      stroke-width: 0.5;
+      opacity: 0;
+      animation: serif-appear 0.8s ease-out 3.2s forwards;
+    }
+
+    @keyframes serif-appear {
+      0% { opacity: 0; }
+      100% { opacity: 0.3; }
+    }
+
+    /* ===== 키프레임 ===== */
+
+    @keyframes fog-base-in {
+      0% { opacity: 0; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fog-rise {
+      0% { opacity: 0; transform: translate(-50%, -30%) scale(0.7); filter: blur(60px); }
+      100% { opacity: 1; filter: blur(40px); }
+    }
+
+    @keyframes fog-rise-up {
+      0% { opacity: 0; transform: translateX(-50%) translateY(40px) scale(0.8); filter: blur(60px); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); filter: blur(40px); }
+    }
+
+    @keyframes fog-drift-1 {
+      0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+      50% { transform: translate(-50%, -50%) translateX(20px); }
+    }
+
+    @keyframes fog-drift-2 {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-15px); }
+    }
+
+    @keyframes fog-drift-3 {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(-20px) translateY(10px); }
+    }
+
+    @keyframes eyes-emerge {
+      0% { opacity: 0; filter: blur(10px); transform: scale(0.92); }
+      60% { opacity: 0.8; filter: blur(2px); transform: scale(0.98); }
+      100% { opacity: 1; filter: blur(0); transform: scale(1); }
+    }
+
+    @keyframes glow-emerge {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); }
+      50% { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+    }
+
+    @keyframes text-in {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* 디졸브용 */
+    .dissolving .splash { pointer-events: none; }
+    .particle { position: fixed; pointer-events: none; }
+  </style>
+</head>
+<body>
+  <!-- 안개 레이어들 -->
+  <div class="fog-base"></div>
+  <div class="fog-layer fog-1"></div>
+  <div class="fog-layer fog-2"></div>
+  <div class="fog-layer fog-3"></div>
+  <div class="fog-layer fog-4"></div>
+  <div class="fog-layer fog-5"></div>
+
+  <div class="splash">
+    <div class="eyes-group">
+      <div class="eye-top-glow"></div>
+      <svg class="eyes-svg" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g-cat" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#E8D5A0" />
+            <stop offset="60%" stop-color="#D4B870" />
+            <stop offset="100%" stop-color="#A08040" />
+          </radialGradient>
+          <radialGradient id="g-top" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#F0E6CC" />
+            <stop offset="60%" stop-color="#D4B870" />
+            <stop offset="100%" stop-color="#8A6E30" />
+          </radialGradient>
+        </defs>
+
+        <!-- ===== 바이너리 코드 원형 띠 ===== -->
+        <g style="animation: spin 50s linear infinite; transform-origin: 190px 100px;">
+          <path id="bin-outer" d="M 190,100 m -75,0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0" fill="none" />
+          <text font-family="SF Mono, Menlo, monospace" font-size="9" fill="#D4B870" opacity="0.3">
+            <textPath href="#bin-outer">0 1 0 1 0 1 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</textPath>
+          </text>
+        </g>
+
+        <g style="animation: spin 40s linear reverse infinite; transform-origin: 190px 100px;">
+          <path id="bin-inner" d="M 190,100 m -56,0 a 56,56 0 1,1 112,0 a 56,56 0 1,1 -112,0" fill="none" />
+          <text font-family="SF Mono, Menlo, monospace" font-size="7" fill="#D4B870" opacity="0.15">
+            <textPath href="#bin-inner">0 0 1 0 0 1 1 0 1 0 0 0 1 1 0 1 0 1 0 0 1 0 1 1</textPath>
+          </text>
+        </g>
+
+        <!-- ===== 감시의 눈 ===== -->
+        <g>
+          <path d="M 152,100 Q 190,68 228,100 Q 190,132 152,100 Z"
+                fill="none" stroke="#D4B870" stroke-width="1.5" opacity="0.5" />
+          <circle cx="190" cy="100" r="16" fill="url(#g-top)" opacity="0.85">
+            <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="190" cy="100" r="5.5" fill="var(--bg-deep)" />
+          <circle cx="186" cy="95" r="3" fill="white" opacity="0.45" />
+        </g>
+
+        <!-- ===== 왼쪽 고양이 눈 ===== -->
+        <g>
+          <ellipse cx="125" cy="290" rx="34" ry="14" fill="url(#g-cat)" opacity="0.9">
+            <animate attributeName="opacity" values="0.8;0.95;0.8" dur="3s" repeatCount="indefinite" />
+          </ellipse>
+          <path d="M 84,290 Q 102,275 125,273 Q 148,275 166,290 Q 148,305 125,307 Q 102,305 84,290 Z"
+                fill="url(#g-cat)" opacity="0.3" />
+          <ellipse cx="125" cy="290" rx="4.5" ry="11.5" fill="var(--bg-deep)" />
+          <circle cx="118" cy="285" r="3.5" fill="white" opacity="0.35" />
+          <circle cx="132" cy="295" r="1.5" fill="white" opacity="0.18" />
+        </g>
+
+        <!-- ===== 오른쪽 고양이 눈 ===== -->
+        <g>
+          <ellipse cx="255" cy="290" rx="34" ry="14" fill="url(#g-cat)" opacity="0.9">
+            <animate attributeName="opacity" values="0.8;0.95;0.8" dur="3s" begin="0.5s" repeatCount="indefinite" />
+          </ellipse>
+          <path d="M 214,290 Q 232,275 255,273 Q 278,275 296,290 Q 278,305 255,307 Q 232,305 214,290 Z"
+                fill="url(#g-cat)" opacity="0.3" />
+          <ellipse cx="255" cy="290" rx="4.5" ry="11.5" fill="var(--bg-deep)" />
+          <circle cx="248" cy="285" r="3.5" fill="white" opacity="0.35" />
+          <circle cx="262" cy="295" r="1.5" fill="white" opacity="0.18" />
+        </g>
+
+        <!-- 연결선 -->
+        <line x1="175" y1="120" x2="135" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
+        <line x1="205" y1="120" x2="245" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
+      </svg>
+    </div>
+
+    <!-- PROWL 우아한 세리프 타이포그래피 -->
+    <svg class="title-svg" viewBox="0 0 320 60" xmlns="http://www.w3.org/2000/svg">
+      <!-- 세리프 장식 — 상단 -->
+      <line class="serif-line" x1="20" y1="4" x2="300" y2="4" />
+
+      <!-- 글자들: stroke 드로잉 → fill 등장 -->
+      <g class="letter-P">
+        <text class="title-letter" x="30" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">P</text>
+        <text class="title-letter-fill" x="30" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">P</text>
+      </g>
+      <g class="letter-R">
+        <text class="title-letter" x="86" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">R</text>
+        <text class="title-letter-fill" x="86" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">R</text>
+      </g>
+      <g class="letter-O">
+        <text class="title-letter" x="142" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">O</text>
+        <text class="title-letter-fill" x="142" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">O</text>
+      </g>
+      <g class="letter-W">
+        <text class="title-letter" x="198" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">W</text>
+        <text class="title-letter-fill" x="198" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">W</text>
+      </g>
+      <g class="letter-L">
+        <text class="title-letter" x="268" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">L</text>
+        <text class="title-letter-fill" x="268" y="44" font-family="'Georgia', 'Times New Roman', 'Garamond', serif"
+              font-size="42" font-weight="400" letter-spacing="22">L</text>
+      </g>
+
+      <!-- 세리프 장식 — 하단 -->
+      <line class="serif-line" x1="20" y1="56" x2="300" y2="56" />
+    </svg>
+  </div>
+
+  <script>
+    function dissolve() {
+      document.body.classList.add('dissolving');
+      // 안개 페이드아웃
+      document.querySelectorAll('.fog-base, .fog-layer').forEach(el => {
+        el.style.transition = 'opacity 1s ease-out';
+        el.style.opacity = '0';
+      });
+      const splash = document.querySelector('.splash');
+      const rect = splash.getBoundingClientRect();
+      const colors = ['#D4B870', '#E8D5A0', '#A08040', '#E8E8EC'];
+      const count = 120;
+
+      splash.style.transition = 'opacity 0.2s';
+      splash.style.opacity = '0';
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'particle';
+        const size = 1.5 + Math.random() * 3;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const startX = rect.left + Math.random() * rect.width;
+        const startY = rect.top + Math.random() * rect.height;
+        const windX = 150 + Math.random() * 300;
+        const windY = -60 + Math.random() * 120;
+        const delay = Math.random() * 400;
+        const dur = 600 + Math.random() * 600;
+
+        el.style.cssText = `
+          position:fixed; left:${startX}px; top:${startY}px;
+          width:${size}px; height:${size}px;
+          background:${color}; border-radius:50%;
+          box-shadow:0 0 ${size*2}px ${color};
+          opacity:0.7; pointer-events:none;
+          transition: transform ${dur}ms cubic-bezier(0.23,1,0.32,1),
+                      opacity ${dur}ms ease-out;
+          transition-delay:${delay}ms;
+        `;
+        document.body.appendChild(el);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          el.style.transform = `translate(${windX}px,${windY}px) scale(0.1)`;
+          el.style.opacity = '0';
+        }));
+      }
+    }
+  </script>
+</body>
+</html>
