@@ -64,16 +64,19 @@ body {
   @apply text-gray-700 dark:text-gray-200;
 }
 
-/* 카드 스타일 - 모던 다크 */
+/* 카드 스타일 - 플랫 리스트 */
 .job-card {
-  @apply bg-card-light dark:bg-prowl-card rounded-xl p-4;
-  @apply border border-gray-200 dark:border-prowl-border;
-  @apply transition-all duration-200;
+  @apply px-4 py-3;
+  @apply border-b border-gray-100 dark:border-prowl-border;
+  @apply transition-all duration-150;
+}
+
+.job-card:last-child {
+  @apply border-b-0;
 }
 
 .job-card:hover {
-  @apply border-gray-300 dark:border-prowl-border-hover;
-  @apply dark:shadow-lg;
+  @apply bg-gray-50/50 dark:bg-white/[0.02];
 }
 
 /* 로그 뷰어 - 터미널 스타일 */
