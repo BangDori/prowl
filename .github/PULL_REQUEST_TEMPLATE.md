@@ -8,6 +8,6 @@
 
 ## 검증
 
-- [ ] `pnpm test` 통과
-- [ ] `pnpm build` 성공
+- [ ] `bun run test` 통과
+- [ ] `bun run build` 성공
 <!-- 추가 검증 항목 -->

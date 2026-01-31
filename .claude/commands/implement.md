@@ -52,8 +52,8 @@ AskUserQuestion으로 최소한의 필수 정보를 확인:
 - [ ] renderer/global.d.ts
 
 ## 성공 기준
-- [ ] pnpm test 통과
-- [ ] pnpm build:main 통과
+- [ ] bun run test 통과
+- [ ] bun run build:main 통과
 - [ ] [기능별 구체적 기준]
 
 ## 테스트 계획
@@ -73,8 +73,8 @@ AskUserQuestion으로 최소한의 필수 정보를 확인:
 반복 (최대 5회):
   1. 코드 작성/수정 (implementer 지침)
   2. 관련 테스트 작성/수정 (test-writer 지침)
-  3. pnpm test 실행
-  4. pnpm build:main 실행
+  3. bun run test 실행
+  4. bun run build:main 실행
   5. 전부 통과 → Phase 4로
      하나라도 실패 → 에러 분석 후 1로
 ```

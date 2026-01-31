@@ -13,8 +13,8 @@
 계획에 반드시 포함할 것:
 - **변경 대상 파일** 목록 (경로 + 변경 이유)
 - **성공 기준** — 이 작업이 "완료"되려면 무엇이 통과해야 하는가
-  - `pnpm test` 통과
-  - `pnpm build` 성공
+  - `bun run test` 통과
+  - `bun run build` 성공
   - 특정 동작 확인 (예: "JobCard에 설명 필드가 표시된다")
 - **IPC 변경 여부** — 변경 시 main/preload/renderer 세 곳 명시
 - **새 타입 필요 여부** — shared/types.ts에 추가할 타입
