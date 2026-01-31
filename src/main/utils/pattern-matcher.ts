@@ -13,7 +13,7 @@ export function matchesAnyPattern(value: string, patterns: string[]): boolean {
 export function filterByPatterns<T>(
   items: T[],
   patterns: string[],
-  getValue: (item: T) => string
+  getValue: (item: T) => string,
 ): T[] {
   if (patterns.length === 0) return items;
   return items.filter((item) => matchesAnyPattern(getValue(item), patterns));

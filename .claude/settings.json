@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(pnpm build*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

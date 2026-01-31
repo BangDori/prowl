@@ -1,12 +1,12 @@
-import Store from 'electron-store';
+import Store from "electron-store";
 import {
-  AppSettings,
+  type AppSettings,
   DEFAULT_FOCUS_MODE,
   DEFAULT_SETTINGS,
-  FocusMode,
-  JobCustomization,
-  JobCustomizations,
-} from '../../shared/types';
+  type FocusMode,
+  type JobCustomization,
+  type JobCustomizations,
+} from "../../shared/types";
 
 interface StoreSchema {
   settings: AppSettings;
@@ -21,11 +21,11 @@ const store = new Store<StoreSchema>({
 });
 
 export function getSettings(): AppSettings {
-  return store.get('settings') ?? DEFAULT_SETTINGS;
+  return store.get("settings") ?? DEFAULT_SETTINGS;
 }
 
 export function setSettings(settings: AppSettings): void {
-  store.set('settings', settings);
+  store.set("settings", settings);
 }
 
 export function getPatterns(): string[] {
@@ -43,14 +43,11 @@ export function setFocusMode(focusMode: FocusMode): void {
 
 // 작업 커스터마이징 관련 함수들
 export function getAllJobCustomizations(): JobCustomizations {
-  return store.get('jobCustomizations');
+  return store.get("jobCustomizations");
 }
 
-export function setJobCustomization(
-  jobId: string,
-  customization: JobCustomization
-): void {
-  const customizations = store.get('jobCustomizations');
+export function setJobCustomization(jobId: string, customization: JobCustomization): void {
+  const customizations = store.get("jobCustomizations");
   customizations[jobId] = customization;
-  store.set('jobCustomizations', customizations);
+  store.set("jobCustomizations", customizations);
 }

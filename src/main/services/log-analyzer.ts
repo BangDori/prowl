@@ -1,9 +1,9 @@
 import {
-  LOG_PATTERNS,
   LOG_ANALYSIS_LINES,
   LOG_ERROR_SEARCH_LINES,
   LOG_MESSAGE_MAX_LENGTH,
-} from '../constants';
+  LOG_PATTERNS,
+} from "../constants";
 
 export interface LogAnalysisResult {
   success: boolean;
@@ -15,7 +15,7 @@ export interface LogAnalysisResult {
  * 패턴 기반으로 마지막 실행 결과를 추론
  */
 export function analyzeLogContent(lines: string[]): LogAnalysisResult {
-  const lastLines = lines.slice(-LOG_ANALYSIS_LINES).join('\n').toLowerCase();
+  const lastLines = lines.slice(-LOG_ANALYSIS_LINES).join("\n").toLowerCase();
 
   let success = true;
   let message: string | undefined;

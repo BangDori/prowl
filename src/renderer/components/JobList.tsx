@@ -1,11 +1,11 @@
-import {
-  LaunchdJob,
+import type {
+  JobActionResult,
   JobCustomization,
   JobCustomizations,
-  JobActionResult,
+  LaunchdJob,
   LogContent,
-} from '../../shared/types';
-import JobCard from './JobCard';
+} from "../../shared/types";
+import JobCard from "./JobCard";
 
 interface JobActionsHook {
   toggling: string | null;
@@ -29,7 +29,7 @@ export default function JobList({
   onUpdateCustomization,
 }: JobListProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-0">
       {jobs.map((job) => (
         <JobCard
           key={job.id}

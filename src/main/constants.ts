@@ -20,12 +20,6 @@ export const WEEKDAY_NAMES: Record<number, string> = {
 };
 
 // ============================================
-// 기본값
-// ============================================
-export const DEFAULT_ICON = "⚙️";
-export const DEFAULT_DESCRIPTION = "설명 없음";
-
-// ============================================
 // 로그 관련 상수
 // ============================================
 export const LOG_LINES_DEFAULT = 50;
@@ -34,21 +28,14 @@ export const LOG_ERROR_SEARCH_LINES = 10;
 export const LOG_MESSAGE_MAX_LENGTH = 100;
 
 export const LOG_PATTERNS = {
-  success: [
-    "완료",
-    "complete",
-    "success",
-    "finished",
-    "리포트 완료",
-    "slack 전송 완료",
-  ],
+  success: ["완료", "complete", "success", "finished", "리포트 완료", "slack 전송 완료"],
   failure: ["error", "failed", "exception", "실패", "unable to"],
 } as const;
 
 // ============================================
 // 시간 상수 (shared에서 re-export)
 // ============================================
-export { TIME, JOB_POLLING_INTERVAL_MS } from "../shared/constants";
+export { JOB_POLLING_INTERVAL_MS, TIME } from "../shared/constants";
 
 // ============================================
 // 윈도우 설정
@@ -56,6 +43,7 @@ export { TIME, JOB_POLLING_INTERVAL_MS } from "../shared/constants";
 export const WINDOW = {
   WIDTH: 400,
   HEIGHT: 500,
+  MAX_HEIGHT: 600,
 } as const;
 
 export const DEV_SERVER_PORT = 5173;

@@ -20,13 +20,11 @@ export interface ElectronAPI {
   showInFolder: (filePath: string) => Promise<void>;
   openExternal: (url: string) => Promise<void>;
   getJobCustomizations: () => Promise<JobCustomizations>;
-  setJobCustomization: (
-    jobId: string,
-    customization: JobCustomization,
-  ) => Promise<void>;
-  showEmojiPanel: () => Promise<void>;
+  setJobCustomization: (jobId: string, customization: JobCustomization) => Promise<void>;
   getFocusMode: () => Promise<FocusMode>;
   setFocusMode: (focusMode: FocusMode) => Promise<void>;
+  resizeWindow: (height: number) => Promise<void>;
+  quitApp: () => Promise<void>;
 }
 
 declare global {
@@ -34,5 +32,3 @@ declare global {
     electronAPI: ElectronAPI;
   }
 }
-
-export {};
