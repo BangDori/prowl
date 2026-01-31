@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.hoisted ensures these are available before vi.mock factory runs
 const { mockGet, mockSet } = vi.hoisted(() => ({
@@ -13,16 +13,16 @@ vi.mock("electron-store", () => ({
   },
 }));
 
-import {
-  getSettings,
-  setSettings,
-  getPatterns,
-  getFocusMode,
-  setFocusMode,
-  getAllJobCustomizations,
-  setJobCustomization,
-} from "./settings";
 import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "../../shared/types";
+import {
+  getAllJobCustomizations,
+  getFocusMode,
+  getPatterns,
+  getSettings,
+  setFocusMode,
+  setJobCustomization,
+  setSettings,
+} from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {

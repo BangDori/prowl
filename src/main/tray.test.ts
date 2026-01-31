@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockTrayInstance = {
   setToolTip: vi.fn(),
@@ -36,8 +36,8 @@ vi.mock("electron", () => ({
   shell: { openExternal: vi.fn() },
 }));
 
-import { Tray, Menu } from "electron";
-import { createTray, getTray, getSubWindow } from "./tray";
+import { Menu, Tray } from "electron";
+import { createTray, getSubWindow, getTray } from "./tray";
 
 describe("tray", () => {
   beforeEach(() => {

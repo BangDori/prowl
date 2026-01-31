@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({
   ipcMain: { handle: vi.fn() },
@@ -37,19 +37,18 @@ vi.mock("./tray", () => ({
   getSubWindow: vi.fn(),
 }));
 
-import { ipcMain, app, shell } from "electron";
+import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
-import { listAllJobs, findJobById, toggleJob, startJob } from "./services/launchd";
+import { updateFocusModeMonitor } from "./services/focus-mode";
+import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
 import {
-  getSettings,
-  setSettings,
   getAllJobCustomizations,
-  setJobCustomization,
-  getFocusMode,
+  getSettings,
   setFocusMode,
+  setJobCustomization,
+  setSettings,
 } from "./services/settings";
-import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getSubWindow } from "./tray";
 
 const mockIpcHandle = vi.mocked(ipcMain.handle);
@@ -203,7 +202,10 @@ describe("registerIpcHandlers", () => {
     });
 
     it("setSettings를 호출한다", async () => {
-      const settings = { patterns: ["test"], focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" } };
+      const settings = {
+        patterns: ["test"],
+        focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" },
+      };
       const handler = getHandler("settings:set");
       await handler({}, settings);
       expect(setSettings).toHaveBeenCalledWith(settings);

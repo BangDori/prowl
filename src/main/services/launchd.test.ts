@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");
 vi.mock("node:child_process", () => ({
@@ -26,34 +26,33 @@ vi.mock("../utils/pattern-matcher", () => ({
   matchesAnyPattern: vi.fn(),
 }));
 
-import * as fs from "node:fs";
 import { execSync } from "node:child_process";
-import { getPatterns } from "./settings";
-import { matchesAnyPattern } from "../utils/pattern-matcher";
+import * as fs from "node:fs";
 import { executeCommand } from "../utils/command";
+import { matchesAnyPattern } from "../utils/pattern-matcher";
 import {
-  parsePlistFile,
+  findJobById,
+  findPlistFiles,
+  getLoadedJobPids,
+  getLoadedJobs,
+  isJobLoaded,
+  listAllJobs,
+  loadJob,
+  startJob,
+  toggleJob,
+  unloadJob,
+} from "./launchd";
+import { getLastRunInfo } from "./log-reader";
+import {
   extractLabel,
   extractLogPath,
   extractSchedule,
   extractScriptPath,
   getJobNameFromLabel,
+  parsePlistFile,
   scheduleToText,
 } from "./plist-parser";
-import { getLastRunInfo } from "./log-reader";
-
-import {
-  findPlistFiles,
-  getLoadedJobs,
-  getLoadedJobPids,
-  isJobLoaded,
-  loadJob,
-  unloadJob,
-  startJob,
-  toggleJob,
-  listAllJobs,
-  findJobById,
-} from "./launchd";
+import { getPatterns } from "./settings";
 
 const mockFs = vi.mocked(fs);
 const mockExecSync = vi.mocked(execSync);
