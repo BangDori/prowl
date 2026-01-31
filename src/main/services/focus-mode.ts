@@ -40,6 +40,16 @@ function getNotificationIcon(): Electron.NativeImage {
   return notificationIcon;
 }
 
+function sendNudgeToRenderer(message: string): void {
+  // dynamic import to avoid circular dependency
+  import("../tray").then(({ getSubWindow }) => {
+    const win = getSubWindow();
+    if (win && !win.isDestroyed()) {
+      win.webContents.send("focusMode:nudge", message);
+    }
+  });
+}
+
 function sendNotification(title: string, message: string): void {
   console.log(
     `[focus-mode] sendNotification called, isReady=${app.isReady()}, supported=${Notification.isSupported()}`,
@@ -92,7 +102,9 @@ function checkProcesses(): void {
   if (now - lastNotifiedAt < NUDGE_INTERVAL_MS) return;
 
   lastNotifiedAt = now;
-  sendNotification("Prowl", pickNudgeMessage());
+  const message = pickNudgeMessage();
+  sendNotification("Prowl", message);
+  sendNudgeToRenderer(message);
 }
 
 export function startFocusModeMonitor(): void {
