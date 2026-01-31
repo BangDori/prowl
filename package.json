@@ -57,9 +57,14 @@
       "biome check --write"
     ]
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BangDori/prowl"
+  },
   "build": {
     "appId": "com.bangdori.prowl",
     "productName": "Prowl",
+    "publish": null,
     "asar": true,
     "npmRebuild": true,
     "mac": {
