@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, X, Github, Plus } from "lucide-react";
-import { FocusMode, DEFAULT_FOCUS_MODE } from "../../shared/types";
-import ToggleSwitch from "./ToggleSwitch";
 
 interface SettingsProps {
 	onBack: () => void;
@@ -12,17 +10,11 @@ export default function Settings({ onBack }: SettingsProps) {
 	const [newPattern, setNewPattern] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
-	const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
-
 	useEffect(() => {
 		async function load() {
 			try {
-				const [settings, fm] = await Promise.all([
-					window.electronAPI.getSettings(),
-					window.electronAPI.getFocusMode(),
-				]);
+				const settings = await window.electronAPI.getSettings();
 				setPatterns(settings.patterns);
-				setFocusMode(fm);
 			} catch (error) {
 				console.error("Failed to load settings:", error);
 			} finally {
@@ -32,22 +24,11 @@ export default function Settings({ onBack }: SettingsProps) {
 		load();
 	}, []);
 
-	const saveFocusMode = async (updated: FocusMode) => {
-		setFocusMode(updated);
-		try {
-			await window.electronAPI.setFocusMode(updated);
-		} catch (error) {
-			console.error("Failed to save focus mode:", error);
-		}
-	};
-
 	const saveSettings = async (newPatterns: string[]) => {
 		setSaving(true);
 		try {
-			await window.electronAPI.setSettings({
-				patterns: newPatterns,
-				focusMode,
-			});
+			const current = await window.electronAPI.getSettings();
+			await window.electronAPI.setSettings({ ...current, patterns: newPatterns });
 			setPatterns(newPatterns);
 		} catch (error) {
 			console.error("Failed to save settings:", error);
@@ -162,60 +143,6 @@ export default function Settings({ onBack }: SettingsProps) {
 					)}
 				</section>
 
-				<section className="mt-6">
-					<div className="flex items-center justify-between mb-2">
-						<h2 className="section-title">집중 모드</h2>
-						<ToggleSwitch
-							enabled={focusMode.enabled}
-							onChange={() =>
-								saveFocusMode({ ...focusMode, enabled: !focusMode.enabled })
-							}
-						/>
-					</div>
-					<p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-						설정한 시간대에 작업이 실행되면 알림을 보냅니다.
-					</p>
-
-					{focusMode.enabled && (
-						<div className="flex items-center gap-2">
-							<select
-								value={focusMode.startTime}
-								onChange={(e) =>
-									saveFocusMode({ ...focusMode, startTime: e.target.value })
-								}
-								className="input-field text-sm text-center"
-							>
-								{Array.from({ length: 24 }, (_, h) => {
-									const v = `${String(h).padStart(2, "0")}:00`;
-									return (
-										<option key={v} value={v}>
-											{v}
-										</option>
-									);
-								})}
-							</select>
-							<span className="text-xs text-gray-500 dark:text-gray-500">
-								~
-							</span>
-							<select
-								value={focusMode.endTime}
-								onChange={(e) =>
-									saveFocusMode({ ...focusMode, endTime: e.target.value })
-								}
-								className="input-field text-sm text-center"
-							>
-								{Array.from({ length: 24 }, (_, h) => {
-									const v = `${String(h).padStart(2, "0")}:00`;
-									return (
-										<option key={v} value={v}>
-											{v}
-										</option>
-									);
-								})}
-							</select>
-						</div>
-					)}
-				</section>
 			</main>
 
 			<footer className="fixed bottom-0 left-0 right-0 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-xl border-t border-gray-200 dark:border-prowl-border px-4 py-3">

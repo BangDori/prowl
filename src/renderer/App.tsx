@@ -4,19 +4,22 @@ import { useJobActions } from "./hooks/useJobActions";
 import JobList from "./components/JobList";
 import Header from "./components/Header";
 import Settings from "./components/Settings";
-import { JobCustomization, JobCustomizations } from "../shared/types";
+import FocusModePanel from "./components/FocusModePanel";
+import { FocusMode, DEFAULT_FOCUS_MODE, JobCustomization, JobCustomizations } from "../shared/types";
 
-type View = "main" | "settings";
+type View = "main" | "settings" | "focusMode";
 
 export default function App() {
   const [view, setView] = useState<View>("main");
   const { jobs, loading, error, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);
   const [customizations, setCustomizations] = useState<JobCustomizations>({});
+  const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
 
-  // 커스터마이징 데이터 로드
+  // 초기 데이터 로드
   useEffect(() => {
     window.electronAPI.getJobCustomizations().then(setCustomizations);
+    window.electronAPI.getFocusMode().then(setFocusMode);
   }, []);
 
   // 커스터마이징 업데이트
@@ -31,13 +34,28 @@ export default function App() {
     [],
   );
 
-  const handleBackFromSettings = () => {
+  const saveFocusMode = useCallback(async (updated: FocusMode) => {
+    setFocusMode(updated);
+    await window.electronAPI.setFocusMode(updated);
+  }, []);
+
+  const handleBack = () => {
     setView("main");
     refresh();
   };
 
   if (view === "settings") {
-    return <Settings onBack={handleBackFromSettings} />;
+    return <Settings onBack={handleBack} />;
+  }
+
+  if (view === "focusMode") {
+    return (
+      <FocusModePanel
+        focusMode={focusMode}
+        onUpdate={saveFocusMode}
+        onBack={handleBack}
+      />
+    );
   }
 
   return (
@@ -46,6 +64,8 @@ export default function App() {
         onRefresh={refresh}
         onSettings={() => setView("settings")}
         loading={loading}
+        focusMode={focusMode}
+        onToggleFocusMode={() => setView("focusMode")}
       />
 
       <main
