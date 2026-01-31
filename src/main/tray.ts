@@ -1,5 +1,5 @@
-import { BrowserWindow, Menu, Tray, app, nativeImage, shell } from "electron";
-import * as path from "path";
+import * as path from "node:path";
+import { app, BrowserWindow, Menu, nativeImage, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "./constants";
 
 let tray: Tray | null = null;
@@ -24,7 +24,9 @@ function showSubPage(hash: string): void {
   }
 
   const trayBounds = tray?.getBounds();
-  const x = trayBounds ? Math.round(trayBounds.x + trayBounds.width / 2 - WINDOW.WIDTH / 2) : undefined;
+  const x = trayBounds
+    ? Math.round(trayBounds.x + trayBounds.width / 2 - WINDOW.WIDTH / 2)
+    : undefined;
   const y = trayBounds ? trayBounds.y + trayBounds.height : undefined;
 
   subWindow = new BrowserWindow({

@@ -1,6 +1,6 @@
-import { execSync } from "child_process";
-import * as fs from "fs";
-import * as path from "path";
+import { execSync } from "node:child_process";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import type { JobActionResult, LaunchdJob } from "../../shared/types";
 import { LAUNCH_AGENTS_DIR } from "../constants";
 import { executeCommand } from "../utils/command";
@@ -86,7 +86,7 @@ export function getLoadedJobPids(): Map<string, number> {
         const label = parts[2];
         if (matchesAnyPattern(label, patterns)) {
           const pid = parseInt(parts[0], 10);
-          pidMap.set(label, isNaN(pid) ? 0 : pid);
+          pidMap.set(label, Number.isNaN(pid) ? 0 : pid);
         }
       }
     }

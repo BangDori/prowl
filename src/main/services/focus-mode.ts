@@ -1,6 +1,6 @@
-import { execFileSync } from "child_process";
+import { execFileSync } from "node:child_process";
+import path from "node:path";
 import { app, Notification, nativeImage } from "electron";
-import path from "path";
 import type { FocusMode } from "../../shared/types";
 import { getFocusMode } from "./settings";
 

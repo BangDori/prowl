@@ -1,5 +1,4 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
 import * as plist from "plist";
 import type { JobSchedule } from "../../shared/types";
 import { WEEKDAY_NAMES } from "../constants";
