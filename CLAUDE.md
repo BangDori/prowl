@@ -130,6 +130,13 @@ type JobSchedule =
   | { type: "unknown" };
 ```
 
+## Design System
+
+UI 작업 시 `.claude/skills/design-system.md`를 참조하여 일관된 디자인 시스템을 유지합니다.
+- **테마**: 다크 기반 + 골드 액센트 (고양이 눈 컨셉)
+- **핵심 토큰**: `prowl-bg`, `prowl-surface`, `prowl-card`, `accent`
+- **규칙**: 다크 모드 우선, 커스텀 토큰 사용, 하드코딩 금지
+
 ## Code Organization Principles
 
 - **상수**: 매직 넘버는 `constants.ts`에 정의
