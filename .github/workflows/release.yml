@@ -13,15 +13,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - name: Check version change
         id: version
         run: |
           CURRENT=$(node -p "require('./package.json').version")
-          git show HEAD~1:package.json > /tmp/prev-package.json 2>/dev/null || echo '{"version":"0.0.0"}' > /tmp/prev-package.json
-          PREVIOUS=$(node -p "require('/tmp/prev-package.json').version")
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          PREVIOUS=${LATEST_TAG#v}
           if [ "$CURRENT" = "$PREVIOUS" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
