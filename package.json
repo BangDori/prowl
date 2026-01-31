@@ -21,6 +21,7 @@
     "format": "biome format --write src",
     "test": "vitest run",
     "test:watch": "vitest",
+    "postinstall": "node node_modules/electron/install.js",
     "prepare": "husky"
   },
   "dependencies": {
