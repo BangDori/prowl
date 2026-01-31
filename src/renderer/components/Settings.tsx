@@ -1,4 +1,4 @@
-import { ChevronLeft, Github, Plus, X } from "lucide-react";
+import { ChevronLeft, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface SettingsProps {
@@ -142,21 +142,6 @@ export default function Settings({ onBack }: SettingsProps) {
         </section>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-xl border-t border-gray-200 dark:border-prowl-border px-4 py-3">
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-gray-500 dark:text-gray-500">
-            추가 기능 제안 및 이슈 제보는 언제나 환영합니다
-          </p>
-          <button
-            type="button"
-            onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-            className="btn-icon text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-            title="GitHub"
-          >
-            <Github className="w-4 h-4" />
-          </button>
-        </div>
-      </footer>
     </div>
   );
 }

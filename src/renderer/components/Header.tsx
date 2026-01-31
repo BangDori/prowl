@@ -1,4 +1,4 @@
-import { Moon, RefreshCw, Settings } from "lucide-react";
+import { Github, Moon, RefreshCw, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FocusMode } from "../../shared/types";
 
@@ -90,6 +90,14 @@ export default function Header({
             title="설정"
           >
             <Settings className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
+            className="btn-icon text-gray-500 dark:text-gray-400"
+            title="GitHub"
+          >
+            <Github className="w-4 h-4" />
           </button>
         </div>
       </div>
