@@ -12,7 +12,6 @@
   <img src="https://img.shields.io/badge/platform-macOS-black?style=flat-square&logo=apple" alt="macOS">
   <img src="https://img.shields.io/badge/electron-28-47848F?style=flat-square&logo=electron" alt="Electron">
   <img src="https://img.shields.io/badge/react-18-61DAFB?style=flat-square&logo=react" alt="React">
-  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
 </p>
 
 ---
@@ -186,8 +185,3 @@ xattr -cr /Applications/Prowl.app
 launchctl load ~/Library/LaunchAgents/com.yourname.jobname.plist
 ```
 
----
-
-## 📜 License
-
-MIT © [BangDori](https://github.com/bangdori)
