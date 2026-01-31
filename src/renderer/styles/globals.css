@@ -95,6 +95,11 @@ body {
   @apply placeholder:text-gray-400 dark:placeholder:text-gray-600;
 }
 
+select.input-field {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
 /* 버튼 - 프라이머리 */
 .btn-primary {
   @apply px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200;
