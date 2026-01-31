@@ -43,6 +43,7 @@ export { JOB_POLLING_INTERVAL_MS, TIME } from "../shared/constants";
 export const WINDOW = {
   WIDTH: 400,
   HEIGHT: 500,
+  MAX_HEIGHT: 600,
 } as const;
 
 export const DEV_SERVER_PORT = 5173;

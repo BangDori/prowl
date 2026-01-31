@@ -23,6 +23,8 @@ export interface ElectronAPI {
   setJobCustomization: (jobId: string, customization: JobCustomization) => Promise<void>;
   getFocusMode: () => Promise<FocusMode>;
   setFocusMode: (focusMode: FocusMode) => Promise<void>;
+  resizeWindow: (height: number) => Promise<void>;
+  quitApp: () => Promise<void>;
 }
 
 declare global {

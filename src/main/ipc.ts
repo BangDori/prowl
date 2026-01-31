@@ -1,4 +1,5 @@
-import { ipcMain, shell } from "electron";
+import { app, ipcMain, shell } from "electron";
+import { WINDOW } from "./constants";
 import type {
   AppSettings,
   FocusMode,
@@ -122,5 +123,20 @@ export function registerIpcHandlers(): void {
   ipcMain.handle("focusMode:set", async (_event, focusMode: FocusMode): Promise<void> => {
     setFocusMode(focusMode);
     updateFocusModeMonitor(focusMode);
+  });
+
+  // 윈도우 높이 동적 조정
+  ipcMain.handle("window:resize", async (_event, height: number): Promise<void> => {
+    const { getSubWindow } = await import("./tray");
+    const win = getSubWindow();
+    if (!win || win.isDestroyed()) return;
+    const clampedHeight = Math.min(Math.max(height, 100), WINDOW.MAX_HEIGHT);
+    const [width] = win.getSize();
+    win.setSize(width, clampedHeight);
+  });
+
+  // 앱 종료
+  ipcMain.handle("app:quit", async (): Promise<void> => {
+    app.quit();
   });
 }

@@ -63,6 +63,12 @@ const electronAPI = {
 
   setFocusMode: (focusMode: FocusMode): Promise<void> =>
     ipcRenderer.invoke("focusMode:set", focusMode),
+
+  // 윈도우 높이 동적 조정
+  resizeWindow: (height: number): Promise<void> => ipcRenderer.invoke("window:resize", height),
+
+  // 앱 종료
+  quitApp: (): Promise<void> => ipcRenderer.invoke("app:quit"),
 };
 
 // contextBridge로 API 노출

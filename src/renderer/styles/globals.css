@@ -184,6 +184,30 @@ select.input-field {
   @apply border-b border-gray-200 dark:border-prowl-border;
 }
 
+/* 메뉴 항목 */
+.menu-item {
+  @apply flex items-center justify-between px-3 py-1.5;
+  @apply text-xs text-gray-800 dark:text-gray-200;
+  @apply transition-colors duration-150;
+  @apply cursor-default;
+}
+
+.menu-item:hover {
+  @apply bg-gray-50/50 dark:bg-white/[0.04];
+}
+
+.menu-item-danger {
+  @apply text-gray-500 dark:text-gray-400;
+}
+
+.menu-item-danger:hover {
+  @apply text-red-500 dark:text-red-400;
+}
+
+.menu-divider {
+  @apply border-t border-gray-100 dark:border-prowl-border my-0.5;
+}
+
 /* Empty state */
 .empty-state {
   @apply text-center py-12;

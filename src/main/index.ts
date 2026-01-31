@@ -2,7 +2,7 @@ import { app } from "electron";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
-import { createMenubar } from "./tray";
+import { createTray } from "./tray";
 
 // 단일 인스턴스 잠금
 const gotTheLock = app.requestSingleInstanceLock();
@@ -15,8 +15,8 @@ if (!gotTheLock) {
     // IPC 핸들러 등록
     registerIpcHandlers();
 
-    // 메뉴바 생성
-    createMenubar();
+    // 트레이 생성
+    createTray();
 
     // 집중 모드 모니터 초기화
     updateFocusModeMonitor(getFocusMode());
@@ -34,11 +34,6 @@ if (!gotTheLock) {
 
   // 두 번째 인스턴스 실행 시 기존 창 표시
   app.on("second-instance", () => {
-    // 이미 실행 중이면 메뉴바 표시
-    const { getMenubar } = require("./tray");
-    const mb = getMenubar();
-    if (mb) {
-      mb.showWindow();
-    }
+    // 이미 실행 중이면 트레이 메뉴 표시
   });
 }
