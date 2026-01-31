@@ -74,14 +74,22 @@ function pickNudgeMessage(): string {
 
 function checkPidChanges(): void {
 	const focusMode = getFocusMode();
-	if (!focusMode.enabled) return;
-	if (!isInFocusTime(focusMode.startTime, focusMode.endTime)) return;
+	if (!focusMode.enabled) {
+		console.log("[focus-mode] disabled, skipping");
+		return;
+	}
+	if (!isInFocusTime(focusMode.startTime, focusMode.endTime)) {
+		console.log("[focus-mode] outside time range, skipping");
+		return;
+	}
 
 	for (const procName of WATCHED_PROCESSES) {
 		const currentSet = getProcessPids(procName);
 		const prevSet = prevProcessPids.get(procName) ?? new Set();
+		console.log(`[focus-mode] ${procName}: prev=${[...prevSet]} current=${[...currentSet]}`);
 		for (const pid of currentSet) {
 			if (!prevSet.has(pid)) {
+				console.log(`[focus-mode] new pid detected: ${pid}`);
 				sendNotification("Prowl", pickNudgeMessage());
 				break;
 			}
