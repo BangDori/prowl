@@ -1,6 +1,6 @@
 {
   "name": "prowl",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "A cat that watches your background jobs from the macOS menubar",
   "packageManager": "pnpm@10.15.1",
   "main": "dist/main/index.js",
@@ -21,6 +21,7 @@
     "format": "biome format --write src",
     "test": "vitest run",
     "test:watch": "vitest",
+    "postinstall": "node node_modules/electron/install.js",
     "prepare": "husky"
   },
   "dependencies": {
