@@ -1,6 +1,6 @@
 import { execFileSync } from "child_process";
 import path from "path";
-import { Notification, nativeImage } from "electron";
+import { Notification, nativeImage, app } from "electron";
 import { getFocusMode } from "./settings";
 import { FocusMode } from "../../shared/types";
 
@@ -40,11 +40,16 @@ function getNotificationIcon(): Electron.NativeImage {
 }
 
 function sendNotification(title: string, message: string): void {
-	new Notification({
+	console.log(
+		`[focus-mode] sendNotification called, isReady=${app.isReady()}, supported=${Notification.isSupported()}`,
+	);
+	const n = new Notification({
 		title,
 		body: message,
 		icon: getNotificationIcon(),
-	}).show();
+	});
+	n.on("show", () => console.log("[focus-mode] notification shown"));
+	n.show();
 }
 
 /** pgrep으로 특정 이름의 프로세스 PID 목록을 가져온다 */
@@ -61,11 +66,13 @@ function getProcessPids(name: string): Set<number> {
 }
 
 const NUDGE_MESSAGES = [
-	"오늘도 충분히 해냈다냥. 내일 더 멋진 코드를 위해 충전하라옹.",
-	"지금의 집사도 대단하다냥. 푹 자고 내일 더 빛나라옹.",
-	"여기까지 달려온 것만으로 충분하다냥. 나머지는 내일의 집사에게 맡기라옹.",
-	"오늘의 노력은 이미 충분하다냥. 자고 일어나면 더 좋은 아이디어가 떠오를 거다옹.",
-	"집사의 열정은 인정이다냥. 근데 잠도 실력이라옹.",
+	"이 시간에 또 코딩이다냥? 집사 내일 눈 퉁퉁 붓는다옹.",
+	"아직도 안 잔 거다냥…? 모니터 끄고 이불 속으로 들어가라옹.",
+	"새벽 코딩은 버그만 늘어난다냥. 자고 일어나서 하라옹.",
+	"집사, 지금 몇 시인지 알고 있다냥? 키보드에서 손 떼라옹.",
+	"이 시간에 커밋하면 내일의 집사가 운다냥. 제발 자라옹.",
+	"또 밤새려고? 천재는 잠을 자야 완성된다옹.",
+	"집사의 코드는 도망 안 간다냥. 근데 건강은 도망간다옹.",
 ];
 
 function pickNudgeMessage(): string {
@@ -86,7 +93,9 @@ function checkPidChanges(): void {
 	for (const procName of WATCHED_PROCESSES) {
 		const currentSet = getProcessPids(procName);
 		const prevSet = prevProcessPids.get(procName) ?? new Set();
-		console.log(`[focus-mode] ${procName}: prev=${[...prevSet]} current=${[...currentSet]}`);
+		console.log(
+			`[focus-mode] ${procName}: prev=${[...prevSet]} current=${[...currentSet]}`,
+		);
 		for (const pid of currentSet) {
 			if (!prevSet.has(pid)) {
 				console.log(`[focus-mode] new pid detected: ${pid}`);
