@@ -6,7 +6,7 @@ const FOCUS_CHECK_INTERVAL_MS = 10_000; // 10초마다 PID 변화 체크
 // 감시 대상 프로세스 이름
 const WATCHED_PROCESSES = ["claude"];
 
-const NUDGE_INTERVAL_MS = 5 * 60 * 1000; // 5분마다 알림
+const NUDGE_INTERVAL_MS = 1 * 60 * 1000; // 1분마다 알림
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let lastNotifiedAt = 0;
