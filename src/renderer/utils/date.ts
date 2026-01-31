@@ -1,4 +1,4 @@
-import { TIME } from '../../shared/constants';
+import { TIME } from "../../shared/constants";
 
 /**
  * 상대적 시간 포맷 (예: "5분 전", "3시간 전")
@@ -10,14 +10,14 @@ export function formatRelativeTime(date: Date): string {
   const diffHours = Math.floor(diffMs / TIME.HOUR);
   const diffDays = Math.floor(diffMs / TIME.DAY);
 
-  if (diffMins < 1) return '방금 전';
+  if (diffMins < 1) return "방금 전";
   if (diffMins < 60) return `${diffMins}분 전`;
   if (diffHours < 24) return `${diffHours}시간 전`;
   if (diffDays < 7) return `${diffDays}일 전`;
 
-  return date.toLocaleDateString('ko-KR', {
-    month: 'short',
-    day: 'numeric',
+  return date.toLocaleDateString("ko-KR", {
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -25,11 +25,11 @@ export function formatRelativeTime(date: Date): string {
  * 날짜/시간 포맷 (예: "1월 15일 14:30")
  */
 export function formatDateTime(date: Date | null): string {
-  if (!date) return '';
-  return new Date(date).toLocaleString('ko-KR', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  if (!date) return "";
+  return new Date(date).toLocaleString("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }

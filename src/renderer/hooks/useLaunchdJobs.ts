@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { LaunchdJob } from '../../shared/types';
-import { JOB_POLLING_INTERVAL_MS } from '../../shared/constants';
+import { useCallback, useEffect, useState } from "react";
+import { JOB_POLLING_INTERVAL_MS } from "../../shared/constants";
+import type { LaunchdJob } from "../../shared/types";
 
 interface UseLaunchdJobsResult {
   jobs: LaunchdJob[];
@@ -20,8 +20,8 @@ export function useLaunchdJobs(): UseLaunchdJobsResult {
       const result = await window.electronAPI.listJobs();
       setJobs(result);
     } catch (err) {
-      setError('작업 목록을 불러오는데 실패했습니다.');
-      console.error('Failed to fetch jobs:', err);
+      setError("작업 목록을 불러오는데 실패했습니다.");
+      console.error("Failed to fetch jobs:", err);
     } finally {
       setLoading(false);
     }

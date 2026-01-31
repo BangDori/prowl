@@ -1,11 +1,11 @@
-import {
-  LaunchdJob,
+import type {
+  JobActionResult,
   JobCustomization,
   JobCustomizations,
-  JobActionResult,
+  LaunchdJob,
   LogContent,
-} from '../../shared/types';
-import JobCard from './JobCard';
+} from "../../shared/types";
+import JobCard from "./JobCard";
 
 interface JobActionsHook {
   toggling: string | null;

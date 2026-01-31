@@ -1,11 +1,16 @@
-import { useState, useEffect, useCallback } from "react";
-import { useLaunchdJobs } from "./hooks/useLaunchdJobs";
-import { useJobActions } from "./hooks/useJobActions";
-import JobList from "./components/JobList";
-import Header from "./components/Header";
-import Settings from "./components/Settings";
+import { useCallback, useEffect, useState } from "react";
+import {
+  DEFAULT_FOCUS_MODE,
+  type FocusMode,
+  type JobCustomization,
+  type JobCustomizations,
+} from "../shared/types";
 import FocusModePanel from "./components/FocusModePanel";
-import { FocusMode, DEFAULT_FOCUS_MODE, JobCustomization, JobCustomizations } from "../shared/types";
+import Header from "./components/Header";
+import JobList from "./components/JobList";
+import Settings from "./components/Settings";
+import { useJobActions } from "./hooks/useJobActions";
+import { useLaunchdJobs } from "./hooks/useLaunchdJobs";
 
 type View = "main" | "settings" | "focusMode";
 
@@ -49,13 +54,7 @@ export default function App() {
   }
 
   if (view === "focusMode") {
-    return (
-      <FocusModePanel
-        focusMode={focusMode}
-        onUpdate={saveFocusMode}
-        onBack={handleBack}
-      />
-    );
+    return <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} onBack={handleBack} />;
   }
 
   return (
@@ -68,10 +67,7 @@ export default function App() {
         onToggleFocusMode={() => setView("focusMode")}
       />
 
-      <main
-        className="p-4 pt-2 overflow-y-auto"
-        style={{ maxHeight: "calc(100vh - 52px)" }}
-      >
+      <main className="p-4 pt-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 52px)" }}>
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg mb-4 text-sm border border-red-200 dark:border-red-800">
             {error}

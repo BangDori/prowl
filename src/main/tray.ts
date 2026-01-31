@@ -1,7 +1,7 @@
-import { menubar, Menubar } from "menubar";
-import { app, nativeImage, Menu, shell } from "electron";
+import { app, Menu, nativeImage, shell } from "electron";
+import { type Menubar, menubar } from "menubar";
 import * as path from "path";
-import { WINDOW, DEV_SERVER_PORT } from "./constants";
+import { DEV_SERVER_PORT, WINDOW } from "./constants";
 
 let mb: Menubar | null = null;
 
@@ -10,8 +10,7 @@ let mb: Menubar | null = null;
  */
 export function createMenubar(): Menubar {
   // 개발 모드 감지: --dev 플래그 또는 ELECTRON_DEV 환경변수
-  const isDev =
-    process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
+  const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
   console.log("isDev:", isDev);
   console.log("__dirname:", __dirname);
@@ -86,9 +85,7 @@ export function createMenubar(): Menubar {
       {
         label: "LaunchAgents 폴더 열기",
         click: () => {
-          shell.openPath(
-            path.join(app.getPath("home"), "Library/LaunchAgents"),
-          );
+          shell.openPath(path.join(app.getPath("home"), "Library/LaunchAgents"));
         },
       },
       { type: "separator" },

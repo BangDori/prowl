@@ -1,5 +1,5 @@
-import { X } from 'lucide-react';
-import { formatDateTime } from '../utils/date';
+import { X } from "lucide-react";
+import { formatDateTime } from "../utils/date";
 
 interface LogViewerProps {
   content: string;
@@ -7,12 +7,7 @@ interface LogViewerProps {
   onClose: () => void;
 }
 
-export default function LogViewer({
-  content,
-  lastModified,
-  onClose,
-}: LogViewerProps) {
-
+export default function LogViewer({ content, lastModified, onClose }: LogViewerProps) {
   return (
     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-prowl-border">
       <div className="flex items-center justify-between mb-2">
