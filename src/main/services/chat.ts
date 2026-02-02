@@ -5,5 +5,5 @@ export async function sendChatMessage(
   _history: ChatMessage[],
 ): Promise<ChatSendResult> {
   // TODO: 백엔드 연동 예정
-  return { success: false, error: "채팅 백엔드가 아직 연결되지 않았습니다." };
+  return { success: false, error: "아직 대화할 준비가 안 됐다냥... 조금만 기다려라냥!" };
 }
