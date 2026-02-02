@@ -138,7 +138,7 @@ export default function BackgroundMonitor({ onBack }: BackgroundMonitorProps) {
         </div>
       )}
 
-      <main>
+      <main className="overflow-y-auto" style={{ maxHeight: "calc(4.5 * 64px)" }}>
         {loading && jobs.length === 0 ? (
           <div className="space-y-0">
             {[1, 2, 3].map((i) => (
