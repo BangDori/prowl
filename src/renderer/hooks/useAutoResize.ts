@@ -3,10 +3,11 @@ import { useEffect, useRef } from "react";
 /**
  * 콘텐츠 높이에 맞춰 윈도우 크기를 자동 조정하는 훅
  */
-export function useAutoResize() {
+export function useAutoResize(disabled = false) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (disabled) return;
     const el = ref.current;
     if (!el) return;
 
@@ -26,7 +27,7 @@ export function useAutoResize() {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [disabled]);
 
   return ref;
 }

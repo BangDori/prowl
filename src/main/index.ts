@@ -1,4 +1,5 @@
-import { app } from "electron";
+import { app, globalShortcut } from "electron";
+import { showChatWindow } from "./chat-window";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -23,6 +24,11 @@ if (!gotTheLock) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
       createTray();
       updateFocusModeMonitor(getFocusMode());
+
+      // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+      globalShortcut.register("CommandOrControl+Shift+P", () => {
+        showChatWindow();
+      });
     } else {
       // 프로덕션: 스플래시 윈도우 표시 후 트레이 전환
       createSplashWindow();
@@ -30,8 +36,17 @@ if (!gotTheLock) {
         await dismissSplash();
         createTray();
         updateFocusModeMonitor(getFocusMode());
+
+        // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+        globalShortcut.register("CommandOrControl+Shift+P", () => {
+          showChatWindow();
+        });
       }, SPLASH.DISPLAY_DURATION_MS);
     }
+  });
+
+  app.on("will-quit", () => {
+    globalShortcut.unregisterAll();
   });
 
   // 모든 창이 닫혀도 앱 종료하지 않음 (메뉴바 앱이므로)

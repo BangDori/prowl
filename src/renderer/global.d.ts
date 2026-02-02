@@ -3,6 +3,8 @@ import {
   JobActionResult,
   LogContent,
   AppSettings,
+  ChatMessage,
+  ChatSendResult,
   FocusMode,
   JobCustomization,
   JobCustomizations,
@@ -25,6 +27,10 @@ export interface ElectronAPI {
   setFocusMode: (focusMode: FocusMode) => Promise<void>;
   resizeWindow: (height: number) => Promise<void>;
   quitApp: () => Promise<void>;
+  sendChatMessage: (content: string, history: ChatMessage[]) => Promise<ChatSendResult>;
+  resizeChatWindow: (height: number) => Promise<void>;
+  closeChatWindow: () => Promise<void>;
+  navigateBack: () => Promise<void>;
 }
 
 declare global {

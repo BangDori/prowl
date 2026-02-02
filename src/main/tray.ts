@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, shell, Tray } from "electron";
+import { showChatWindow } from "./chat-window";
 import { DEV_SERVER_PORT, WINDOW } from "./constants";
 
 let tray: Tray | null = null;
@@ -95,6 +96,11 @@ export function popUpTrayMenu(): void {
     {
       label: "야간 감시",
       click: () => showSubPage("quiet-hours"),
+    },
+    {
+      label: "Prowl 채팅",
+      accelerator: "CommandOrControl+Shift+P",
+      click: () => showChatWindow(),
     },
     { type: "separator" },
     {

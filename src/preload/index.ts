@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type {
   AppSettings,
+  ChatMessage,
+  ChatSendResult,
   FocusMode,
   JobActionResult,
   JobCustomization,
@@ -72,6 +74,12 @@ const electronAPI = {
 
   // 앱 종료
   quitApp: (): Promise<void> => ipcRenderer.invoke("app:quit"),
+
+  // 채팅
+  sendChatMessage: (content: string, history: ChatMessage[]): Promise<ChatSendResult> =>
+    ipcRenderer.invoke("chat:send", content, history),
+  resizeChatWindow: (height: number): Promise<void> => ipcRenderer.invoke("chat:resize", height),
+  closeChatWindow: (): Promise<void> => ipcRenderer.invoke("chat:close"),
 };
 
 // contextBridge로 API 노출
