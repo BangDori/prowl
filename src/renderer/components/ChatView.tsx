@@ -3,6 +3,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import prowlProfile from "../../../assets/prowl-profile.png";
 import type { ChatMessage } from "../../shared/types";
 
+const PLACEHOLDERS = [
+  "뭐가 궁금하냥...",
+  "오늘은 뭘 도와줄까냥~",
+  "말해봐, 듣고 있다냥 🐾",
+  "심심하다냥... 뭐 없어?",
+  "나한테 맡겨봐냥!",
+];
+
+function getRandomPlaceholder(): string {
+  return PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
+}
+
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
   const time = new Date(message.timestamp).toLocaleTimeString("ko-KR", {
@@ -41,6 +53,7 @@ export default function ChatView() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
+  const [placeholder] = useState(getRandomPlaceholder);
   const [apiKeyInput, setApiKeyInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -222,7 +235,7 @@ export default function ChatView() {
           value={input}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          placeholder="Prowl에게 물어보세요..."
+          placeholder={placeholder}
           rows={1}
           // biome-ignore lint/a11y/noAutofocus: 채팅창 열릴 때 즉시 입력 가능해야 함
           autoFocus
