@@ -5,13 +5,15 @@ import { SPLASH } from "./constants";
 let splashWindow: BrowserWindow | null = null;
 
 export function createSplashWindow(): BrowserWindow {
-  const { width: screenWidth } = screen.getPrimaryDisplay().workAreaSize;
+  const cursorPoint = screen.getCursorScreenPoint();
+  const display = screen.getDisplayNearestPoint(cursorPoint);
+  const { x: dx, y: dy, width: dw, height: dh } = display.workArea;
 
   splashWindow = new BrowserWindow({
     width: SPLASH.WIDTH,
     height: SPLASH.HEIGHT,
-    x: Math.round(screenWidth / 2 - SPLASH.WIDTH / 2),
-    y: Math.round(screen.getPrimaryDisplay().workAreaSize.height / 2 - SPLASH.HEIGHT / 2),
+    x: Math.round(dx + dw / 2 - SPLASH.WIDTH / 2),
+    y: Math.round(dy + dh / 2 - SPLASH.HEIGHT / 2),
     transparent: true,
     frame: false,
     hasShadow: false,
