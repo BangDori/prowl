@@ -1,6 +1,8 @@
 import { app, ipcMain, shell } from "electron";
 import type {
   AppSettings,
+  ChatMessage,
+  ChatSendResult,
   FocusMode,
   JobActionResult,
   JobCustomization,
@@ -9,13 +11,16 @@ import type {
   LogContent,
 } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
+import { sendChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
 import {
   getAllJobCustomizations,
+  getApiKey,
   getFocusMode,
   getSettings,
+  setApiKey,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -147,5 +152,35 @@ export function registerIpcHandlers(): void {
   // 앱 종료
   ipcMain.handle("app:quit", async (): Promise<void> => {
     app.quit();
+  });
+
+  // 채팅 메시지 전송
+  ipcMain.handle(
+    "chat:send",
+    async (_event, content: string, history: ChatMessage[]): Promise<ChatSendResult> => {
+      return sendChatMessage(content, history);
+    },
+  );
+
+  // API 키 조회
+  ipcMain.handle("chat:getApiKey", async (): Promise<string> => {
+    return getApiKey();
+  });
+
+  // API 키 저장
+  ipcMain.handle("chat:setApiKey", async (_event, apiKey: string): Promise<void> => {
+    setApiKey(apiKey);
+  });
+
+  // 채팅 윈도우 리사이즈
+  ipcMain.handle("chat:resize", async (_event, height: number): Promise<void> => {
+    const { resizeChatWindow } = await import("./chat-window");
+    resizeChatWindow(height);
+  });
+
+  // 채팅 윈도우 닫기
+  ipcMain.handle("chat:close", async (): Promise<void> => {
+    const { closeChatWindow } = await import("./chat-window");
+    closeChatWindow();
   });
 }

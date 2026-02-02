@@ -80,3 +80,17 @@ export interface JobCustomization {
 }
 
 export type JobCustomizations = Record<string, JobCustomization>;
+
+// 채팅 메시지
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+}
+
+export interface ChatSendResult {
+  success: boolean;
+  message?: ChatMessage;
+  error?: string;
+}
