@@ -11,7 +11,7 @@ const NUDGE_INTERVAL_MS = 1 * 60 * 1000; // 1분마다 알림
 let intervalId: ReturnType<typeof setInterval> | null = null;
 let lastNotifiedAt = 0;
 
-function isInFocusTime(startTime: string, endTime: string): boolean {
+export function isInFocusTime(startTime: string, endTime: string): boolean {
   const now = new Date();
   const [startH, startM] = startTime.split(":").map(Number);
   const [endH, endM] = endTime.split(":").map(Number);
