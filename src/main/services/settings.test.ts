@@ -16,9 +16,11 @@ vi.mock("electron-store", () => ({
 import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "../../shared/types";
 import {
   getAllJobCustomizations,
+  getApiKey,
   getFocusMode,
   getPatterns,
   getSettings,
+  setApiKey,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -112,6 +114,39 @@ describe("settings 서비스", () => {
         "com.old.job": { displayName: "기존" },
         "com.new.job": { displayName: "신규" },
       });
+    });
+  });
+
+  describe("getApiKey", () => {
+    it("환경변수 CLAUDE_CODE_OAUTH_TOKEN이 있으면 우선 반환한다", () => {
+      process.env.CLAUDE_CODE_OAUTH_TOKEN = "env-token-123";
+      mockGet.mockReturnValue("");
+
+      expect(getApiKey()).toBe("env-token-123");
+
+      delete process.env.CLAUDE_CODE_OAUTH_TOKEN;
+    });
+
+    it("환경변수가 없으면 store에서 chatApiKey를 반환한다", () => {
+      delete process.env.CLAUDE_CODE_OAUTH_TOKEN;
+      mockGet.mockReturnValue("sk-ant-stored-key");
+
+      expect(getApiKey()).toBe("sk-ant-stored-key");
+    });
+
+    it("둘 다 없으면 빈 문자열을 반환한다", () => {
+      delete process.env.CLAUDE_CODE_OAUTH_TOKEN;
+      mockGet.mockReturnValue("");
+
+      expect(getApiKey()).toBe("");
+    });
+  });
+
+  describe("setApiKey", () => {
+    it("chatApiKey를 store에 저장한다", () => {
+      setApiKey("sk-ant-new-key");
+
+      expect(mockSet).toHaveBeenCalledWith("chatApiKey", "sk-ant-new-key");
     });
   });
 });

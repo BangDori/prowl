@@ -27,6 +27,8 @@ vi.mock("./services/settings", () => ({
   setJobCustomization: vi.fn(),
   getFocusMode: vi.fn(),
   setFocusMode: vi.fn(),
+  getApiKey: vi.fn(),
+  setApiKey: vi.fn(),
 }));
 
 vi.mock("./services/focus-mode", () => ({
@@ -37,14 +39,27 @@ vi.mock("./tray", () => ({
   getSubWindow: vi.fn(),
 }));
 
+vi.mock("./services/chat", () => ({
+  sendChatMessage: vi.fn(),
+}));
+
+vi.mock("./chat-window", () => ({
+  resizeChatWindow: vi.fn(),
+  closeChatWindow: vi.fn(),
+}));
+
 import { app, ipcMain, shell } from "electron";
+import { closeChatWindow, resizeChatWindow } from "./chat-window";
 import { registerIpcHandlers } from "./ipc";
+import { sendChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
 import {
   getAllJobCustomizations,
+  getApiKey,
   getSettings,
+  setApiKey,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -297,6 +312,69 @@ describe("registerIpcHandlers", () => {
       const handler = getHandler("app:quit");
       await handler({});
       expect(app.quit).toHaveBeenCalled();
+    });
+  });
+
+  it("채팅 관련 IPC 채널을 등록한다", () => {
+    const channels = mockIpcHandle.mock.calls.map((c) => c[0]);
+    expect(channels).toContain("chat:send");
+    expect(channels).toContain("chat:getApiKey");
+    expect(channels).toContain("chat:setApiKey");
+    expect(channels).toContain("chat:resize");
+    expect(channels).toContain("chat:close");
+  });
+
+  describe("chat:send", () => {
+    it("sendChatMessage를 호출하고 결과를 반환한다", async () => {
+      const mockResult = {
+        success: true,
+        message: { id: "msg_1", role: "assistant" as const, content: "응답", timestamp: 1000 },
+      };
+      vi.mocked(sendChatMessage).mockResolvedValue(mockResult);
+
+      const handler = getHandler("chat:send");
+      const result = await handler({}, "안녕", []);
+
+      expect(sendChatMessage).toHaveBeenCalledWith("안녕", []);
+      expect(result).toEqual(mockResult);
+    });
+  });
+
+  describe("chat:getApiKey", () => {
+    it("getApiKey를 호출한다", async () => {
+      vi.mocked(getApiKey).mockReturnValue("sk-ant-test");
+      const handler = getHandler("chat:getApiKey");
+      const result = await handler({});
+
+      expect(getApiKey).toHaveBeenCalled();
+      expect(result).toBe("sk-ant-test");
+    });
+  });
+
+  describe("chat:setApiKey", () => {
+    it("setApiKey를 호출한다", async () => {
+      const handler = getHandler("chat:setApiKey");
+      await handler({}, "sk-ant-new-key");
+
+      expect(setApiKey).toHaveBeenCalledWith("sk-ant-new-key");
+    });
+  });
+
+  describe("chat:resize", () => {
+    it("resizeChatWindow를 호출한다", async () => {
+      const handler = getHandler("chat:resize");
+      await handler({}, 400);
+
+      expect(resizeChatWindow).toHaveBeenCalledWith(400);
+    });
+  });
+
+  describe("chat:close", () => {
+    it("closeChatWindow를 호출한다", async () => {
+      const handler = getHandler("chat:close");
+      await handler({});
+
+      expect(closeChatWindow).toHaveBeenCalled();
     });
   });
 });
