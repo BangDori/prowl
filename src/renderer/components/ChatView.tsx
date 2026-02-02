@@ -5,11 +5,10 @@ import prowlProfile from "../../../assets/prowl-profile.png";
 import type { ChatMessage } from "../../shared/types";
 
 const PLACEHOLDERS = [
-  "뭐가 궁금하냥...",
-  "오늘은 뭘 도와줄까냥~",
-  "말해봐, 듣고 있다냥 🐾",
-  "심심하다냥... 뭐 없어?",
-  "나한테 맡겨봐냥!",
+  "아직은 나랑 얘기할 수 없다냥...",
+  "준비 중이다냥~ 조금만 기다려라냥",
+  "곧 대화할 수 있을 거다냥~",
+  "지금은 낮잠 중이다냥... zZZ",
 ];
 
 function getRandomPlaceholder(): string {
