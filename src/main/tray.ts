@@ -1,8 +1,6 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "./constants";
-import { isInFocusTime } from "./services/focus-mode";
-import { getFocusMode } from "./services/settings";
 
 let tray: Tray | null = null;
 let subWindow: BrowserWindow | null = null;
@@ -88,15 +86,6 @@ export function createTray(): Tray {
 
 export function popUpTrayMenu(): void {
   if (!tray) return;
-  const focusMode = getFocusMode();
-  let focusIndicator: string;
-  if (!focusMode.enabled) {
-    focusIndicator = "🔴";
-  } else if (isInFocusTime(focusMode.startTime, focusMode.endTime)) {
-    focusIndicator = "🟢";
-  } else {
-    focusIndicator = "🟠";
-  }
 
   const menu = Menu.buildFromTemplate([
     {
@@ -104,7 +93,7 @@ export function popUpTrayMenu(): void {
       click: () => showSubPage("monitor"),
     },
     {
-      label: `${focusIndicator} 야간 감시`,
+      label: "야간 감시",
       click: () => showSubPage("quiet-hours"),
     },
     { type: "separator" },
