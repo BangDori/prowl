@@ -99,6 +99,7 @@ export function popUpTrayMenu(): void {
     },
     {
       label: "Prowl 채팅",
+      accelerator: "CommandOrControl+Shift+P",
       click: () => showChatWindow(),
     },
     { type: "separator" },
