@@ -117,7 +117,7 @@
 
     .eye-top-glow {
       position: absolute;
-      top: 30px;
+      top: 60px;
       left: 50%;
       transform: translateX(-50%);
       width: 80px;
@@ -271,98 +271,131 @@
             <stop offset="60%" stop-color="#D4B870" />
             <stop offset="100%" stop-color="#8A6E30" />
           </radialGradient>
-          <!-- 눈꺼풀 형태 path morphing 클립 마스크 -->
-          <!-- 위쪽 눈: 위 눈꺼풀이 올라가며 열림 (아래는 거의 고정) -->
-          <clipPath id="clip-top-eye">
-            <path d="M 152,100 Q 190,100 228,100 Q 190,100 152,100 Z">
+          <!--
+            고양이 눈 열림 애니메이션 (리서치 기반)
+            1단계: 실눈 — 위 눈꺼풀만 살짝 올라감 (아래는 거의 고정)
+            2단계: 완전 열림 — 위 눈꺼풀이 크게 올라가고, 아래는 약간만 내려감
+            제3안검(nictitating membrane): 안쪽→바깥쪽 수평 후퇴
+          -->
+
+          <!-- 왼쪽 고양이 눈: 둥근 아몬드형 클립 -->
+          <clipPath id="clip-left-eye">
+            <path d="M 84,290 C 84,290 104,290 125,290 C 146,290 166,290 166,290 C 166,290 146,290 125,290 C 104,290 84,290 84,290 Z">
               <animate attributeName="d"
-                values="M 152,100 Q 190,100 228,100 Q 190,100 152,100 Z;
-                        M 152,100 Q 190,66 228,100 Q 190,132 152,100 Z"
-                dur="1.8s" begin="3.6s" fill="freeze"
+                values="M 84,290 C 84,290 104,290 125,290 C 146,290 166,290 166,290 C 166,290 146,290 125,290 C 104,290 84,290 84,290 Z;
+                        M 84,290 C 84,278 100,268 125,268 C 150,268 166,278 166,290 C 166,302 150,312 125,312 C 100,312 84,302 84,290 Z"
+                dur="1.8s" begin="2s" fill="freeze"
                 calcMode="spline" keySplines="0.05 0.7 0.1 1" />
             </path>
           </clipPath>
-          <clipPath id="clip-left-eye">
-            <path d="M 84,290 Q 102,290 125,290 Q 148,290 166,290 Q 148,290 125,290 Q 102,290 84,290 Z">
+
+          <!-- 오른쪽 고양이 눈: 둥근 아몬드형 클립 (약간 시차) -->
+          <clipPath id="clip-right-eye">
+            <path d="M 214,290 C 214,290 234,290 255,290 C 276,290 296,290 296,290 C 296,290 276,290 255,290 C 234,290 214,290 214,290 Z">
               <animate attributeName="d"
-                values="M 84,290 Q 102,290 125,290 Q 148,290 166,290 Q 148,290 125,290 Q 102,290 84,290 Z;
-                        M 84,290 Q 102,275 125,273 Q 148,275 166,290 Q 148,305 125,307 Q 102,305 84,290 Z"
-                dur="1.4s" begin="2s" fill="freeze"
-                calcMode="spline" keySplines="0.16 1 0.3 1" />
+                values="M 214,290 C 214,290 234,290 255,290 C 276,290 296,290 296,290 C 296,290 276,290 255,290 C 234,290 214,290 214,290 Z;
+                        M 214,290 C 214,278 230,268 255,268 C 280,268 296,278 296,290 C 296,302 280,312 255,312 C 230,312 214,302 214,290 Z"
+                dur="1.8s" begin="2.15s" fill="freeze"
+                calcMode="spline" keySplines="0.05 0.7 0.1 1" />
             </path>
           </clipPath>
-          <clipPath id="clip-right-eye">
-            <path d="M 214,290 Q 232,290 255,290 Q 278,290 296,290 Q 278,290 255,290 Q 232,290 214,290 Z">
-              <animate attributeName="d"
-                values="M 214,290 Q 232,290 255,290 Q 278,290 296,290 Q 278,290 255,290 Q 232,290 214,290 Z;
-                        M 214,290 Q 232,275 255,273 Q 278,275 296,290 Q 278,305 255,307 Q 232,305 214,290 Z"
-                dur="1.4s" begin="2s" fill="freeze"
-                calcMode="spline" keySplines="0.16 1 0.3 1" />
-            </path>
+
+          <!-- 제3안검(nictitating membrane) 마스크: 수평 와이프 -->
+          <clipPath id="clip-nictitating-left">
+            <rect x="84" y="270" width="0" height="40">
+              <animate attributeName="width" values="0;82" dur="0.6s" begin="1.6s" fill="freeze"
+                calcMode="spline" keySplines="0.2 0.8 0.2 1" />
+            </rect>
+          </clipPath>
+          <clipPath id="clip-nictitating-right">
+            <rect x="214" y="270" width="0" height="40">
+              <animate attributeName="width" values="0;82" dur="0.6s" begin="1.75s" fill="freeze"
+                calcMode="spline" keySplines="0.2 0.8 0.2 1" />
+            </rect>
           </clipPath>
         </defs>
 
-        <!-- ===== 바이너리 코드 원형 띠 ===== -->
-        <g style="animation: spin 50s linear infinite; transform-origin: 190px 100px;">
-          <path id="bin-outer" d="M 190,100 m -75,0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0" fill="none" />
+        <!-- ===== 바이너리 코드 삼각형 띠 (프로비던스의 눈) ===== -->
+        <g style="animation: spin 50s linear infinite; transform-origin: 190px 130px;">
+          <path id="bin-outer" d="M 190,30 L 290,210 L 90,210 Z" fill="none" />
           <text font-family="SF Mono, Menlo, monospace" font-size="9" fill="#D4B870" opacity="0.3">
-            <textPath href="#bin-outer">0 1 0 1 0 1 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</textPath>
+            <textPath href="#bin-outer">0 1 0 1 0 1 0 1 1 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1</textPath>
           </text>
         </g>
 
-        <g style="animation: spin 40s linear reverse infinite; transform-origin: 190px 100px;">
-          <path id="bin-inner" d="M 190,100 m -56,0 a 56,56 0 1,1 112,0 a 56,56 0 1,1 -112,0" fill="none" />
+        <g style="animation: spin 40s linear reverse infinite; transform-origin: 190px 130px;">
+          <path id="bin-inner" d="M 190,50 L 275,195 L 105,195 Z" fill="none" />
           <text font-family="SF Mono, Menlo, monospace" font-size="7" fill="#D4B870" opacity="0.15">
-            <textPath href="#bin-inner">0 0 1 0 0 1 1 0 1 0 0 0 1 1 0 1 0 1 0 0 1 0 1 1</textPath>
+            <textPath href="#bin-inner">0 0 1 0 0 1 1 0 1 0 0 0 1 1 0 1 0 1 0 0 1 0 1 1 0 1 0 0 1 0 1 1</textPath>
           </text>
         </g>
 
-        <!-- ===== 감시의 눈 ===== -->
-        <g>
-          <g clip-path="url(#clip-top-eye)">
-            <path d="M 152,100 Q 190,68 228,100 Q 190,132 152,100 Z"
-                  fill="none" stroke="#D4B870" stroke-width="1.5" opacity="0.5" />
-            <circle cx="190" cy="100" r="16" fill="url(#g-top)" opacity="0.85">
-              <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="190" cy="100" r="5.5" fill="var(--bg-deep)" />
-            <circle cx="186" cy="95" r="3" fill="white" opacity="0.45" />
-          </g>
+        <!-- 삼각형 외곽선 (정적) -->
+        <path d="M 190,25 L 298,215 L 82,215 Z"
+              fill="none" stroke="#D4B870" stroke-width="0.6" opacity="0.15" />
+
+        <!-- ===== 감시의 눈 (프로비던스) ===== -->
+        <g opacity="0">
+          <animate attributeName="opacity" values="0;1" dur="1.8s" begin="3.6s" fill="freeze"
+            calcMode="spline" keySplines="0.05 0.7 0.1 1" />
+          <path d="M 152,130 Q 190,98 228,130 Q 190,162 152,130 Z"
+                fill="none" stroke="#D4B870" stroke-width="1.5" opacity="0.5" />
+          <circle cx="190" cy="130" r="16" fill="url(#g-top)" opacity="0.85">
+            <animate attributeName="opacity" values="0.7;0.9;0.7" dur="4s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="190" cy="130" r="5.5" fill="var(--bg-deep)" />
+          <circle cx="186" cy="125" r="3" fill="white" opacity="0.45" />
         </g>
 
         <!-- ===== 왼쪽 고양이 눈 ===== -->
         <g>
+          <!-- 제3안검: 반투명 막이 안쪽→바깥쪽으로 후퇴하며 눈이 드러남 -->
+          <g clip-path="url(#clip-left-eye)">
+            <rect x="84" y="268" width="82" height="44" fill="rgba(180,160,100,0.15)">
+              <animate attributeName="x" values="84;166" dur="0.8s" begin="2.2s" fill="freeze"
+                calcMode="spline" keySplines="0.3 0.8 0.2 1" />
+              <animate attributeName="opacity" values="1;0" dur="0.8s" begin="2.2s" fill="freeze"
+                calcMode="spline" keySplines="0.3 0.8 0.2 1" />
+            </rect>
+          </g>
           <!-- 눈 내용물 (클립으로 열림) -->
           <g clip-path="url(#clip-left-eye)">
-            <path d="M 84,290 Q 102,275 125,273 Q 148,275 166,290 Q 148,305 125,307 Q 102,305 84,290 Z"
-                  fill="none" stroke="#D4B870" stroke-width="1.2" opacity="0.4" />
-            <ellipse cx="125" cy="290" rx="34" ry="14" fill="url(#g-cat)" opacity="0.9">
+            <ellipse cx="125" cy="290" rx="40" ry="21" fill="none" stroke="#D4B870" stroke-width="1.2" opacity="0.4" />
+            <ellipse cx="125" cy="290" rx="38" ry="19" fill="url(#g-cat)" opacity="0.9">
               <animate attributeName="opacity" values="0.8;0.95;0.8" dur="3s" repeatCount="indefinite" />
             </ellipse>
-            <ellipse cx="125" cy="290" rx="4.5" ry="11.5" fill="var(--bg-deep)" />
-            <circle cx="118" cy="285" r="3.5" fill="white" opacity="0.35" />
-            <circle cx="132" cy="295" r="1.5" fill="white" opacity="0.18" />
+            <ellipse cx="125" cy="290" rx="5" ry="16" fill="var(--bg-deep)" />
+            <circle cx="118" cy="283" r="4" fill="white" opacity="0.3" />
+            <circle cx="133" cy="297" r="2" fill="white" opacity="0.15" />
           </g>
         </g>
 
         <!-- ===== 오른쪽 고양이 눈 ===== -->
         <g>
+          <!-- 제3안검: 반투명 막이 안쪽→바깥쪽으로 후퇴 -->
+          <g clip-path="url(#clip-right-eye)">
+            <rect x="296" y="268" width="82" height="44" fill="rgba(180,160,100,0.15)">
+              <animate attributeName="x" values="296;214" dur="0.8s" begin="2.35s" fill="freeze"
+                calcMode="spline" keySplines="0.3 0.8 0.2 1" />
+              <animate attributeName="opacity" values="1;0" dur="0.8s" begin="2.35s" fill="freeze"
+                calcMode="spline" keySplines="0.3 0.8 0.2 1" />
+            </rect>
+          </g>
           <!-- 눈 내용물 (클립으로 열림) -->
           <g clip-path="url(#clip-right-eye)">
-            <path d="M 214,290 Q 232,275 255,273 Q 278,275 296,290 Q 278,305 255,307 Q 232,305 214,290 Z"
-                  fill="none" stroke="#D4B870" stroke-width="1.2" opacity="0.4" />
-            <ellipse cx="255" cy="290" rx="34" ry="14" fill="url(#g-cat)" opacity="0.9">
+            <ellipse cx="255" cy="290" rx="40" ry="21" fill="none" stroke="#D4B870" stroke-width="1.2" opacity="0.4" />
+            <ellipse cx="255" cy="290" rx="38" ry="19" fill="url(#g-cat)" opacity="0.9">
               <animate attributeName="opacity" values="0.8;0.95;0.8" dur="3s" begin="0.5s" repeatCount="indefinite" />
             </ellipse>
-            <ellipse cx="255" cy="290" rx="4.5" ry="11.5" fill="var(--bg-deep)" />
-            <circle cx="248" cy="285" r="3.5" fill="white" opacity="0.35" />
-            <circle cx="262" cy="295" r="1.5" fill="white" opacity="0.18" />
+            <ellipse cx="255" cy="290" rx="5" ry="16" fill="var(--bg-deep)" />
+            <circle cx="248" cy="283" r="4" fill="white" opacity="0.3" />
+            <circle cx="263" cy="297" r="2" fill="white" opacity="0.15" />
           </g>
         </g>
 
         <!-- 연결선 -->
-        <line x1="175" y1="120" x2="135" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
-        <line x1="205" y1="120" x2="245" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
+        <line x1="175" y1="150" x2="135" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
+        <line x1="205" y1="150" x2="245" y2="274" stroke="#D4B870" stroke-width="0.4" opacity="0.08" />
       </svg>
     </div>
 
