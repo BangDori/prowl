@@ -17,10 +17,8 @@ import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launch
 import { readLogContent } from "./services/log-reader";
 import {
   getAllJobCustomizations,
-  getApiKey,
   getFocusMode,
   getSettings,
-  setApiKey,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -161,16 +159,6 @@ export function registerIpcHandlers(): void {
       return sendChatMessage(content, history);
     },
   );
-
-  // API 키 조회
-  ipcMain.handle("chat:getApiKey", async (): Promise<string> => {
-    return getApiKey();
-  });
-
-  // API 키 저장
-  ipcMain.handle("chat:setApiKey", async (_event, apiKey: string): Promise<void> => {
-    setApiKey(apiKey);
-  });
 
   // 채팅 윈도우 리사이즈
   ipcMain.handle("chat:resize", async (_event, height: number): Promise<void> => {

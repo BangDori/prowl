@@ -1,4 +1,4 @@
-import { KeyRound, Send, X } from "lucide-react";
+import { Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import prowlProfile from "../../../assets/prowl-profile.png";
 import type { ChatMessage } from "../../shared/types";
@@ -52,22 +52,18 @@ export default function ChatView() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
-  const [placeholder] = useState(getRandomPlaceholder);
-  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [placeholder, setPlaceholder] = useState(getRandomPlaceholder);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
 
-  useEffect(() => {
-    window.electronAPI.getChatApiKey().then((key) => setHasApiKey(!!key));
-  }, []);
-
   // 글로벌 ESC 키로 채팅창 닫기
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") window.electronAPI.closeChatWindow();
+      if (e.key === "Escape") {
+        window.electronAPI.closeChatWindow();
+      }
     };
     window.addEventListener("keydown", handleGlobalKeyDown);
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
@@ -95,8 +91,13 @@ export default function ChatView() {
     setLoading(true);
 
     if (textareaRef.current) {
-      // IME 조합 강제 종료: blur → value 초기화 → refocus
-      textareaRef.current.blur();
+      // IME 조합 강제 종료: 포커스를 임시 요소로 옮겨 composition 중단
+      const tmp = document.createElement("input");
+      tmp.style.position = "fixed";
+      tmp.style.opacity = "0";
+      document.body.appendChild(tmp);
+      tmp.focus();
+      document.body.removeChild(tmp);
       textareaRef.current.value = "";
       textareaRef.current.style.height = "auto";
       textareaRef.current.focus();
@@ -134,11 +135,6 @@ export default function ChatView() {
     [handleSend],
   );
 
-  const handleApiKeySave = useCallback(async (key: string) => {
-    await window.electronAPI.setChatApiKey(key);
-    setHasApiKey(true);
-  }, []);
-
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     const el = e.target;
@@ -147,40 +143,6 @@ export default function ChatView() {
   }, []);
 
   const hasMessages = messages.length > 0 || loading;
-
-  // API 키 미설정 시: 인풋바 자체에 API 키 입력 UI
-  if (hasApiKey === false) {
-    return (
-      <div className="chat-floating-root">
-        <div className="chat-input-bar">
-          <KeyRound className="w-4 h-4 text-accent flex-shrink-0" />
-          <input
-            type="password"
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder="Anthropic API 키를 입력하세요 (sk-ant-...)"
-            className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/30 outline-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && apiKeyInput.trim()) handleApiKeySave(apiKeyInput.trim());
-              if (e.key === "Escape") window.electronAPI.closeChatWindow();
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => apiKeyInput.trim() && handleApiKeySave(apiKeyInput.trim())}
-            disabled={!apiKeyInput.trim()}
-            className="chat-send-btn"
-          >
-            <Send className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (hasApiKey === null) {
-    return <div className="chat-floating-root" />;
-  }
 
   return (
     <div className="chat-floating-root">
@@ -225,11 +187,6 @@ export default function ChatView() {
 
       {/* 하단 입력바 */}
       <div className="chat-input-bar">
-        <img
-          src={prowlProfile}
-          alt="Prowl"
-          className="flex-shrink-0 w-6 h-6 rounded-full object-cover"
-        />
         <textarea
           ref={textareaRef}
           value={input}
@@ -241,6 +198,19 @@ export default function ChatView() {
           autoFocus
           className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/30 resize-none outline-none leading-relaxed max-h-[120px]"
         />
+        {messages.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              setMessages([]);
+              setPlaceholder(getRandomPlaceholder());
+            }}
+            title="새 대화"
+            className="flex-shrink-0 p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
         <button
           type="button"
           onClick={handleSend}

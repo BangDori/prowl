@@ -11,14 +11,12 @@ import {
 interface StoreSchema {
   settings: AppSettings;
   jobCustomizations: JobCustomizations;
-  chatApiKey: string;
 }
 
 const store = new Store<StoreSchema>({
   defaults: {
     settings: DEFAULT_SETTINGS,
     jobCustomizations: {},
-    chatApiKey: "",
   },
 });
 
@@ -52,13 +50,4 @@ export function setJobCustomization(jobId: string, customization: JobCustomizati
   const customizations = store.get("jobCustomizations");
   customizations[jobId] = customization;
   store.set("jobCustomizations", customizations);
-}
-
-// API 키 관련
-export function getApiKey(): string {
-  return process.env.CLAUDE_CODE_OAUTH_TOKEN || store.get("chatApiKey") || "";
-}
-
-export function setApiKey(apiKey: string): void {
-  store.set("chatApiKey", apiKey);
 }

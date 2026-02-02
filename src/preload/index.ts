@@ -78,8 +78,6 @@ const electronAPI = {
   // 채팅
   sendChatMessage: (content: string, history: ChatMessage[]): Promise<ChatSendResult> =>
     ipcRenderer.invoke("chat:send", content, history),
-  getChatApiKey: (): Promise<string> => ipcRenderer.invoke("chat:getApiKey"),
-  setChatApiKey: (apiKey: string): Promise<void> => ipcRenderer.invoke("chat:setApiKey", apiKey),
   resizeChatWindow: (height: number): Promise<void> => ipcRenderer.invoke("chat:resize", height),
   closeChatWindow: (): Promise<void> => ipcRenderer.invoke("chat:close"),
 };

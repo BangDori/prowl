@@ -27,8 +27,6 @@ vi.mock("./services/settings", () => ({
   setJobCustomization: vi.fn(),
   getFocusMode: vi.fn(),
   setFocusMode: vi.fn(),
-  getApiKey: vi.fn(),
-  setApiKey: vi.fn(),
 }));
 
 vi.mock("./services/focus-mode", () => ({
@@ -57,9 +55,7 @@ import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launch
 import { readLogContent } from "./services/log-reader";
 import {
   getAllJobCustomizations,
-  getApiKey,
   getSettings,
-  setApiKey,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -318,8 +314,6 @@ describe("registerIpcHandlers", () => {
   it("채팅 관련 IPC 채널을 등록한다", () => {
     const channels = mockIpcHandle.mock.calls.map((c) => c[0]);
     expect(channels).toContain("chat:send");
-    expect(channels).toContain("chat:getApiKey");
-    expect(channels).toContain("chat:setApiKey");
     expect(channels).toContain("chat:resize");
     expect(channels).toContain("chat:close");
   });
@@ -337,26 +331,6 @@ describe("registerIpcHandlers", () => {
 
       expect(sendChatMessage).toHaveBeenCalledWith("안녕", []);
       expect(result).toEqual(mockResult);
-    });
-  });
-
-  describe("chat:getApiKey", () => {
-    it("getApiKey를 호출한다", async () => {
-      vi.mocked(getApiKey).mockReturnValue("sk-ant-test");
-      const handler = getHandler("chat:getApiKey");
-      const result = await handler({});
-
-      expect(getApiKey).toHaveBeenCalled();
-      expect(result).toBe("sk-ant-test");
-    });
-  });
-
-  describe("chat:setApiKey", () => {
-    it("setApiKey를 호출한다", async () => {
-      const handler = getHandler("chat:setApiKey");
-      await handler({}, "sk-ant-new-key");
-
-      expect(setApiKey).toHaveBeenCalledWith("sk-ant-new-key");
     });
   });
 

@@ -81,7 +81,7 @@ export interface JobCustomization {
 
 export type JobCustomizations = Record<string, JobCustomization>;
 
-// 채팅 메시지
+// 채팅
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";

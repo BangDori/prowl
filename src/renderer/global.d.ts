@@ -33,8 +33,6 @@ export interface ElectronAPI {
   resizeWindow: (height: number) => Promise<void>;
   quitApp: () => Promise<void>;
   sendChatMessage: (content: string, history: ChatMessage[]) => Promise<ChatSendResult>;
-  getChatApiKey: () => Promise<string>;
-  setChatApiKey: (apiKey: string) => Promise<void>;
   resizeChatWindow: (height: number) => Promise<void>;
   closeChatWindow: () => Promise<void>;
   navigateBack: () => Promise<void>;
