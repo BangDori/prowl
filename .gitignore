@@ -29,3 +29,7 @@ Thumbs.db
 
 # Vite
 .vite/
+
+# Claude hooks temp
+.claude/.lint-needed-*
+
