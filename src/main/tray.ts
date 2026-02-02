@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import { app, BrowserWindow, Menu, nativeImage, shell, Tray } from "electron";
+import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { showChatWindow } from "./chat-window";
 import { DEV_SERVER_PORT, WINDOW } from "./constants";
 
@@ -15,20 +15,50 @@ function getIndexUrl(): string {
 }
 
 /**
- * 서브페이지 BrowserWindow를 트레이 근처에 열기
+ * 커서가 있는 디스플레이 기준으로 서브윈도우 위치 계산
+ * - 트레이 아이콘이 같은 디스플레이에 있으면 트레이 아래에 표시
+ * - 다른 디스플레이면 해당 디스플레이 상단 중앙에 표시
+ */
+function calcSubWindowPosition(): { x: number; y: number } {
+  const cursor = screen.getCursorScreenPoint();
+  const cursorDisplay = screen.getDisplayNearestPoint(cursor);
+  const trayBounds = tray?.getBounds();
+
+  if (trayBounds) {
+    const trayCenter = {
+      x: trayBounds.x + trayBounds.width / 2,
+      y: trayBounds.y + trayBounds.height / 2,
+    };
+    const trayDisplay = screen.getDisplayNearestPoint(trayCenter);
+
+    if (trayDisplay.id === cursorDisplay.id) {
+      return {
+        x: Math.round(trayBounds.x + trayBounds.width / 2 - WINDOW.WIDTH / 2),
+        y: trayBounds.y + trayBounds.height,
+      };
+    }
+  }
+
+  const { x: dx, y: dy, width: dw } = cursorDisplay.workArea;
+  return {
+    x: Math.round(dx + dw / 2 - WINDOW.WIDTH / 2),
+    y: dy,
+  };
+}
+
+/**
+ * 서브페이지 BrowserWindow를 활성 디스플레이에 열기
  */
 function showSubPage(hash: string): void {
   if (subWindow && !subWindow.isDestroyed()) {
+    const pos = calcSubWindowPosition();
+    subWindow.setPosition(pos.x, pos.y);
     subWindow.loadURL(`${getIndexUrl()}#${hash}`);
     subWindow.show();
     return;
   }
 
-  const trayBounds = tray?.getBounds();
-  const x = trayBounds
-    ? Math.round(trayBounds.x + trayBounds.width / 2 - WINDOW.WIDTH / 2)
-    : undefined;
-  const y = trayBounds ? trayBounds.y + trayBounds.height : undefined;
+  const { x, y } = calcSubWindowPosition();
 
   subWindow = new BrowserWindow({
     width: WINDOW.WIDTH,
