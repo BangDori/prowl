@@ -75,6 +75,19 @@ export function createTray(): Tray {
   tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
   tray.setToolTip("Prowl");
 
+  tray.on("click", () => {
+    popUpTrayMenu();
+  });
+
+  tray.on("right-click", () => {
+    popUpTrayMenu();
+  });
+
+  return tray;
+}
+
+export function popUpTrayMenu(): void {
+  if (!tray) return;
   const focusMode = getFocusMode();
   let focusIndicator: string;
   if (!focusMode.enabled) {
@@ -106,15 +119,7 @@ export function createTray(): Tray {
     },
   ]);
 
-  tray.on("click", () => {
-    tray?.popUpContextMenu(menu);
-  });
-
-  tray.on("right-click", () => {
-    tray?.popUpContextMenu(menu);
-  });
-
-  return tray;
+  tray.popUpContextMenu(menu);
 }
 
 export function getTray(): Tray | null {

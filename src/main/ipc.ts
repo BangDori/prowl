@@ -134,6 +134,16 @@ export function registerIpcHandlers(): void {
     win.setSize(width, clampedHeight);
   });
 
+  // 뒤로가기 (서브윈도우 숨기고 트레이 메뉴 팝업)
+  ipcMain.handle("nav:back", async (): Promise<void> => {
+    const { getSubWindow, popUpTrayMenu } = await import("./tray");
+    const win = getSubWindow();
+    if (win && !win.isDestroyed()) {
+      win.hide();
+    }
+    popUpTrayMenu();
+  });
+
   // 앱 종료
   ipcMain.handle("app:quit", async (): Promise<void> => {
     app.quit();
