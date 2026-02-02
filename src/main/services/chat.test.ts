@@ -7,7 +7,7 @@ describe("chat 서비스", () => {
       const result = await sendChatMessage("안녕", []);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain("백엔드가 아직 연결되지 않았습니다");
+      expect(result.error).toContain("아직 대화할 준비가 안 됐다냥");
     });
   });
 });
