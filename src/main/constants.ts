@@ -55,7 +55,7 @@ export const CHAT_WINDOW = {
   WIDTH: 680,
   INPUT_HEIGHT: 72,
   EXPANDED_HEIGHT: 520,
-  BOTTOM_MARGIN: 100,
+  BOTTOM_MARGIN: 160,
 } as const;
 
 // ============================================

@@ -1,5 +1,6 @@
 import { KeyRound, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import prowlProfile from "../../../assets/prowl-profile.png";
 import type { ChatMessage } from "../../shared/types";
 
 function MessageBubble({ message }: { message: ChatMessage }) {
@@ -10,11 +11,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   });
 
   return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3`}>
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3 chat-bubble-enter`}>
       {!isUser && (
-        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-prowl-card/80 border border-white/10 flex items-center justify-center mr-2 mt-1 text-xs">
-          🐱
-        </div>
+        <img
+          src={prowlProfile}
+          alt="Prowl"
+          className="flex-shrink-0 w-7 h-7 rounded-full mr-2 mt-1 object-cover"
+        />
       )}
       <div className={`max-w-[75%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
         {!isUser && <span className="text-[10px] text-white/40 mb-0.5 ml-1">Prowl</span>}
@@ -48,6 +51,15 @@ export default function ChatView() {
     window.electronAPI.getChatApiKey().then((key) => setHasApiKey(!!key));
   }, []);
 
+  // 글로벌 ESC 키로 채팅창 닫기
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") window.electronAPI.closeChatWindow();
+    };
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
@@ -69,7 +81,13 @@ export default function ChatView() {
     setInput("");
     setLoading(true);
 
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
+    if (textareaRef.current) {
+      // IME 조합 강제 종료: blur → value 초기화 → refocus
+      textareaRef.current.blur();
+      textareaRef.current.value = "";
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.focus();
+    }
 
     const result = await window.electronAPI.sendChatMessage(content, messagesRef.current);
 
@@ -171,10 +189,12 @@ export default function ChatView() {
                 <MessageBubble key={msg.id} message={msg} />
               ))}
               {loading && (
-                <div className="flex justify-start mb-3">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-prowl-card/80 border border-white/10 flex items-center justify-center mr-2 mt-1 text-xs">
-                    🐱
-                  </div>
+                <div className="flex justify-start mb-3 chat-bubble-enter">
+                  <img
+                    src={prowlProfile}
+                    alt="Prowl"
+                    className="flex-shrink-0 w-7 h-7 rounded-full mr-2 mt-1 object-cover"
+                  />
                   <div className="px-3 py-2 rounded-2xl rounded-bl-sm bg-white/10">
                     <div className="flex gap-1">
                       <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" />
@@ -192,7 +212,11 @@ export default function ChatView() {
 
       {/* 하단 입력바 */}
       <div className="chat-input-bar">
-        <span className="text-sm flex-shrink-0">🐱</span>
+        <img
+          src={prowlProfile}
+          alt="Prowl"
+          className="flex-shrink-0 w-6 h-6 rounded-full object-cover"
+        />
         <textarea
           ref={textareaRef}
           value={input}

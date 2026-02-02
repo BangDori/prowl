@@ -98,7 +98,7 @@ export function popUpTrayMenu(): void {
       click: () => showSubPage("quiet-hours"),
     },
     {
-      label: "🐱 Prowl 채팅",
+      label: "Prowl 채팅",
       click: () => showChatWindow(),
     },
     { type: "separator" },

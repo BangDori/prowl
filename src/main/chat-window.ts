@@ -3,7 +3,6 @@ import { BrowserWindow, screen } from "electron";
 import { CHAT_WINDOW, DEV_SERVER_PORT } from "./constants";
 
 let chatWindow: BrowserWindow | null = null;
-let keepFocus = true;
 
 const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -24,7 +23,6 @@ export function showChatWindow(): void {
   const y = dispY + fullH - CHAT_WINDOW.EXPANDED_HEIGHT - CHAT_WINDOW.BOTTOM_MARGIN;
 
   if (chatWindow && !chatWindow.isDestroyed()) {
-    keepFocus = true;
     chatWindow.setPosition(x, y);
     chatWindow.show();
     chatWindow.focus();
@@ -57,19 +55,17 @@ export function showChatWindow(): void {
   chatWindow.loadURL(`${getIndexUrl()}#chat`);
   chatWindow.once("ready-to-show", () => chatWindow?.show());
   chatWindow.on("blur", () => {
-    if (keepFocus && chatWindow && !chatWindow.isDestroyed()) {
-      chatWindow.focus();
+    if (chatWindow && !chatWindow.isDestroyed()) {
+      chatWindow.hide();
     }
   });
   chatWindow.on("closed", () => {
     chatWindow = null;
-    keepFocus = true;
   });
 }
 
 export function closeChatWindow(): void {
   if (!chatWindow || chatWindow.isDestroyed()) return;
-  keepFocus = false;
   chatWindow.hide();
 }
 
