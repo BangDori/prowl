@@ -12,7 +12,8 @@ function getHashRoute(): string {
 export default function App() {
   const [route, setRoute] = useState(getHashRoute);
   const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
-  const containerRef = useAutoResize();
+  const isChat = route === "chat";
+  const containerRef = useAutoResize(isChat);
 
   useEffect(() => {
     const onHashChange = () => setRoute(getHashRoute());
@@ -49,7 +50,7 @@ export default function App() {
     <div
       ref={containerRef}
       className={
-        route === "chat"
+        isChat
           ? "text-gray-100"
           : "bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100"
       }
@@ -58,7 +59,7 @@ export default function App() {
         <BackgroundMonitor onBack={closeWindow} />
       ) : route === "quiet-hours" ? (
         <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} onBack={closeWindow} />
-      ) : route === "chat" ? (
+      ) : isChat ? (
         <ChatView />
       ) : (
         <div className="p-4 text-sm text-gray-500">Loading...</div>
