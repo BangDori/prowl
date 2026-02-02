@@ -44,6 +44,7 @@ PR 생성 전에 변경사항을 분석하여 package.json 버전을 자동 업�
 ### 규칙
 
 - main 브랜치 대비 커밋이 없으면 버저닝을 건너뛴다
+- **앱 코드(`src/`)나 빌드 설정(`package.json`, `tsconfig`, `vite.config` 등)에 변경이 없으면 버저닝을 건너뛴다.** 예: `.claude/`, `.github/`, `docs/`, `.gitignore` 등 개발 환경·CI·문서만 변경된 경우
 - 버전 범프 커밋은 PR의 마지막 커밋이어야 한다
 - `git log main..HEAD --format='%s%n%b'`로 제목과 본문 모두 확인하여 BREAKING CHANGE를 탐지한다
 - `feat` 타입이라도 스플래시 화면, 내부 UI 개선, 리팩토링성 변경 등 **사용자에게 새로운 기능으로 노출되지 않는 경우** patch로 처리한다. minor는 새 IPC 채널, 새 화면/페이지, 새 사용자 인터랙션이 추가될 때만 적용한다.
