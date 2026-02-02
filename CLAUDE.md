@@ -141,6 +141,11 @@ UI 작업 시 `.claude/skills/design-system.md`를 참조하여 일관된 디자
 - **핵심 토큰**: `prowl-bg`, `prowl-surface`, `prowl-card`, `accent`
 - **규칙**: 다크 모드 우선, 커스텀 토큰 사용, 하드코딩 금지
 
+## 커밋 컨벤션
+
+- `.claude/commands/commit.md` 문서의 규칙을 **기존 커밋 히스토리보다 우선** 따른다
+- 형식: `{타입}: {한국어 설명}` (예: `feat: 스플래시 화면 추가`)
+
 ## Code Organization Principles
 
 - **상수**: 매직 넘버는 `constants.ts`에 정의
