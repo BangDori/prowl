@@ -6,6 +6,8 @@ import { getFocusMode } from "./services/settings";
 import { createSplashWindow, dismissSplash } from "./splash";
 import { createTray } from "./tray";
 
+const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
+
 // 단일 인스턴스 잠금
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -17,15 +19,19 @@ if (!gotTheLock) {
     // IPC 핸들러 등록
     registerIpcHandlers();
 
-    // 스플래시 윈도우 표시
-    createSplashWindow();
-
-    // 스플래시 표시 후 트레이 생성 및 전환
-    setTimeout(async () => {
-      await dismissSplash();
+    if (isDev) {
+      // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
       createTray();
       updateFocusModeMonitor(getFocusMode());
-    }, SPLASH.DISPLAY_DURATION_MS);
+    } else {
+      // 프로덕션: 스플래시 윈도우 표시 후 트레이 전환
+      createSplashWindow();
+      setTimeout(async () => {
+        await dismissSplash();
+        createTray();
+        updateFocusModeMonitor(getFocusMode());
+      }, SPLASH.DISPLAY_DURATION_MS);
+    }
   });
 
   // 모든 창이 닫혀도 앱 종료하지 않음 (메뉴바 앱이므로)
