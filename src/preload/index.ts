@@ -67,6 +67,9 @@ const electronAPI = {
   // 윈도우 높이 동적 조정
   resizeWindow: (height: number): Promise<void> => ipcRenderer.invoke("window:resize", height),
 
+  // 뒤로가기 (트레이 메뉴로 돌아가기)
+  navigateBack: (): Promise<void> => ipcRenderer.invoke("nav:back"),
+
   // 앱 종료
   quitApp: (): Promise<void> => ipcRenderer.invoke("app:quit"),
 };

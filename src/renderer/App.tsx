@@ -29,7 +29,7 @@ export default function App() {
   }, []);
 
   const closeWindow = useCallback(() => {
-    window.close();
+    window.electronAPI.navigateBack();
   }, []);
 
   return (
