@@ -37,7 +37,7 @@ vi.mock("electron", () => ({
 }));
 
 import { Menu, Tray } from "electron";
-import { createTray, getSubWindow, getTray } from "./tray";
+import { createTray, getSubWindow, getTray, popUpTrayMenu } from "./tray";
 
 describe("tray", () => {
   beforeEach(() => {
@@ -55,6 +55,7 @@ describe("tray", () => {
 
     it("컨텍스트 메뉴를 구성한다", () => {
       createTray();
+      popUpTrayMenu();
 
       expect(Menu.buildFromTemplate).toHaveBeenCalledWith(
         expect.arrayContaining([
