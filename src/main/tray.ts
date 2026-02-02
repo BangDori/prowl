@@ -54,7 +54,9 @@ function showSubPage(hash: string): void {
     const pos = calcSubWindowPosition();
     subWindow.setPosition(pos.x, pos.y);
     subWindow.loadURL(`${getIndexUrl()}#${hash}`);
-    subWindow.show();
+    subWindow.setOpacity(1);
+    subWindow.setIgnoreMouseEvents(false);
+    subWindow.focus();
     return;
   }
 
@@ -80,9 +82,20 @@ function showSubPage(hash: string): void {
     },
   });
 
+  subWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+    skipTransformProcessType: true,
+  });
   subWindow.loadURL(`${getIndexUrl()}#${hash}`);
   subWindow.once("ready-to-show", () => subWindow?.show());
-  subWindow.on("blur", () => subWindow?.hide());
+  subWindow.on("blur", () => {
+    setTimeout(() => {
+      if (subWindow && !subWindow.isDestroyed() && !subWindow.isFocused()) {
+        subWindow.setOpacity(0);
+        subWindow.setIgnoreMouseEvents(true);
+      }
+    }, 200);
+  });
   subWindow.on("closed", () => {
     subWindow = null;
   });

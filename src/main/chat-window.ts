@@ -24,7 +24,8 @@ export function showChatWindow(): void {
 
   if (chatWindow && !chatWindow.isDestroyed()) {
     chatWindow.setPosition(x, y);
-    chatWindow.show();
+    chatWindow.setOpacity(1);
+    chatWindow.setIgnoreMouseEvents(false);
     chatWindow.focus();
     return;
   }
@@ -52,13 +53,12 @@ export function showChatWindow(): void {
     },
   });
 
+  chatWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+    skipTransformProcessType: true,
+  });
   chatWindow.loadURL(`${getIndexUrl()}#chat`);
   chatWindow.once("ready-to-show", () => chatWindow?.show());
-  chatWindow.on("blur", () => {
-    if (chatWindow && !chatWindow.isDestroyed()) {
-      chatWindow.hide();
-    }
-  });
   chatWindow.on("closed", () => {
     chatWindow = null;
   });
@@ -66,7 +66,8 @@ export function showChatWindow(): void {
 
 export function closeChatWindow(): void {
   if (!chatWindow || chatWindow.isDestroyed()) return;
-  chatWindow.hide();
+  chatWindow.setOpacity(0);
+  chatWindow.setIgnoreMouseEvents(true);
 }
 
 export function getChatWindow(): BrowserWindow | null {
