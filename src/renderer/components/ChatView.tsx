@@ -1,5 +1,6 @@
 import { Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import prowlLying from "../../../assets/prowl-lying.png";
 import prowlProfile from "../../../assets/prowl-profile.png";
 import type { ChatMessage } from "../../shared/types";
 
@@ -182,6 +183,18 @@ export default function ChatView() {
               <div ref={messagesEndRef} />
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 고양이 로고: 메시지가 없을 때 입력바 위에 누워있기 */}
+      {!hasMessages && (
+        <div className="relative flex justify-start pl-0 z-10">
+          <img
+            src={prowlLying}
+            alt="Prowl"
+            className="w-28 h-auto object-contain opacity-60 drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)]"
+            style={{ marginBottom: "-12px" }}
+          />
         </div>
       )}
 
