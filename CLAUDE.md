@@ -172,9 +172,20 @@ UI 작업 시 `.claude/skills/design-system.md`를 참조하여 일관된 디자
 - **타입 안전성**: `Promise<any>` 대신 구체적인 타입 사용
 - **SRP (단일 책임 원칙)**: 각 함수/모듈은 하나의 책임만 담당
 
+## Documentation
+
+코드 작성 시 `docs/` 폴더의 규칙 문서를 참조:
+
+| 문서 | 내용 |
+|------|------|
+| `docs/naming-convention.md` | 네이밍 규칙 (파일, 변수, 함수, IPC 등) |
+| `docs/file-organization.md` | 파일/폴더 구조 원칙 |
+| `docs/component-patterns.md` | React 컴포넌트 작성 패턴 |
+| `docs/ipc-conventions.md` | IPC 통신 규칙 |
+
 ## Naming Convention
 
-상세 규칙은 `.claude/docs/naming-convention.md` 참조.
+상세 규칙은 `docs/naming-convention.md` 참조.
 
 | 대상 | 규칙 | 예시 |
 |------|------|------|
