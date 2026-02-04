@@ -14,19 +14,32 @@ export function useJobActions(onActionComplete?: () => void): UseJobActionsResul
   const [toggling, setToggling] = useState<string | null>(null);
   const [runningJobs, setRunningJobs] = useState<Set<string>>(new Set());
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const onActionCompleteRef = useRef(onActionComplete);
+
+  // 콜백 ref 최신 상태 유지
+  useEffect(() => {
+    onActionCompleteRef.current = onActionComplete;
+  }, [onActionComplete]);
+
+  // 폴링 중지 및 완료 처리
+  const stopPollingAndRefresh = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+    }
+    onActionCompleteRef.current?.();
+  }, []);
 
   // 실행 중인 Job 목록 폴링
   const pollRunningJobs = useCallback(async () => {
     const running = await window.electronAPI.getRunningJobs();
     setRunningJobs(new Set(running));
 
-    // 실행 중인 Job이 없으면 폴링 중지
-    if (running.length === 0 && pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current);
-      pollIntervalRef.current = null;
-      onActionComplete?.();
+    // 실행 중인 Job이 없으면 폴링 중지 및 새로고침
+    if (running.length === 0) {
+      stopPollingAndRefresh();
     }
-  }, [onActionComplete]);
+  }, [stopPollingAndRefresh]);
 
   // 폴링 시작
   const startPolling = useCallback(() => {

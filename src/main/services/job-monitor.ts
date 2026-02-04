@@ -44,10 +44,14 @@ export function getRunningJobIds(): string[] {
  */
 export function startMonitoringJob(jobId: string, jobName: string, logPath: string | null): void {
   if (!logPath) {
+    console.log(`[job-monitor] No logPath for ${jobName}, skipping monitoring`);
     return;
   }
 
   const initialMtime = getLogMtime(logPath);
+  console.log(
+    `[job-monitor] Starting monitoring for ${jobName}, logPath: ${logPath}, initialMtime: ${initialMtime}`,
+  );
 
   monitoringJobs.set(jobId, {
     jobName,
@@ -91,8 +95,10 @@ function checkMonitoringJobs(): void {
 
     // 로그 파일이 업데이트되었는지 확인
     if (job.initialMtime === null || currentMtime > job.initialMtime) {
+      console.log(`[job-monitor] Log file updated for ${job.jobName}, sending notification`);
       // 로그 분석 및 알림 발송
       const lastRun = getLastRunInfo(job.logPath);
+      console.log(`[job-monitor] lastRun:`, lastRun);
       if (lastRun) {
         sendJobNotification({
           jobName: job.jobName,

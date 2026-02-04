@@ -1,6 +1,15 @@
 import { Notification } from "electron";
 import { isNotificationsEnabled } from "./settings";
 
+// macOS 알림 권한 확인
+function checkNotificationSupport(): boolean {
+  if (!Notification.isSupported()) {
+    console.log("[notification] Notifications not supported on this platform");
+    return false;
+  }
+  return true;
+}
+
 interface JobNotificationParams {
   jobName: string;
   success: boolean;
@@ -29,7 +38,14 @@ function getRandomMessage(messages: string[]): string {
  * Job 완료 알림 발송
  */
 export function sendJobNotification({ jobName, success, message }: JobNotificationParams): void {
+  console.log(`[notification] sendJobNotification called for ${jobName}, success: ${success}`);
+
+  if (!checkNotificationSupport()) {
+    return;
+  }
+
   if (!isNotificationsEnabled()) {
+    console.log(`[notification] Notifications disabled, skipping`);
     return;
   }
 
@@ -39,11 +55,29 @@ export function sendJobNotification({ jobName, success, message }: JobNotificati
     : getRandomMessage(FAILURE_MESSAGES);
   const body = message ? `${catMessage}\n${message}` : catMessage;
 
-  const notification = new Notification({
-    title,
-    body,
-    silent: false,
-  });
+  console.log(`[notification] Showing notification: ${title} - ${body}`);
 
-  notification.show();
+  try {
+    const notification = new Notification({
+      title,
+      body,
+      silent: false,
+    });
+
+    notification.on("show", () => {
+      console.log("[notification] Notification shown successfully");
+    });
+
+    notification.on("click", () => {
+      console.log("[notification] Notification clicked");
+    });
+
+    notification.on("close", () => {
+      console.log("[notification] Notification closed");
+    });
+
+    notification.show();
+  } catch (error) {
+    console.error("[notification] Failed to create/show notification:", error);
+  }
 }
