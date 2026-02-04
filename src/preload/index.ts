@@ -8,6 +8,7 @@ import type {
   JobCustomizations,
   LaunchdJob,
   LogContent,
+  UpdateCheckResult,
 } from "@shared/types";
 import { contextBridge, ipcRenderer } from "electron";
 
@@ -86,6 +87,9 @@ const electronAPI = {
 
   // 앱 버전 조회
   getAppVersion: (): Promise<string> => ipcRenderer.invoke("app:version"),
+
+  // 업데이트 확인
+  checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke("app:check-update"),
 };
 
 // contextBridge로 API 노출

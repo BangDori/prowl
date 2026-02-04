@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.10.0] - 2026-02-05
+- Settings에 업데이트 체크 기능 추가 (GitHub API 연동)
+- 최신 버전일 경우 10분 쿨다운으로 API 남용 방지
+- Night Watch 시간 선택 UI 개선 (토글 시 슬라이드 애니메이션)
+
 ## [1.9.0] - 2026-02-04
 - Job 완료/실패 시 macOS 알림 발송 (고양이 컨셉 메시지)
 - Job 실행 중 상태 표시 (스피너, "실행 중...")

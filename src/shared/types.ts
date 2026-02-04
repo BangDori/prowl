@@ -96,3 +96,13 @@ export interface ChatSendResult {
   message?: ChatMessage;
   error?: string;
 }
+
+// 업데이트 체크 결과
+export interface UpdateCheckResult {
+  hasUpdate: boolean;
+  currentVersion: string;
+  latestVersion: string;
+  releaseUrl: string;
+  releaseNotes?: string;
+  error?: string;
+}
