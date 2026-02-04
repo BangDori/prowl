@@ -9,6 +9,7 @@ import type {
   JobCustomizations,
   LaunchdJob,
   LogContent,
+  UpdateCheckResult,
 } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { sendChatMessage } from "./services/chat";
@@ -24,6 +25,7 @@ import {
   setJobCustomization,
   setSettings,
 } from "./services/settings";
+import { checkForUpdates } from "./services/update-checker";
 import { closeChatWindow, getSubWindow, popUpTrayMenu, resizeChatWindow } from "./windows";
 
 /**
@@ -191,5 +193,10 @@ export function registerIpcHandlers(): void {
   // 앱 버전 조회
   ipcMain.handle("app:version", async (): Promise<string> => {
     return app.getVersion();
+  });
+
+  // 업데이트 확인
+  ipcMain.handle("app:check-update", async (): Promise<UpdateCheckResult> => {
+    return checkForUpdates();
   });
 }
