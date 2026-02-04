@@ -35,7 +35,7 @@ export const LOG_PATTERNS = {
 // ============================================
 // 시간 상수 (shared에서 re-export)
 // ============================================
-export { JOB_POLLING_INTERVAL_MS, TIME } from "../shared/constants";
+export { JOB_COMPLETION, JOB_POLLING_INTERVAL_MS, TIME } from "../shared/constants";
 
 // ============================================
 // 윈도우 설정

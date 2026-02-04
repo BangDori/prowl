@@ -121,14 +121,21 @@ export default function JobCard({
             </h3>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-xs text-gray-500 dark:text-gray-500">{job.scheduleText}</span>
-              {job.lastRun && (
+              <span className="text-xs text-gray-400 dark:text-gray-600">·</span>
+              {isRunning ? (
                 <>
-                  <span className="text-xs text-gray-400 dark:text-gray-600">·</span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {formatLastRun()}
-                  </span>
-                  <StatusBadge success={job.lastRun.success} />
+                  <span className="text-xs text-accent">실행 중...</span>
+                  <Loader2 className="w-3.5 h-3.5 text-accent animate-spin" />
                 </>
+              ) : (
+                job.lastRun && (
+                  <>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      {formatLastRun()}
+                    </span>
+                    <StatusBadge success={job.lastRun.success} />
+                  </>
+                )
               )}
             </div>
           </div>

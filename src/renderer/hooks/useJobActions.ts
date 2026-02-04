@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { JOB_COMPLETION } from "../../shared/constants";
 import type { JobActionResult, LogContent } from "../../shared/types";
 
 interface UseJobActionsResult {
   toggling: string | null;
-  running: string | null;
+  runningJobs: Set<string>;
   toggle: (jobId: string) => Promise<JobActionResult>;
   run: (jobId: string) => Promise<JobActionResult>;
   getLogs: (jobId: string, lines?: number) => Promise<LogContent>;
@@ -11,7 +12,46 @@ interface UseJobActionsResult {
 
 export function useJobActions(onActionComplete?: () => void): UseJobActionsResult {
   const [toggling, setToggling] = useState<string | null>(null);
-  const [running, setRunning] = useState<string | null>(null);
+  const [runningJobs, setRunningJobs] = useState<Set<string>>(new Set());
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // 실행 중인 Job 목록 폴링
+  const pollRunningJobs = useCallback(async () => {
+    const running = await window.electronAPI.getRunningJobs();
+    setRunningJobs(new Set(running));
+
+    // 실행 중인 Job이 없으면 폴링 중지
+    if (running.length === 0 && pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current);
+      pollIntervalRef.current = null;
+      onActionComplete?.();
+    }
+  }, [onActionComplete]);
+
+  // 폴링 시작
+  const startPolling = useCallback(() => {
+    if (pollIntervalRef.current) return;
+    pollIntervalRef.current = setInterval(pollRunningJobs, JOB_COMPLETION.POLL_INTERVAL_MS);
+  }, [pollRunningJobs]);
+
+  // 컴포넌트 마운트 시 실행 중인 Job 목록 초기화
+  useEffect(() => {
+    const initRunningJobs = async () => {
+      const running = await window.electronAPI.getRunningJobs();
+      if (running.length > 0) {
+        setRunningJobs(new Set(running));
+        startPolling();
+      }
+    };
+    initRunningJobs();
+
+    // 언마운트 시 폴링 정리
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, [startPolling]);
 
   const toggle = useCallback(
     async (jobId: string): Promise<JobActionResult> => {
@@ -29,20 +69,21 @@ export function useJobActions(onActionComplete?: () => void): UseJobActionsResul
     [onActionComplete],
   );
 
-  const run = useCallback(async (jobId: string): Promise<JobActionResult> => {
-    setRunning(jobId);
-    try {
+  const run = useCallback(
+    async (jobId: string): Promise<JobActionResult> => {
       const result = await window.electronAPI.runJob(jobId);
+      if (result.success) {
+        setRunningJobs((prev) => new Set(prev).add(jobId));
+        startPolling();
+      }
       return result;
-    } finally {
-      // 실행 후 잠시 대기 후 상태 해제 (피드백용)
-      setTimeout(() => setRunning(null), 1000);
-    }
-  }, []);
+    },
+    [startPolling],
+  );
 
   const getLogs = useCallback(async (jobId: string, lines?: number): Promise<LogContent> => {
     return window.electronAPI.getJobLogs(jobId, lines);
   }, []);
 
-  return { toggling, running, toggle, run, getLogs };
+  return { toggling, runningJobs, toggle, run, getLogs };
 }

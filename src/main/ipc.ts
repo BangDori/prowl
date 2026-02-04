@@ -13,6 +13,7 @@ import type {
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { sendChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
+import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
 import {
@@ -59,7 +60,25 @@ export function registerIpcHandlers(): void {
         message: "작업이 비활성화 상태입니다. 먼저 활성화해주세요.",
       };
     }
-    return startJob(job.label);
+    if (isJobRunning(jobId)) {
+      return {
+        success: false,
+        message: "작업이 이미 실행 중입니다.",
+      };
+    }
+    const result = startJob(job.label);
+
+    // Job 완료 모니터링 시작 (알림용)
+    if (result.success) {
+      startMonitoringJob(job.id, job.name, job.logPath);
+    }
+
+    return result;
+  });
+
+  // 실행 중인 작업 ID 목록 조회
+  ipcMain.handle("jobs:running", async (): Promise<string[]> => {
+    return getRunningJobIds();
   });
 
   // 로그 조회

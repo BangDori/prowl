@@ -313,6 +313,29 @@ function ChangelogContent() {
 
 function SettingsContent() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    window.electronAPI.getSettings().then((settings) => {
+      setNotificationsEnabled(settings.notificationsEnabled);
+      setLoading(false);
+    });
+  }, []);
+
+  const toggleNotifications = async () => {
+    const newValue = !notificationsEnabled;
+    setNotificationsEnabled(newValue);
+    const current = await window.electronAPI.getSettings();
+    await window.electronAPI.setSettings({ ...current, notificationsEnabled: newValue });
+  };
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="skeleton h-4 w-32" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-full overflow-y-auto">
@@ -331,10 +354,7 @@ function SettingsContent() {
                   <p className="text-[10px] text-gray-500">Show alerts when jobs complete</p>
                 </div>
               </div>
-              <ToggleSwitch
-                enabled={notificationsEnabled}
-                onChange={() => setNotificationsEnabled(!notificationsEnabled)}
-              />
+              <ToggleSwitch enabled={notificationsEnabled} onChange={toggleNotifications} />
             </div>
           </div>
         </div>

@@ -27,6 +27,9 @@ const electronAPI = {
   // 작업 수동 실행
   runJob: (jobId: string): Promise<JobActionResult> => ipcRenderer.invoke("jobs:run", jobId),
 
+  // 실행 중인 작업 ID 목록 조회
+  getRunningJobs: (): Promise<string[]> => ipcRenderer.invoke("jobs:running"),
+
   // 로그 조회
   getJobLogs: (jobId: string, lines?: number): Promise<LogContent> =>
     ipcRenderer.invoke("jobs:logs", jobId, lines),
