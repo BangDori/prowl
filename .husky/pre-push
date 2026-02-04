@@ -1,5 +1,6 @@
 # 버전 관리 파일 변경 확인
-CHANGED_FILES=$(git diff main...HEAD --name-only 2>/dev/null)
+git fetch origin main --quiet 2>/dev/null
+CHANGED_FILES=$(git diff origin/main...HEAD --name-only 2>/dev/null)
 
 # main 브랜치가 없거나 첫 push인 경우 스킵
 if [ -z "$CHANGED_FILES" ]; then
