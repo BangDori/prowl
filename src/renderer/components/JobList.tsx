@@ -9,7 +9,7 @@ import JobCard from "./JobCard";
 
 interface JobActionsHook {
   toggling: string | null;
-  running: string | null;
+  runningJobs: Set<string>;
   toggle: (jobId: string) => Promise<JobActionResult>;
   run: (jobId: string) => Promise<JobActionResult>;
   getLogs: (jobId: string, lines?: number) => Promise<LogContent>;
@@ -36,7 +36,7 @@ export default function JobList({
           job={job}
           customization={customizations[job.id]}
           isToggling={actions.toggling === job.id}
-          isRunning={actions.running === job.id}
+          isRunning={actions.runningJobs.has(job.id)}
           onToggle={() => actions.toggle(job.id)}
           onRun={() => actions.run(job.id)}
           onViewLogs={() => actions.getLogs(job.id)}

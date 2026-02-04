@@ -67,11 +67,13 @@ export const DEFAULT_FOCUS_MODE: FocusMode = {
 export interface AppSettings {
   patterns: string[]; // 감지할 plist 패턴 목록 (예: ['com.claude.', 'com.myapp.'])
   focusMode: FocusMode;
+  notificationsEnabled: boolean; // Job 완료 알림 활성화
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   patterns: [],
   focusMode: DEFAULT_FOCUS_MODE,
+  notificationsEnabled: true,
 };
 
 // 작업 커스터마이징

@@ -116,32 +116,41 @@ export default function JobCard({
         // 일반 모드
         <div className="flex items-center justify-between">
           <div className="min-w-0">
-            <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
-              {displayName}
-            </h3>
+            <div className="flex items-center gap-1">
+              <h3 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+                {displayName}
+              </h3>
+              <button
+                onClick={startEditing}
+                className="btn-icon text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                title="편집"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-xs text-gray-500 dark:text-gray-500">{job.scheduleText}</span>
-              {job.lastRun && (
+              <span className="text-xs text-gray-400 dark:text-gray-600">·</span>
+              {isRunning ? (
                 <>
-                  <span className="text-xs text-gray-400 dark:text-gray-600">·</span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {formatLastRun()}
-                  </span>
-                  <StatusBadge success={job.lastRun.success} />
+                  <span className="text-xs text-accent">실행 중...</span>
+                  <Loader2 className="w-3.5 h-3.5 text-accent animate-spin" />
                 </>
+              ) : (
+                job.lastRun && (
+                  <>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      {formatLastRun()}
+                    </span>
+                    <StatusBadge success={job.lastRun.success} />
+                  </>
+                )
               )}
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0">
             {/* hover 시에만 표시되는 액션 버튼 */}
             <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-              <button
-                onClick={startEditing}
-                className="btn-icon text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                title="편집"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </button>
               <button
                 onClick={onRun}
                 disabled={!job.isLoaded || isRunning}

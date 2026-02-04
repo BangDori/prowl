@@ -51,3 +51,8 @@ export function setJobCustomization(jobId: string, customization: JobCustomizati
   customizations[jobId] = customization;
   store.set("jobCustomizations", customizations);
 }
+
+// 알림 설정
+export function isNotificationsEnabled(): boolean {
+  return getSettings().notificationsEnabled ?? true;
+}
