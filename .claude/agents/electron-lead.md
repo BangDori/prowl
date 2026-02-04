@@ -1,3 +1,9 @@
+---
+name: electron-lead
+description: Electron Main process와 IPC 통신 담당
+role: execution
+---
+
 # Electron Lead
 
 Electron Main process와 IPC 통신을 담당하는 에이전트.

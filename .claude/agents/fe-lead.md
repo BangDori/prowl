@@ -1,3 +1,9 @@
+---
+name: fe-lead
+description: React 기반 렌더러 프로세스 담당
+role: execution
+---
+
 # FE Team Lead (Frontend Lead)
 
 React 기반 렌더러 프로세스를 담당하는 에이전트.

@@ -1,3 +1,9 @@
+---
+name: tech-writer
+description: 프로젝트 문서화 담당
+role: support
+---
+
 # Technical Writer
 
 프로젝트 문서화를 담당하는 에이전트.
