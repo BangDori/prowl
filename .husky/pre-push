@@ -1,0 +1,28 @@
+# 버전 관리 파일 변경 확인
+CHANGED_FILES=$(git diff main...HEAD --name-only 2>/dev/null)
+
+# main 브랜치가 없거나 첫 push인 경우 스킵
+if [ -z "$CHANGED_FILES" ]; then
+  exit 0
+fi
+
+# src/ 변경이 있는지 확인 (기능 변경)
+if echo "$CHANGED_FILES" | grep -q "^src/"; then
+  # package.json 변경 확인
+  if ! echo "$CHANGED_FILES" | grep -q "^package.json$"; then
+    echo "❌ package.json 버전을 업데이트해주세요."
+    echo ""
+    echo "   /version-bump 명령어를 실행하세요."
+    echo ""
+    exit 1
+  fi
+
+  # CHANGELOG.md 변경 확인
+  if ! echo "$CHANGED_FILES" | grep -q "^CHANGELOG.md$"; then
+    echo "❌ CHANGELOG.md를 업데이트해주세요."
+    echo ""
+    echo "   변경사항을 기록해주세요."
+    echo ""
+    exit 1
+  fi
+fi
