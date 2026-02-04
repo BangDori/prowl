@@ -50,9 +50,9 @@ export default function SettingsSection() {
     setUpdateResult(result);
     setUpdateStatus("checked");
 
-    // 최신 버전이면 5초 쿨다운
+    // 최신 버전이면 10분 쿨다운
     if (!result.error && !result.hasUpdate) {
-      setCooldown(5);
+      setCooldown(600);
     }
   };
 
@@ -167,11 +167,7 @@ export default function SettingsSection() {
                     disabled={updateStatus === "checking" || cooldown > 0}
                     className="px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors disabled:opacity-50"
                   >
-                    {updateStatus === "checking"
-                      ? "Checking"
-                      : cooldown > 0
-                        ? `${cooldown}s`
-                        : "Check"}
+                    {updateStatus === "checking" ? "Checking" : cooldown > 0 ? "Checked" : "Check"}
                   </button>
                 </div>
               </div>
