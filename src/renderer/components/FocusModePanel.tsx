@@ -5,23 +5,25 @@ import ToggleSwitch from "./ToggleSwitch";
 interface FocusModePanelProps {
   focusMode: FocusMode;
   onUpdate: (updated: FocusMode) => void;
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export default function FocusModePanel({ focusMode, onUpdate, onBack }: FocusModePanelProps) {
   return (
     <div>
-      <header className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 dark:border-prowl-border">
-        <button
-          type="button"
-          onClick={onBack}
-          className="btn-icon text-gray-500 dark:text-gray-400 p-0.5"
-          title="뒤로"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <h1 className="text-xs font-semibold">야간 감시</h1>
-      </header>
+      {onBack && (
+        <header className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 dark:border-prowl-border">
+          <button
+            type="button"
+            onClick={onBack}
+            className="btn-icon text-gray-500 dark:text-gray-400 p-0.5"
+            title="뒤로"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <h1 className="text-xs font-semibold">야간 감시</h1>
+        </header>
+      )}
 
       <div className="py-0.5">
         <div className="flex items-center justify-between px-3 py-1.5">

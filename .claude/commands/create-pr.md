@@ -11,43 +11,10 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 
 1. `git status`와 `git log main..HEAD`로 변경사항 파악
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
-3. **시멘틱 버저닝 (아래 섹션 참조)**
+3. **버전 범프 필요 시 `/version-bump` 실행** (PR 생성 전 마지막 커밋)
 4. 리모트에 push (`git push -u origin HEAD`)
 5. 템플릿에 맞춰 PR 본문 작성
 6. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
-
-## 시멘틱 버저닝
-
-PR 생성 전에 변경사항을 분석하여 package.json 버전을 자동 업데이트한다.
-
-### 절차
-
-1. 현재 package.json 버전이 이미 릴리스되었는지 확인:
-   - `git tag -l "v$(node -p "require('./package.json').version")"` 로 태그 존재 여부 확인
-   - **태그가 없으면 현재 버전이 아직 미릴리스 상태이므로 버저닝을 건너뛴다**
-2. `git log main..HEAD --oneline`로 커밋 메시지 수집
-3. 커밋 타입 기반으로 범프 레벨 결정:
-
-| 조건 | 범프 | 예시 |
-|------|------|------|
-| 커밋 본문에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
-| `feat` 타입이고 **사용자에게 노출되는 새 기능** 추가 | **minor** | 1.3.0 → 1.4.0 |
-| 그 외 (`fix`, `enhance`, `refactor`, `docs`, `chore`, `test`, 또는 UI/내부 개선성 `feat`) | **patch** | 1.3.0 → 1.3.1 |
-
-4. 가장 높은 범프 레벨을 선택 (major > minor > patch)
-5. package.json의 `version` 필드를 업데이트
-6. 별도 커밋 생성:
-   ```
-   chore: bump version to {new_version}
-   ```
-
-### 규칙
-
-- main 브랜치 대비 커밋이 없으면 버저닝을 건너뛴다
-- **앱 코드(`src/`)나 빌드 설정(`package.json`, `tsconfig`, `vite.config` 등)에 변경이 없으면 버저닝을 건너뛴다.** 예: `.claude/`, `.github/`, `docs/`, `.gitignore` 등 개발 환경·CI·문서만 변경된 경우
-- 버전 범프 커밋은 PR의 마지막 커밋이어야 한다
-- `git log main..HEAD --format='%s%n%b'`로 제목과 본문 모두 확인하여 BREAKING CHANGE를 탐지한다
-- `feat` 타입이라도 스플래시 화면, 내부 UI 개선, 리팩토링성 변경 등 **사용자에게 새로운 기능으로 노출되지 않는 경우** patch로 처리한다. minor는 새 IPC 채널, 새 화면/페이지, 새 사용자 인터랙션이 추가될 때만 적용한다.
 
 ## 브랜치 컨벤션
 

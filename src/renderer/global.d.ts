@@ -31,6 +31,7 @@ export interface ElectronAPI {
   resizeChatWindow: (height: number) => Promise<void>;
   closeChatWindow: () => Promise<void>;
   navigateBack: () => Promise<void>;
+  getAppVersion: () => Promise<string>;
 }
 
 declare global {

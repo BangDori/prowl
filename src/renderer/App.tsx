@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { DEFAULT_FOCUS_MODE, type FocusMode } from "../shared/types";
 import BackgroundMonitor from "./components/BackgroundMonitor";
 import ChatView from "./components/ChatView";
+import Dashboard from "./components/Dashboard";
 import FocusModePanel from "./components/FocusModePanel";
 import { useAutoResize } from "./hooks/useAutoResize";
 
@@ -45,6 +46,10 @@ export default function App() {
   const closeWindow = useCallback(() => {
     window.electronAPI.navigateBack();
   }, []);
+
+  if (route === "dashboard") {
+    return <Dashboard />;
+  }
 
   return (
     <div

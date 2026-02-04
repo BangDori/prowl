@@ -279,3 +279,15 @@ select.input-field {
 .chat-bubble-enter {
   animation: chat-bubble-in 0.25s ease-out;
 }
+
+/* ============================================
+   대시보드 윈도우 드래그 영역
+   ============================================ */
+
+.-webkit-app-region-drag {
+  -webkit-app-region: drag;
+}
+
+.-webkit-app-region-no-drag {
+  -webkit-app-region: no-drag;
+}
