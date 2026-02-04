@@ -5,7 +5,8 @@
     "changes": [
       "Docker 스타일 대시보드 윈도우 추가",
       "트레이 메뉴에 macOS 네이티브 아이콘 추가",
-      "Settings에 버전 히스토리 및 알림 설정 추가"
+      "Version History 사이드바 메뉴 추가",
+      "Settings에 알림 설정 및 링크 추가"
     ]
   },
   {
