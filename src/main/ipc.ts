@@ -171,4 +171,9 @@ export function registerIpcHandlers(): void {
     const { closeChatWindow } = await import("./chat-window");
     closeChatWindow();
   });
+
+  // 앱 버전 조회
+  ipcMain.handle("app:version", async (): Promise<string> => {
+    return app.getVersion();
+  });
 }

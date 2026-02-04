@@ -68,3 +68,13 @@ export const SPLASH = {
   ABSORB_DURATION_MS: 600,
   DISSOLVE_DURATION_MS: 1200,
 } as const;
+
+// ============================================
+// 대시보드 윈도우 설정
+// ============================================
+export const DASHBOARD = {
+  WIDTH: 900,
+  HEIGHT: 600,
+  MIN_WIDTH: 700,
+  MIN_HEIGHT: 400,
+} as const;

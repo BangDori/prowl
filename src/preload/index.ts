@@ -80,6 +80,9 @@ const electronAPI = {
     ipcRenderer.invoke("chat:send", content, history),
   resizeChatWindow: (height: number): Promise<void> => ipcRenderer.invoke("chat:resize", height),
   closeChatWindow: (): Promise<void> => ipcRenderer.invoke("chat:close"),
+
+  // 앱 버전 조회
+  getAppVersion: (): Promise<string> => ipcRenderer.invoke("app:version"),
 };
 
 // contextBridge로 API 노출

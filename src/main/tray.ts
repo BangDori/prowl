@@ -2,6 +2,7 @@ import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { showChatWindow } from "./chat-window";
 import { DEV_SERVER_PORT, WINDOW } from "./constants";
+import { showDashboardWindow } from "./dashboard-window";
 
 let tray: Tray | null = null;
 let subWindow: BrowserWindow | null = null;
@@ -133,26 +134,31 @@ export function popUpTrayMenu(): void {
 
   const menu = Menu.buildFromTemplate([
     {
-      label: "백그라운드 모니터링",
+      label: "Go to Dashboard",
+      click: () => showDashboardWindow(),
+    },
+    { type: "separator" },
+    {
+      label: "Background Monitor",
       click: () => showSubPage("monitor"),
     },
     {
-      label: "야간 감시",
+      label: "Night Watch",
       click: () => showSubPage("quiet-hours"),
     },
     {
-      label: "Prowl 채팅",
+      label: "Prowl Chat",
       accelerator: "CommandOrControl+Shift+P",
       click: () => showChatWindow(),
     },
     { type: "separator" },
     {
-      label: "GitHub 저장소 열기",
+      label: "Open GitHub Repository",
       click: () => shell.openExternal("https://github.com/BangDori/prowl"),
     },
     { type: "separator" },
     {
-      label: "Prowl 종료",
+      label: "Quit Prowl",
       click: () => app.quit(),
     },
   ]);
