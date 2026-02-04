@@ -13,7 +13,39 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import prowlProfile from "../../../assets/prowl-profile.png";
-import CHANGELOG from "../../shared/changelog.json";
+import changelogRaw from "../../../CHANGELOG.md?raw";
+
+interface ChangelogEntry {
+  version: string;
+  date: string;
+  changes: string[];
+}
+
+function parseChangelog(markdown: string): ChangelogEntry[] {
+  const entries: ChangelogEntry[] = [];
+  const lines = markdown.split("\n");
+  let currentEntry: ChangelogEntry | null = null;
+
+  for (const line of lines) {
+    // Match version header: ## [1.8.0] - 2026-02-04
+    const headerMatch = line.match(/^## \[(.+?)\] - (\d{4}-\d{2}-\d{2})/);
+    if (headerMatch) {
+      if (currentEntry) entries.push(currentEntry);
+      currentEntry = { version: headerMatch[1], date: headerMatch[2], changes: [] };
+      continue;
+    }
+    // Match change item: - 변경사항
+    const itemMatch = line.match(/^- (.+)/);
+    if (itemMatch && currentEntry) {
+      currentEntry.changes.push(itemMatch[1]);
+    }
+  }
+  if (currentEntry) entries.push(currentEntry);
+  return entries;
+}
+
+const CHANGELOG = parseChangelog(changelogRaw);
+
 import {
   DEFAULT_FOCUS_MODE,
   type FocusMode,

@@ -5,14 +5,14 @@ description: package.json 버전 범프 및 changelog 업데이트
 
 # Version Bump
 
-package.json 버전을 범프하고 changelog.json에 변경 내역을 추가합니다.
+package.json 버전을 범프하고 CHANGELOG.md에 변경 내역을 추가합니다.
 
 ## 수행 작업
 
 1. **버전 범프 필요 여부 확인**
 2. **범프 레벨 결정** (major/minor/patch)
 3. **package.json 버전 업데이트**
-4. **changelog.json에 새 버전 항목 추가**
+4. **CHANGELOG.md에 새 버전 항목 추가**
 5. **버전 범프 커밋 생성**
 
 ## 버전 범프 조건
@@ -40,22 +40,17 @@ package.json 버전을 범프하고 changelog.json에 변경 내역을 추가합
 - 가장 높은 범프 레벨 선택 (major > minor > patch)
 - `feat`라도 스플래시, 내부 UI 개선 등은 patch
 
-## changelog.json 업데이트
+## CHANGELOG.md 업데이트
 
-`src/shared/changelog.json` 파일의 **맨 앞에** 새 버전 항목을 추가한다:
+루트의 `CHANGELOG.md` 파일에 새 버전 섹션을 **맨 위에** 추가한다:
 
-```json
-[
-  {
-    "version": "1.9.0",       // 새 버전
-    "date": "2025-02-04",     // 오늘 날짜 (YYYY-MM-DD)
-    "changes": [
-      "변경사항 1",           // 커밋 메시지 기반으로 작성
-      "변경사항 2"
-    ]
-  },
-  // ... 기존 항목들
-]
+```markdown
+## [1.9.0] - 2025-02-04
+- 변경사항 1
+- 변경사항 2
+
+## [1.8.0] - 2025-02-03
+...
 ```
 
 ### changes 작성 규칙
@@ -68,7 +63,7 @@ package.json 버전을 범프하고 changelog.json에 변경 내역을 추가합
 ## 커밋 생성
 
 ```bash
-git add package.json src/shared/changelog.json
+git add package.json CHANGELOG.md
 git commit -m "chore: bump version to {new_version}"
 ```
 
