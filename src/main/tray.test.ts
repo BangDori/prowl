@@ -59,8 +59,8 @@ describe("tray", () => {
 
       expect(Menu.buildFromTemplate).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ label: "백그라운드 모니터링" }),
-          expect.objectContaining({ label: "Prowl 종료" }),
+          expect.objectContaining({ label: "Background Monitor" }),
+          expect.objectContaining({ label: "Quit Prowl" }),
         ]),
       );
     });
