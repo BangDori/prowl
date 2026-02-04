@@ -7,8 +7,6 @@ import { createSplashWindow, createTray, dismissSplash, showChatWindow } from ".
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
-console.log("test");
-
 // 단일 인스턴스 잠금
 const gotTheLock = app.requestSingleInstanceLock();
 
