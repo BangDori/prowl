@@ -2,6 +2,13 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.9.0] - 2026-02-04
+- Job 완료/실패 시 macOS 알림 발송 (고양이 컨셉 메시지)
+- Job 실행 중 상태 표시 (스피너, "실행 중...")
+- 실행 중인 Job 재실행 방지
+- Settings에서 알림 활성화/비활성화 토글
+- 편집 버튼을 제목 옆으로 이동
+
 ## [1.8.0] - 2026-02-04
 - Docker 스타일 대시보드 윈도우 추가
 - 트레이 메뉴에 macOS 네이티브 아이콘 추가
