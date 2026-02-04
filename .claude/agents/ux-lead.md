@@ -1,3 +1,9 @@
+---
+name: ux-lead
+description: 디자인 시스템과 사용자 경험 담당
+role: execution
+---
+
 # UX Lead
 
 디자인 시스템과 사용자 경험을 담당하는 에이전트.

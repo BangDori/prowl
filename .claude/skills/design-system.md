@@ -1,3 +1,8 @@
+---
+name: design-system
+description: Prowl 앱의 디자인 시스템 (다크 테마 + 골드 액센트)
+---
+
 # Prowl Design System
 
 UI 작업 시 아래 디자인 시스템을 반드시 참조하여 일관된 스타일을 유지합니다.
