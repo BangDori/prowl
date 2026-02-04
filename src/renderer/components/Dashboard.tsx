@@ -3,6 +3,7 @@ import {
   Box,
   Cog,
   ExternalLink,
+  History,
   LayoutDashboard,
   Moon,
   Plus,
@@ -26,7 +27,7 @@ import FocusModePanel from "./FocusModePanel";
 import JobList from "./JobList";
 import ToggleSwitch from "./ToggleSwitch";
 
-type NavItem = "jobs" | "quiet-hours" | "settings";
+type NavItem = "jobs" | "quiet-hours" | "changelog" | "settings";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -225,13 +226,61 @@ function QuietHoursContent() {
   );
 }
 
-function SettingsContent() {
+function ChangelogContent() {
   const [currentVersion, setCurrentVersion] = useState("");
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   useEffect(() => {
     window.electronAPI.getAppVersion().then(setCurrentVersion);
   }, []);
+
+  return (
+    <div className="h-full overflow-y-auto">
+      <div className="p-4">
+        {/* 현재 버전 헤더 */}
+        <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card border border-prowl-border">
+          <img src={prowlProfile} alt="Prowl" className="w-8 h-8 rounded-full" />
+          <div>
+            <h4 className="text-sm font-medium">Prowl</h4>
+            <p className="text-[10px] text-gray-500">Background job monitor for macOS</p>
+          </div>
+          <span className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
+            <Sparkles className="w-3 h-3" />v{currentVersion}
+          </span>
+        </div>
+
+        {/* 버전 히스토리 */}
+        <div className="space-y-3">
+          {CHANGELOG.map((release, index) => (
+            <div
+              key={release.version}
+              className={`p-3 rounded-lg border ${
+                index === 0 ? "bg-accent/5 border-accent/20" : "bg-prowl-card border-prowl-border"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-sm font-medium ${index === 0 ? "text-accent" : ""}`}>
+                  v{release.version}
+                </span>
+                <span className="text-[10px] text-gray-500">{release.date}</span>
+              </div>
+              <ul className="space-y-1">
+                {release.changes.map((change) => (
+                  <li key={change} className="text-xs text-gray-400 flex items-start gap-2">
+                    <span className="text-gray-600 mt-0.5">•</span>
+                    {change}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsContent() {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   return (
     <div className="h-full overflow-y-auto">
@@ -254,56 +303,6 @@ function SettingsContent() {
                 enabled={notificationsEnabled}
                 onChange={() => setNotificationsEnabled(!notificationsEnabled)}
               />
-            </div>
-          </div>
-        </div>
-
-        {/* 버전 정보 */}
-        <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">About</h3>
-          <div className="p-4 rounded-lg bg-prowl-card border border-prowl-border">
-            <div className="flex items-center gap-3 mb-4">
-              <img src={prowlProfile} alt="Prowl" className="w-10 h-10 rounded-full" />
-              <div>
-                <h4 className="text-sm font-medium">Prowl</h4>
-                <p className="text-[10px] text-gray-500">Background job monitor for macOS</p>
-              </div>
-              <span className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
-                <Sparkles className="w-3 h-3" />v{currentVersion}
-              </span>
-            </div>
-
-            {/* 버전 히스토리 */}
-            <div className="border-t border-prowl-border pt-3 mt-3">
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">
-                Version History
-              </p>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {CHANGELOG.map((release, index) => (
-                  <div
-                    key={release.version}
-                    className={`p-2 rounded ${index === 0 ? "bg-accent/5" : "bg-prowl-bg/50"}`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`text-xs font-medium ${index === 0 ? "text-accent" : ""}`}>
-                        v{release.version}
-                      </span>
-                      <span className="text-[9px] text-gray-500">{release.date}</span>
-                    </div>
-                    <ul className="space-y-0.5">
-                      {release.changes.map((change) => (
-                        <li
-                          key={change}
-                          className="text-[10px] text-gray-400 flex items-start gap-1.5"
-                        >
-                          <span className="text-gray-600">•</span>
-                          {change}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
@@ -346,6 +345,7 @@ function SettingsContent() {
 const NAV_LABELS: Record<NavItem, string> = {
   jobs: "Background Monitor",
   "quiet-hours": "Night Watch",
+  changelog: "Version History",
   settings: "Settings",
 };
 
@@ -382,6 +382,12 @@ export default function Dashboard() {
             onClick={() => setActiveNav("quiet-hours")}
           />
           <SidebarItem
+            icon={<History className="w-4 h-4" />}
+            label="Version History"
+            active={activeNav === "changelog"}
+            onClick={() => setActiveNav("changelog")}
+          />
+          <SidebarItem
             icon={<Cog className="w-4 h-4" />}
             label="Settings"
             active={activeNav === "settings"}
@@ -401,6 +407,7 @@ export default function Dashboard() {
         <div className="flex-1 overflow-hidden">
           {activeNav === "jobs" && <JobsContent />}
           {activeNav === "quiet-hours" && <QuietHoursContent />}
+          {activeNav === "changelog" && <ChangelogContent />}
           {activeNav === "settings" && <SettingsContent />}
         </div>
       </main>
