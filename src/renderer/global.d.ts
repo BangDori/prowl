@@ -8,7 +8,7 @@ import {
   FocusMode,
   JobCustomization,
   JobCustomizations,
-} from "../shared/types";
+} from "@shared/types";
 
 export interface ElectronAPI {
   listJobs: () => Promise<LaunchdJob[]>;

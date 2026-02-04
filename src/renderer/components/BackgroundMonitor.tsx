@@ -1,14 +1,36 @@
+import { useJobActions } from "@renderer/hooks/useJobActions";
+import { useLaunchdJobs } from "@renderer/hooks/useLaunchdJobs";
+import type { JobCustomization, JobCustomizations, LaunchdJob } from "@shared/types";
 import { ChevronLeft, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { JobCustomization, JobCustomizations, LaunchdJob } from "../../shared/types";
-import { useJobActions } from "../hooks/useJobActions";
-import { useLaunchdJobs } from "../hooks/useLaunchdJobs";
 import JobList from "./JobList";
 
+/**
+ * BackgroundMonitor 컴포넌트의 Props
+ */
 interface BackgroundMonitorProps {
+  /** 뒤로 가기 핸들러 */
   onBack: () => void;
 }
 
+/**
+ * launchd 백그라운드 작업 모니터링 화면 컴포넌트
+ *
+ * @description
+ * ~/Library/LaunchAgents/ 디렉토리의 launchd 작업을 모니터링하는 메인 화면입니다.
+ *
+ * 주요 기능:
+ * - 작업 목록 표시 및 관리 (활성화/비활성화, 실행, 로그 조회)
+ * - 모니터링 패턴 관리 (추가/삭제)
+ * - 작업 커스터마이징 (표시 이름 변경)
+ *
+ * @param props - {@link BackgroundMonitorProps}
+ *
+ * @example
+ * ```tsx
+ * <BackgroundMonitor onBack={() => setView("main")} />
+ * ```
+ */
 export default function BackgroundMonitor({ onBack }: BackgroundMonitorProps) {
   const { jobs, loading, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);

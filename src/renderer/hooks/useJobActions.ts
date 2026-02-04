@@ -1,6 +1,6 @@
+import { JOB_COMPLETION } from "@shared/constants";
+import type { JobActionResult, LogContent } from "@shared/types";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { JOB_COMPLETION } from "../../shared/constants";
-import type { JobActionResult, LogContent } from "../../shared/types";
 
 interface UseJobActionsResult {
   toggling: string | null;

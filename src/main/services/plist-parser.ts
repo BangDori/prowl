@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
+import type { JobSchedule } from "@shared/types";
 import * as plist from "plist";
-import type { JobSchedule } from "../../shared/types";
 import { WEEKDAY_NAMES } from "../constants";
 
 interface PlistData {

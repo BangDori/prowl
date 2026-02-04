@@ -1,4 +1,3 @@
-import Store from "electron-store";
 import {
   type AppSettings,
   DEFAULT_FOCUS_MODE,
@@ -6,7 +5,8 @@ import {
   type FocusMode,
   type JobCustomization,
   type JobCustomizations,
-} from "../../shared/types";
+} from "@shared/types";
+import Store from "electron-store";
 
 interface StoreSchema {
   settings: AppSettings;

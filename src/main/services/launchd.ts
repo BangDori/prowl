@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { JobActionResult, LaunchdJob } from "../../shared/types";
+import type { JobActionResult, LaunchdJob } from "@shared/types";
 import { LAUNCH_AGENTS_DIR } from "../constants";
 import { executeCommand } from "../utils/command";
 import { matchesAnyPattern } from "../utils/pattern-matcher";

@@ -1,22 +1,56 @@
+import type { JobActionResult, JobCustomization, LaunchdJob, LogContent } from "@shared/types";
 import { Check, FileText, Folder, Loader2, Pencil, Play, X } from "lucide-react";
 import { useState } from "react";
-import type { JobActionResult, JobCustomization, LaunchdJob, LogContent } from "../../shared/types";
 import { formatRelativeTime } from "../utils/date";
 import LogViewer from "./LogViewer";
 import StatusBadge from "./StatusBadge";
 import ToggleSwitch from "./ToggleSwitch";
 
+/**
+ * JobCard 컴포넌트의 Props
+ */
 interface JobCardProps {
+  /** launchd 작업 정보 객체 */
   job: LaunchdJob;
+  /** 사용자 정의 커스터마이징 (표시 이름 등) */
   customization?: JobCustomization;
+  /** 활성화/비활성화 토글 진행 중 여부 */
   isToggling: boolean;
+  /** 작업 실행 중 여부 */
   isRunning: boolean;
+  /** 활성화/비활성화 토글 핸들러 */
   onToggle: () => Promise<JobActionResult>;
+  /** 수동 실행 핸들러 */
   onRun: () => Promise<JobActionResult>;
+  /** 로그 조회 핸들러 */
   onViewLogs: () => Promise<LogContent>;
+  /** 커스터마이징 업데이트 핸들러 */
   onUpdateCustomization: (customization: JobCustomization) => Promise<void>;
 }
 
+/**
+ * 개별 launchd 작업을 표시하는 카드 컴포넌트
+ *
+ * @description
+ * 작업의 이름, 스케줄, 마지막 실행 상태를 표시하고
+ * 활성화/비활성화, 수동 실행, 로그 조회, 커스터마이징 편집 기능을 제공합니다.
+ *
+ * @param props - {@link JobCardProps}
+ *
+ * @example
+ * ```tsx
+ * <JobCard
+ *   job={launchdJob}
+ *   customization={{ displayName: "일일 백업" }}
+ *   isToggling={false}
+ *   isRunning={false}
+ *   onToggle={() => toggleJob(job.id)}
+ *   onRun={() => runJob(job.id)}
+ *   onViewLogs={() => getLogs(job.id)}
+ *   onUpdateCustomization={(c) => updateCustomization(job.id, c)}
+ * />
+ * ```
+ */
 export default function JobCard({
   job,
   customization,

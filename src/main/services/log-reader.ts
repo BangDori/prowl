@@ -1,5 +1,5 @@
 import * as fs from "node:fs";
-import type { LastRunInfo, LogContent } from "../../shared/types";
+import type { LastRunInfo, LogContent } from "@shared/types";
 import { LOG_LINES_DEFAULT } from "../constants";
 import { analyzeLogContent } from "./log-analyzer";
 

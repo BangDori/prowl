@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import type { JobActionResult } from "../../shared/types";
+import type { JobActionResult } from "@shared/types";
 
 interface CommandOptions {
   successMessage: string;

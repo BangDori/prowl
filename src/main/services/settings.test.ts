@@ -13,7 +13,7 @@ vi.mock("electron-store", () => ({
   },
 }));
 
-import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "../../shared/types";
+import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "@shared/types";
 import {
   getAllJobCustomizations,
   getFocusMode,

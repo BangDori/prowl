@@ -1,5 +1,5 @@
+import { DEFAULT_FOCUS_MODE, type FocusMode } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
-import { DEFAULT_FOCUS_MODE, type FocusMode } from "../shared/types";
 import BackgroundMonitor from "./components/BackgroundMonitor";
 import ChatView from "./components/ChatView";
 import Dashboard from "./components/Dashboard";
