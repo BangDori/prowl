@@ -1,6 +1,6 @@
 import { BrowserWindow, screen } from "electron";
 import * as path from "path";
-import { SPLASH } from "./constants";
+import { SPLASH } from "../constants";
 
 let splashWindow: BrowserWindow | null = null;
 
@@ -31,7 +31,7 @@ export function createSplashWindow(): BrowserWindow {
     },
   });
 
-  const splashPath = path.join(__dirname, "../../splash.html");
+  const splashPath = path.join(__dirname, "../../../splash.html");
   splashWindow.loadFile(splashPath);
 
   splashWindow.once("ready-to-show", () => {

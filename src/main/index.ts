@@ -1,11 +1,9 @@
 import { app, globalShortcut } from "electron";
-import { showChatWindow } from "./chat-window";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
-import { createSplashWindow, dismissSplash } from "./splash";
-import { createTray } from "./tray";
+import { createSplashWindow, createTray, dismissSplash, showChatWindow } from "./windows";
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 

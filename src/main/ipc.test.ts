@@ -33,21 +33,18 @@ vi.mock("./services/focus-mode", () => ({
   updateFocusModeMonitor: vi.fn(),
 }));
 
-vi.mock("./tray", () => ({
-  getSubWindow: vi.fn(),
-}));
-
 vi.mock("./services/chat", () => ({
   sendChatMessage: vi.fn(),
 }));
 
-vi.mock("./chat-window", () => ({
+vi.mock("./windows", () => ({
+  getSubWindow: vi.fn(),
+  popUpTrayMenu: vi.fn(),
   resizeChatWindow: vi.fn(),
   closeChatWindow: vi.fn(),
 }));
 
 import { app, ipcMain, shell } from "electron";
-import { closeChatWindow, resizeChatWindow } from "./chat-window";
 import { registerIpcHandlers } from "./ipc";
 import { sendChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -60,7 +57,7 @@ import {
   setJobCustomization,
   setSettings,
 } from "./services/settings";
-import { getSubWindow } from "./tray";
+import { closeChatWindow, getSubWindow, resizeChatWindow } from "./windows";
 
 const mockIpcHandle = vi.mocked(ipcMain.handle);
 const mockFindJobById = vi.mocked(findJobById);
