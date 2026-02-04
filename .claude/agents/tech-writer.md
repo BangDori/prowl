@@ -21,6 +21,11 @@ role: support
 CLAUDE.md                       # 프로젝트 가이드
 README.md                       # 사용자 문서
 .claude/skills/design-system.md # 디자인 시스템
+docs/                           # 개발 규칙 문서
+├── naming-convention.md        # 네이밍 규칙
+├── file-organization.md        # 파일/폴더 구조
+├── component-patterns.md       # React 컴포넌트 패턴
+└── ipc-conventions.md          # IPC 통신 규칙
 ```
 
 ## 문서화 규칙

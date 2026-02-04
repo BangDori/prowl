@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import type { FocusMode } from "../../shared/types";
+import type { FocusMode } from "@shared/types";
 import { getFocusMode } from "./settings";
 
 const FOCUS_CHECK_INTERVAL_MS = 10_000; // 10초마다 PID 변화 체크
@@ -30,7 +30,7 @@ export function isInFocusTime(startTime: string, endTime: string): boolean {
 const NUDGE_SPLASH_DURATION_MS = 10_000;
 
 function showNudgeSplash(message: string): void {
-  import("../splash").then(({ createSplashWindow, dismissSplash }) => {
+  import("../windows/splash").then(({ createSplashWindow, dismissSplash }) => {
     const win = createSplashWindow();
     // 10초간 닫기 방지
     const preventClose = (e: Electron.Event) => e.preventDefault();

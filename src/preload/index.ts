@@ -1,4 +1,3 @@
-import { contextBridge, ipcRenderer } from "electron";
 import type {
   AppSettings,
   ChatMessage,
@@ -9,7 +8,8 @@ import type {
   JobCustomizations,
   LaunchdJob,
   LogContent,
-} from "../shared/types";
+} from "@shared/types";
+import { contextBridge, ipcRenderer } from "electron";
 
 /**
  * 렌더러 프로세스에 노출할 API

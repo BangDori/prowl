@@ -1,6 +1,6 @@
+import { JOB_POLLING_INTERVAL_MS } from "@shared/constants";
+import type { LaunchdJob } from "@shared/types";
 import { useCallback, useEffect, useState } from "react";
-import { JOB_POLLING_INTERVAL_MS } from "../../shared/constants";
-import type { LaunchdJob } from "../../shared/types";
 
 interface UseLaunchdJobsResult {
   jobs: LaunchdJob[];

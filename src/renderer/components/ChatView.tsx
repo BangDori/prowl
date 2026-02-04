@@ -1,9 +1,10 @@
+import prowlLying from "@assets/prowl-lying.png";
+import prowlProfile from "@assets/prowl-profile.png";
+import type { ChatMessage } from "@shared/types";
 import { Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import prowlLying from "../../../assets/prowl-lying.png";
-import prowlProfile from "../../../assets/prowl-profile.png";
-import type { ChatMessage } from "../../shared/types";
 
+/** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
   "아직은 나랑 얘기할 수 없다냥...",
   "준비 중이다냥~ 조금만 기다려라냥",
@@ -11,10 +12,23 @@ const PLACEHOLDERS = [
   "지금은 낮잠 중이다냥... zZZ",
 ];
 
+/**
+ * 랜덤 플레이스홀더 메시지 반환
+ * @returns 랜덤하게 선택된 플레이스홀더 문자열
+ */
 function getRandomPlaceholder(): string {
   return PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
 }
 
+/**
+ * 개별 채팅 메시지 버블 컴포넌트
+ *
+ * @description
+ * 사용자/어시스턴트 메시지를 말풍선 형태로 표시합니다.
+ * 어시스턴트 메시지에는 프로필 이미지가 함께 표시됩니다.
+ *
+ * @param props.message - 표시할 채팅 메시지 객체
+ */
 function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
   const time = new Date(message.timestamp).toLocaleTimeString("ko-KR", {
@@ -48,6 +62,26 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   );
 }
 
+/**
+ * AI 채팅 인터페이스 컴포넌트
+ *
+ * @description
+ * Prowl 마스코트와 대화할 수 있는 채팅 UI를 제공합니다.
+ * 메시지가 없을 때는 누워있는 고양이 이미지를 표시하고,
+ * 대화 중에는 메시지 버블과 입력창을 표시합니다.
+ *
+ * 주요 기능:
+ * - 메시지 전송 (Enter 키 또는 전송 버튼)
+ * - 새 대화 시작
+ * - ESC 키로 창 닫기
+ * - 자동 스크롤
+ *
+ * @example
+ * ```tsx
+ * // 채팅 윈도우에서 사용
+ * <ChatView />
+ * ```
+ */
 export default function ChatView() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");

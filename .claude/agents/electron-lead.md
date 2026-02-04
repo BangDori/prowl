@@ -31,6 +31,8 @@ src/preload/
 
 ## IPC 채널 추가/수정 규칙
 
+상세 IPC 규칙은 `docs/ipc-conventions.md` 참조.
+
 **반드시 세 곳을 동시에 수정**:
 1. `src/main/ipc.ts` - 핸들러 구현
 2. `src/preload/index.ts` - contextBridge 노출

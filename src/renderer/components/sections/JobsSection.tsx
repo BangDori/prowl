@@ -1,37 +1,19 @@
 import { useJobActions } from "@renderer/hooks/useJobActions";
 import { useLaunchdJobs } from "@renderer/hooks/useLaunchdJobs";
 import type { JobCustomization, JobCustomizations, LaunchdJob } from "@shared/types";
-import { ChevronLeft, Plus, X } from "lucide-react";
+import { Box, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import JobList from "./JobList";
+import JobList from "../JobList";
 
 /**
- * BackgroundMonitor 컴포넌트의 Props
+ * 작업 목록 섹션 컴포넌트
+ *
+ * launchd 작업 목록을 표시하고 관리합니다.
+ * - 패턴 필터 관리 (추가/삭제)
+ * - 작업 목록 표시
+ * - 작업 커스터마이징 (아이콘, 이름, 설명)
  */
-interface BackgroundMonitorProps {
-  /** 뒤로 가기 핸들러 */
-  onBack: () => void;
-}
-
-/**
- * launchd 백그라운드 작업 모니터링 화면 컴포넌트
- *
- * @description
- * ~/Library/LaunchAgents/ 디렉토리의 launchd 작업을 모니터링하는 메인 화면입니다.
- *
- * 주요 기능:
- * - 작업 목록 표시 및 관리 (활성화/비활성화, 실행, 로그 조회)
- * - 모니터링 패턴 관리 (추가/삭제)
- * - 작업 커스터마이징 (표시 이름 변경)
- *
- * @param props - {@link BackgroundMonitorProps}
- *
- * @example
- * ```tsx
- * <BackgroundMonitor onBack={() => setView("main")} />
- * ```
- */
-export default function BackgroundMonitor({ onBack }: BackgroundMonitorProps) {
+export default function JobsSection() {
   const { jobs, loading, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);
   const [customizations, setCustomizations] = useState<JobCustomizations>({});
@@ -94,37 +76,40 @@ export default function BackgroundMonitor({ onBack }: BackgroundMonitorProps) {
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
-  return (
-    <div>
-      <header className="flex items-center gap-2 px-3 py-2 border-b border-gray-100 dark:border-prowl-border">
-        <button
-          type="button"
-          onClick={onBack}
-          className="btn-icon text-gray-500 dark:text-gray-400 p-0.5"
-          title="뒤로"
-        >
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-        <h1 className="text-xs font-semibold">백그라운드 모니터링</h1>
-      </header>
+  if (loading && jobs.length === 0) {
+    return (
+      <div className="space-y-2 p-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="job-card">
+            <div className="flex-1">
+              <div className="skeleton h-4 w-32 mb-2" />
+              <div className="skeleton h-3 w-48" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
+  return (
+    <div className="h-full flex flex-col">
       {/* 패턴 칩 바 */}
       {!patternLoading && (
-        <div className="flex items-center gap-1 flex-wrap px-3 py-1.5 border-b border-gray-100 dark:border-prowl-border">
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 mr-0.5">패턴</span>
+        <div className="flex items-center gap-1.5 flex-wrap px-4 py-2 border-b border-prowl-border">
+          <span className="text-[10px] text-gray-500 mr-1">패턴</span>
           {patterns.map((pattern, index) => (
             <span
               key={pattern}
-              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-gray-100 dark:bg-prowl-card text-[10px] font-mono text-gray-600 dark:text-gray-400"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-prowl-card text-[11px] font-mono text-gray-400"
             >
               {pattern}
               <button
                 type="button"
                 onClick={() => removePattern(index)}
                 disabled={saving}
-                className="text-gray-400 hover:text-red-500 disabled:opacity-50"
+                className="text-gray-500 hover:text-red-400 disabled:opacity-50"
               >
-                <X className="w-2.5 h-2.5" />
+                <X className="w-3 h-3" />
               </button>
             </span>
           ))}
@@ -146,46 +131,37 @@ export default function BackgroundMonitor({ onBack }: BackgroundMonitorProps) {
               }}
               onBlur={addPattern}
               placeholder="com.example."
-              className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-gray-300 dark:border-prowl-border bg-transparent outline-none w-24"
+              className="text-[11px] font-mono px-2 py-0.5 rounded border border-prowl-border bg-transparent outline-none w-28 text-gray-300"
             />
           ) : (
             <button
               type="button"
               onClick={startAdding}
-              className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[10px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-prowl-card transition-colors"
+              className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] text-gray-500 hover:text-gray-300 hover:bg-prowl-card transition-colors"
             >
-              <Plus className="w-2.5 h-2.5" />
+              <Plus className="w-3 h-3" />
             </button>
           )}
         </div>
       )}
 
-      <main className="overflow-y-auto" style={{ maxHeight: "calc(4.5 * 64px)" }}>
-        {loading && jobs.length === 0 ? (
-          <div className="space-y-0">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="job-card">
-                <div className="flex-1">
-                  <div className="skeleton h-4 w-32 mb-2" />
-                  <div className="skeleton h-3 w-48" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : jobs.length === 0 ? (
-          <div className="empty-state py-8">
-            <p className="text-sm font-medium mb-1">등록된 작업이 없습니다</p>
-            <p className="text-xs">~/Library/LaunchAgents/</p>
-          </div>
-        ) : (
+      {/* 작업 목록 */}
+      {jobs.length === 0 ? (
+        <div className="empty-state py-16 flex-1">
+          <Box className="w-12 h-12 text-gray-500 mb-4" />
+          <p className="text-sm font-medium mb-1">등록된 작업이 없습니다</p>
+          <p className="text-xs text-gray-500">~/Library/LaunchAgents/</p>
+        </div>
+      ) : (
+        <div className="overflow-y-auto flex-1">
           <JobList
             jobs={jobs as LaunchdJob[]}
             actions={actions}
             customizations={customizations}
             onUpdateCustomization={updateCustomization}
           />
-        )}
-      </main>
+        </div>
+      )}
     </div>
   );
 }

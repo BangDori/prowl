@@ -1,12 +1,36 @@
 import { X } from "lucide-react";
 import { formatDateTime } from "../utils/date";
 
+/**
+ * LogViewer 컴포넌트의 Props
+ */
 interface LogViewerProps {
+  /** 로그 파일 내용 */
   content: string;
+  /** 로그 파일 마지막 수정 시간 */
   lastModified: Date | null;
+  /** 로그 뷰어 닫기 핸들러 */
   onClose: () => void;
 }
 
+/**
+ * 작업 로그를 표시하는 뷰어 컴포넌트
+ *
+ * @description
+ * JobCard 내부에서 펼쳐지는 형태로 로그 내용을 표시합니다.
+ * 마지막 수정 시간과 닫기 버튼을 제공합니다.
+ *
+ * @param props - {@link LogViewerProps}
+ *
+ * @example
+ * ```tsx
+ * <LogViewer
+ *   content={logContent}
+ *   lastModified={new Date()}
+ *   onClose={() => setShowLogs(false)}
+ * />
+ * ```
+ */
 export default function LogViewer({ content, lastModified, onClose }: LogViewerProps) {
   return (
     <div className="mt-4 pt-4 border-t border-gray-100 dark:border-prowl-border">

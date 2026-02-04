@@ -18,6 +18,7 @@ vi.mock("electron", () => ({
     isDestroyed: vi.fn().mockReturnValue(false),
     getSize: vi.fn().mockReturnValue([400, 500]),
     setSize: vi.fn(),
+    setVisibleOnAllWorkspaces: vi.fn(),
   })),
   Menu: {
     buildFromTemplate: vi.fn().mockReturnValue({}),
@@ -34,6 +35,13 @@ vi.mock("electron", () => ({
   },
   app: { quit: vi.fn() },
   shell: { openExternal: vi.fn() },
+  screen: {
+    getCursorScreenPoint: vi.fn().mockReturnValue({ x: 0, y: 0 }),
+    getDisplayNearestPoint: vi.fn().mockReturnValue({
+      id: 1,
+      workArea: { x: 0, y: 0, width: 1920, height: 1080 },
+    }),
+  },
 }));
 
 import { Menu, Tray } from "electron";

@@ -1,4 +1,4 @@
-import type { ChatMessage, ChatSendResult } from "../../shared/types";
+import type { ChatMessage, ChatSendResult } from "@shared/types";
 
 export async function sendChatMessage(
   _userContent: string,

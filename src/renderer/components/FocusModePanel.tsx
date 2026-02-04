@@ -1,13 +1,37 @@
+import type { FocusMode } from "@shared/types";
 import { ChevronLeft } from "lucide-react";
-import type { FocusMode } from "../../shared/types";
 import ToggleSwitch from "./ToggleSwitch";
 
+/**
+ * FocusModePanel 컴포넌트의 Props
+ */
 interface FocusModePanelProps {
+  /** 현재 야간 감시 모드 설정 */
   focusMode: FocusMode;
+  /** 설정 변경 핸들러 */
   onUpdate: (updated: FocusMode) => void;
+  /** 뒤로 가기 핸들러 (제공 시 헤더 표시) */
   onBack?: () => void;
 }
 
+/**
+ * 야간 감시 모드 설정 패널 컴포넌트
+ *
+ * @description
+ * 특정 시간대에 작업이 실행되면 알림을 보내는 "야간 감시" 기능의 설정 UI입니다.
+ * 활성화 토글과 시작/종료 시간 선택을 제공합니다.
+ *
+ * @param props - {@link FocusModePanelProps}
+ *
+ * @example
+ * ```tsx
+ * <FocusModePanel
+ *   focusMode={{ enabled: true, startTime: "22:00", endTime: "07:00" }}
+ *   onUpdate={(updated) => setFocusMode(updated)}
+ *   onBack={() => setView("main")}
+ * />
+ * ```
+ */
 export default function FocusModePanel({ focusMode, onUpdate, onBack }: FocusModePanelProps) {
   return (
     <div>

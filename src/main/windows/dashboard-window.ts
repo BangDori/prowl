@@ -1,6 +1,6 @@
 import * as path from "node:path";
 import { BrowserWindow, screen } from "electron";
-import { DASHBOARD, DEV_SERVER_PORT } from "./constants";
+import { DASHBOARD, DEV_SERVER_PORT } from "../constants";
 
 let dashboardWindow: BrowserWindow | null = null;
 
@@ -9,7 +9,7 @@ const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV =
 function getIndexUrl(): string {
   return isDev()
     ? `http://localhost:${DEV_SERVER_PORT}`
-    : `file://${path.join(__dirname, "../renderer/index.html")}`;
+    : `file://${path.join(__dirname, "../../renderer/index.html")}`;
 }
 
 export function showDashboardWindow(): void {
@@ -44,7 +44,7 @@ export function showDashboardWindow(): void {
     trafficLightPosition: { x: 12, y: 12 },
     vibrancy: "sidebar",
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
+      preload: path.join(__dirname, "../../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },

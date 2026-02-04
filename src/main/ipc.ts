@@ -24,6 +24,7 @@ import {
   setJobCustomization,
   setSettings,
 } from "./services/settings";
+import { closeChatWindow, getSubWindow, popUpTrayMenu, resizeChatWindow } from "./windows";
 
 /**
  * IPC 핸들러 등록
@@ -148,7 +149,6 @@ export function registerIpcHandlers(): void {
 
   // 윈도우 높이 동적 조정
   ipcMain.handle("window:resize", async (_event, height: number): Promise<void> => {
-    const { getSubWindow } = await import("./tray");
     const win = getSubWindow();
     if (!win || win.isDestroyed()) return;
     const clampedHeight = Math.min(Math.max(height, 100), WINDOW.MAX_HEIGHT);
@@ -158,7 +158,6 @@ export function registerIpcHandlers(): void {
 
   // 뒤로가기 (서브윈도우 숨기고 트레이 메뉴 팝업)
   ipcMain.handle("nav:back", async (): Promise<void> => {
-    const { getSubWindow, popUpTrayMenu } = await import("./tray");
     const win = getSubWindow();
     if (win && !win.isDestroyed()) {
       win.hide();
@@ -181,13 +180,11 @@ export function registerIpcHandlers(): void {
 
   // 채팅 윈도우 리사이즈
   ipcMain.handle("chat:resize", async (_event, height: number): Promise<void> => {
-    const { resizeChatWindow } = await import("./chat-window");
     resizeChatWindow(height);
   });
 
   // 채팅 윈도우 닫기
   ipcMain.handle("chat:close", async (): Promise<void> => {
-    const { closeChatWindow } = await import("./chat-window");
     closeChatWindow();
   });
 

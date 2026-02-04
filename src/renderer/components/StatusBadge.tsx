@@ -1,9 +1,31 @@
 import { CheckCircle, XCircle } from "lucide-react";
 
+/**
+ * StatusBadge 컴포넌트의 Props
+ */
 interface StatusBadgeProps {
+  /** 성공 여부 (true: 성공, false: 실패) */
   success: boolean;
 }
 
+/**
+ * 작업 실행 결과 상태를 아이콘으로 표시하는 배지 컴포넌트
+ *
+ * @description
+ * 성공 시 초록색 체크 아이콘, 실패 시 빨간색 X 아이콘을 표시합니다.
+ * 마우스 호버 시 툴팁으로 상태를 안내합니다.
+ *
+ * @param props - {@link StatusBadgeProps}
+ *
+ * @example
+ * ```tsx
+ * // 성공 상태
+ * <StatusBadge success={true} />
+ *
+ * // 실패 상태
+ * <StatusBadge success={false} />
+ * ```
+ */
 export default function StatusBadge({ success }: StatusBadgeProps) {
   if (success) {
     return (

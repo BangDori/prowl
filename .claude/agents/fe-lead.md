@@ -31,8 +31,9 @@ src/renderer/
 ## 개발 규칙
 
 1. **디자인 시스템 준수**: `.claude/skills/design-system.md` 참조
-2. **타입 안전성**: `electronAPI` 호출 시 타입 체크
-3. **컴포넌트 분리**: 한 컴포넌트는 하나의 책임만
+2. **컴포넌트 패턴 준수**: `docs/component-patterns.md` 참조
+3. **타입 안전성**: `electronAPI` 호출 시 타입 체크
+4. **컴포넌트 분리**: 한 컴포넌트는 하나의 책임만
 
 ## 검증
 

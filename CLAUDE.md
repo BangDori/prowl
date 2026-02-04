@@ -11,6 +11,25 @@ bun run start      # 빌드된 앱 실행
 bun run package    # DMG 패키징
 ```
 
+## Path Aliases
+
+상대 경로 대신 alias를 사용하여 import 가독성 향상:
+
+| Alias | 경로 | 용도 |
+|-------|------|------|
+| `@main/*` | `src/main/*` | Main 프로세스 모듈 |
+| `@renderer/*` | `src/renderer/*` | Renderer 프로세스 모듈 |
+| `@shared/*` | `src/shared/*` | 공유 타입/상수 |
+| `@assets/*` | `assets/*` | 이미지 등 에셋 |
+
+```typescript
+// Before
+import type { LaunchdJob } from "../../shared/types";
+
+// After
+import type { LaunchdJob } from "@shared/types";
+```
+
 ## Architecture
 
 ```
@@ -152,3 +171,27 @@ UI 작업 시 `.claude/skills/design-system.md`를 참조하여 일관된 디자
 - **유틸리티**: 재사용 가능한 함수는 `utils/` 폴더에 분리
 - **타입 안전성**: `Promise<any>` 대신 구체적인 타입 사용
 - **SRP (단일 책임 원칙)**: 각 함수/모듈은 하나의 책임만 담당
+
+## Documentation
+
+코드 작성 시 `docs/` 폴더의 규칙 문서를 참조:
+
+| 문서 | 내용 |
+|------|------|
+| `docs/naming-convention.md` | 네이밍 규칙 (파일, 변수, 함수, IPC 등) |
+| `docs/file-organization.md` | 파일/폴더 구조 원칙 |
+| `docs/component-patterns.md` | React 컴포넌트 작성 패턴 |
+| `docs/ipc-conventions.md` | IPC 통신 규칙 |
+
+## Naming Convention
+
+상세 규칙은 `docs/naming-convention.md` 참조.
+
+| 대상 | 규칙 | 예시 |
+|------|------|------|
+| 파일 (Non-React) | kebab-case | `log-reader.ts` |
+| 파일 (React) | PascalCase | `JobCard.tsx` |
+| 함수/변수 | camelCase | `readLogContent` |
+| 상수 | UPPER_SNAKE_CASE | `LOG_LINES_DEFAULT` |
+| IPC 채널 | domain:kebab-action | `jobs:get-customizations` |
+| 타입/인터페이스 | PascalCase | `LaunchdJob` |

@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
+import { DEV_SERVER_PORT, WINDOW } from "../constants";
 import { showChatWindow } from "./chat-window";
-import { DEV_SERVER_PORT, WINDOW } from "./constants";
 import { showDashboardWindow } from "./dashboard-window";
 
 let tray: Tray | null = null;
@@ -12,7 +12,7 @@ const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV =
 function getIndexUrl(): string {
   return isDev()
     ? `http://localhost:${DEV_SERVER_PORT}`
-    : `file://${path.join(__dirname, "../renderer/index.html")}`;
+    : `file://${path.join(__dirname, "../../renderer/index.html")}`;
 }
 
 /**
@@ -77,7 +77,7 @@ function showSubPage(hash: string): void {
     show: false,
     frame: false,
     webPreferences: {
-      preload: path.join(__dirname, "../preload/index.js"),
+      preload: path.join(__dirname, "../../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -106,7 +106,7 @@ function showSubPage(hash: string): void {
  * 메뉴 아이콘 로드 헬퍼
  */
 function loadMenuIcon(name: string): Electron.NativeImage {
-  const iconPath = path.join(__dirname, `../../assets/menu-icons/${name}Template.png`);
+  const iconPath = path.join(__dirname, `../../../assets/menu-icons/${name}Template.png`);
   try {
     const icon = nativeImage.createFromPath(iconPath);
     icon.setTemplateImage(true);
@@ -120,7 +120,7 @@ function loadMenuIcon(name: string): Electron.NativeImage {
  * 트레이 아이콘 + 네이티브 메뉴 생성
  */
 export function createTray(): Tray {
-  const iconPath = path.join(__dirname, "../../assets/tray-iconTemplate.png");
+  const iconPath = path.join(__dirname, "../../../assets/tray-iconTemplate.png");
   let icon = nativeImage.createEmpty();
   try {
     icon = nativeImage.createFromPath(iconPath);
@@ -157,11 +157,6 @@ export function popUpTrayMenu(): void {
       label: "Background Monitor",
       icon: loadMenuIcon("monitor"),
       click: () => showSubPage("monitor"),
-    },
-    {
-      label: "Night Watch",
-      icon: loadMenuIcon("moon"),
-      click: () => showSubPage("quiet-hours"),
     },
     {
       label: "Prowl Chat",

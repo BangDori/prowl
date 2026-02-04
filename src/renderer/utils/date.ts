@@ -1,4 +1,4 @@
-import { TIME } from "../../shared/constants";
+import { TIME } from "@shared/constants";
 
 /**
  * 상대적 시간 포맷 (예: "5분 전", "3시간 전")
