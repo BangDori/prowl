@@ -1,5 +1,5 @@
 import { DEFAULT_FOCUS_MODE, type FocusMode, type UpdateCheckResult } from "@shared/types";
-import { Bell, ExternalLink, Moon, RefreshCw } from "lucide-react";
+import { Bell, ExternalLink, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import FocusModePanel from "../FocusModePanel";
 import ToggleSwitch from "../ToggleSwitch";
@@ -76,11 +76,12 @@ export default function SettingsSection() {
       <div className="p-4 space-y-6">
         {/* Night Watch 설정 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Moon className="w-3.5 h-3.5" />
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
             Night Watch
           </h3>
-          <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
+          <div className="rounded-lg bg-prowl-card border border-prowl-border">
+            <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
+          </div>
         </div>
 
         {/* 알림 설정 */}
