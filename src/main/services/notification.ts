@@ -3,11 +3,7 @@ import { isNotificationsEnabled } from "./settings";
 
 // macOS 알림 권한 확인
 function checkNotificationSupport(): boolean {
-  if (!Notification.isSupported()) {
-    console.log("[notification] Notifications not supported on this platform");
-    return false;
-  }
-  return true;
+  return Notification.isSupported();
 }
 
 interface JobNotificationParams {
@@ -38,14 +34,7 @@ function getRandomMessage(messages: string[]): string {
  * Job 완료 알림 발송
  */
 export function sendJobNotification({ jobName, success, message }: JobNotificationParams): void {
-  console.log(`[notification] sendJobNotification called for ${jobName}, success: ${success}`);
-
-  if (!checkNotificationSupport()) {
-    return;
-  }
-
-  if (!isNotificationsEnabled()) {
-    console.log(`[notification] Notifications disabled, skipping`);
+  if (!checkNotificationSupport() || !isNotificationsEnabled()) {
     return;
   }
 
@@ -55,29 +44,11 @@ export function sendJobNotification({ jobName, success, message }: JobNotificati
     : getRandomMessage(FAILURE_MESSAGES);
   const body = message ? `${catMessage}\n${message}` : catMessage;
 
-  console.log(`[notification] Showing notification: ${title} - ${body}`);
+  const notification = new Notification({
+    title,
+    body,
+    silent: false,
+  });
 
-  try {
-    const notification = new Notification({
-      title,
-      body,
-      silent: false,
-    });
-
-    notification.on("show", () => {
-      console.log("[notification] Notification shown successfully");
-    });
-
-    notification.on("click", () => {
-      console.log("[notification] Notification clicked");
-    });
-
-    notification.on("close", () => {
-      console.log("[notification] Notification closed");
-    });
-
-    notification.show();
-  } catch (error) {
-    console.error("[notification] Failed to create/show notification:", error);
-  }
+  notification.show();
 }
