@@ -103,6 +103,20 @@ function showSubPage(hash: string): void {
 }
 
 /**
+ * 메뉴 아이콘 로드 헬퍼
+ */
+function loadMenuIcon(name: string): Electron.NativeImage {
+  const iconPath = path.join(__dirname, `../../assets/menu-icons/${name}Template.png`);
+  try {
+    const icon = nativeImage.createFromPath(iconPath);
+    icon.setTemplateImage(true);
+    return icon;
+  } catch {
+    return nativeImage.createEmpty();
+  }
+}
+
+/**
  * 트레이 아이콘 + 네이티브 메뉴 생성
  */
 export function createTray(): Tray {
@@ -135,30 +149,36 @@ export function popUpTrayMenu(): void {
   const menu = Menu.buildFromTemplate([
     {
       label: "Go to Dashboard",
+      icon: loadMenuIcon("layout-dashboard"),
       click: () => showDashboardWindow(),
     },
     { type: "separator" },
     {
       label: "Background Monitor",
+      icon: loadMenuIcon("monitor"),
       click: () => showSubPage("monitor"),
     },
     {
       label: "Night Watch",
+      icon: loadMenuIcon("moon"),
       click: () => showSubPage("quiet-hours"),
     },
     {
       label: "Prowl Chat",
+      icon: loadMenuIcon("message-circle"),
       accelerator: "CommandOrControl+Shift+P",
       click: () => showChatWindow(),
     },
     { type: "separator" },
     {
       label: "Open GitHub Repository",
+      icon: loadMenuIcon("github"),
       click: () => shell.openExternal("https://github.com/BangDori/prowl"),
     },
     { type: "separator" },
     {
       label: "Quit Prowl",
+      icon: loadMenuIcon("power"),
       click: () => app.quit(),
     },
   ]);
