@@ -159,11 +159,6 @@ export function popUpTrayMenu(): void {
       click: () => showSubPage("monitor"),
     },
     {
-      label: "Night Watch",
-      icon: loadMenuIcon("moon"),
-      click: () => showSubPage("quiet-hours"),
-    },
-    {
       label: "Prowl Chat",
       icon: loadMenuIcon("message-circle"),
       accelerator: "CommandOrControl+Shift+P",

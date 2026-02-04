@@ -1,18 +1,16 @@
 import prowlProfile from "@assets/prowl-profile.png";
-import { Cog, History, LayoutDashboard, Moon } from "lucide-react";
+import { Cog, History, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import ChangelogSection from "./sections/ChangelogSection";
 import JobsSection from "./sections/JobsSection";
-import NightWatchSection from "./sections/NightWatchSection";
 import SettingsSection from "./sections/SettingsSection";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "jobs" | "quiet-hours" | "changelog" | "settings";
+type NavItem = "jobs" | "changelog" | "settings";
 
 /** 네비게이션 아이템별 레이블 */
 const NAV_LABELS: Record<NavItem, string> = {
   jobs: "Background Monitor",
-  "quiet-hours": "Night Watch",
   changelog: "Version History",
   settings: "Settings",
 };
@@ -59,9 +57,8 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
  *
  * 각 섹션은 별도 컴포넌트로 분리:
  * - JobsSection: 작업 목록
- * - NightWatchSection: 집중 모드 설정
  * - ChangelogSection: 버전 히스토리
- * - SettingsSection: 앱 설정
+ * - SettingsSection: 앱 설정 (Night Watch 포함)
  */
 export default function DashboardLayout() {
   const [activeNav, setActiveNav] = useState<NavItem>("jobs");
@@ -90,12 +87,6 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("jobs")}
           />
           <SidebarItem
-            icon={<Moon className="w-4 h-4" />}
-            label="Night Watch"
-            active={activeNav === "quiet-hours"}
-            onClick={() => setActiveNav("quiet-hours")}
-          />
-          <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
             active={activeNav === "changelog"}
@@ -120,7 +111,6 @@ export default function DashboardLayout() {
         {/* Content */}
         <div className="flex-1 overflow-hidden">
           {activeNav === "jobs" && <JobsSection />}
-          {activeNav === "quiet-hours" && <NightWatchSection />}
           {activeNav === "changelog" && <ChangelogSection />}
           {activeNav === "settings" && <SettingsSection />}
         </div>

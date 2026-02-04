@@ -1,23 +1,30 @@
-import { Bell, ExternalLink, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { DEFAULT_FOCUS_MODE, type FocusMode } from "@shared/types";
+import { Bell, ExternalLink, Moon, RefreshCw } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import FocusModePanel from "../FocusModePanel";
 import ToggleSwitch from "../ToggleSwitch";
 
 /**
  * 설정 섹션 컴포넌트
  *
  * 앱의 전체 설정을 관리합니다.
+ * - Night Watch (집중 모드) 설정
  * - 알림 설정 (활성화/비활성화)
  * - 외부 링크 (GitHub, 릴리즈)
  */
 export default function SettingsSection() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.electronAPI.getSettings().then((settings) => {
-      setNotificationsEnabled(settings.notificationsEnabled);
-      setLoading(false);
-    });
+    Promise.all([window.electronAPI.getSettings(), window.electronAPI.getFocusMode()]).then(
+      ([settings, focus]) => {
+        setNotificationsEnabled(settings.notificationsEnabled);
+        setFocusMode(focus);
+        setLoading(false);
+      },
+    );
   }, []);
 
   const toggleNotifications = async () => {
@@ -26,6 +33,11 @@ export default function SettingsSection() {
     const current = await window.electronAPI.getSettings();
     await window.electronAPI.setSettings({ ...current, notificationsEnabled: newValue });
   };
+
+  const saveFocusMode = useCallback(async (updated: FocusMode) => {
+    setFocusMode(updated);
+    await window.electronAPI.setFocusMode(updated);
+  }, []);
 
   if (loading) {
     return (
@@ -38,6 +50,15 @@ export default function SettingsSection() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 space-y-6">
+        {/* Night Watch 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Moon className="w-3.5 h-3.5" />
+            Night Watch
+          </h3>
+          <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
+        </div>
+
         {/* 알림 설정 */}
         <div>
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
