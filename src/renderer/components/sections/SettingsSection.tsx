@@ -1,8 +1,10 @@
-import { DEFAULT_FOCUS_MODE, type FocusMode } from "@shared/types";
+import { DEFAULT_FOCUS_MODE, type FocusMode, type UpdateCheckResult } from "@shared/types";
 import { Bell, ExternalLink, Moon, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import FocusModePanel from "../FocusModePanel";
 import ToggleSwitch from "../ToggleSwitch";
+
+type UpdateStatus = "idle" | "checking" | "checked";
 
 /**
  * 설정 섹션 컴포넌트
@@ -16,6 +18,9 @@ export default function SettingsSection() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
   const [loading, setLoading] = useState(true);
+  const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("idle");
+  const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
+  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
     Promise.all([window.electronAPI.getSettings(), window.electronAPI.getFocusMode()]).then(
@@ -38,6 +43,25 @@ export default function SettingsSection() {
     setFocusMode(updated);
     await window.electronAPI.setFocusMode(updated);
   }, []);
+
+  const handleCheckForUpdates = async () => {
+    setUpdateStatus("checking");
+    const result = await window.electronAPI.checkForUpdates();
+    setUpdateResult(result);
+    setUpdateStatus("checked");
+
+    // 최신 버전이면 5초 쿨다운
+    if (!result.error && !result.hasUpdate) {
+      setCooldown(5);
+    }
+  };
+
+  // 쿨다운 타이머
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
   if (loading) {
     return (
@@ -93,19 +117,65 @@ export default function SettingsSection() {
                 <p className="text-[10px] text-gray-500">View source code and contribute</p>
               </div>
             </button>
-            <button
-              type="button"
-              onClick={() =>
-                window.electronAPI.openExternal("https://github.com/BangDori/prowl/releases")
-              }
-              className="w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card border border-prowl-border text-left hover:border-gray-600 transition-colors"
-            >
-              <RefreshCw className="w-4 h-4 text-gray-400" />
-              <div>
-                <p className="text-sm">Check for Updates</p>
-                <p className="text-[10px] text-gray-500">View latest releases</p>
+            <div className="p-3 rounded-lg bg-prowl-card border border-prowl-border">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <RefreshCw
+                    className={`w-4 h-4 text-gray-400 ${updateStatus === "checking" ? "animate-spin" : ""}`}
+                  />
+                  <div>
+                    <p className="text-sm">Check for Updates</p>
+                    {updateStatus === "idle" && (
+                      <p className="text-[10px] text-gray-500">
+                        Check if a new version is available
+                      </p>
+                    )}
+                    {updateStatus === "checking" && (
+                      <p className="text-[10px] text-gray-500">Checking...</p>
+                    )}
+                    {updateStatus === "checked" && updateResult && (
+                      <div className="text-[10px]">
+                        {updateResult.error ? (
+                          <p className="text-red-400">{updateResult.error}</p>
+                        ) : updateResult.hasUpdate ? (
+                          <p className="text-accent">
+                            v{updateResult.latestVersion} available (current: v
+                            {updateResult.currentVersion})
+                          </p>
+                        ) : (
+                          <p className="text-green-400">
+                            You're on the latest version (v{updateResult.currentVersion})
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {updateStatus === "checked" && updateResult?.hasUpdate && (
+                    <button
+                      type="button"
+                      onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
+                      className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
+                    >
+                      Download
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleCheckForUpdates}
+                    disabled={updateStatus === "checking" || cooldown > 0}
+                    className="px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors disabled:opacity-50"
+                  >
+                    {updateStatus === "checking"
+                      ? "Checking"
+                      : cooldown > 0
+                        ? `${cooldown}s`
+                        : "Check"}
+                  </button>
+                </div>
               </div>
-            </button>
+            </div>
           </div>
         </div>
       </div>
