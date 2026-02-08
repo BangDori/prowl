@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.11.0] - 2026-02-08
+- Claude Config 탭 추가 (~/.claude/ 설정 조회)
+- agents, commands, hooks, rules 탐색 가능
+- Obsidian 스타일 2패널 UI (파일 트리 + 콘텐츠 뷰어)
+- Finder에서 설정 파일 열기 지원
+
 ## [1.10.0] - 2026-02-05
 - Settings에 업데이트 체크 기능 추가 (GitHub API 연동)
 - 최신 버전일 경우 10분 쿨다운으로 API 남용 방지

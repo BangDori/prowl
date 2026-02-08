@@ -2,6 +2,7 @@ import type {
   AppSettings,
   ChatMessage,
   ChatSendResult,
+  ClaudeConfig,
   FocusMode,
   JobActionResult,
   JobCustomization,
@@ -90,6 +91,13 @@ const electronAPI = {
 
   // 업데이트 확인
   checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke("app:check-update"),
+
+  // Claude Config 조회
+  getClaudeConfig: (): Promise<ClaudeConfig> => ipcRenderer.invoke("claude-config:list"),
+
+  // 파일 내용 조회
+  readConfigFile: (filePath: string): Promise<string> =>
+    ipcRenderer.invoke("claude-config:read-file", filePath),
 };
 
 // contextBridge로 API 노출
