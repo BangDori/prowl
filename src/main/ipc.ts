@@ -3,6 +3,7 @@ import type {
   AppSettings,
   ChatMessage,
   ChatSendResult,
+  ClaudeConfig,
   FocusMode,
   JobActionResult,
   JobCustomization,
@@ -13,6 +14,7 @@ import type {
 } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { sendChatMessage } from "./services/chat";
+import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
@@ -198,5 +200,15 @@ export function registerIpcHandlers(): void {
   // 업데이트 확인
   ipcMain.handle("app:check-update", async (): Promise<UpdateCheckResult> => {
     return checkForUpdates();
+  });
+
+  // Claude Config 조회
+  ipcMain.handle("claude-config:list", async (): Promise<ClaudeConfig> => {
+    return getClaudeConfig();
+  });
+
+  // 파일 내용 조회
+  ipcMain.handle("claude-config:read-file", async (_event, filePath: string): Promise<string> => {
+    return getFileContent(filePath);
   });
 }

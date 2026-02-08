@@ -49,7 +49,8 @@ Main Process (Electron)          Renderer Process (React)
 │      ├── plist-parser.ts       │  index.ts   │
 │      ├── log-reader.ts │       └─────────────┘
 │      ├── log-analyzer.ts
-│      └── settings.ts   │
+│      ├── settings.ts   │
+│      └── claude-config.ts
 └────────────────────────┘
          ▲
          │              ┌─────────────────────┐
@@ -74,12 +75,14 @@ Main Process (Electron)          Renderer Process (React)
 | `src/main/services/log-reader.ts`   | 로그 파일 읽기                            |
 | `src/main/services/log-analyzer.ts` | 로그 분석 (성공/실패 판단)                |
 | `src/main/services/settings.ts`     | 앱 설정 및 작업 커스터마이징 저장         |
+| `src/main/services/claude-config.ts`| ~/.claude 설정 조회 (agents/commands/hooks/rules) |
 | `src/main/ipc.ts`                   | IPC 핸들러 등록                           |
 | `src/main/tray.ts`                  | menubar 패키지로 트레이 아이콘 생성       |
 | `src/preload/index.ts`              | contextBridge로 electronAPI 노출          |
 | `src/shared/types.ts`               | 공유 타입 정의                            |
 | `src/shared/constants.ts`           | 공유 상수 (main/renderer 공통)            |
 | `src/renderer/utils/date.ts`        | 날짜/시간 포맷 유틸리티                   |
+| `src/renderer/components/sections/ClaudeConfigSection.tsx` | Claude Config 대시보드 UI |
 
 ## IPC Channels
 
@@ -92,6 +95,8 @@ Main Process (Electron)          Renderer Process (React)
 | `jobs:logs`              | 로그 내용 조회              | `LogContent`        |
 | `jobs:getCustomizations` | 모든 작업 커스터마이징 조회 | `JobCustomizations` |
 | `jobs:setCustomization`  | 작업 커스터마이징 저장      | `void`              |
+| `claude-config:list`     | Claude 설정 목록 조회       | `ClaudeConfig`      |
+| `claude-config:read-file`| 파일 내용 조회              | `string`            |
 
 ## Job Customization
 
@@ -151,6 +156,54 @@ type JobSchedule =
   | { type: "interval"; intervalSeconds: number }
   | { type: "keepAlive" }
   | { type: "unknown" };
+
+// Claude Config 타입
+interface ClaudeAgentMeta {
+  name: string;
+  description: string;
+  model?: string;
+  color?: string;
+}
+
+interface ClaudeAgent {
+  id: string;           // "resume/resume-analyst"
+  filename: string;     // "resume-analyst.md"
+  category: string;     // "resume"
+  filePath: string;
+  meta: ClaudeAgentMeta;
+  content: string;      // 미리보기 500자
+}
+
+interface ClaudeCommand {
+  id: string;
+  filename: string;
+  filePath: string;
+  title: string;        // 첫 # 제목
+  description: string;  // 첫 100자
+  content: string;
+}
+
+interface ClaudeHook {
+  id: string;           // "SessionStart", "PreToolUse:Bash"
+  event: string;
+  matcher?: string;
+  hooks: Array<{ type: string; command: string }>;
+}
+
+interface ClaudeRule {
+  id: string;
+  filename: string;
+  filePath: string;
+  content: string;
+}
+
+interface ClaudeConfig {
+  agents: ClaudeAgent[];
+  commands: ClaudeCommand[];
+  hooks: ClaudeHook[];
+  rules: ClaudeRule[];
+  lastUpdated: Date;
+}
 ```
 
 ## Design System

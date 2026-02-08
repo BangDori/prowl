@@ -1,18 +1,20 @@
 import prowlProfile from "@assets/prowl-profile.png";
-import { Cog, History, LayoutDashboard } from "lucide-react";
+import { Bot, Cog, History, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import ChangelogSection from "./sections/ChangelogSection";
+import ClaudeConfigSection from "./sections/ClaudeConfigSection";
 import JobsSection from "./sections/JobsSection";
 import SettingsSection from "./sections/SettingsSection";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "jobs" | "changelog" | "settings";
+type NavItem = "jobs" | "changelog" | "settings" | "claude-config";
 
 /** 네비게이션 아이템별 레이블 */
 const NAV_LABELS: Record<NavItem, string> = {
   jobs: "Background Monitor",
   changelog: "Version History",
   settings: "Settings",
+  "claude-config": "Claude Config",
 };
 
 /** 사이드바 아이템 Props */
@@ -87,6 +89,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("jobs")}
           />
           <SidebarItem
+            icon={<Bot className="w-4 h-4" />}
+            label="Claude Config"
+            active={activeNav === "claude-config"}
+            onClick={() => setActiveNav("claude-config")}
+          />
+          <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
             active={activeNav === "changelog"}
@@ -113,6 +121,7 @@ export default function DashboardLayout() {
           {activeNav === "jobs" && <JobsSection />}
           {activeNav === "changelog" && <ChangelogSection />}
           {activeNav === "settings" && <SettingsSection />}
+          {activeNav === "claude-config" && <ClaudeConfigSection />}
         </div>
       </main>
     </div>

@@ -5,9 +5,11 @@ import {
   AppSettings,
   ChatMessage,
   ChatSendResult,
+  ClaudeConfig,
   FocusMode,
   JobCustomization,
   JobCustomizations,
+  UpdateCheckResult,
 } from "@shared/types";
 
 export interface ElectronAPI {
@@ -32,6 +34,10 @@ export interface ElectronAPI {
   closeChatWindow: () => Promise<void>;
   navigateBack: () => Promise<void>;
   getAppVersion: () => Promise<string>;
+  getRunningJobs: () => Promise<string[]>;
+  checkForUpdates: () => Promise<UpdateCheckResult>;
+  getClaudeConfig: () => Promise<ClaudeConfig>;
+  readConfigFile: (filePath: string) => Promise<string>;
 }
 
 declare global {

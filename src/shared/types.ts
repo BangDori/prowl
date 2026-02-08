@@ -106,3 +106,59 @@ export interface UpdateCheckResult {
   releaseNotes?: string;
   error?: string;
 }
+
+// Claude Agent 메타데이터
+export interface ClaudeAgentMeta {
+  name: string;
+  description: string;
+  model?: string;
+  color?: string;
+}
+
+// Claude Agent
+export interface ClaudeAgent {
+  id: string; // "resume/resume-analyst"
+  filename: string; // "resume-analyst.md"
+  category: string; // "resume"
+  filePath: string;
+  meta: ClaudeAgentMeta;
+  content: string; // 미리보기 500자
+}
+
+// Claude Command
+export interface ClaudeCommand {
+  id: string; // "agent-loop"
+  filename: string;
+  filePath: string;
+  title: string; // 첫 # 제목
+  description: string; // 첫 100자
+  content: string;
+}
+
+// Claude Hook
+export interface ClaudeHook {
+  id: string; // "SessionStart", "PreToolUse:Bash" 등
+  event: string; // "SessionStart", "PreToolUse" 등
+  matcher?: string; // "Bash" 등 (PreToolUse/PostToolUse용)
+  hooks: Array<{
+    type: string;
+    command: string;
+  }>;
+}
+
+// Claude Rule
+export interface ClaudeRule {
+  id: string;
+  filename: string;
+  filePath: string;
+  content: string;
+}
+
+// Claude Config 전체 데이터
+export interface ClaudeConfig {
+  agents: ClaudeAgent[];
+  commands: ClaudeCommand[];
+  hooks: ClaudeHook[];
+  rules: ClaudeRule[];
+  lastUpdated: Date;
+}
