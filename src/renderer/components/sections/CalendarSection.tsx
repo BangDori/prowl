@@ -326,7 +326,7 @@ export default function CalendarSection() {
     setNewUrl("");
   };
 
-  // 로컬 이벤트 추가
+  // 로컬 이벤트 추가 (낙관적 업데이트)
   const handleAddLocalEvent = async () => {
     const summary = eventSummary.trim();
     if (!summary) return;
@@ -352,19 +352,46 @@ export default function CalendarSection() {
       dtend: eventAllDay ? `${dateStr}T23:59:59` : `${dateStr}T${eventEndTime}:00`,
     };
 
-    await window.electronAPI.addLocalEvent(localEvent);
+    // 낙관적: 즉시 UI에 반영
+    const optimisticEvent: CalendarEvent = {
+      uid: localEvent.id,
+      summary: localEvent.summary,
+      dtstart: new Date(localEvent.dtstart),
+      dtend: new Date(localEvent.dtend),
+      allDay: localEvent.allDay,
+      feedId: LOCAL_FEED_ID,
+    };
+    const prev = events;
+    setEvents((cur) =>
+      [...cur, optimisticEvent].sort((a, b) => a.dtstart.getTime() - b.dtstart.getTime()),
+    );
+
     setAddingEvent(false);
     setEventSummary("");
     setEventStartTime("09:00");
     setEventEndTime("10:00");
     setEventAllDay(false);
-    fetchEvents();
+
+    // 백그라운드 IPC — 실패 시 롤백
+    try {
+      await window.electronAPI.addLocalEvent(localEvent);
+    } catch {
+      setEvents(prev);
+    }
   };
 
-  // 로컬 이벤트 삭제
+  // 로컬 이벤트 삭제 (낙관적 업데이트)
   const handleDeleteLocalEvent = async (eventId: string) => {
-    await window.electronAPI.deleteLocalEvent(eventId);
-    fetchEvents();
+    // 낙관적: 즉시 UI에서 제거
+    const prev = events;
+    setEvents((cur) => cur.filter((e) => e.uid !== eventId));
+
+    // 백그라운드 IPC — 실패 시 롤백
+    try {
+      await window.electronAPI.deleteLocalEvent(eventId);
+    } catch {
+      setEvents(prev);
+    }
   };
 
   // 월 이동
