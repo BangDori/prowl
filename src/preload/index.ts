@@ -1,5 +1,7 @@
 import type {
   AppSettings,
+  CalendarEvent,
+  CalendarSettings,
   ChatMessage,
   ChatSendResult,
   ClaudeConfig,
@@ -8,6 +10,7 @@ import type {
   JobCustomization,
   JobCustomizations,
   LaunchdJob,
+  LocalEvent,
   LogContent,
   UpdateCheckResult,
 } from "@shared/types";
@@ -91,6 +94,31 @@ const electronAPI = {
 
   // 업데이트 확인
   checkForUpdates: (): Promise<UpdateCheckResult> => ipcRenderer.invoke("app:check-update"),
+
+  // 캘린더 이벤트 조회
+  getCalendarEvents: (): Promise<CalendarEvent[]> => ipcRenderer.invoke("calendar:list-events"),
+
+  // 캘린더 설정 조회
+  getCalendarSettings: (): Promise<CalendarSettings> => ipcRenderer.invoke("calendar:get-settings"),
+
+  // 캘린더 설정 저장
+  setCalendarSettings: (settings: CalendarSettings): Promise<void> =>
+    ipcRenderer.invoke("calendar:set-settings", settings),
+
+  // 로컬 이벤트 목록 조회
+  getLocalEvents: (): Promise<LocalEvent[]> => ipcRenderer.invoke("calendar:local-events"),
+
+  // 로컬 이벤트 추가
+  addLocalEvent: (event: LocalEvent): Promise<void> =>
+    ipcRenderer.invoke("calendar:add-local-event", event),
+
+  // 로컬 이벤트 수정
+  updateLocalEvent: (event: LocalEvent): Promise<void> =>
+    ipcRenderer.invoke("calendar:update-local-event", event),
+
+  // 로컬 이벤트 삭제
+  deleteLocalEvent: (eventId: string): Promise<void> =>
+    ipcRenderer.invoke("calendar:delete-local-event", eventId),
 
   // Claude Config 조회
   getClaudeConfig: (): Promise<ClaudeConfig> => ipcRenderer.invoke("claude-config:list"),

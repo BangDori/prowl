@@ -1,6 +1,8 @@
 import { app, ipcMain, shell } from "electron";
 import type {
   AppSettings,
+  CalendarEvent,
+  CalendarSettings,
   ChatMessage,
   ChatSendResult,
   ClaudeConfig,
@@ -9,10 +11,20 @@ import type {
   JobCustomization,
   JobCustomizations,
   LaunchdJob,
+  LocalEvent,
   LogContent,
   UpdateCheckResult,
 } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
+import {
+  addLocalEvent,
+  deleteLocalEvent,
+  fetchCalendarEvents,
+  getCalendarSettings,
+  getLocalEvents,
+  setCalendarSettings,
+  updateLocalEvent,
+} from "./services/calendar";
 import { sendChatMessage } from "./services/chat";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -200,6 +212,50 @@ export function registerIpcHandlers(): void {
   // 업데이트 확인
   ipcMain.handle("app:check-update", async (): Promise<UpdateCheckResult> => {
     return checkForUpdates();
+  });
+
+  // 캘린더 이벤트 조회
+  ipcMain.handle("calendar:list-events", async (): Promise<CalendarEvent[]> => {
+    return fetchCalendarEvents();
+  });
+
+  // 캘린더 설정 조회
+  ipcMain.handle("calendar:get-settings", async (): Promise<CalendarSettings> => {
+    return getCalendarSettings();
+  });
+
+  // 캘린더 설정 저장
+  ipcMain.handle(
+    "calendar:set-settings",
+    async (_event, settings: CalendarSettings): Promise<void> => {
+      setCalendarSettings(settings);
+    },
+  );
+
+  // 로컬 이벤트 목록 조회
+  ipcMain.handle("calendar:local-events", async (): Promise<LocalEvent[]> => {
+    return getLocalEvents();
+  });
+
+  // 로컬 이벤트 추가
+  ipcMain.handle(
+    "calendar:add-local-event",
+    async (_event, localEvent: LocalEvent): Promise<void> => {
+      addLocalEvent(localEvent);
+    },
+  );
+
+  // 로컬 이벤트 수정
+  ipcMain.handle(
+    "calendar:update-local-event",
+    async (_event, localEvent: LocalEvent): Promise<void> => {
+      updateLocalEvent(localEvent);
+    },
+  );
+
+  // 로컬 이벤트 삭제
+  ipcMain.handle("calendar:delete-local-event", async (_event, eventId: string): Promise<void> => {
+    deleteLocalEvent(eventId);
   });
 
   // Claude Config 조회
