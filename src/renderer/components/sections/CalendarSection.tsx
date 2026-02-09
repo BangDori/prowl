@@ -12,7 +12,7 @@ import {
   Tag,
   Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const CALENDAR_GRID_SIZE = 42; // 6주 × 7일
@@ -196,6 +196,131 @@ function DayCell({ date, isCurrentMonth, events, selected, feedColorMap, onClick
   );
 }
 
+/** 커스텀 미니 날짜 선택기 (native date picker 대체) */
+function MiniDatePicker({
+  value,
+  min,
+  onChange,
+  onClose,
+}: {
+  value: string;
+  min?: string;
+  onChange: (dateStr: string) => void;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const selected = new Date(`${value}T00:00:00`);
+  const minDate = min ? new Date(`${min}T00:00:00`) : undefined;
+  const [pickerYear, setPickerYear] = useState(selected.getFullYear());
+  const [pickerMonth, setPickerMonth] = useState(selected.getMonth());
+
+  const days = useMemo(() => getCalendarDays(pickerYear, pickerMonth), [pickerYear, pickerMonth]);
+
+  const monthLabel = new Date(pickerYear, pickerMonth).toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+  });
+
+  // 외부 클릭 시 닫기
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onClose]);
+
+  const goPrev = () => {
+    if (pickerMonth === 0) {
+      setPickerYear(pickerYear - 1);
+      setPickerMonth(11);
+    } else {
+      setPickerMonth(pickerMonth - 1);
+    }
+  };
+
+  const goNext = () => {
+    if (pickerMonth === 11) {
+      setPickerYear(pickerYear + 1);
+      setPickerMonth(0);
+    } else {
+      setPickerMonth(pickerMonth + 1);
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="absolute z-50 mt-1 p-2 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl"
+      style={{ width: "210px" }}
+    >
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-1">
+        <button
+          type="button"
+          onClick={goPrev}
+          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+        >
+          <ChevronLeft className="w-3 h-3" />
+        </button>
+        <span className="text-[10px] font-medium text-gray-300">{monthLabel}</span>
+        <button
+          type="button"
+          onClick={goNext}
+          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+        >
+          <ChevronRight className="w-3 h-3" />
+        </button>
+      </div>
+      {/* 요일 헤더 */}
+      <div className="grid grid-cols-7 mb-0.5">
+        {WEEKDAYS.map((d) => (
+          <div
+            key={d}
+            className={`text-center text-[9px] font-medium py-0.5 ${
+              d === "일" ? "text-red-400/70" : d === "토" ? "text-blue-400/70" : "text-gray-600"
+            }`}
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+      {/* 날짜 그리드 */}
+      <div className="grid grid-cols-7">
+        {days.map((day) => {
+          const dateStr = toDateStr(day);
+          const isCurrentMonth = day.getMonth() === pickerMonth;
+          const isSelected = dateStr === value;
+          const isDisabled = minDate && day < minDate && !isSameDay(day, minDate);
+          const today = isToday(day);
+
+          return (
+            <button
+              key={day.getTime()}
+              type="button"
+              disabled={!!isDisabled}
+              onClick={() => {
+                onChange(dateStr);
+                onClose();
+              }}
+              className={`
+                text-[10px] w-full py-1 rounded transition-colors
+                ${isDisabled ? "opacity-20 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"}
+                ${isSelected ? "bg-accent/25 text-accent font-medium" : ""}
+                ${!isSelected && today ? "text-accent font-medium" : ""}
+                ${!isSelected && !today && isCurrentMonth ? "text-gray-300" : ""}
+                ${!isCurrentMonth && !isSelected ? "opacity-30" : ""}
+              `}
+            >
+              {day.getDate()}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 interface EventDetailProps {
   event: CalendarEvent;
   feedLabel?: string;
@@ -233,6 +358,7 @@ function EventDetail({
   const [editStartTime, setEditStartTime] = useState(formatTime(new Date(event.dtstart)));
   const [editEndTime, setEditEndTime] = useState(formatTime(new Date(event.dtend)));
   const [editEndDate, setEditEndDate] = useState(toDateStr(new Date(event.dtend)));
+  const [editEndDateOpen, setEditEndDateOpen] = useState(false);
 
   if (isEditing) {
     const startDateStr = toDateStr(new Date(event.dtstart));
@@ -266,19 +392,23 @@ function EventDetail({
             />
           )}
           <span className="text-[10px] text-gray-600">~</span>
-          <label className="relative text-[10px] text-gray-300 cursor-pointer">
-            <span className="border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setEditEndDateOpen(!editEndDateOpen)}
+              className="text-[10px] text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
+            >
               {formatDateKr(editEndDate)}
-            </span>
-            <input
-              type="date"
-              value={editEndDate}
-              min={startDateStr}
-              onChange={(e) => setEditEndDate(e.target.value)}
-              onClick={(e) => (e.target as HTMLInputElement).showPicker()}
-              className="absolute inset-0 opacity-0 cursor-pointer"
-            />
-          </label>
+            </button>
+            {editEndDateOpen && (
+              <MiniDatePicker
+                value={editEndDate}
+                min={startDateStr}
+                onChange={setEditEndDate}
+                onClose={() => setEditEndDateOpen(false)}
+              />
+            )}
+          </div>
           {!editAllDay && (
             <input
               type="text"
@@ -433,6 +563,7 @@ export default function CalendarSection() {
   const [eventEndTime, setEventEndTime] = useState("10:00");
   const [eventAllDay, setEventAllDay] = useState(false);
   const [eventEndDate, setEventEndDate] = useState("");
+  const [eventEndDateOpen, setEventEndDateOpen] = useState(false);
 
   // 로컬 이벤트 수정
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
@@ -509,6 +640,13 @@ export default function CalendarSection() {
     const updated = feeds.filter((f) => f.id !== feedId);
     await window.electronAPI.setCalendarSettings({ feeds: updated });
     setFeeds(updated);
+  };
+
+  // 피드 키워드 필터 업데이트
+  const handleUpdateFeedFilter = async (feedId: string, filterKeyword: string) => {
+    const updated = feeds.map((f) => (f.id === feedId ? { ...f, filterKeyword } : f));
+    setFeeds(updated);
+    await window.electronAPI.setCalendarSettings({ feeds: updated });
   };
 
   const handleStartEditing = () => setEditing(true);
@@ -670,10 +808,24 @@ export default function CalendarSection() {
   // 이벤트 목록에 표시할 날짜 (선택 없으면 오늘)
   const displayDate = selectedDate ?? new Date();
 
+  // 피드별 키워드 필터 적용
+  const filteredEvents = useMemo(() => {
+    const filterMap = new Map<string, string>();
+    for (const f of feeds) {
+      if (f.filterKeyword?.trim()) filterMap.set(f.id, f.filterKeyword.trim().toLowerCase());
+    }
+    if (filterMap.size === 0) return events;
+    return events.filter((e) => {
+      const keyword = filterMap.get(e.feedId);
+      if (!keyword) return true; // 필터 없는 피드는 통과
+      return e.summary.toLowerCase().includes(keyword);
+    });
+  }, [events, feeds]);
+
   // 표시 날짜의 이벤트
   const selectedDayEvents = useMemo(
-    () => getEventsForDay(events, displayDate),
-    [events, displayDate],
+    () => getEventsForDay(filteredEvents, displayDate),
+    [filteredEvents, displayDate],
   );
 
   // 어젠다: 오늘부터 앞으로의 이벤트 (날짜별 그룹)
@@ -681,7 +833,9 @@ export default function CalendarSection() {
     if (selectedDate !== null) return [];
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const upcoming = events.filter((e) => new Date(e.dtend).getTime() >= todayStart.getTime());
+    const upcoming = filteredEvents.filter(
+      (e) => new Date(e.dtend).getTime() >= todayStart.getTime(),
+    );
     // 날짜별 그룹핑
     const groups: { date: Date; events: CalendarEvent[] }[] = [];
     for (const e of upcoming) {
@@ -698,7 +852,7 @@ export default function CalendarSection() {
     }
     groups.sort((a, b) => a.date.getTime() - b.date.getTime());
     return groups;
-  }, [selectedDate, events]);
+  }, [selectedDate, filteredEvents]);
 
   // feedId → label/color 매핑
   const feedLabelMap = useMemo(() => {
@@ -809,9 +963,15 @@ export default function CalendarSection() {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium text-gray-300 truncate">{feed.label}</p>
-                    <p className="text-[10px] text-gray-600 font-mono truncate">
-                      {"•".repeat(Math.min(feed.url.length, 30))}
-                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <input
+                        type="text"
+                        value={feed.filterKeyword ?? ""}
+                        onChange={(e) => handleUpdateFeedFilter(feed.id, e.target.value)}
+                        placeholder="포함 키워드 (미설정 시 전체)"
+                        className="flex-1 min-w-0 bg-transparent text-[10px] text-gray-500 placeholder-gray-700 outline-none"
+                      />
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -913,7 +1073,7 @@ export default function CalendarSection() {
 
             <div className="grid grid-cols-7 gap-y-0.5">
               {calendarDays.map((day) => {
-                const dayEvents = getEventsForDay(events, day);
+                const dayEvents = getEventsForDay(filteredEvents, day);
                 return (
                   <DayCell
                     key={day.getTime()}
@@ -1029,19 +1189,23 @@ export default function CalendarSection() {
                         />
                       )}
                       <span className="text-[10px] text-gray-600">~</span>
-                      <label className="relative text-[10px] text-gray-300 cursor-pointer">
-                        <span className="border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors">
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setEventEndDateOpen(!eventEndDateOpen)}
+                          className="text-[10px] text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
+                        >
                           {formatDateKr(eventEndDate || toDateStr(displayDate))}
-                        </span>
-                        <input
-                          type="date"
-                          value={eventEndDate || toDateStr(displayDate)}
-                          min={toDateStr(displayDate)}
-                          onChange={(e) => setEventEndDate(e.target.value)}
-                          onClick={(e) => (e.target as HTMLInputElement).showPicker()}
-                          className="absolute inset-0 opacity-0 cursor-pointer"
-                        />
-                      </label>
+                        </button>
+                        {eventEndDateOpen && (
+                          <MiniDatePicker
+                            value={eventEndDate || toDateStr(displayDate)}
+                            min={toDateStr(displayDate)}
+                            onChange={setEventEndDate}
+                            onClose={() => setEventEndDateOpen(false)}
+                          />
+                        )}
+                      </div>
                       {!eventAllDay && (
                         <input
                           type="text"

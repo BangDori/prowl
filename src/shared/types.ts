@@ -125,6 +125,7 @@ export interface IcsFeed {
   label: string; // "회사", "개인" 등
   url: string; // ICS URL
   color: string; // 피드 색상 (hex)
+  filterKeyword?: string; // 포함 키워드 필터 (설정 시 키워드가 포함된 이벤트만 표시)
 }
 
 // 피드 색상 프리셋
