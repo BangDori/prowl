@@ -19,6 +19,11 @@ const CALENDAR_GRID_SIZE = 42; // 6주 × 7일
 const MS_PER_DAY = 86400000;
 const MAX_EVENT_DOTS = 3;
 
+/** 날짜를 "YYYY-MM-DD" 형식으로 포맷 */
+function toDateStr(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 /** 시간을 "14:30" 형식으로 포맷 */
 function formatTime(date: Date): string {
   return new Date(date).toLocaleTimeString("ko-KR", {
@@ -26,6 +31,12 @@ function formatTime(date: Date): string {
     minute: "2-digit",
     hour12: false,
   });
+}
+
+/** 날짜를 "2월 24일 (화)" 형식으로 포맷 */
+function formatDateKr(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(`${date}T00:00:00`) : date;
+  return d.toLocaleDateString("ko-KR", { month: "long", day: "numeric", weekday: "short" });
 }
 
 /** 두 날짜가 같은 날인지 확인 */
@@ -77,6 +88,19 @@ function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
   });
 }
 
+/** 이벤트가 여러 날에 걸치는지 확인 (종일 이벤트의 exclusive DTEND 고려) */
+function isMultiDay(event: CalendarEvent): boolean {
+  const s = new Date(event.dtstart);
+  const e = new Date(event.dtend);
+  const startDay = new Date(s.getFullYear(), s.getMonth(), s.getDate()).getTime();
+  const endDay = new Date(e.getFullYear(), e.getMonth(), e.getDate()).getTime();
+  const diffDays = (endDay - startDay) / MS_PER_DAY;
+  if (diffDays <= 0) return false;
+  // ICS 종일 이벤트: DTEND가 다음 날(exclusive)이면 실제로는 1일짜리
+  if (diffDays <= 1 && event.allDay) return false;
+  return true;
+}
+
 /** 현재 진행 중인 이벤트인지 확인 */
 function isOngoing(event: CalendarEvent): boolean {
   const now = Date.now();
@@ -99,21 +123,38 @@ interface DayCellProps {
 
 function DayCell({ date, isCurrentMonth, events, selected, feedColorMap, onClick }: DayCellProps) {
   const today = isToday(date);
-  const hasEvents = events.length > 0;
+  const dayOfWeek = date.getDay();
 
-  // 고유 피드 색상만 추출 (중복 제거)
-  const dotColors = [...new Set(events.map((e) => feedColorMap[e.feedId] ?? FEED_COLORS[0]))].slice(
-    0,
-    MAX_EVENT_DOTS,
-  );
+  // multi-day 이벤트 → 바, single-day → 점으로 분리
+  const multiDay = events.filter(isMultiDay);
+  const singleDay = events.filter((e) => !isMultiDay(e));
+
+  // 바 세그먼트: 시작/끝/주 경계에서 라운딩
+  const bars = multiDay.slice(0, 2).map((e) => {
+    const isStart = isSameDay(new Date(e.dtstart), date);
+    const isEnd = isSameDay(new Date(e.dtend), date);
+    return {
+      key: `bar-${e.uid}`,
+      color: feedColorMap[e.feedId] ?? FEED_COLORS[0],
+      roundLeft: isStart || dayOfWeek === 0,
+      roundRight: isEnd || dayOfWeek === 6,
+    };
+  });
+
+  // 남은 슬롯에 single-day 점 표시
+  const remainingSlots = MAX_EVENT_DOTS - bars.length;
+  const dotColors =
+    remainingSlots > 0
+      ? singleDay.map((e) => feedColorMap[e.feedId] ?? FEED_COLORS[0]).slice(0, remainingSlots)
+      : [];
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={`
-        relative flex flex-col items-center py-1 rounded-md transition-colors min-h-[36px]
-        ${selected ? "bg-accent/20 ring-1 ring-accent/40" : "hover:bg-white/5"}
+        relative flex flex-col items-center py-1 transition-colors min-h-[36px] overflow-hidden
+        ${selected ? "bg-accent/20 ring-1 ring-accent/40 rounded-md" : "hover:bg-white/5 rounded-md"}
         ${!isCurrentMonth ? "opacity-30" : ""}
       `}
     >
@@ -127,11 +168,24 @@ function DayCell({ date, isCurrentMonth, events, selected, feedColorMap, onClick
       >
         {date.getDate()}
       </span>
-      {hasEvents && (
-        <div className="flex gap-0.5 mt-0.5">
-          {dotColors.map((color) => (
+      {/* Multi-day 바 */}
+      {bars.length > 0 && (
+        <div className="w-full mt-0.5 space-y-px">
+          {bars.map((bar) => (
             <div
-              key={`dot-${date.getTime()}-${color}`}
+              key={bar.key}
+              className={`h-[3px] ${bar.roundLeft ? "ml-0.5 rounded-l-full" : ""} ${bar.roundRight ? "mr-0.5 rounded-r-full" : ""}`}
+              style={{ backgroundColor: bar.color }}
+            />
+          ))}
+        </div>
+      )}
+      {/* Single-day 점 */}
+      {dotColors.length > 0 && (
+        <div className="flex gap-0.5 mt-0.5">
+          {dotColors.map((color, i) => (
+            <div
+              key={`dot-${date.getTime()}-${i}`}
               className="w-1 h-1 rounded-full"
               style={{ backgroundColor: color }}
             />
@@ -150,7 +204,13 @@ interface EventDetailProps {
   isEditing?: boolean;
   onDelete?: () => void;
   onEdit?: () => void;
-  onEditSave?: (summary: string, allDay: boolean, startTime: string, endTime: string) => void;
+  onEditSave?: (
+    summary: string,
+    allDay: boolean,
+    startTime: string,
+    endTime: string,
+    endDate: string,
+  ) => void;
   onEditCancel?: () => void;
 }
 
@@ -172,8 +232,10 @@ function EventDetail({
   const [editAllDay, setEditAllDay] = useState(event.allDay ?? false);
   const [editStartTime, setEditStartTime] = useState(formatTime(new Date(event.dtstart)));
   const [editEndTime, setEditEndTime] = useState(formatTime(new Date(event.dtend)));
+  const [editEndDate, setEditEndDate] = useState(toDateStr(new Date(event.dtend)));
 
   if (isEditing) {
+    const startDateStr = toDateStr(new Date(event.dtstart));
     return (
       <div className="rounded-md border border-accent/30 bg-prowl-card overflow-hidden">
         <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
@@ -182,15 +244,52 @@ function EventDetail({
             value={editSummary}
             onChange={(e) => setEditSummary(e.target.value)}
             onKeyDown={(e) =>
-              e.key === "Enter" && onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime)
+              e.key === "Enter" &&
+              onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime, editEndDate)
             }
             className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
             // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
             autoFocus
           />
         </div>
-        <div className="flex items-center gap-2 px-2.5 py-2">
-          <label className="flex items-center gap-1.5 cursor-pointer">
+        {/* 날짜/시간 행 */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 px-2.5 py-2">
+          <span className="text-[10px] text-gray-400">{formatDateKr(startDateStr)}</span>
+          {!editAllDay && (
+            <input
+              type="text"
+              value={editStartTime}
+              onChange={(e) => setEditStartTime(e.target.value)}
+              placeholder="09:00"
+              maxLength={5}
+              className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+            />
+          )}
+          <span className="text-[10px] text-gray-600">~</span>
+          <label className="relative text-[10px] text-gray-300 cursor-pointer">
+            <span className="border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors">
+              {formatDateKr(editEndDate)}
+            </span>
+            <input
+              type="date"
+              value={editEndDate}
+              min={startDateStr}
+              onChange={(e) => setEditEndDate(e.target.value)}
+              onClick={(e) => (e.target as HTMLInputElement).showPicker()}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+          </label>
+          {!editAllDay && (
+            <input
+              type="text"
+              value={editEndTime}
+              onChange={(e) => setEditEndTime(e.target.value)}
+              placeholder="10:00"
+              maxLength={5}
+              className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+            />
+          )}
+          <label className="flex items-center gap-1 ml-auto cursor-pointer">
             <input
               type="checkbox"
               checked={editAllDay}
@@ -199,23 +298,6 @@ function EventDetail({
             />
             <span className="text-[10px] text-gray-400">종일</span>
           </label>
-          {!editAllDay && (
-            <div className="flex items-center gap-1.5">
-              <input
-                type="time"
-                value={editStartTime}
-                onChange={(e) => setEditStartTime(e.target.value)}
-                className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
-              />
-              <span className="text-xs text-gray-600">~</span>
-              <input
-                type="time"
-                value={editEndTime}
-                onChange={(e) => setEditEndTime(e.target.value)}
-                className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
-              />
-            </div>
-          )}
           <div className="flex-1" />
           <button
             type="button"
@@ -226,7 +308,9 @@ function EventDetail({
           </button>
           <button
             type="button"
-            onClick={() => onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime)}
+            onClick={() =>
+              onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime, editEndDate)
+            }
             disabled={!editSummary.trim()}
             className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
           >
@@ -280,7 +364,18 @@ function EventDetail({
         )}
       </div>
       <div className="ml-2 mt-0.5 space-y-0.5">
-        {event.allDay ? (
+        {isMultiDay(event) ? (
+          <div className="flex items-center gap-1">
+            <Clock className="w-2.5 h-2.5 text-gray-600" />
+            <span className="text-[10px] text-gray-500">
+              {formatDateKr(new Date(event.dtstart))}
+              {!event.allDay && ` ${formatTime(new Date(event.dtstart))}`}
+              {" ~ "}
+              {formatDateKr(new Date(event.dtend))}
+              {!event.allDay && ` ${formatTime(new Date(event.dtend))}`}
+            </span>
+          </div>
+        ) : event.allDay ? (
           <span className="text-[10px] text-gray-500">종일</span>
         ) : (
           <div className="flex items-center gap-1">
@@ -337,6 +432,7 @@ export default function CalendarSection() {
   const [eventStartTime, setEventStartTime] = useState("09:00");
   const [eventEndTime, setEventEndTime] = useState("10:00");
   const [eventAllDay, setEventAllDay] = useState(false);
+  const [eventEndDate, setEventEndDate] = useState("");
 
   // 로컬 이벤트 수정
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
@@ -346,8 +442,8 @@ export default function CalendarSection() {
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
 
-  // 선택된 날짜
-  const [selectedDate, setSelectedDate] = useState<Date>(now);
+  // 선택된 날짜 (null = 선택 없음, 오늘 기준 이벤트 표시)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // 설정 로드
   useEffect(() => {
@@ -438,14 +534,15 @@ export default function CalendarSection() {
       return;
     }
 
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    const startDateStr = toDateStr(displayDate);
+    const endDateStr = eventEndDate || startDateStr;
 
     const localEvent: LocalEvent = {
       id: generateId(),
       summary,
       allDay: eventAllDay,
-      dtstart: eventAllDay ? `${dateStr}T00:00:00` : `${dateStr}T${eventStartTime}:00`,
-      dtend: eventAllDay ? `${dateStr}T23:59:59` : `${dateStr}T${eventEndTime}:00`,
+      dtstart: eventAllDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${eventStartTime}:00`,
+      dtend: eventAllDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${eventEndTime}:00`,
     };
 
     // 낙관적: 즉시 UI에 반영
@@ -467,6 +564,7 @@ export default function CalendarSection() {
     setEventStartTime("09:00");
     setEventEndTime("10:00");
     setEventAllDay(false);
+    setEventEndDate("");
 
     // 백그라운드 IPC — 실패 시 롤백
     try {
@@ -497,18 +595,20 @@ export default function CalendarSection() {
     allDay: boolean,
     startTime: string,
     endTime: string,
+    endDate: string,
   ) => {
     const trimmed = summary.trim();
     if (!trimmed) return;
 
-    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+    const startDateStr = toDateStr(displayDate);
+    const endDateStr = endDate || startDateStr;
 
     const updatedLocal: LocalEvent = {
       id: eventId,
       summary: trimmed,
       allDay,
-      dtstart: allDay ? `${dateStr}T00:00:00` : `${dateStr}T${startTime}:00`,
-      dtend: allDay ? `${dateStr}T23:59:59` : `${dateStr}T${endTime}:00`,
+      dtstart: allDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${startTime}:00`,
+      dtend: allDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${endTime}:00`,
     };
 
     // 낙관적: 즉시 UI 반영
@@ -561,17 +661,44 @@ export default function CalendarSection() {
     const today = new Date();
     setViewYear(today.getFullYear());
     setViewMonth(today.getMonth());
-    setSelectedDate(today);
+    setSelectedDate(null);
   };
 
   // 캘린더 그리드 날짜 계산
   const calendarDays = useMemo(() => getCalendarDays(viewYear, viewMonth), [viewYear, viewMonth]);
 
-  // 선택된 날짜의 이벤트
+  // 이벤트 목록에 표시할 날짜 (선택 없으면 오늘)
+  const displayDate = selectedDate ?? new Date();
+
+  // 표시 날짜의 이벤트
   const selectedDayEvents = useMemo(
-    () => getEventsForDay(events, selectedDate),
-    [events, selectedDate],
+    () => getEventsForDay(events, displayDate),
+    [events, displayDate],
   );
+
+  // 어젠다: 오늘부터 앞으로의 이벤트 (날짜별 그룹)
+  const upcomingEvents = useMemo(() => {
+    if (selectedDate !== null) return [];
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const upcoming = events.filter((e) => new Date(e.dtend).getTime() >= todayStart.getTime());
+    // 날짜별 그룹핑
+    const groups: { date: Date; events: CalendarEvent[] }[] = [];
+    for (const e of upcoming) {
+      const eStart = new Date(e.dtstart);
+      const eventDay = new Date(eStart.getFullYear(), eStart.getMonth(), eStart.getDate());
+      // 시작일이 오늘 이전이면 오늘 기준으로
+      const groupDay = eventDay.getTime() < todayStart.getTime() ? todayStart : eventDay;
+      const existing = groups.find((g) => isSameDay(g.date, groupDay));
+      if (existing) {
+        existing.events.push(e);
+      } else {
+        groups.push({ date: groupDay, events: [e] });
+      }
+    }
+    groups.sort((a, b) => a.date.getTime() - b.date.getTime());
+    return groups;
+  }, [selectedDate, events]);
 
   // feedId → label/color 매핑
   const feedLabelMap = useMemo(() => {
@@ -784,7 +911,7 @@ export default function CalendarSection() {
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-0.5">
+            <div className="grid grid-cols-7 gap-y-0.5">
               {calendarDays.map((day) => {
                 const dayEvents = getEventsForDay(events, day);
                 return (
@@ -793,138 +920,209 @@ export default function CalendarSection() {
                     date={day}
                     isCurrentMonth={day.getMonth() === viewMonth}
                     events={dayEvents}
-                    selected={isSameDay(day, selectedDate)}
+                    selected={selectedDate !== null && isSameDay(day, selectedDate)}
                     feedColorMap={feedColorMap}
-                    onClick={() => setSelectedDate(day)}
+                    onClick={() =>
+                      setSelectedDate(selectedDate && isSameDay(day, selectedDate) ? null : day)
+                    }
                   />
                 );
               })}
             </div>
           </div>
 
-          {/* 선택된 날짜의 이벤트 목록 */}
-          <div
-            key={selectedDate.getTime()}
-            className="flex-1 border-t border-prowl-border overflow-y-auto"
-          >
-            <div className="flex items-center justify-between px-3 py-1.5">
-              <span className="text-[10px] font-medium text-gray-500">
-                {selectedDate.toLocaleDateString("ko-KR", {
-                  month: "long",
-                  day: "numeric",
-                  weekday: "short",
-                })}
-                {isToday(selectedDate) && <span className="ml-1.5 text-accent">오늘</span>}
-              </span>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-gray-600">{selectedDayEvents.length}건</span>
-                {!addingEvent && (
-                  <button
-                    type="button"
-                    onClick={() => setAddingEvent(true)}
-                    className="p-0.5 rounded text-gray-600 hover:text-accent transition-colors"
-                    title="일정 추가"
-                  >
-                    <Plus className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* 로컬 이벤트 추가 폼 */}
-            {addingEvent && (
-              <div className="mx-3 mb-2 rounded-lg border border-prowl-border bg-prowl-card/50 overflow-hidden">
-                <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
-                  <input
-                    type="text"
-                    value={eventSummary}
-                    onChange={(e) => setEventSummary(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAddLocalEvent()}
-                    placeholder="일정 제목"
-                    className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
-                    // biome-ignore lint/a11y/noAutofocus: 인라인 폼 열릴 때 즉시 입력 가능해야 함
-                    autoFocus
-                  />
+          {/* 이벤트 목록 */}
+          <div className="flex-1 border-t border-prowl-border overflow-y-auto">
+            {selectedDate === null ? (
+              /* 어젠다: 오늘부터 앞으로의 일정 */
+              upcomingEvents.length === 0 ? (
+                <div className="flex items-center justify-center py-6">
+                  <p className="text-[11px] text-gray-600">예정된 일정 없음</p>
                 </div>
-                <div className="flex items-center gap-2 px-2.5 py-2">
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={eventAllDay}
-                      onChange={(e) => setEventAllDay(e.target.checked)}
-                      className="w-3 h-3 rounded accent-accent"
-                    />
-                    <span className="text-[10px] text-gray-400">종일</span>
-                  </label>
-                  {!eventAllDay && (
-                    <div className="flex items-center gap-1.5">
+              ) : (
+                <div className="px-3 pb-3">
+                  {upcomingEvents.map((group) => (
+                    <div key={group.date.getTime()} className="mt-2 first:mt-1">
+                      <span className="text-[10px] font-medium text-gray-500">
+                        {group.date.toLocaleDateString("ko-KR", {
+                          month: "long",
+                          day: "numeric",
+                          weekday: "short",
+                        })}
+                        {isToday(group.date) && <span className="ml-1.5 text-accent">오늘</span>}
+                      </span>
+                      <div className="mt-1 space-y-1">
+                        {group.events.map((event) => (
+                          <EventDetail
+                            key={event.uid}
+                            event={event}
+                            feedLabel={feeds.length > 1 ? feedLabelMap[event.feedId] : undefined}
+                            feedColor={feedColorMap[event.feedId]}
+                            isLocal={event.feedId === LOCAL_FEED_ID}
+                            onDelete={
+                              event.feedId === LOCAL_FEED_ID
+                                ? () => handleDeleteLocalEvent(event.uid)
+                                : undefined
+                            }
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              /* 선택된 날짜의 이벤트 */
+              <>
+                <div className="flex items-center justify-between px-3 py-1.5">
+                  <span className="text-[10px] font-medium text-gray-500">
+                    {displayDate.toLocaleDateString("ko-KR", {
+                      month: "long",
+                      day: "numeric",
+                      weekday: "short",
+                    })}
+                    {isToday(displayDate) && <span className="ml-1.5 text-accent">오늘</span>}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-gray-600">{selectedDayEvents.length}건</span>
+                    {!addingEvent && (
+                      <button
+                        type="button"
+                        onClick={() => setAddingEvent(true)}
+                        className="p-0.5 rounded text-gray-600 hover:text-accent transition-colors"
+                        title="일정 추가"
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* 로컬 이벤트 추가 폼 */}
+                {addingEvent && (
+                  <div className="mx-3 mb-2 rounded-lg border border-prowl-border bg-prowl-card/50 overflow-hidden">
+                    <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
                       <input
-                        type="time"
-                        value={eventStartTime}
-                        onChange={(e) => setEventStartTime(e.target.value)}
-                        className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
-                      />
-                      <span className="text-xs text-gray-600">~</span>
-                      <input
-                        type="time"
-                        value={eventEndTime}
-                        onChange={(e) => setEventEndTime(e.target.value)}
-                        className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
+                        type="text"
+                        value={eventSummary}
+                        onChange={(e) => setEventSummary(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleAddLocalEvent()}
+                        placeholder="일정 제목"
+                        className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
+                        // biome-ignore lint/a11y/noAutofocus: 인라인 폼 열릴 때 즉시 입력 가능해야 함
+                        autoFocus
                       />
                     </div>
-                  )}
-                  <div className="flex-1" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAddingEvent(false);
-                      setEventSummary("");
-                    }}
-                    className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
-                  >
-                    취소
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAddLocalEvent}
-                    disabled={!eventSummary.trim()}
-                    className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
-                  >
-                    추가
-                  </button>
-                </div>
-              </div>
-            )}
+                    {/* 날짜/시간 행 */}
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 px-2.5 py-2">
+                      <span className="text-[10px] text-gray-400">
+                        {formatDateKr(toDateStr(displayDate))}
+                      </span>
+                      {!eventAllDay && (
+                        <input
+                          type="text"
+                          value={eventStartTime}
+                          onChange={(e) => setEventStartTime(e.target.value)}
+                          placeholder="09:00"
+                          maxLength={5}
+                          className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+                        />
+                      )}
+                      <span className="text-[10px] text-gray-600">~</span>
+                      <label className="relative text-[10px] text-gray-300 cursor-pointer">
+                        <span className="border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors">
+                          {formatDateKr(eventEndDate || toDateStr(displayDate))}
+                        </span>
+                        <input
+                          type="date"
+                          value={eventEndDate || toDateStr(displayDate)}
+                          min={toDateStr(displayDate)}
+                          onChange={(e) => setEventEndDate(e.target.value)}
+                          onClick={(e) => (e.target as HTMLInputElement).showPicker()}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                      </label>
+                      {!eventAllDay && (
+                        <input
+                          type="text"
+                          value={eventEndTime}
+                          onChange={(e) => setEventEndTime(e.target.value)}
+                          placeholder="10:00"
+                          maxLength={5}
+                          className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+                        />
+                      )}
+                      <label className="flex items-center gap-1 ml-auto cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={eventAllDay}
+                          onChange={(e) => setEventAllDay(e.target.checked)}
+                          className="w-3 h-3 rounded accent-accent"
+                        />
+                        <span className="text-[10px] text-gray-400">종일</span>
+                      </label>
+                      <div className="flex-1" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAddingEvent(false);
+                          setEventSummary("");
+                          setEventEndDate("");
+                        }}
+                        className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddLocalEvent}
+                        disabled={!eventSummary.trim()}
+                        className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
+                      >
+                        추가
+                      </button>
+                    </div>
+                  </div>
+                )}
 
-            {selectedDayEvents.length === 0 && !addingEvent ? (
-              <div className="flex items-center justify-center py-6">
-                <p className="text-[11px] text-gray-600">일정 없음</p>
-              </div>
-            ) : (
-              <div className="px-3 pb-3 space-y-1">
-                {selectedDayEvents.map((event) => {
-                  const isLocal = event.feedId === LOCAL_FEED_ID;
-                  return (
-                    <EventDetail
-                      key={event.uid}
-                      event={event}
-                      feedLabel={feeds.length > 1 ? feedLabelMap[event.feedId] : undefined}
-                      feedColor={feedColorMap[event.feedId]}
-                      isLocal={isLocal}
-                      isEditing={isLocal && editingEventId === event.uid}
-                      onEdit={isLocal ? () => setEditingEventId(event.uid) : undefined}
-                      onEditSave={
-                        isLocal
-                          ? (summary, allDay, startTime, endTime) =>
-                              handleUpdateLocalEvent(event.uid, summary, allDay, startTime, endTime)
-                          : undefined
-                      }
-                      onEditCancel={() => setEditingEventId(null)}
-                      onDelete={isLocal ? () => handleDeleteLocalEvent(event.uid) : undefined}
-                    />
-                  );
-                })}
-              </div>
+                {selectedDayEvents.length === 0 && !addingEvent ? (
+                  <div className="flex items-center justify-center py-6">
+                    <p className="text-[11px] text-gray-600">일정 없음</p>
+                  </div>
+                ) : (
+                  <div className="px-3 pb-3 space-y-1">
+                    {selectedDayEvents.map((event) => {
+                      const isLocal = event.feedId === LOCAL_FEED_ID;
+                      return (
+                        <EventDetail
+                          key={event.uid}
+                          event={event}
+                          feedLabel={feeds.length > 1 ? feedLabelMap[event.feedId] : undefined}
+                          feedColor={feedColorMap[event.feedId]}
+                          isLocal={isLocal}
+                          isEditing={isLocal && editingEventId === event.uid}
+                          onEdit={isLocal ? () => setEditingEventId(event.uid) : undefined}
+                          onEditSave={
+                            isLocal
+                              ? (summary, allDay, startTime, endTime, endDate) =>
+                                  handleUpdateLocalEvent(
+                                    event.uid,
+                                    summary,
+                                    allDay,
+                                    startTime,
+                                    endTime,
+                                    endDate,
+                                  )
+                              : undefined
+                          }
+                          onEditCancel={() => setEditingEventId(null)}
+                          onDelete={isLocal ? () => handleDeleteLocalEvent(event.uid) : undefined}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
