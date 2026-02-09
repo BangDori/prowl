@@ -147,12 +147,95 @@ interface EventDetailProps {
   feedLabel?: string;
   feedColor?: string;
   isLocal?: boolean;
+  isEditing?: boolean;
   onDelete?: () => void;
+  onEdit?: () => void;
+  onEditSave?: (summary: string, allDay: boolean, startTime: string, endTime: string) => void;
+  onEditCancel?: () => void;
 }
 
-function EventDetail({ event, feedLabel, feedColor, isLocal, onDelete }: EventDetailProps) {
+function EventDetail({
+  event,
+  feedLabel,
+  feedColor,
+  isLocal,
+  isEditing,
+  onDelete,
+  onEdit,
+  onEditSave,
+  onEditCancel,
+}: EventDetailProps) {
   const ongoing = isOngoing(event);
   const barColor = isLocal ? LOCAL_EVENT_COLOR : (feedColor ?? FEED_COLORS[0]);
+
+  const [editSummary, setEditSummary] = useState(event.summary);
+  const [editAllDay, setEditAllDay] = useState(event.allDay ?? false);
+  const [editStartTime, setEditStartTime] = useState(formatTime(new Date(event.dtstart)));
+  const [editEndTime, setEditEndTime] = useState(formatTime(new Date(event.dtend)));
+
+  if (isEditing) {
+    return (
+      <div className="rounded-md border border-accent/30 bg-prowl-card overflow-hidden">
+        <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
+          <input
+            type="text"
+            value={editSummary}
+            onChange={(e) => setEditSummary(e.target.value)}
+            onKeyDown={(e) =>
+              e.key === "Enter" && onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime)
+            }
+            className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
+            // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
+            autoFocus
+          />
+        </div>
+        <div className="flex items-center gap-2 px-2.5 py-2">
+          <label className="flex items-center gap-1.5 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={editAllDay}
+              onChange={(e) => setEditAllDay(e.target.checked)}
+              className="w-3 h-3 rounded accent-accent"
+            />
+            <span className="text-[10px] text-gray-400">종일</span>
+          </label>
+          {!editAllDay && (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="time"
+                value={editStartTime}
+                onChange={(e) => setEditStartTime(e.target.value)}
+                className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
+              />
+              <span className="text-xs text-gray-600">~</span>
+              <input
+                type="time"
+                value={editEndTime}
+                onChange={(e) => setEditEndTime(e.target.value)}
+                className="bg-transparent text-xs text-gray-300 outline-none border border-prowl-border rounded px-2 py-0.5 min-w-[5.5rem]"
+              />
+            </div>
+          )}
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={onEditCancel}
+            className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={() => onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime)}
+            disabled={!editSummary.trim()}
+            className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
+          >
+            저장
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -174,6 +257,16 @@ function EventDetail({ event, feedLabel, feedColor, isLocal, onDelete }: EventDe
           <span className="flex-shrink-0 text-[8px] px-1 py-0.5 rounded-full bg-accent/20 text-accent font-medium">
             NOW
           </span>
+        )}
+        {isLocal && onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="flex-shrink-0 p-0.5 rounded text-gray-700 opacity-0 group-hover:opacity-100 hover:text-accent transition-all"
+            title="수정"
+          >
+            <Pencil className="w-2.5 h-2.5" />
+          </button>
         )}
         {isLocal && onDelete && (
           <button
@@ -244,6 +337,9 @@ export default function CalendarSection() {
   const [eventStartTime, setEventStartTime] = useState("09:00");
   const [eventEndTime, setEventEndTime] = useState("10:00");
   const [eventAllDay, setEventAllDay] = useState(false);
+
+  // 로컬 이벤트 수정
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   // 현재 보고 있는 월
   const now = new Date();
@@ -389,6 +485,54 @@ export default function CalendarSection() {
     // 백그라운드 IPC — 실패 시 롤백
     try {
       await window.electronAPI.deleteLocalEvent(eventId);
+    } catch {
+      setEvents(prev);
+    }
+  };
+
+  // 로컬 이벤트 수정 (낙관적 업데이트)
+  const handleUpdateLocalEvent = async (
+    eventId: string,
+    summary: string,
+    allDay: boolean,
+    startTime: string,
+    endTime: string,
+  ) => {
+    const trimmed = summary.trim();
+    if (!trimmed) return;
+
+    const dateStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
+
+    const updatedLocal: LocalEvent = {
+      id: eventId,
+      summary: trimmed,
+      allDay,
+      dtstart: allDay ? `${dateStr}T00:00:00` : `${dateStr}T${startTime}:00`,
+      dtend: allDay ? `${dateStr}T23:59:59` : `${dateStr}T${endTime}:00`,
+    };
+
+    // 낙관적: 즉시 UI 반영
+    const prev = events;
+    setEvents((cur) =>
+      cur
+        .map((e) =>
+          e.uid === eventId
+            ? {
+                ...e,
+                summary: trimmed,
+                allDay,
+                dtstart: new Date(updatedLocal.dtstart),
+                dtend: new Date(updatedLocal.dtend),
+              }
+            : e,
+        )
+        .sort((a, b) => a.dtstart.getTime() - b.dtstart.getTime()),
+    );
+    setEditingEventId(null);
+
+    // 백그라운드 IPC — 실패 시 롤백
+    try {
+      await window.electronAPI.updateLocalEvent(updatedLocal);
     } catch {
       setEvents(prev);
     }
@@ -758,20 +902,28 @@ export default function CalendarSection() {
               </div>
             ) : (
               <div className="px-3 pb-3 space-y-1">
-                {selectedDayEvents.map((event) => (
-                  <EventDetail
-                    key={event.uid}
-                    event={event}
-                    feedLabel={feeds.length > 1 ? feedLabelMap[event.feedId] : undefined}
-                    feedColor={feedColorMap[event.feedId]}
-                    isLocal={event.feedId === LOCAL_FEED_ID}
-                    onDelete={
-                      event.feedId === LOCAL_FEED_ID
-                        ? () => handleDeleteLocalEvent(event.uid)
-                        : undefined
-                    }
-                  />
-                ))}
+                {selectedDayEvents.map((event) => {
+                  const isLocal = event.feedId === LOCAL_FEED_ID;
+                  return (
+                    <EventDetail
+                      key={event.uid}
+                      event={event}
+                      feedLabel={feeds.length > 1 ? feedLabelMap[event.feedId] : undefined}
+                      feedColor={feedColorMap[event.feedId]}
+                      isLocal={isLocal}
+                      isEditing={isLocal && editingEventId === event.uid}
+                      onEdit={isLocal ? () => setEditingEventId(event.uid) : undefined}
+                      onEditSave={
+                        isLocal
+                          ? (summary, allDay, startTime, endTime) =>
+                              handleUpdateLocalEvent(event.uid, summary, allDay, startTime, endTime)
+                          : undefined
+                      }
+                      onEditCancel={() => setEditingEventId(null)}
+                      onDelete={isLocal ? () => handleDeleteLocalEvent(event.uid) : undefined}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
