@@ -2,6 +2,14 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.12.0] - 2026-02-10
+- Google Calendar ICS 피드 연동 및 월별 캘린더 뷰
+- 로컬 일정 CRUD (추가/수정/삭제) 및 낙관적 업데이트
+- 여러 날 일정(multi-day) 생성/수정 지원
+- multi-day 이벤트 캘린더 그리드 바 시각화
+- 날짜 미선택 시 어젠다 뷰 (오늘부터 예정 일정)
+- 날짜/시간 입력 UI 개선 (한국어 포맷)
+
 ## [1.11.0] - 2026-02-08
 - Claude Config 탭 추가 (~/.claude/ 설정 조회)
 - agents, commands, hooks, rules 탐색 가능
