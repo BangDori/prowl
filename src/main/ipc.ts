@@ -27,6 +27,7 @@ import {
 } from "./services/calendar";
 import { sendChatMessage } from "./services/chat";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
+import { refreshReminders } from "./services/event-reminder";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
@@ -242,6 +243,7 @@ export function registerIpcHandlers(): void {
     "calendar:add-local-event",
     async (_event, localEvent: LocalEvent): Promise<void> => {
       addLocalEvent(localEvent);
+      refreshReminders();
     },
   );
 
@@ -250,12 +252,14 @@ export function registerIpcHandlers(): void {
     "calendar:update-local-event",
     async (_event, localEvent: LocalEvent): Promise<void> => {
       updateLocalEvent(localEvent);
+      refreshReminders();
     },
   );
 
   // 로컬 이벤트 삭제
   ipcMain.handle("calendar:delete-local-event", async (_event, eventId: string): Promise<void> => {
     deleteLocalEvent(eventId);
+    refreshReminders();
   });
 
   // Claude Config 조회

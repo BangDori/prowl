@@ -1,6 +1,7 @@
-import type { CalendarEvent, IcsFeed, LocalEvent } from "@shared/types";
-import { FEED_COLORS, LOCAL_EVENT_COLOR, LOCAL_FEED_ID } from "@shared/types";
+import type { CalendarEvent, EventReminder, IcsFeed, LocalEvent } from "@shared/types";
+import { FEED_COLORS, LOCAL_EVENT_COLOR, LOCAL_FEED_ID, REMINDER_PRESETS } from "@shared/types";
 import {
+  Bell,
   ChevronLeft,
   ChevronRight,
   Clock,
@@ -11,6 +12,7 @@ import {
   RefreshCw,
   Tag,
   Trash2,
+  X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -107,6 +109,54 @@ function isOngoing(event: CalendarEvent): boolean {
   return new Date(event.dtstart).getTime() <= now && new Date(event.dtend).getTime() > now;
 }
 
+/**
+ * 시간 문자열 자동 파싱: "1900" → "19:00", "930" → "09:30", "9" → "09:00"
+ * 유효하지 않으면 null 반환
+ */
+function parseTimeInput(raw: string): string | null {
+  const trimmed = raw.trim().replace(/[：;]/g, ":");
+
+  // 이미 HH:MM 형식
+  const colonMatch = trimmed.match(/^(\d{1,2}):(\d{2})$/);
+  if (colonMatch) {
+    const h = Number(colonMatch[1]);
+    const m = Number(colonMatch[2]);
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    }
+    return null;
+  }
+
+  // 숫자만 입력 (1~4자리)
+  const digitMatch = trimmed.match(/^(\d{1,4})$/);
+  if (digitMatch) {
+    const num = digitMatch[1];
+    let h: number;
+    let m: number;
+
+    if (num.length <= 2) {
+      // "9" → 09:00, "14" → 14:00
+      h = Number(num);
+      m = 0;
+    } else if (num.length === 3) {
+      // "930" → 09:30
+      h = Number(num[0]);
+      m = Number(num.substring(1));
+    } else {
+      // "1900" → 19:00, "0930" → 09:30
+      h = Number(num.substring(0, 2));
+      m = Number(num.substring(2));
+    }
+
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    }
+    return null;
+  }
+
+  return null;
+}
+
 /** 고유 ID 생성 */
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
@@ -196,23 +246,127 @@ function DayCell({ date, isCurrentMonth, events, selected, feedColorMap, onClick
   );
 }
 
-/** 커스텀 미니 날짜 선택기 (native date picker 대체) */
+/** 알림 선택 UI */
+function ReminderPicker({
+  reminders,
+  onChange,
+}: {
+  reminders: EventReminder[];
+  onChange: (reminders: EventReminder[]) => void;
+}) {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setShowDropdown(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const toggleDropdown = () => {
+    if (!showDropdown && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.top - 4, left: rect.left });
+    }
+    setShowDropdown(!showDropdown);
+  };
+
+  const addReminder = (minutes: number) => {
+    if (reminders.some((r) => r.minutes === minutes)) return;
+    onChange([...reminders, { minutes }].sort((a, b) => a.minutes - b.minutes));
+    setShowDropdown(false);
+  };
+
+  const removeReminder = (minutes: number) => {
+    onChange(reminders.filter((r) => r.minutes !== minutes));
+  };
+
+  const getLabel = (minutes: number): string => {
+    const preset = REMINDER_PRESETS.find((p) => p.minutes === minutes);
+    return preset?.label ?? `${minutes}분 전`;
+  };
+
+  return (
+    <div ref={ref}>
+      <div className="flex items-center gap-1 flex-wrap">
+        <button
+          ref={btnRef}
+          type="button"
+          onClick={toggleDropdown}
+          className="flex items-center gap-0.5 text-[10px] text-gray-500 hover:text-accent transition-colors"
+        >
+          <Bell className="w-2.5 h-2.5" />
+          {reminders.length === 0 ? "알림" : `알림 ${reminders.length}개`}
+        </button>
+        {reminders.map((r) => (
+          <span
+            key={r.minutes}
+            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-accent/10 text-[9px] text-accent"
+          >
+            {getLabel(r.minutes)}
+            <button
+              type="button"
+              onClick={() => removeReminder(r.minutes)}
+              className="hover:text-red-400 transition-colors"
+            >
+              <X className="w-2 h-2" />
+            </button>
+          </span>
+        ))}
+      </div>
+      {showDropdown && dropdownPos && (
+        <div
+          className="fixed z-[9999] p-1 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl min-w-[120px]"
+          style={{ top: dropdownPos.top, left: dropdownPos.left, transform: "translateY(-100%)" }}
+        >
+          {REMINDER_PRESETS.map((preset) => {
+            const isAdded = reminders.some((r) => r.minutes === preset.minutes);
+            return (
+              <button
+                key={preset.minutes}
+                type="button"
+                disabled={isAdded}
+                onClick={() => addReminder(preset.minutes)}
+                className={`w-full text-left px-2 py-1 rounded text-[10px] transition-colors ${
+                  isAdded
+                    ? "text-gray-600 cursor-not-allowed"
+                    : "text-gray-300 hover:bg-white/10 cursor-pointer"
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 커스텀 미니 날짜 선택기 (fixed 포지셔닝으로 overflow 부모에 잘리지 않음) */
 function MiniDatePicker({
   value,
   min,
   onChange,
   onClose,
+  anchorRef,
 }: {
   value: string;
   min?: string;
   onChange: (dateStr: string) => void;
   onClose: () => void;
+  anchorRef: React.RefObject<HTMLElement | null>;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const selected = new Date(`${value}T00:00:00`);
   const minDate = min ? new Date(`${min}T00:00:00`) : undefined;
   const [pickerYear, setPickerYear] = useState(selected.getFullYear());
   const [pickerMonth, setPickerMonth] = useState(selected.getMonth());
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
 
   const days = useMemo(() => getCalendarDays(pickerYear, pickerMonth), [pickerYear, pickerMonth]);
 
@@ -220,6 +374,14 @@ function MiniDatePicker({
     year: "numeric",
     month: "long",
   });
+
+  // 앵커 기준 위치 계산
+  useEffect(() => {
+    if (anchorRef.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      setPos({ top: rect.top - 4, left: rect.left });
+    }
+  }, [anchorRef]);
 
   // 외부 클릭 시 닫기
   useEffect(() => {
@@ -248,11 +410,13 @@ function MiniDatePicker({
     }
   };
 
+  if (!pos) return null;
+
   return (
     <div
       ref={ref}
-      className="absolute z-50 mt-1 p-2 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl"
-      style={{ width: "210px" }}
+      className="fixed z-[9999] p-2 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl"
+      style={{ width: "210px", top: pos.top, left: pos.left, transform: "translateY(-100%)" }}
     >
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-1">
@@ -331,10 +495,12 @@ interface EventDetailProps {
   onEdit?: () => void;
   onEditSave?: (
     summary: string,
+    description: string,
     allDay: boolean,
     startTime: string,
     endTime: string,
     endDate: string,
+    reminders: EventReminder[],
   ) => void;
   onEditCancel?: () => void;
 }
@@ -354,16 +520,22 @@ function EventDetail({
   const barColor = isLocal ? LOCAL_EVENT_COLOR : (feedColor ?? FEED_COLORS[0]);
 
   const [editSummary, setEditSummary] = useState(event.summary);
+  const [editDescription, setEditDescription] = useState(event.description ?? "");
   const [editAllDay, setEditAllDay] = useState(event.allDay ?? false);
   const [editStartTime, setEditStartTime] = useState(formatTime(new Date(event.dtstart)));
   const [editEndTime, setEditEndTime] = useState(formatTime(new Date(event.dtend)));
   const [editEndDate, setEditEndDate] = useState(toDateStr(new Date(event.dtend)));
   const [editEndDateOpen, setEditEndDateOpen] = useState(false);
+  const [editReminders, setEditReminders] = useState<EventReminder[]>([
+    { minutes: 1440 },
+    { minutes: 60 },
+  ]);
+  const editEndDateBtnRef = useRef<HTMLButtonElement>(null);
 
   if (isEditing) {
     const startDateStr = toDateStr(new Date(event.dtstart));
     return (
-      <div className="rounded-md border border-accent/30 bg-prowl-card overflow-hidden">
+      <div className="rounded-md border border-accent/30 bg-prowl-card">
         <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
           <input
             type="text"
@@ -371,81 +543,128 @@ function EventDetail({
             onChange={(e) => setEditSummary(e.target.value)}
             onKeyDown={(e) =>
               e.key === "Enter" &&
-              onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime, editEndDate)
+              onEditSave?.(
+                editSummary,
+                editDescription,
+                editAllDay,
+                editStartTime,
+                editEndTime,
+                editEndDate,
+                editReminders,
+              )
             }
             className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
             // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
             autoFocus
           />
         </div>
+        <div className="px-2.5 pb-1">
+          <textarea
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="내용 (선택)"
+            rows={2}
+            className="w-full bg-transparent text-[10px] text-gray-300 placeholder-gray-600 outline-none resize-none border-b border-prowl-border/50 focus:border-accent/50 py-1 transition-colors"
+          />
+        </div>
         {/* 날짜/시간 행 */}
-        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 px-2.5 py-2">
-          <span className="text-[10px] text-gray-400">{formatDateKr(startDateStr)}</span>
-          {!editAllDay && (
-            <input
-              type="text"
-              value={editStartTime}
-              onChange={(e) => setEditStartTime(e.target.value)}
-              placeholder="09:00"
-              maxLength={5}
-              className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
-            />
-          )}
-          <span className="text-[10px] text-gray-600">~</span>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setEditEndDateOpen(!editEndDateOpen)}
-              className="text-[10px] text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
-            >
-              {formatDateKr(editEndDate)}
-            </button>
-            {editEndDateOpen && (
-              <MiniDatePicker
-                value={editEndDate}
-                min={startDateStr}
-                onChange={setEditEndDate}
-                onClose={() => setEditEndDateOpen(false)}
+        <div className="px-2.5 py-2 space-y-1.5">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[10px] leading-relaxed text-gray-400 py-0.5">
+              {formatDateKr(startDateStr)}
+            </span>
+            {!editAllDay && (
+              <input
+                type="text"
+                value={editStartTime}
+                onChange={(e) => setEditStartTime(e.target.value)}
+                onBlur={() => {
+                  const parsed = parseTimeInput(editStartTime);
+                  if (parsed) setEditStartTime(parsed);
+                }}
+                placeholder="09:00"
+                maxLength={5}
+                className="w-12 bg-transparent text-[10px] leading-relaxed text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+              />
+            )}
+            <span className="text-[10px] leading-relaxed text-gray-600 py-0.5">~</span>
+            <div className="relative">
+              <button
+                ref={editEndDateBtnRef}
+                type="button"
+                onClick={() => setEditEndDateOpen(!editEndDateOpen)}
+                className="text-[10px] leading-relaxed text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
+              >
+                {formatDateKr(editEndDate)}
+              </button>
+              {editEndDateOpen && (
+                <MiniDatePicker
+                  value={editEndDate}
+                  min={startDateStr}
+                  onChange={setEditEndDate}
+                  onClose={() => setEditEndDateOpen(false)}
+                  anchorRef={editEndDateBtnRef}
+                />
+              )}
+            </div>
+            {!editAllDay && (
+              <input
+                type="text"
+                value={editEndTime}
+                onChange={(e) => setEditEndTime(e.target.value)}
+                onBlur={() => {
+                  const parsed = parseTimeInput(editEndTime);
+                  if (parsed) setEditEndTime(parsed);
+                }}
+                placeholder="10:00"
+                maxLength={5}
+                className="w-12 bg-transparent text-[10px] leading-relaxed text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
               />
             )}
           </div>
-          {!editAllDay && (
-            <input
-              type="text"
-              value={editEndTime}
-              onChange={(e) => setEditEndTime(e.target.value)}
-              placeholder="10:00"
-              maxLength={5}
-              className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
-            />
-          )}
-          <label className="flex items-center gap-1 ml-auto cursor-pointer">
-            <input
-              type="checkbox"
-              checked={editAllDay}
-              onChange={(e) => setEditAllDay(e.target.checked)}
-              className="w-3 h-3 rounded accent-accent"
-            />
-            <span className="text-[10px] text-gray-400">종일</span>
-          </label>
-          <div className="flex-1" />
-          <button
-            type="button"
-            onClick={onEditCancel}
-            className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
-          >
-            취소
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              onEditSave?.(editSummary, editAllDay, editStartTime, editEndTime, editEndDate)
-            }
-            disabled={!editSummary.trim()}
-            className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
-          >
-            저장
-          </button>
+          <ReminderPicker reminders={editReminders} onChange={setEditReminders} />
+          <div className="flex items-center gap-1.5">
+            <label className="flex items-center gap-1 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={editAllDay}
+                onChange={(e) => {
+                  setEditAllDay(e.target.checked);
+                  if (e.target.checked) {
+                    setEditEndDate(startDateStr);
+                  }
+                }}
+                className="w-3 h-3 rounded accent-accent"
+              />
+              <span className="text-[10px] text-gray-400">종일</span>
+            </label>
+            <div className="flex-1" />
+            <button
+              type="button"
+              onClick={onEditCancel}
+              className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                onEditSave?.(
+                  editSummary,
+                  editDescription,
+                  editAllDay,
+                  editStartTime,
+                  editEndTime,
+                  editEndDate,
+                  editReminders,
+                )
+              }
+              disabled={!editSummary.trim()}
+              className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
+            >
+              저장
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -515,6 +734,11 @@ function EventDetail({
             </span>
           </div>
         )}
+        {event.description && (
+          <p className="text-[10px] text-gray-500 whitespace-pre-wrap line-clamp-2">
+            {event.description}
+          </p>
+        )}
         {event.location && (
           <div className="flex items-center gap-1">
             <MapPin className="w-2.5 h-2.5 text-gray-600" />
@@ -559,11 +783,20 @@ export default function CalendarSection() {
   // 로컬 이벤트 추가 폼
   const [addingEvent, setAddingEvent] = useState(false);
   const [eventSummary, setEventSummary] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
   const [eventStartTime, setEventStartTime] = useState("09:00");
   const [eventEndTime, setEventEndTime] = useState("10:00");
   const [eventAllDay, setEventAllDay] = useState(false);
   const [eventEndDate, setEventEndDate] = useState("");
   const [eventEndDateOpen, setEventEndDateOpen] = useState(false);
+  const [eventReminders, setEventReminders] = useState<EventReminder[]>([
+    { minutes: 1440 },
+    { minutes: 60 },
+  ]);
+  const addEndDateBtnRef = useRef<HTMLButtonElement>(null);
+
+  // 시간 입력 에러
+  const [timeError, setTimeError] = useState<string | null>(null);
 
   // 로컬 이벤트 수정
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
@@ -661,32 +894,53 @@ export default function CalendarSection() {
     const summary = eventSummary.trim();
     if (!summary) return;
 
-    // 종일이 아닌 경우 종료 시간이 시작 시간보다 뒤인지 검증
-    if (!eventAllDay && eventEndTime <= eventStartTime) {
-      setEventEndTime(
-        eventStartTime.replace(
-          /:(\d+)$/,
-          (_, m) => `:${String(Math.min(59, Number(m) + 30)).padStart(2, "0")}`,
-        ),
-      );
-      return;
+    setTimeError(null);
+
+    // 종일이 아닌 경우 시간 파싱 및 검증
+    let parsedStart = eventStartTime;
+    let parsedEnd = eventEndTime;
+    if (!eventAllDay) {
+      const ps = parseTimeInput(eventStartTime);
+      const pe = parseTimeInput(eventEndTime);
+      if (!ps) {
+        setTimeError("시작 시간이 올바르지 않습니다 (예: 09:00, 1400)");
+        return;
+      }
+      if (!pe) {
+        setTimeError("종료 시간이 올바르지 않습니다 (예: 10:00, 1830)");
+        return;
+      }
+      parsedStart = ps;
+      parsedEnd = pe;
+
+      if (parsedEnd <= parsedStart) {
+        setTimeError("종료 시간이 시작 시간보다 이후여야 합니다");
+        return;
+      }
+
+      setEventStartTime(parsedStart);
+      setEventEndTime(parsedEnd);
     }
 
     const startDateStr = toDateStr(displayDate);
     const endDateStr = eventEndDate || startDateStr;
 
+    const desc = eventDescription.trim() || undefined;
     const localEvent: LocalEvent = {
       id: generateId(),
       summary,
+      description: desc,
       allDay: eventAllDay,
-      dtstart: eventAllDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${eventStartTime}:00`,
-      dtend: eventAllDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${eventEndTime}:00`,
+      dtstart: eventAllDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${parsedStart}:00`,
+      dtend: eventAllDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${parsedEnd}:00`,
+      reminders: eventReminders.length > 0 ? eventReminders : undefined,
     };
 
     // 낙관적: 즉시 UI에 반영
     const optimisticEvent: CalendarEvent = {
       uid: localEvent.id,
       summary: localEvent.summary,
+      description: localEvent.description,
       dtstart: new Date(localEvent.dtstart),
       dtend: new Date(localEvent.dtend),
       allDay: localEvent.allDay,
@@ -699,10 +953,12 @@ export default function CalendarSection() {
 
     setAddingEvent(false);
     setEventSummary("");
+    setEventDescription("");
     setEventStartTime("09:00");
     setEventEndTime("10:00");
     setEventAllDay(false);
     setEventEndDate("");
+    setEventReminders([{ minutes: 1440 }, { minutes: 60 }]);
 
     // 백그라운드 IPC — 실패 시 롤백
     try {
@@ -730,23 +986,52 @@ export default function CalendarSection() {
   const handleUpdateLocalEvent = async (
     eventId: string,
     summary: string,
+    description: string,
     allDay: boolean,
     startTime: string,
     endTime: string,
     endDate: string,
+    reminders: EventReminder[],
   ) => {
     const trimmed = summary.trim();
     if (!trimmed) return;
 
+    setTimeError(null);
+
+    let parsedStart = startTime;
+    let parsedEnd = endTime;
+    if (!allDay) {
+      const ps = parseTimeInput(startTime);
+      const pe = parseTimeInput(endTime);
+      if (!ps) {
+        setTimeError("시작 시간이 올바르지 않습니다 (예: 09:00, 1400)");
+        return;
+      }
+      if (!pe) {
+        setTimeError("종료 시간이 올바르지 않습니다 (예: 10:00, 1830)");
+        return;
+      }
+      parsedStart = ps;
+      parsedEnd = pe;
+
+      if (parsedEnd <= parsedStart) {
+        setTimeError("종료 시간이 시작 시간보다 이후여야 합니다");
+        return;
+      }
+    }
+
+    const desc = description.trim() || undefined;
     const startDateStr = toDateStr(displayDate);
     const endDateStr = endDate || startDateStr;
 
     const updatedLocal: LocalEvent = {
       id: eventId,
       summary: trimmed,
+      description: desc,
       allDay,
-      dtstart: allDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${startTime}:00`,
-      dtend: allDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${endTime}:00`,
+      dtstart: allDay ? `${startDateStr}T00:00:00` : `${startDateStr}T${parsedStart}:00`,
+      dtend: allDay ? `${endDateStr}T23:59:59` : `${endDateStr}T${parsedEnd}:00`,
+      reminders: reminders.length > 0 ? reminders : undefined,
     };
 
     // 낙관적: 즉시 UI 반영
@@ -758,6 +1043,7 @@ export default function CalendarSection() {
             ? {
                 ...e,
                 summary: trimmed,
+                description: desc,
                 allDay,
                 dtstart: new Date(updatedLocal.dtstart),
                 dtend: new Date(updatedLocal.dtend),
@@ -1160,91 +1446,128 @@ export default function CalendarSection() {
 
                 {/* 로컬 이벤트 추가 폼 */}
                 {addingEvent && (
-                  <div className="mx-3 mb-2 rounded-lg border border-prowl-border bg-prowl-card/50 overflow-hidden">
-                    <div className="flex items-center gap-2 px-2.5 py-2 border-b border-prowl-border/50">
+                  <div className="mx-3 mb-2 rounded-lg border border-prowl-border bg-prowl-card/50">
+                    <div className="px-2.5 py-2 border-b border-prowl-border/50 space-y-1">
                       <input
                         type="text"
                         value={eventSummary}
                         onChange={(e) => setEventSummary(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && handleAddLocalEvent()}
                         placeholder="일정 제목"
-                        className="flex-1 bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
+                        className="w-full bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
                         // biome-ignore lint/a11y/noAutofocus: 인라인 폼 열릴 때 즉시 입력 가능해야 함
                         autoFocus
                       />
+                      <textarea
+                        value={eventDescription}
+                        onChange={(e) => setEventDescription(e.target.value)}
+                        placeholder="내용 (선택)"
+                        rows={2}
+                        className="w-full bg-transparent text-[10px] text-gray-300 placeholder-gray-600 outline-none resize-none"
+                      />
                     </div>
                     {/* 날짜/시간 행 */}
-                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 px-2.5 py-2">
-                      <span className="text-[10px] text-gray-400">
-                        {formatDateKr(toDateStr(displayDate))}
-                      </span>
-                      {!eventAllDay && (
-                        <input
-                          type="text"
-                          value={eventStartTime}
-                          onChange={(e) => setEventStartTime(e.target.value)}
-                          placeholder="09:00"
-                          maxLength={5}
-                          className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
-                        />
-                      )}
-                      <span className="text-[10px] text-gray-600">~</span>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setEventEndDateOpen(!eventEndDateOpen)}
-                          className="text-[10px] text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
-                        >
-                          {formatDateKr(eventEndDate || toDateStr(displayDate))}
-                        </button>
-                        {eventEndDateOpen && (
-                          <MiniDatePicker
-                            value={eventEndDate || toDateStr(displayDate)}
-                            min={toDateStr(displayDate)}
-                            onChange={setEventEndDate}
-                            onClose={() => setEventEndDateOpen(false)}
+                    <div className="px-2.5 py-2 space-y-1.5">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[10px] leading-relaxed text-gray-400 py-0.5">
+                          {formatDateKr(toDateStr(displayDate))}
+                        </span>
+                        {!eventAllDay && (
+                          <input
+                            type="text"
+                            value={eventStartTime}
+                            onChange={(e) => {
+                              setEventStartTime(e.target.value);
+                              setTimeError(null);
+                            }}
+                            onBlur={() => {
+                              const parsed = parseTimeInput(eventStartTime);
+                              if (parsed) setEventStartTime(parsed);
+                            }}
+                            placeholder="09:00"
+                            maxLength={5}
+                            className="w-12 bg-transparent text-[10px] leading-relaxed text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
+                          />
+                        )}
+                        <span className="text-[10px] leading-relaxed text-gray-600 py-0.5">~</span>
+                        <div className="relative">
+                          <button
+                            ref={addEndDateBtnRef}
+                            type="button"
+                            onClick={() => setEventEndDateOpen(!eventEndDateOpen)}
+                            className="text-[10px] leading-relaxed text-gray-300 border-b border-dashed border-prowl-border/50 hover:border-accent/50 py-0.5 transition-colors cursor-pointer"
+                          >
+                            {formatDateKr(eventEndDate || toDateStr(displayDate))}
+                          </button>
+                          {eventEndDateOpen && (
+                            <MiniDatePicker
+                              value={eventEndDate || toDateStr(displayDate)}
+                              min={toDateStr(displayDate)}
+                              onChange={setEventEndDate}
+                              onClose={() => setEventEndDateOpen(false)}
+                              anchorRef={addEndDateBtnRef}
+                            />
+                          )}
+                        </div>
+                        {!eventAllDay && (
+                          <input
+                            type="text"
+                            value={eventEndTime}
+                            onChange={(e) => {
+                              setEventEndTime(e.target.value);
+                              setTimeError(null);
+                            }}
+                            onBlur={() => {
+                              const parsed = parseTimeInput(eventEndTime);
+                              if (parsed) setEventEndTime(parsed);
+                            }}
+                            placeholder="10:00"
+                            maxLength={5}
+                            className="w-12 bg-transparent text-[10px] leading-relaxed text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
                           />
                         )}
                       </div>
-                      {!eventAllDay && (
-                        <input
-                          type="text"
-                          value={eventEndTime}
-                          onChange={(e) => setEventEndTime(e.target.value)}
-                          placeholder="10:00"
-                          maxLength={5}
-                          className="w-12 bg-transparent text-[10px] text-gray-300 text-center outline-none border-b border-prowl-border/50 focus:border-accent/50 py-0.5 transition-colors"
-                        />
-                      )}
-                      <label className="flex items-center gap-1 ml-auto cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={eventAllDay}
-                          onChange={(e) => setEventAllDay(e.target.checked)}
-                          className="w-3 h-3 rounded accent-accent"
-                        />
-                        <span className="text-[10px] text-gray-400">종일</span>
-                      </label>
-                      <div className="flex-1" />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setAddingEvent(false);
-                          setEventSummary("");
-                          setEventEndDate("");
-                        }}
-                        className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
-                      >
-                        취소
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleAddLocalEvent}
-                        disabled={!eventSummary.trim()}
-                        className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
-                      >
-                        추가
-                      </button>
+                      {timeError && <p className="text-[9px] text-red-400">{timeError}</p>}
+                      <ReminderPicker reminders={eventReminders} onChange={setEventReminders} />
+                      <div className="flex items-center gap-1.5">
+                        <label className="flex items-center gap-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={eventAllDay}
+                            onChange={(e) => {
+                              setEventAllDay(e.target.checked);
+                              if (e.target.checked) {
+                                setEventEndDate(toDateStr(displayDate));
+                                setTimeError(null);
+                              }
+                            }}
+                            className="w-3 h-3 rounded accent-accent"
+                          />
+                          <span className="text-[10px] text-gray-400">종일</span>
+                        </label>
+                        <div className="flex-1" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAddingEvent(false);
+                            setEventSummary("");
+                            setEventDescription("");
+                            setEventEndDate("");
+                            setTimeError(null);
+                          }}
+                          className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          취소
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleAddLocalEvent}
+                          disabled={!eventSummary.trim()}
+                          className="flex items-center gap-0.5 px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
+                        >
+                          추가
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1268,14 +1591,24 @@ export default function CalendarSection() {
                           onEdit={isLocal ? () => setEditingEventId(event.uid) : undefined}
                           onEditSave={
                             isLocal
-                              ? (summary, allDay, startTime, endTime, endDate) =>
+                              ? (
+                                  summary,
+                                  description,
+                                  allDay,
+                                  startTime,
+                                  endTime,
+                                  endDate,
+                                  reminders,
+                                ) =>
                                   handleUpdateLocalEvent(
                                     event.uid,
                                     summary,
+                                    description,
                                     allDay,
                                     startTime,
                                     endTime,
                                     endDate,
+                                    reminders,
                                   )
                               : undefined
                           }
