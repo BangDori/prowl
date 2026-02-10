@@ -138,6 +138,25 @@ export const FEED_COLORS = [
   "#06b6d4", // cyan
 ] as const;
 
+// 일정 알림 (이벤트 시작 전 알림)
+export interface EventReminder {
+  minutes: number; // 이벤트 시작 몇 분 전에 알림 (예: 60 = 1시간 전, 1440 = 1일 전)
+}
+
+// 알림 프리셋 옵션
+export const REMINDER_PRESETS: { label: string; minutes: number }[] = [
+  { label: "정각", minutes: 0 },
+  { label: "5분 전", minutes: 5 },
+  { label: "10분 전", minutes: 10 },
+  { label: "30분 전", minutes: 30 },
+  { label: "1시간 전", minutes: 60 },
+  { label: "2시간 전", minutes: 120 },
+  { label: "1일 전", minutes: 1440 },
+  { label: "2일 전", minutes: 2880 },
+  { label: "3일 전", minutes: 4320 },
+  { label: "1주 전", minutes: 10080 },
+];
+
 // 로컬 이벤트 (사용자가 직접 추가)
 export interface LocalEvent {
   id: string;
@@ -147,6 +166,7 @@ export interface LocalEvent {
   dtstart: string; // ISO 문자열 (저장용)
   dtend: string;
   allDay: boolean;
+  reminders?: EventReminder[]; // 알림 목록
 }
 
 // 로컬 이벤트 전용 feedId 및 색상

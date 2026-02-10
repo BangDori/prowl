@@ -1,6 +1,7 @@
 import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
+import { startEventReminderScheduler } from "./services/event-reminder";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
 import { createSplashWindow, createTray, dismissSplash, showChatWindow } from "./windows";
@@ -17,6 +18,9 @@ if (!gotTheLock) {
   app.on("ready", () => {
     // IPC 핸들러 등록
     registerIpcHandlers();
+
+    // 일정 알림 스케줄러 시작
+    startEventReminderScheduler();
 
     if (isDev) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
