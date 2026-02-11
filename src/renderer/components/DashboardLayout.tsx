@@ -1,6 +1,7 @@
 import prowlProfile from "@assets/prowl-profile.png";
 import { Bot, Calendar, Cog, History, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
+import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
@@ -127,19 +128,29 @@ export default function DashboardLayout() {
         {/* Content - 탭 전환 시 상태 유지를 위해 CSS로 보이기/숨기기 */}
         <div className="flex-1 overflow-hidden relative">
           <div className={`h-full ${activeNav === "jobs" ? "" : "hidden"}`}>
-            <JobsSection />
+            <ErrorBoundary section="Background Monitor">
+              <JobsSection />
+            </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
-            <CalendarSection />
+            <ErrorBoundary section="Calendar">
+              <CalendarSection />
+            </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "changelog" ? "" : "hidden"}`}>
-            <ChangelogSection />
+            <ErrorBoundary section="Version History">
+              <ChangelogSection />
+            </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "settings" ? "" : "hidden"}`}>
-            <SettingsSection />
+            <ErrorBoundary section="Settings">
+              <SettingsSection />
+            </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "claude-config" ? "" : "hidden"}`}>
-            <ClaudeConfigSection />
+            <ErrorBoundary section="Claude Config">
+              <ClaudeConfigSection />
+            </ErrorBoundary>
           </div>
         </div>
       </main>

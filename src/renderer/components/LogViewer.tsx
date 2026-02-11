@@ -7,8 +7,8 @@ import { formatDateTime } from "../utils/date";
 interface LogViewerProps {
   /** 로그 파일 내용 */
   content: string;
-  /** 로그 파일 마지막 수정 시간 */
-  lastModified: Date | null;
+  /** 로그 파일 마지막 수정 시간 (ISO 8601) */
+  lastModified: string | null;
   /** 로그 뷰어 닫기 핸들러 */
   onClose: () => void;
 }

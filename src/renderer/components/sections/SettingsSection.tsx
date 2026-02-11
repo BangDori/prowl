@@ -1,6 +1,8 @@
 import { DEFAULT_FOCUS_MODE, type FocusMode, type UpdateCheckResult } from "@shared/types";
 import { Bell, ExternalLink, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
+import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
 import FocusModePanel from "../FocusModePanel";
 import ToggleSwitch from "../ToggleSwitch";
 
@@ -8,41 +10,28 @@ type UpdateStatus = "idle" | "checking" | "checked";
 
 /**
  * 설정 섹션 컴포넌트
- *
- * 앱의 전체 설정을 관리합니다.
- * - Night Watch (집중 모드) 설정
- * - 알림 설정 (활성화/비활성화)
- * - 외부 링크 (GitHub, 릴리즈)
  */
 export default function SettingsSection() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [focusMode, setFocusMode] = useState<FocusMode>(DEFAULT_FOCUS_MODE);
-  const [loading, setLoading] = useState(true);
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+  const { data: focusMode = DEFAULT_FOCUS_MODE, isLoading: focusLoading } = useFocusMode();
+  const updateSettings = useUpdateSettings();
+  const updateFocusMode = useUpdateFocusMode();
+
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>("idle");
   const [updateResult, setUpdateResult] = useState<UpdateCheckResult | null>(null);
   const [cooldown, setCooldown] = useState(0);
 
-  useEffect(() => {
-    Promise.all([window.electronAPI.getSettings(), window.electronAPI.getFocusMode()]).then(
-      ([settings, focus]) => {
-        setNotificationsEnabled(settings.notificationsEnabled);
-        setFocusMode(focus);
-        setLoading(false);
-      },
-    );
-  }, []);
+  const loading = settingsLoading || focusLoading;
+  const notificationsEnabled = settings?.notificationsEnabled ?? true;
 
   const toggleNotifications = async () => {
-    const newValue = !notificationsEnabled;
-    setNotificationsEnabled(newValue);
-    const current = await window.electronAPI.getSettings();
-    await window.electronAPI.setSettings({ ...current, notificationsEnabled: newValue });
+    if (!settings) return;
+    updateSettings.mutate({ ...settings, notificationsEnabled: !notificationsEnabled });
   };
 
-  const saveFocusMode = useCallback(async (updated: FocusMode) => {
-    setFocusMode(updated);
-    await window.electronAPI.setFocusMode(updated);
-  }, []);
+  const saveFocusMode = (updated: FocusMode) => {
+    updateFocusMode.mutate(updated);
+  };
 
   const handleCheckForUpdates = async () => {
     setUpdateStatus("checking");

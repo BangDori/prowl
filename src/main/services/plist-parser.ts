@@ -1,31 +1,42 @@
 import * as fs from "node:fs";
 import type { JobSchedule } from "@shared/types";
 import * as plist from "plist";
+import { z } from "zod";
 import { WEEKDAY_NAMES } from "../constants";
 
-interface PlistData {
-  Label?: string;
-  ProgramArguments?: string[];
-  StartCalendarInterval?: CalendarInterval | CalendarInterval[];
-  StartInterval?: number;
-  KeepAlive?: boolean;
-  StandardOutPath?: string;
-  StandardErrorPath?: string;
-  WorkingDirectory?: string;
-}
+const CalendarIntervalSchema = z.object({
+  Weekday: z.number().optional(),
+  Hour: z.number().optional(),
+  Minute: z.number().optional(),
+  Day: z.number().optional(),
+  Month: z.number().optional(),
+});
 
-interface CalendarInterval {
-  Weekday?: number;
-  Hour?: number;
-  Minute?: number;
-  Day?: number;
-  Month?: number;
-}
+const PlistDataSchema = z.object({
+  Label: z.string().optional(),
+  ProgramArguments: z.array(z.string()).optional(),
+  StartCalendarInterval: z
+    .union([CalendarIntervalSchema, z.array(CalendarIntervalSchema)])
+    .optional(),
+  StartInterval: z.number().optional(),
+  KeepAlive: z.boolean().optional(),
+  StandardOutPath: z.string().optional(),
+  StandardErrorPath: z.string().optional(),
+  WorkingDirectory: z.string().optional(),
+});
+
+type PlistData = z.infer<typeof PlistDataSchema>;
 
 export function parsePlistFile(plistPath: string): PlistData | null {
   try {
     const content = fs.readFileSync(plistPath, "utf-8");
-    return plist.parse(content) as PlistData;
+    const raw = plist.parse(content);
+    const result = PlistDataSchema.safeParse(raw);
+    if (!result.success) {
+      console.warn(`[plist] Invalid structure: ${plistPath}`, result.error.message);
+      return null;
+    }
+    return result.data;
   } catch (error) {
     console.error(`Failed to parse plist: ${plistPath}`, error);
     return null;

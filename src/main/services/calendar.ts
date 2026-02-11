@@ -59,8 +59,8 @@ function localToCalendarEvents(locals: LocalEvent[]): CalendarEvent[] {
     summary: e.summary,
     description: e.description,
     location: e.location,
-    dtstart: new Date(e.dtstart),
-    dtend: new Date(e.dtend),
+    dtstart: e.dtstart,
+    dtend: e.dtend,
     allDay: e.allDay,
     feedId: LOCAL_FEED_ID,
   }));
@@ -90,7 +90,7 @@ export async function fetchCalendarEvents(): Promise<CalendarEvent[]> {
   // UID+시작시간 기반 중복 제거 (반복 일정은 같은 UID를 공유하므로 시작시간도 함께 비교)
   const seen = new Set<string>();
   const unique = allEvents.filter((e) => {
-    const key = `${e.uid}_${e.dtstart.getTime()}`;
+    const key = `${e.uid}_${e.dtstart}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -99,7 +99,7 @@ export async function fetchCalendarEvents(): Promise<CalendarEvent[]> {
   // 로컬 이벤트 병합
   unique.push(...localToCalendarEvents(getLocalEvents()));
 
-  unique.sort((a, b) => a.dtstart.getTime() - b.dtstart.getTime());
+  unique.sort((a, b) => new Date(a.dtstart).getTime() - new Date(b.dtstart).getTime());
   return unique;
 }
 
@@ -211,7 +211,7 @@ function parseIcs(icsText: string, feedId: string): CalendarEvent[] {
     }
   }
 
-  events.sort((a, b) => a.dtstart.getTime() - b.dtstart.getTime());
+  events.sort((a, b) => new Date(a.dtstart).getTime() - new Date(b.dtstart).getTime());
   return events;
 }
 
@@ -249,16 +249,16 @@ function parseLine(line: string): { key: string; params: string; value: string }
 }
 
 /**
- * ICS 날짜 문자열을 Date로 변환
+ * ICS 날짜 문자열을 ISO 8601 문자열로 변환
  * 형식: 20240101 (all-day) 또는 20240101T120000Z (datetime)
  */
-function parseIcsDate(value: string): Date {
+function parseIcsDate(value: string): string {
   // YYYYMMDD
   if (value.length === 8) {
     const y = Number.parseInt(value.substring(0, 4), 10);
     const m = Number.parseInt(value.substring(4, 6), 10) - 1;
     const d = Number.parseInt(value.substring(6, 8), 10);
-    return new Date(y, m, d);
+    return new Date(y, m, d).toISOString();
   }
 
   // YYYYMMDDTHHMMSS or YYYYMMDDTHHMMSSZ
@@ -270,10 +270,10 @@ function parseIcsDate(value: string): Date {
   const s = Number.parseInt(value.substring(13, 15), 10);
 
   if (value.endsWith("Z")) {
-    return new Date(Date.UTC(y, m, d, h, min, s));
+    return new Date(Date.UTC(y, m, d, h, min, s)).toISOString();
   }
 
-  return new Date(y, m, d, h, min, s);
+  return new Date(y, m, d, h, min, s).toISOString();
 }
 
 /**

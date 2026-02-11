@@ -296,8 +296,8 @@ Reviews PR for issues.`;
         const result = getClaudeConfig();
         const after = new Date();
 
-        expect(result.lastUpdated.getTime()).toBeGreaterThanOrEqual(before.getTime());
-        expect(result.lastUpdated.getTime()).toBeLessThanOrEqual(after.getTime());
+        expect(new Date(result.lastUpdated).getTime()).toBeGreaterThanOrEqual(before.getTime());
+        expect(new Date(result.lastUpdated).getTime()).toBeLessThanOrEqual(after.getTime());
       });
     });
   });

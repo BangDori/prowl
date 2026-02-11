@@ -34,7 +34,7 @@ describe("log-reader", () => {
       const result = getLastRunInfo("/tmp/test.log");
 
       expect(result).toEqual({
-        timestamp: mtime,
+        timestamp: mtime.toISOString(),
         success: true,
         message: "완료",
       });
@@ -71,7 +71,7 @@ describe("log-reader", () => {
       const result = readLogContent("/tmp/test.log", 3);
 
       expect(result.content).toBe("c\nd\ne");
-      expect(result.lastModified).toEqual(mtime);
+      expect(result.lastModified).toEqual(mtime.toISOString());
     });
 
     it("빈 내용이면 (빈 로그)를 반환한다", () => {
