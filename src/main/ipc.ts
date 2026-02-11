@@ -33,12 +33,20 @@ import { closeChatWindow, getSubWindow, popUpTrayMenu, resizeChatWindow } from "
  *
  * IpcInvokeSchema에서 채널의 파라미터/반환 타입을 자동 추론한다.
  * 잘못된 채널명, 파라미터 타입, 반환 타입 사용 시 컴파일 에러 발생.
+ * 모든 핸들러에 try/catch를 적용하여 에러가 숨겨지지 않도록 한다.
  */
 function handleIpc<C extends IpcChannel>(
   channel: C,
   handler: (...args: IpcParams<C>) => Promise<IpcReturn<C>>,
 ): void {
-  ipcMain.handle(channel, (_event, ...args) => handler(...(args as IpcParams<C>)));
+  ipcMain.handle(channel, async (_event, ...args) => {
+    try {
+      return await handler(...(args as IpcParams<C>));
+    } catch (error) {
+      console.error(`[IPC] ${channel} failed:`, error);
+      throw error;
+    }
+  });
 }
 
 /**
@@ -122,7 +130,12 @@ export function registerIpcHandlers(): void {
 
   // 설정 저장
   handleIpc("settings:set", async (settings) => {
-    setSettings(settings);
+    try {
+      setSettings(settings);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // Finder에서 파일 위치 보기
@@ -142,7 +155,12 @@ export function registerIpcHandlers(): void {
 
   // 작업 커스터마이징 저장
   handleIpc("jobs:setCustomization", async (jobId, customization) => {
-    setJobCustomization(jobId, customization);
+    try {
+      setJobCustomization(jobId, customization);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 집중 모드 조회
@@ -152,8 +170,13 @@ export function registerIpcHandlers(): void {
 
   // 집중 모드 설정 저장 + 모니터 업데이트
   handleIpc("focusMode:set", async (focusMode) => {
-    setFocusMode(focusMode);
-    updateFocusModeMonitor(focusMode);
+    try {
+      setFocusMode(focusMode);
+      updateFocusModeMonitor(focusMode);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 윈도우 높이 동적 조정
@@ -216,7 +239,12 @@ export function registerIpcHandlers(): void {
 
   // 캘린더 설정 저장
   handleIpc("calendar:set-settings", async (settings) => {
-    setCalendarSettings(settings);
+    try {
+      setCalendarSettings(settings);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 로컬 이벤트 목록 조회
@@ -226,20 +254,35 @@ export function registerIpcHandlers(): void {
 
   // 로컬 이벤트 추가
   handleIpc("calendar:add-local-event", async (localEvent) => {
-    addLocalEvent(localEvent);
-    refreshReminders();
+    try {
+      addLocalEvent(localEvent);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 로컬 이벤트 수정
   handleIpc("calendar:update-local-event", async (localEvent) => {
-    updateLocalEvent(localEvent);
-    refreshReminders();
+    try {
+      updateLocalEvent(localEvent);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 로컬 이벤트 삭제
   handleIpc("calendar:delete-local-event", async (eventId) => {
-    deleteLocalEvent(eventId);
-    refreshReminders();
+    try {
+      deleteLocalEvent(eventId);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // Claude Config 조회
