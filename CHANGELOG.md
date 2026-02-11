@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.13.1] - 2026-02-11
+- IPC 채널 타입을 단일 스키마(ipc-schema.ts)로 통합하여 컴파일 타임 타입 안전성 확보
+- global.d.ts 수동 동기화 제거 (누락됐던 캘린더 메서드 7개 자동 해결)
+
 ## [1.13.0] - 2026-02-10
 - 일정 알림 시스템 구축 (다중 알림 등록 가능: 3일 전, 1일 전, 1시간 전 등)
 - 일정 설명(내용) 입력 필드 추가
