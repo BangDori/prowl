@@ -231,7 +231,7 @@ export function getClaudeConfig(): ClaudeConfig {
     commands: scanCommands(),
     hooks: scanHooks(),
     rules: scanRules(),
-    lastUpdated: new Date(),
+    lastUpdated: new Date().toISOString(),
   };
 }
 

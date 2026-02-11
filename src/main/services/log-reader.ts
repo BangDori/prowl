@@ -19,7 +19,7 @@ export function getLastRunInfo(logPath: string): LastRunInfo | null {
     const analysis = analyzeLogContent(lines);
 
     return {
-      timestamp: stats.mtime,
+      timestamp: stats.mtime.toISOString(),
       success: analysis.success,
       message: analysis.message,
     };
@@ -48,7 +48,7 @@ export function readLogContent(logPath: string, lines: number = LOG_LINES_DEFAUL
 
     return {
       content: lastLines || "(빈 로그)",
-      lastModified: stats.mtime,
+      lastModified: stats.mtime.toISOString(),
     };
   } catch (error) {
     return {
