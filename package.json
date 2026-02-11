@@ -25,9 +25,11 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.21",
     "electron-store": "^8.1.0",
     "lucide-react": "^0.563.0",
-    "plist": "^3.1.0"
+    "plist": "^3.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
