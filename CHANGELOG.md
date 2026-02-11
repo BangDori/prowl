@@ -2,6 +2,15 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.13.2] - 2026-02-12
+- TanStack Query 도입으로 데이터 페칭 안정성 및 캐시 관리 개선
+- 대시보드 섹션별 크래시 격리 (ErrorBoundary)
+- IPC mutation 에러 처리 강화 (IpcResult 타입 통일)
+- plist 파싱 런타임 검증 추가 (Zod safeParse)
+- Date 직렬화 안정성 개선 (IPC 경계에서 ISO 8601 문자열 사용)
+- CalendarSection 컴포넌트 분리 및 파일 슬림화 (1627줄→539줄)
+- CLAUDE.md Anthropic 가이드라인 기반 슬림화 (294줄→66줄)
+
 ## [1.13.1] - 2026-02-11
 - IPC 채널 타입을 단일 스키마(ipc-schema.ts)로 통합하여 컴파일 타임 타입 안전성 확보
 - global.d.ts 수동 동기화 제거 (누락됐던 캘린더 메서드 7개 자동 해결)
