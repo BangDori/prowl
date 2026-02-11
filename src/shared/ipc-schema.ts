@@ -6,6 +6,7 @@ import type {
   ChatSendResult,
   ClaudeConfig,
   FocusMode,
+  IpcResult,
   JobActionResult,
   JobCustomization,
   JobCustomizations,
@@ -38,12 +39,12 @@ export interface IpcInvokeSchema {
   "jobs:getCustomizations": { params: []; return: JobCustomizations };
   "jobs:setCustomization": {
     params: [jobId: string, customization: JobCustomization];
-    return: void;
+    return: IpcResult;
   };
 
   // Settings (2 channels)
   "settings:get": { params: []; return: AppSettings };
-  "settings:set": { params: [settings: AppSettings]; return: void };
+  "settings:set": { params: [settings: AppSettings]; return: IpcResult };
 
   // Shell (2 channels)
   "shell:showInFolder": { params: [filePath: string]; return: void };
@@ -51,7 +52,7 @@ export interface IpcInvokeSchema {
 
   // Focus Mode (2 channels)
   "focusMode:get": { params: []; return: FocusMode };
-  "focusMode:set": { params: [focusMode: FocusMode]; return: void };
+  "focusMode:set": { params: [focusMode: FocusMode]; return: IpcResult };
 
   // Window (1 channel)
   "window:resize": { params: [height: number]; return: void };
@@ -72,11 +73,11 @@ export interface IpcInvokeSchema {
   // Calendar (7 channels)
   "calendar:list-events": { params: []; return: CalendarEvent[] };
   "calendar:get-settings": { params: []; return: CalendarSettings };
-  "calendar:set-settings": { params: [settings: CalendarSettings]; return: void };
+  "calendar:set-settings": { params: [settings: CalendarSettings]; return: IpcResult };
   "calendar:local-events": { params: []; return: LocalEvent[] };
-  "calendar:add-local-event": { params: [event: LocalEvent]; return: void };
-  "calendar:update-local-event": { params: [event: LocalEvent]; return: void };
-  "calendar:delete-local-event": { params: [eventId: string]; return: void };
+  "calendar:add-local-event": { params: [event: LocalEvent]; return: IpcResult };
+  "calendar:update-local-event": { params: [event: LocalEvent]; return: IpcResult };
+  "calendar:delete-local-event": { params: [eventId: string]; return: IpcResult };
 
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };
