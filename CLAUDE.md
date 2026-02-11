@@ -1,250 +1,66 @@
-# Prowl - Project Guide
+# Prowl
 
-macOS 메뉴바에서 launchd 백그라운드 작업을 관리하는 Electron 앱
+macOS 메뉴바에서 launchd 작업을 관리하는 Electron 앱 (Main/Renderer IPC 구조)
 
-## Quick Commands
+## Commands
 
 ```bash
-bun run dev        # 개발 모드 (main + renderer 동시)
+bun run dev        # 개발 모드
 bun run build      # 프로덕션 빌드
-bun run start      # 빌드된 앱 실행
-bun run package    # DMG 패키징
+bun run test       # 테스트
+bun run lint       # biome 린트
 ```
 
 ## Path Aliases
 
-상대 경로 대신 alias를 사용하여 import 가독성 향상:
+| Alias | 경로 |
+|-------|------|
+| `@main/*` | `src/main/*` |
+| `@renderer/*` | `src/renderer/*` |
+| `@shared/*` | `src/shared/*` |
 
-| Alias | 경로 | 용도 |
-|-------|------|------|
-| `@main/*` | `src/main/*` | Main 프로세스 모듈 |
-| `@renderer/*` | `src/renderer/*` | Renderer 프로세스 모듈 |
-| `@shared/*` | `src/shared/*` | 공유 타입/상수 |
-| `@assets/*` | `assets/*` | 이미지 등 에셋 |
+## Build
 
-```typescript
-// Before
-import type { LaunchdJob } from "../../shared/types";
+- Main: TypeScript → `dist/main/`
+- Renderer: Vite + React → `dist/renderer/`
+- Preload: TypeScript → `dist/preload/`
 
-// After
-import type { LaunchdJob } from "@shared/types";
-```
+## 주의사항
 
-## Architecture
+- `isDev`: `process.argv.includes('--dev')` 또는 `ELECTRON_DEV=true`
+- menubar 패키지로 트레이 팝업 (Dock 숨김, 단일 인스턴스)
+- 스플래시: 앱 실행 → 4.5초 애니메이션 → 트레이 표시
 
-```
-Main Process (Electron)          Renderer Process (React)
-┌────────────────────────┐       ┌─────────────────────┐
-│  src/main/             │       │  src/renderer/      │
-│  ├── index.ts          │       │  ├── App.tsx        │
-│  ├── tray.ts           │  IPC  │  ├── components/    │
-│  ├── splash.ts         │◄─────►│  ├── hooks/         │
-│  ├── ipc.ts            │       │  └── utils/         │
-│  ├── constants.ts      │       │
-│  ├── utils/            │       │      └── date.ts    │
-│  │   ├── command.ts    │       └─────────────────────┘
-│  │   └── pattern-matcher.ts           ▲
-│  └── services/         │       ┌──────┴──────┐
-│      ├── launchd.ts    │       │  preload/   │
-│      ├── plist-parser.ts       │  index.ts   │
-│      ├── log-reader.ts │       └─────────────┘
-│      ├── log-analyzer.ts
-│      ├── settings.ts   │
-│      └── claude-config.ts
-└────────────────────────┘
-         ▲
-         │              ┌─────────────────────┐
-         ▼              │  src/shared/        │
-┌─────────────────────────┐  │  ├── types.ts       │
-│  ~/Library/LaunchAgents │  │  └── constants.ts   │
-│  *.plist                │  └─────────────────────┘
-└─────────────────────────┘
-```
+## IPC Safety
 
-## Key Files
+- IPC 스키마 Single Source of Truth: `src/shared/ipc-schema.ts`
+- Mutation 채널은 `IpcResult { success, error? }` 반환 필수
+- Fire-and-forget(quit, resize, navigate)만 void 허용
+- **Date 객체는 IPC 통과 불가** — ISO 8601 문자열 사용
+- plist 파싱은 Zod `safeParse` 사용 (`as` 캐스팅 금지)
 
-| 파일                                | 역할                                      |
-| ----------------------------------- | ----------------------------------------- |
-| `splash.html`                       | 스플래시 화면 UI (SVG 고양이 눈 + 타이포그래피) |
-| `src/main/splash.ts`                | 스플래시 윈도우 생성/디졸브/닫기          |
-| `src/main/constants.ts`             | 상수 정의 (매직 넘버, 로그 패턴 등)       |
-| `src/main/utils/command.ts`         | launchctl 명령어 실행 유틸리티            |
-| `src/main/utils/pattern-matcher.ts` | 패턴 매칭 유틸리티                        |
-| `src/main/services/launchd.ts`      | launchctl 명령어 래핑 (load/unload/start) |
-| `src/main/services/plist-parser.ts` | plist 파일에서 스케줄/경로 추출           |
-| `src/main/services/log-reader.ts`   | 로그 파일 읽기                            |
-| `src/main/services/log-analyzer.ts` | 로그 분석 (성공/실패 판단)                |
-| `src/main/services/settings.ts`     | 앱 설정 및 작업 커스터마이징 저장         |
-| `src/main/services/claude-config.ts`| ~/.claude 설정 조회 (agents/commands/hooks/rules) |
-| `src/main/ipc.ts`                   | IPC 핸들러 등록                           |
-| `src/main/tray.ts`                  | menubar 패키지로 트레이 아이콘 생성       |
-| `src/preload/index.ts`              | contextBridge로 electronAPI 노출          |
-| `src/shared/types.ts`               | 공유 타입 정의                            |
-| `src/shared/constants.ts`           | 공유 상수 (main/renderer 공통)            |
-| `src/renderer/utils/date.ts`        | 날짜/시간 포맷 유틸리티                   |
-| `src/renderer/components/sections/ClaudeConfigSection.tsx` | Claude Config 대시보드 UI |
+## Data Fetching
 
-## IPC Channels
+- TanStack Query 사용. 쿼리 키: `src/renderer/queries/keys.ts`
+- 읽기: `useQuery`, 쓰기: `useMutation`
+- mutation 성공 → `invalidateQueries`
+- **컴포넌트에서 `window.electronAPI` 직접 호출 금지** — hooks 사용
 
-| 채널                     | 설명                        | 반환 타입           |
-| ------------------------ | --------------------------- | ------------------- |
-| `jobs:list`              | 모든 작업 목록              | `LaunchdJob[]`      |
-| `jobs:refresh`           | 작업 목록 새로고침          | `LaunchdJob[]`      |
-| `jobs:toggle`            | 활성화/비활성화 토글        | `JobActionResult`   |
-| `jobs:run`               | 수동 실행                   | `JobActionResult`   |
-| `jobs:logs`              | 로그 내용 조회              | `LogContent`        |
-| `jobs:getCustomizations` | 모든 작업 커스터마이징 조회 | `JobCustomizations` |
-| `jobs:setCustomization`  | 작업 커스터마이징 저장      | `void`              |
-| `claude-config:list`     | Claude 설정 목록 조회       | `ClaudeConfig`      |
-| `claude-config:read-file`| 파일 내용 조회              | `string`            |
+## File Size
 
-## Job Customization
+- 파일당 최대 300줄
+- 200줄 초과 컴포넌트 → 서브컴포넌트 추출
+- 100줄 초과 훅 → utils로 순수 로직 분리
 
-사용자가 UI에서 직접 작업의 아이콘, 이름, 설명을 편집할 수 있습니다.
-커스터마이징 데이터는 `electron-store`에 저장되며, plist 파일에는 영향을 주지 않습니다.
+## Error Handling
 
-```typescript
-interface JobCustomization {
-  displayName?: string; // 사용자 지정 이름
-  icon?: string; // 사용자 지정 아이콘 (이모지)
-  description?: string; // 사용자 지정 설명
-}
+- 대시보드 각 섹션은 `ErrorBoundary`로 래핑 (크래시 격리)
 
-type JobCustomizations = Record<string, JobCustomization>;
-```
+## Conventions
 
-## launchd plist 경로
-
-- 디렉토리: `~/Library/LaunchAgents/`
-- 패턴: 설정에서 지정 (기본값: 모든 plist)
-
-## Build Configuration
-
-- **Main**: TypeScript → `dist/main/` (tsconfig.main.json)
-- **Renderer**: Vite + React → `dist/renderer/` (vite.config.ts)
-- **Preload**: TypeScript → `dist/preload/`
-
-## 개발 시 주의사항
-
-1. **isDev 판단**: `process.argv.includes('--dev')` 또는 `ELECTRON_DEV=true`
-2. **menubar 패키지**: 트레이 아이콘 클릭 시 팝업 창 자동 표시
-3. **Dock 숨김**: `app.dock?.hide()` (macOS에서 Dock 아이콘 없음)
-4. **단일 인스턴스**: `app.requestSingleInstanceLock()` 사용
-5. **스플래시 화면**: 앱 실행 → 스플래시(4.5초) → 파티클 디졸브 → 트레이 아이콘 표시
-
-## Types
-
-```typescript
-interface LaunchdJob {
-  id: string; // label과 동일
-  label: string; // com.claude.daily-retrospective
-  name: string; // daily-retrospective
-  description: string; // 기본값: "설명 없음" (커스터마이징 가능)
-  icon: string; // 기본값: ⚙️ (커스터마이징 가능)
-  plistPath: string; // plist 파일 경로
-  scriptPath: string; // 실행 스크립트 경로
-  logPath: string | null;
-  schedule: JobSchedule;
-  scheduleText: string; // "매주 금 11:00"
-  isLoaded: boolean; // launchctl list에 있는지
-  lastRun: LastRunInfo | null;
-}
-
-// 판별 유니온 타입
-type JobSchedule =
-  | { type: "calendar"; weekdays?: number[]; hour?: number; minute?: number }
-  | { type: "interval"; intervalSeconds: number }
-  | { type: "keepAlive" }
-  | { type: "unknown" };
-
-// Claude Config 타입
-interface ClaudeAgentMeta {
-  name: string;
-  description: string;
-  model?: string;
-  color?: string;
-}
-
-interface ClaudeAgent {
-  id: string;           // "resume/resume-analyst"
-  filename: string;     // "resume-analyst.md"
-  category: string;     // "resume"
-  filePath: string;
-  meta: ClaudeAgentMeta;
-  content: string;      // 미리보기 500자
-}
-
-interface ClaudeCommand {
-  id: string;
-  filename: string;
-  filePath: string;
-  title: string;        // 첫 # 제목
-  description: string;  // 첫 100자
-  content: string;
-}
-
-interface ClaudeHook {
-  id: string;           // "SessionStart", "PreToolUse:Bash"
-  event: string;
-  matcher?: string;
-  hooks: Array<{ type: string; command: string }>;
-}
-
-interface ClaudeRule {
-  id: string;
-  filename: string;
-  filePath: string;
-  content: string;
-}
-
-interface ClaudeConfig {
-  agents: ClaudeAgent[];
-  commands: ClaudeCommand[];
-  hooks: ClaudeHook[];
-  rules: ClaudeRule[];
-  lastUpdated: Date;
-}
-```
-
-## Design System
-
-UI 작업 시 `.claude/skills/design-system.md`를 참조하여 일관된 디자인 시스템을 유지합니다.
-- **테마**: 다크 기반 + 골드 액센트 (고양이 눈 컨셉)
-- **핵심 토큰**: `prowl-bg`, `prowl-surface`, `prowl-card`, `accent`
-- **규칙**: 다크 모드 우선, 커스텀 토큰 사용, 하드코딩 금지
-
-## 커밋 컨벤션
-
-- `.claude/commands/commit.md` 문서의 규칙을 **기존 커밋 히스토리보다 우선** 따른다
-- 형식: `{타입}: {한국어 설명}` (예: `feat: 스플래시 화면 추가`)
-
-## Code Organization Principles
-
-- **상수**: 매직 넘버는 `constants.ts`에 정의
-- **유틸리티**: 재사용 가능한 함수는 `utils/` 폴더에 분리
-- **타입 안전성**: `Promise<any>` 대신 구체적인 타입 사용
-- **SRP (단일 책임 원칙)**: 각 함수/모듈은 하나의 책임만 담당
-
-## Documentation
-
-코드 작성 시 `docs/` 폴더의 규칙 문서를 참조:
-
-| 문서 | 내용 |
-|------|------|
-| `docs/naming-convention.md` | 네이밍 규칙 (파일, 변수, 함수, IPC 등) |
-| `docs/file-organization.md` | 파일/폴더 구조 원칙 |
-| `docs/component-patterns.md` | React 컴포넌트 작성 패턴 |
-| `docs/ipc-conventions.md` | IPC 통신 규칙 |
-
-## Naming Convention
-
-상세 규칙은 `docs/naming-convention.md` 참조.
-
-| 대상 | 규칙 | 예시 |
-|------|------|------|
-| 파일 (Non-React) | kebab-case | `log-reader.ts` |
-| 파일 (React) | PascalCase | `JobCard.tsx` |
-| 함수/변수 | camelCase | `readLogContent` |
-| 상수 | UPPER_SNAKE_CASE | `LOG_LINES_DEFAULT` |
-| IPC 채널 | domain:kebab-action | `jobs:get-customizations` |
-| 타입/인터페이스 | PascalCase | `LaunchdJob` |
+- 커밋: `.claude/commands/commit.md` 규칙 우선
+- UI: `.claude/skills/design-system.md`
+- IPC 추가/수정: `.claude/skills/ipc-development.md`
+- 데이터 페칭 패턴: `.claude/skills/data-fetching.md`
+- 네이밍: `docs/naming-convention.md`
+- 컴포넌트 패턴: `docs/component-patterns.md`
