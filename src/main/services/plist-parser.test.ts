@@ -1,3 +1,4 @@
+/** plist 파서 유닛 테스트 */
 import { describe, expect, it } from "vitest";
 import {
   extractLabel,

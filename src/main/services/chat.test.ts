@@ -1,3 +1,4 @@
+/** 채팅 서비스 유닛 테스트 */
 import { describe, expect, it } from "vitest";
 import { sendChatMessage } from "./chat";
 

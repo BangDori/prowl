@@ -1,3 +1,4 @@
+/** 상대 시간 및 날짜/시간 포맷 유틸 */
 import { TIME } from "@shared/constants";
 
 /**

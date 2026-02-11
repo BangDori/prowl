@@ -1,3 +1,4 @@
+/** launchd plist 스캔, 로드/언로드, 실행 관리 */
 import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";

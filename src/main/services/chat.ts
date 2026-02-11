@@ -1,3 +1,4 @@
+/** 채팅 메시지 전송 서비스 */
 import type { ChatMessage, ChatSendResult } from "@shared/types";
 
 export async function sendChatMessage(

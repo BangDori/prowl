@@ -1,3 +1,4 @@
+/** 쉘 명령어 실행 및 결과 래핑 유틸 */
 import { execSync } from "node:child_process";
 import type { JobActionResult } from "@shared/types";
 

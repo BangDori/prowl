@@ -1,3 +1,4 @@
+/** 집중 모드 프로세스 감시 및 자동 전환 */
 import { execFileSync } from "node:child_process";
 import type { FocusMode } from "@shared/types";
 import { getFocusMode } from "./settings";

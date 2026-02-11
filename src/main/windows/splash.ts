@@ -1,3 +1,4 @@
+/** 스플래시 화면 BrowserWindow 관리 */
 import { BrowserWindow, screen } from "electron";
 import * as path from "path";
 import { SPLASH } from "../constants";

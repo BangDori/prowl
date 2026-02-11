@@ -1,3 +1,4 @@
+/** 로그 내용 패턴 매칭으로 성공/실패 판별 */
 import {
   LOG_ANALYSIS_LINES,
   LOG_ERROR_SEARCH_LINES,

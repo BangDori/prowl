@@ -1,3 +1,4 @@
+/** 캘린더 날짜 셀 컴포넌트 */
 import type { CalendarEvent } from "@shared/types";
 import { FEED_COLORS } from "@shared/types";
 import { isMultiDay, isSameDay, isToday, MAX_EVENT_DOTS } from "../../utils/calendar";

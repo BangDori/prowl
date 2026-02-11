@@ -1,3 +1,4 @@
+/** IPC 채널 핸들러 등록 및 라우팅 */
 import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";

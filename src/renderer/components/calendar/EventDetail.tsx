@@ -1,3 +1,4 @@
+/** 일정 상세 보기 및 편집 컴포넌트 */
 import type { CalendarEvent, EventReminder } from "@shared/types";
 import { FEED_COLORS, LOCAL_EVENT_COLOR } from "@shared/types";
 import { Clock, MapPin, Pencil, Trash2 } from "lucide-react";

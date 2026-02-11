@@ -1,3 +1,4 @@
+/** 트레이 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockTrayInstance = {

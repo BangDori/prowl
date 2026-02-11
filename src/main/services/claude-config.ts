@@ -1,3 +1,4 @@
+/** ~/.claude 디렉터리 설정 파일 파싱 */
 import * as fs from "node:fs";
 import { homedir } from "node:os";
 import * as path from "node:path";

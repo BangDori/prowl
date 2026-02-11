@@ -1,3 +1,4 @@
+/** 변경 로그 탭 섹션 */
 import prowlProfile from "@assets/prowl-profile.png";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";

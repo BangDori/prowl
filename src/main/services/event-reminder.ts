@@ -1,3 +1,4 @@
+/** 로컬 일정 알림 스케줄러 */
 import type { LocalEvent } from "@shared/types";
 import { Notification } from "electron";
 import { getLocalEvents } from "./calendar";

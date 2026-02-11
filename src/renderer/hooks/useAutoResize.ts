@@ -1,3 +1,4 @@
+/** 콘텐츠 높이 기반 윈도우 자동 리사이즈 훅 */
 import { useEffect, useRef } from "react";
 
 /**

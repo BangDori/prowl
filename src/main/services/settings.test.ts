@@ -1,3 +1,4 @@
+/** 설정 서비스 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.hoisted ensures these are available before vi.mock factory runs

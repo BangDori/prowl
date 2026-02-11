@@ -1,3 +1,4 @@
+/** macOS 네이티브 알림 발송 */
 import { Notification } from "electron";
 import { isNotificationsEnabled } from "./settings";
 

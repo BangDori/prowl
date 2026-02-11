@@ -1,3 +1,4 @@
+/** IPC 채널별 파라미터·반환 타입 스키마 */
 import type {
   AppSettings,
   CalendarEvent,

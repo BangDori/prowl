@@ -1,3 +1,4 @@
+/** 로그 파일 읽기 및 마지막 실행 정보 추출 */
 import * as fs from "node:fs";
 import type { LastRunInfo, LogContent } from "@shared/types";
 import { LOG_LINES_DEFAULT } from "../constants";

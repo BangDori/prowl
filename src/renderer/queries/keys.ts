@@ -1,3 +1,4 @@
+/** TanStack Query 캐시 키 정의 */
 export const queryKeys = {
   jobs: {
     all: ["jobs"] as const,

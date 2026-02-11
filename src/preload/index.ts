@@ -1,3 +1,4 @@
+/** Renderer에 노출할 타입 안전 IPC 브릿지 */
 import type { IpcChannel, IpcParams, IpcReturn } from "@shared/ipc-schema";
 import { contextBridge, ipcRenderer } from "electron";
 

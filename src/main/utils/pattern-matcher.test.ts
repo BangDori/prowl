@@ -1,3 +1,4 @@
+/** 패턴 매처 유닛 테스트 */
 import { describe, expect, it } from "vitest";
 import { filterByPatterns, matchesAnyPattern } from "./pattern-matcher";
 

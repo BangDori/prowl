@@ -56,6 +56,11 @@ bun run lint       # biome 린트
 
 - 대시보드 각 섹션은 `ErrorBoundary`로 래핑 (크래시 격리)
 
+## File Header
+
+- 모든 `.ts`/`.tsx` 파일 첫 줄에 한 줄 JSDoc 설명 필수: `/** 파일 목적 설명 */`
+- 새 파일 생성 시 반드시 포함, PR 리뷰 시 누락 체크
+
 ## Conventions
 
 - 커밋: `.claude/commands/commit.md` 규칙 우선

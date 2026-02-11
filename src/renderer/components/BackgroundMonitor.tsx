@@ -1,3 +1,4 @@
+/** 백그라운드 작업 모니터링 패널 */
 import { useJobActions } from "@renderer/hooks/useJobActions";
 import { useLaunchdJobs } from "@renderer/hooks/useLaunchdJobs";
 import { useSettings, useUpdateSettings } from "@renderer/hooks/useSettings";

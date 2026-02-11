@@ -1,3 +1,4 @@
+/** 채팅 BrowserWindow 생성 및 관리 */
 import * as path from "node:path";
 import { BrowserWindow, screen } from "electron";
 import { CHAT_WINDOW, DEV_SERVER_PORT } from "../constants";

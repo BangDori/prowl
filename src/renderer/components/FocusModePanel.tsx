@@ -1,3 +1,4 @@
+/** 집중 모드 설정 패널 */
 import type { FocusMode } from "@shared/types";
 import { ChevronLeft, Power } from "lucide-react";
 import ToggleSwitch from "./ToggleSwitch";

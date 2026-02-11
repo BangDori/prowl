@@ -1,3 +1,4 @@
+/** 쉘 명령어 실행 유틸 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:child_process", () => ({
