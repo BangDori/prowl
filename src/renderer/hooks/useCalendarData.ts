@@ -1,3 +1,4 @@
+/** 캘린더 이벤트 조회 및 로컬 일정 CRUD 훅 */
 import type { CalendarEvent, EventReminder, LocalEvent } from "@shared/types";
 import { FEED_COLORS, LOCAL_EVENT_COLOR, LOCAL_FEED_ID } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

@@ -1,3 +1,4 @@
+/** Claude 설정 조회 탭 섹션 */
 import type {
   ClaudeAgent,
   ClaudeCommand,

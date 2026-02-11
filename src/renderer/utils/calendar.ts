@@ -1,3 +1,4 @@
+/** 캘린더 날짜 계산, 이벤트 필터링 유틸 */
 import type { CalendarEvent } from "@shared/types";
 
 export const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];

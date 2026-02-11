@@ -1,3 +1,4 @@
+/** 집중 모드 조회 및 업데이트 훅 */
 import type { FocusMode } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queries/keys";

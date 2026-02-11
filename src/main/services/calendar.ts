@@ -1,3 +1,4 @@
+/** Google Calendar ICS 파싱 및 로컬 일정 관리 */
 import type { CalendarEvent, CalendarSettings, LocalEvent } from "@shared/types";
 import { DEFAULT_CALENDAR_SETTINGS, LOCAL_FEED_ID } from "@shared/types";
 import { net } from "electron";

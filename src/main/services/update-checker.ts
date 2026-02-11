@@ -1,3 +1,4 @@
+/** GitHub Releases API 기반 앱 업데이트 확인 */
 import type { UpdateCheckResult } from "@shared/types";
 import { app, net } from "electron";
 

@@ -1,3 +1,4 @@
+/** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
 import { Bot, Calendar, Cog, History, LayoutDashboard } from "lucide-react";
 import { useState } from "react";

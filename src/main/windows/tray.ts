@@ -1,3 +1,4 @@
+/** 시스템 트레이 아이콘 및 메뉴 관리 */
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "../constants";

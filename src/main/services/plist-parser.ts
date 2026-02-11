@@ -1,3 +1,4 @@
+/** plist XML 파싱 및 스케줄 정보 추출 */
 import * as fs from "node:fs";
 import type { JobSchedule } from "@shared/types";
 import * as plist from "plist";

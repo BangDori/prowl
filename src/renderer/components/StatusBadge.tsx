@@ -1,3 +1,4 @@
+/** 작업 성공/실패 상태 배지 */
 import { CheckCircle, XCircle } from "lucide-react";
 
 /**

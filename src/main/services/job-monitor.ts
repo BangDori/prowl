@@ -1,3 +1,4 @@
+/** launchd 작업 완료 감지 및 알림 */
 import * as fs from "node:fs";
 import { JOB_COMPLETION } from "../constants";
 import { getLastRunInfo } from "./log-reader";

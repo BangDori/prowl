@@ -1,3 +1,4 @@
+/** 로그 분석기 유닛 테스트 */
 import { describe, expect, it } from "vitest";
 import { analyzeLogContent } from "./log-analyzer";
 

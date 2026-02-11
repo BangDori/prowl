@@ -1,3 +1,4 @@
+/** 개별 launchd 작업 카드 컴포넌트 */
 import type { JobActionResult, JobCustomization, LaunchdJob, LogContent } from "@shared/types";
 import { Check, FileText, Folder, Loader2, Pencil, Play, X } from "lucide-react";
 import { useState } from "react";

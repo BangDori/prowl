@@ -1,3 +1,4 @@
+/** AI 채팅 인터페이스 뷰 */
 import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatMessage } from "@shared/types";

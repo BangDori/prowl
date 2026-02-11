@@ -1,3 +1,4 @@
+/** Electron Main 프로세스 진입점 */
 import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";

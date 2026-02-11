@@ -1,3 +1,4 @@
+/** Claude 설정 파일 읽기 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");

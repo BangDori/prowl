@@ -1,3 +1,4 @@
+/** Renderer 프로세스 진입점 */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";

@@ -1,3 +1,4 @@
+/** 공용 타입: IPC 결과, 설정, 채팅, Claude 구성 */
 // IPC mutation 채널의 안전한 결과 타입 (에러가 숨겨지지 않도록)
 export interface IpcResult {
   success: boolean;

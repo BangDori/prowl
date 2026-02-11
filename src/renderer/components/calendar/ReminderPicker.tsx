@@ -1,3 +1,4 @@
+/** 일정 알림 시간 선택 컴포넌트 */
 import type { EventReminder } from "@shared/types";
 import { REMINDER_PRESETS } from "@shared/types";
 import { Bell, X } from "lucide-react";

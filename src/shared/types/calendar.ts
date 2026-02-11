@@ -1,3 +1,4 @@
+/** 캘린더 이벤트·피드·로컬 일정 타입 */
 import type { EventReminder } from "./common";
 
 // 캘린더 이벤트

@@ -1,3 +1,4 @@
+/** launchd 작업 관리 탭 섹션 */
 import { useJobActions } from "@renderer/hooks/useJobActions";
 import { useLaunchdJobs } from "@renderer/hooks/useLaunchdJobs";
 import { useSettings, useUpdateSettings } from "@renderer/hooks/useSettings";

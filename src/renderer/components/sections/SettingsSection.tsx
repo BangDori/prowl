@@ -1,3 +1,4 @@
+/** 앱 설정 탭 섹션 */
 import { DEFAULT_FOCUS_MODE, type FocusMode, type UpdateCheckResult } from "@shared/types";
 import { Bell, ExternalLink, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";

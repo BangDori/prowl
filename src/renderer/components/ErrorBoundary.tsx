@@ -1,3 +1,4 @@
+/** React 에러 바운더리 래퍼 */
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 interface Props {

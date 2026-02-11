@@ -1,3 +1,4 @@
+/** launchd 작업 목록 조회 및 자동 폴링 훅 */
 import { JOB_POLLING_INTERVAL_MS } from "@shared/constants";
 import type { LaunchdJob } from "@shared/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

@@ -1,3 +1,4 @@
+/** launchd 작업 및 스케줄 관련 타입 */
 export interface LaunchdJob {
   id: string;
   label: string;

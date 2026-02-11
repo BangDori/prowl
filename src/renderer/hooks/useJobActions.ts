@@ -1,3 +1,4 @@
+/** launchd 작업 토글, 실행, 로그 조회 훅 */
 import { JOB_COMPLETION } from "@shared/constants";
 import type { JobActionResult, LogContent } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";

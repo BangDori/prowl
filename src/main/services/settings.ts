@@ -1,3 +1,4 @@
+/** electron-store 기반 앱 설정 읽기/쓰기 */
 import {
   type AppSettings,
   DEFAULT_FOCUS_MODE,

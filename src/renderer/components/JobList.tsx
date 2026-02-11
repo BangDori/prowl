@@ -1,3 +1,4 @@
+/** launchd 작업 목록 컴포넌트 */
 import type {
   JobActionResult,
   JobCustomization,

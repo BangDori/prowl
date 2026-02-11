@@ -1,3 +1,4 @@
+/** 날짜 포맷 유틸 함수 테스트 */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { formatDateTime, formatRelativeTime } from "./date";
 

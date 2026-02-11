@@ -1,3 +1,4 @@
+/** 캘린더 탭 섹션: 월간 뷰 및 일정 관리 */
 import type { EventReminder } from "@shared/types";
 import { FEED_COLORS, LOCAL_FEED_ID } from "@shared/types";
 import {

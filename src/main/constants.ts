@@ -1,3 +1,4 @@
+/** Main 프로세스 경로·시간·UI 상수 정의 */
 import { homedir } from "node:os";
 import path from "node:path";
 

@@ -1,3 +1,4 @@
+/** IPC 핸들러 등록 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("electron", () => ({

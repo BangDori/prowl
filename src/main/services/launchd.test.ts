@@ -1,3 +1,4 @@
+/** launchd 서비스 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("node:fs");

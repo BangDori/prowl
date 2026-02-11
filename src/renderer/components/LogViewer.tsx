@@ -1,3 +1,4 @@
+/** 작업 로그 뷰어 컴포넌트 */
 import { X } from "lucide-react";
 import { formatDateTime } from "../utils/date";
 
