@@ -1,6 +1,8 @@
 import { JOB_POLLING_INTERVAL_MS } from "@shared/constants";
 import type { LaunchdJob } from "@shared/types";
-import { useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { queryKeys } from "../queries/keys";
 
 interface UseLaunchdJobsResult {
   jobs: LaunchdJob[];
@@ -10,44 +12,33 @@ interface UseLaunchdJobsResult {
 }
 
 export function useLaunchdJobs(): UseLaunchdJobsResult {
-  const [jobs, setJobs] = useState<LaunchdJob[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const fetchJobs = useCallback(async () => {
-    try {
-      setError(null);
-      const result = await window.electronAPI.listJobs();
-      setJobs(result);
-    } catch (err) {
-      setError("작업 목록을 불러오는데 실패했습니다.");
-      console.error("Failed to fetch jobs:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const {
+    data: jobs = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: queryKeys.jobs.list(),
+    queryFn: () => window.electronAPI.listJobs(),
+    refetchInterval: JOB_POLLING_INTERVAL_MS,
+  });
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    await fetchJobs();
-  }, [fetchJobs]);
-
+  // 창이 표시될 때마다 새로고침
   useEffect(() => {
-    fetchJobs();
-
-    // 창이 표시될 때마다 새로고침
     const unsubscribe = window.electronAPI.onWindowShow(() => {
-      fetchJobs();
+      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
     });
+    return unsubscribe;
+  }, [queryClient]);
 
-    // 주기적 폴링
-    const interval = setInterval(fetchJobs, JOB_POLLING_INTERVAL_MS);
-
-    return () => {
-      unsubscribe();
-      clearInterval(interval);
-    };
-  }, [fetchJobs]);
-
-  return { jobs, loading, error, refresh };
+  return {
+    jobs,
+    loading: isLoading,
+    error: error ? "작업 목록을 불러오는데 실패했습니다." : null,
+    refresh: async () => {
+      await refetch();
+    },
+  };
 }
