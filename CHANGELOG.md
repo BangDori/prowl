@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.13.3] - 2026-02-12
+- 모든 소스 파일에 한 줄 JSDoc 파일 헤더 추가 (AI 에이전트 탐색 최적화)
+- CLAUDE.md에 파일 헤더 컨벤션 규칙 추가
+- CI에 파일 헤더 누락 검증 스텝 추가
+
 ## [1.13.2] - 2026-02-12
 - TanStack Query 도입으로 데이터 페칭 안정성 및 캐시 관리 개선
 - 대시보드 섹션별 크래시 격리 (ErrorBoundary)
