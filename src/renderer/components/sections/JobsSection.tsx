@@ -1,5 +1,6 @@
 import { useJobActions } from "@renderer/hooks/useJobActions";
 import { useLaunchdJobs } from "@renderer/hooks/useLaunchdJobs";
+import { useSettings, useUpdateSettings } from "@renderer/hooks/useSettings";
 import type { JobCustomization, JobCustomizations, LaunchdJob } from "@shared/types";
 import { Box, Plus, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -7,35 +8,24 @@ import JobList from "../JobList";
 
 /**
  * 작업 목록 섹션 컴포넌트
- *
- * launchd 작업 목록을 표시하고 관리합니다.
- * - 패턴 필터 관리 (추가/삭제)
- * - 작업 목록 표시
- * - 작업 커스터마이징 (아이콘, 이름, 설명)
  */
 export default function JobsSection() {
   const { jobs, loading, refresh } = useLaunchdJobs();
   const actions = useJobActions(refresh);
+  const { data: settings, isLoading: settingsLoading } = useSettings();
+  const updateSettings = useUpdateSettings();
   const [customizations, setCustomizations] = useState<JobCustomizations>({});
 
-  const [patterns, setPatterns] = useState<string[]>([]);
   const [newPattern, setNewPattern] = useState("");
-  const [patternLoading, setPatternLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [adding, setAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const patterns = settings?.patterns ?? [];
+  const patternLoading = settingsLoading;
+  const saving = updateSettings.isPending;
+
   useEffect(() => {
     window.electronAPI.getJobCustomizations().then(setCustomizations);
-    async function loadPatterns() {
-      try {
-        const settings = await window.electronAPI.getSettings();
-        setPatterns(settings.patterns);
-      } finally {
-        setPatternLoading(false);
-      }
-    }
-    loadPatterns();
   }, []);
 
   const updateCustomization = async (jobId: string, customization: JobCustomization) => {
@@ -43,16 +33,9 @@ export default function JobsSection() {
     setCustomizations((prev) => ({ ...prev, [jobId]: customization }));
   };
 
-  const savePatterns = async (newPatterns: string[]) => {
-    setSaving(true);
-    try {
-      const current = await window.electronAPI.getSettings();
-      await window.electronAPI.setSettings({ ...current, patterns: newPatterns });
-      setPatterns(newPatterns);
-      refresh();
-    } finally {
-      setSaving(false);
-    }
+  const savePatterns = (newPatterns: string[]) => {
+    if (!settings) return;
+    updateSettings.mutate({ ...settings, patterns: newPatterns });
   };
 
   const addPattern = () => {
