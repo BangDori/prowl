@@ -2,6 +2,7 @@
 import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
+import { runBrewUpgrade } from "./services/brew-updater";
 import {
   addLocalEvent,
   deleteLocalEvent,
@@ -226,6 +227,17 @@ export function registerIpcHandlers(): void {
   // 업데이트 확인
   handleIpc("app:check-update", async () => {
     return checkForUpdates();
+  });
+
+  // 업데이트 설치 (brew upgrade)
+  handleIpc("app:install-update", async () => {
+    return runBrewUpgrade();
+  });
+
+  // 앱 재시작
+  handleIpc("app:relaunch", async () => {
+    app.relaunch();
+    app.quit();
   });
 
   // 캘린더 이벤트 조회

@@ -57,12 +57,48 @@ jobs:
           git tag "v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.version }}"
 
+      - name: Find artifacts
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        id: artifacts
+        run: |
+          ZIP=$(ls release/Prowl-*-mac.zip 2>/dev/null | head -1)
+          DMG=$(ls release/Prowl-*.dmg 2>/dev/null | head -1)
+          echo "zip=$ZIP" >> $GITHUB_OUTPUT
+          echo "dmg=$DMG" >> $GITHUB_OUTPUT
+          if [ -n "$ZIP" ]; then
+            SHA=$(shasum -a 256 "$ZIP" | awk '{print $1}')
+            echo "sha256=$SHA" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create GitHub Release
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
         run: |
           gh release create "v${{ steps.version.outputs.version }}" \
             --title "Prowl v${{ steps.version.outputs.version }}" \
             --generate-notes \
-            release/Prowl-*.dmg
+            ${{ steps.artifacts.outputs.dmg }} \
+            ${{ steps.artifacts.outputs.zip }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Homebrew Cask formula
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false' && steps.artifacts.outputs.sha256 != ''
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          SHA256="${{ steps.artifacts.outputs.sha256 }}"
+          ZIP_NAME=$(basename "${{ steps.artifacts.outputs.zip }}")
+
+          git clone "https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/BangDori/homebrew-prowl.git" /tmp/homebrew-prowl
+          cd /tmp/homebrew-prowl
+
+          sed -i '' "s|version \".*\"|version \"${VERSION}\"|" Casks/prowl.rb
+          sed -i '' "s|sha256 \".*\"|sha256 \"${SHA256}\"|" Casks/prowl.rb
+          sed -i '' "s|/v[0-9][0-9.]*\/Prowl-.*-mac\.zip|/v${VERSION}/${ZIP_NAME}|" Casks/prowl.rb
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Casks/prowl.rb
+          git commit -m "chore: bump prowl to v${VERSION}"
+          git push

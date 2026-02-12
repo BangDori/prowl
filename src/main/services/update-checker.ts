@@ -1,6 +1,7 @@
 /** GitHub Releases API 기반 앱 업데이트 확인 */
 import type { UpdateCheckResult } from "@shared/types";
 import { app, net } from "electron";
+import { getBrewInstallStatus } from "./brew-updater";
 
 const GITHUB_RELEASES_API = "https://api.github.com/repos/BangDori/prowl/releases/latest";
 
@@ -83,6 +84,7 @@ async function fetchLatestRelease(): Promise<GitHubRelease> {
  */
 export async function checkForUpdates(): Promise<UpdateCheckResult> {
   const currentVersion = app.getVersion();
+  const brewStatus = getBrewInstallStatus();
 
   try {
     const release = await fetchLatestRelease();
@@ -95,6 +97,7 @@ export async function checkForUpdates(): Promise<UpdateCheckResult> {
       latestVersion,
       releaseUrl: release.html_url,
       releaseNotes: release.body,
+      brewStatus,
     };
   } catch (error) {
     return {
@@ -103,6 +106,7 @@ export async function checkForUpdates(): Promise<UpdateCheckResult> {
       latestVersion: currentVersion,
       releaseUrl: "https://github.com/BangDori/prowl/releases",
       error: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
+      brewStatus,
     };
   }
 }

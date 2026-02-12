@@ -8,6 +8,7 @@ import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
 import JobsSection from "./sections/JobsSection";
 import SettingsSection from "./sections/SettingsSection";
+import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
 type NavItem = "jobs" | "calendar" | "changelog" | "settings" | "claude-config";
@@ -125,6 +126,9 @@ export default function DashboardLayout() {
         <header className="h-10 border-b border-prowl-border flex items-center px-4 -webkit-app-region-drag">
           <h1 className="text-sm font-medium">{NAV_LABELS[activeNav]}</h1>
         </header>
+
+        {/* Update banner */}
+        <UpdateBanner />
 
         {/* Content - 탭 전환 시 상태 유지를 위해 CSS로 보이기/숨기기 */}
         <div className="flex-1 overflow-hidden relative">

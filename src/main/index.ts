@@ -5,6 +5,7 @@ import { registerIpcHandlers } from "./ipc";
 import { startEventReminderScheduler } from "./services/event-reminder";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
+import { checkForUpdates } from "./services/update-checker";
 import { createSplashWindow, createTray, dismissSplash, showChatWindow } from "./windows";
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
@@ -47,6 +48,11 @@ if (!gotTheLock) {
       }, SPLASH.DISPLAY_DURATION_MS);
     }
   });
+
+  // 시작 시 업데이트 자동 체크 (5초 지연, brew 경로 캐시 워밍)
+  setTimeout(() => {
+    checkForUpdates().catch((err) => console.error("[Update] Startup check failed:", err));
+  }, 5000);
 
   app.on("will-quit", () => {
     globalShortcut.unregisterAll();
