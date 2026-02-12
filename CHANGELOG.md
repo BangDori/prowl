@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.14.0] - 2026-02-13
+- Homebrew Cask 기반 앱 내 자동 업데이트 시스템 추가
+- 앱 시작 시 업데이트 자동 체크 및 UpdateBanner 표시
+- Settings에서 brew upgrade 또는 Download 폴백 지원
+- Release 워크플로우에 ZIP 업로드 및 Homebrew formula 자동 갱신
+
 ## [1.13.3] - 2026-02-12
 - 모든 소스 파일에 한 줄 JSDoc 파일 헤더 추가 (AI 에이전트 탐색 최적화)
 - CLAUDE.md에 파일 헤더 컨벤션 규칙 추가
