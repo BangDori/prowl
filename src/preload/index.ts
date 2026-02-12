@@ -47,6 +47,8 @@ const electronAPI = {
   quitApp: invokeIpc("app:quit"),
   getAppVersion: invokeIpc("app:version"),
   checkForUpdates: invokeIpc("app:check-update"),
+  installUpdate: invokeIpc("app:install-update"),
+  relaunchApp: invokeIpc("app:relaunch"),
 
   // Chat
   sendChatMessage: invokeIpc("chat:send"),

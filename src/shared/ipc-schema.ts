@@ -61,10 +61,12 @@ export interface IpcInvokeSchema {
   // Navigation (1 channel)
   "nav:back": { params: []; return: void };
 
-  // App (3 channels)
+  // App (5 channels)
   "app:quit": { params: []; return: void };
   "app:version": { params: []; return: string };
   "app:check-update": { params: []; return: UpdateCheckResult };
+  "app:install-update": { params: []; return: IpcResult };
+  "app:relaunch": { params: []; return: void };
 
   // Chat (3 channels)
   "chat:send": { params: [content: string, history: ChatMessage[]]; return: ChatSendResult };

@@ -45,6 +45,12 @@ export interface ChatSendResult {
   error?: string;
 }
 
+// Homebrew 설치 상태
+export type BrewInstallStatus =
+  | "brew-ready" // brew 설치됨 + prowl이 brew로 설치됨
+  | "not-via-brew" // brew 있지만 prowl은 brew로 설치 안 됨
+  | "brew-not-installed"; // brew 자체가 없음
+
 // 업데이트 체크 결과
 export interface UpdateCheckResult {
   hasUpdate: boolean;
@@ -53,6 +59,7 @@ export interface UpdateCheckResult {
   releaseUrl: string;
   releaseNotes?: string;
   error?: string;
+  brewStatus?: BrewInstallStatus;
 }
 
 // 일정 알림 (이벤트 시작 전 알림)
