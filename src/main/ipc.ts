@@ -18,10 +18,15 @@ import {
 } from "./services/settings";
 import { refreshReminders } from "./services/task-reminder";
 import {
+  addTaskToBacklog,
+  deleteBacklogTask,
   deleteTask,
+  listBacklogTasks,
   listTasksByMonth,
   scanDates,
+  toggleBacklogComplete,
   toggleTaskComplete,
+  updateBacklogTask,
   updateTask,
 } from "./services/tasks";
 import { checkForUpdates } from "./services/update-checker";
@@ -280,6 +285,51 @@ export function registerIpcHandlers(): void {
   // 날짜 파일 목록 조회
   handleIpc("tasks:scan-dates", async () => {
     return scanDates();
+  });
+
+  // ── Backlog ──────────────────────────────────────────
+
+  handleIpc("tasks:list-backlog", async () => {
+    return listBacklogTasks();
+  });
+
+  handleIpc("tasks:add-backlog", async (task) => {
+    try {
+      addTaskToBacklog(task);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("tasks:update-backlog", async (task) => {
+    try {
+      updateBacklogTask(task);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("tasks:toggle-backlog-complete", async (taskId) => {
+    try {
+      toggleBacklogComplete(taskId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("tasks:delete-backlog", async (taskId) => {
+    try {
+      deleteBacklogTask(taskId);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // Claude Config 조회

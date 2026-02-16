@@ -61,6 +61,13 @@ const electronAPI = {
   deleteTask: invokeIpc("tasks:delete-task"),
   scanTaskDates: invokeIpc("tasks:scan-dates"),
 
+  // Tasks – Backlog
+  listBacklogTasks: invokeIpc("tasks:list-backlog"),
+  addBacklogTask: invokeIpc("tasks:add-backlog"),
+  updateBacklogTask: invokeIpc("tasks:update-backlog"),
+  toggleBacklogComplete: invokeIpc("tasks:toggle-backlog-complete"),
+  deleteBacklogTask: invokeIpc("tasks:delete-backlog"),
+
   // Claude Config
   getClaudeConfig: invokeIpc("claude-config:list"),
   readConfigFile: invokeIpc("claude-config:read-file"),
