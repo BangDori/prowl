@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.15.1] - 2026-02-16
+- 업데이트 인디케이터를 사이드바 하단으로 이동
+
 ## [1.15.0] - 2026-02-16
 - Calendar 탭을 파일 기반 Task Manager Calendar로 전환
 - ~/prowl-task-calendar/ 폴더의 JSON 파일로 태스크 관리
