@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.18.1] - 2026-02-17
+- brew upgrade 실행 전 brew update로 로컬 캐시를 갱신하여 tap 업데이트 인식 오류 수정
+
 ## [1.18.0] - 2026-02-17
 - 백로그(날짜 미정) 태스크 관리 기능 추가
 - Compact View 및 대시보드 어젠다 뷰에 날짜 미정 섹션 표시

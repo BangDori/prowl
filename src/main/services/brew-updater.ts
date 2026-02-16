@@ -62,6 +62,15 @@ export function getBrewInstallStatus(): BrewInstallStatus {
 }
 
 /**
+ * brew update로 로컬 formula 캐시 갱신
+ */
+function refreshBrewCache(brewPath: string): Promise<void> {
+  return new Promise((resolve) => {
+    execFile(brewPath, ["update"], { encoding: "utf-8", timeout: 60_000 }, () => resolve());
+  });
+}
+
+/**
  * Homebrew cask에 업그레이드 가능한 버전이 있는지 확인
  */
 function isCaskOutdated(brewPath: string): Promise<boolean> {
@@ -94,28 +103,30 @@ export function runBrewUpgrade(): Promise<IpcResult> {
     return Promise.resolve({ success: false, error: "Homebrew가 설치되어 있지 않습니다." });
   }
 
-  return isCaskOutdated(brewPath).then((outdated) => {
-    if (!outdated) {
-      return {
-        success: false,
-        error:
-          "Homebrew Cask가 아직 최신 버전을 반영하지 않았습니다. GitHub에서 직접 다운로드해주세요.",
-      };
-    }
+  return refreshBrewCache(brewPath)
+    .then(() => isCaskOutdated(brewPath))
+    .then((outdated) => {
+      if (!outdated) {
+        return {
+          success: false,
+          error:
+            "Homebrew Cask가 아직 최신 버전을 반영하지 않았습니다. GitHub에서 직접 다운로드해주세요.",
+        };
+      }
 
-    return new Promise<IpcResult>((resolve) => {
-      execFile(
-        brewPath,
-        ["upgrade", "--cask", CASK_NAME],
-        { encoding: "utf-8", timeout: 120_000 },
-        (error, _stdout, stderr) => {
-          if (error) {
-            resolve({ success: false, error: stderr || error.message });
-          } else {
-            resolve({ success: true });
-          }
-        },
-      );
+      return new Promise<IpcResult>((resolve) => {
+        execFile(
+          brewPath,
+          ["upgrade", "--cask", CASK_NAME],
+          { encoding: "utf-8", timeout: 120_000 },
+          (error, _stdout, stderr) => {
+            if (error) {
+              resolve({ success: false, error: stderr || error.message });
+            } else {
+              resolve({ success: true });
+            }
+          },
+        );
+      });
     });
-  });
 }
