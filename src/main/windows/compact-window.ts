@@ -1,4 +1,4 @@
-/** 컴팩트 Sticky View BrowserWindow 생성 및 관리 */
+/** Task Manager Sticky BrowserWindow 생성 및 관리 */
 import * as path from "node:path";
 import { BrowserWindow, screen } from "electron";
 import { COMPACT, DEV_SERVER_PORT } from "../constants";
@@ -29,7 +29,10 @@ export function showCompactWindow(): void {
     height: COMPACT.HEIGHT,
     x,
     y,
-    resizable: false,
+    resizable: true,
+    minWidth: COMPACT.WIDTH,
+    maxWidth: COMPACT.WIDTH,
+    minHeight: COMPACT.HEADER_HEIGHT,
     movable: true,
     minimizable: false,
     maximizable: false,
@@ -38,6 +41,8 @@ export function showCompactWindow(): void {
     alwaysOnTop: true,
     show: false,
     frame: false,
+    titleBarStyle: "hiddenInset",
+    trafficLightPosition: { x: -20, y: -20 },
     vibrancy: "under-window",
     visualEffectState: "active",
     backgroundColor: "#00000000",
