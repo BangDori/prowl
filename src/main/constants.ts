@@ -76,5 +76,6 @@ export const DASHBOARD = {
 export const COMPACT = {
   WIDTH: 280,
   HEIGHT: 400,
+  HEADER_HEIGHT: 28,
   MARGIN: 16,
 } as const;

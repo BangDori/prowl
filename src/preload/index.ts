@@ -52,6 +52,7 @@ const electronAPI = {
 
   // Compact
   toggleCompactView: invokeIpc("compact:toggle"),
+  resizeCompactView: invokeIpc("compact:resize"),
 
   // Tasks
   listTasksByMonth: invokeIpc("tasks:list-month"),
