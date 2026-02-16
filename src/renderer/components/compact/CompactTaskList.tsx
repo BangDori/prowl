@@ -1,7 +1,7 @@
 /** 오늘의 태스크 목록 (체크박스 토글 가능) */
 import type { Task } from "@shared/types";
 import { PRIORITY_COLORS } from "@shared/types";
-import { ChevronDown, ChevronRight, Clock, Flag } from "lucide-react";
+import { CalendarClock, ChevronDown, ChevronRight, Flag } from "lucide-react";
 import { useState } from "react";
 import { sortTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactTaskDetail from "./CompactTaskDetail";
@@ -25,7 +25,8 @@ export default function CompactTaskList({
   const incompleteCount = tasks.filter((t) => !t.completed).length;
 
   const toggleSort = () => onSortModeChange(sortMode === "priority" ? "time" : "priority");
-  const SortIcon = sortMode === "priority" ? Flag : Clock;
+  const SortIcon = sortMode === "time" ? CalendarClock : Flag;
+  const sortLabel = sortMode === "time" ? "마감기한" : "우선순위";
 
   return (
     <div>
@@ -38,10 +39,10 @@ export default function CompactTaskList({
             type="button"
             onClick={toggleSort}
             className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-colors"
-            title={sortMode === "priority" ? "우선순위순" : "시간순"}
+            title={sortLabel}
           >
             <SortIcon className="w-2.5 h-2.5" />
-            <span>{sortMode === "priority" ? "우선순위" : "시간"}</span>
+            <span>{sortLabel}</span>
           </button>
         </div>
         <span className="text-[9px] text-white/30">
