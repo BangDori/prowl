@@ -99,11 +99,11 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   }
 
   return (
-    <div className="glass-card-3d group flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+    <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-white/[0.03] border border-white/[0.04] hover:bg-white/[0.06] transition-colors">
       <button
         type="button"
         onClick={onToggleComplete}
-        className={`mt-0.5 w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+        className={`w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
           task.completed
             ? "bg-emerald-500/30 border-emerald-500/50"
             : "border-gray-600 hover:border-gray-400"
