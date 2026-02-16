@@ -1,12 +1,12 @@
 /** 일정 알림 시간 선택 컴포넌트 */
-import type { EventReminder } from "@shared/types";
+import type { TaskReminder } from "@shared/types";
 import { REMINDER_PRESETS } from "@shared/types";
 import { Bell, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface ReminderPickerProps {
-  reminders: EventReminder[];
-  onChange: (reminders: EventReminder[]) => void;
+  reminders: TaskReminder[];
+  onChange: (reminders: TaskReminder[]) => void;
 }
 
 export default function ReminderPicker({ reminders, onChange }: ReminderPickerProps) {
