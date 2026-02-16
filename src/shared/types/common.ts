@@ -62,11 +62,6 @@ export interface UpdateCheckResult {
   brewStatus?: BrewInstallStatus;
 }
 
-// 일정 알림 (이벤트 시작 전 알림)
-export interface EventReminder {
-  minutes: number; // 이벤트 시작 몇 분 전에 알림 (예: 60 = 1시간 전, 1440 = 1일 전)
-}
-
 // Claude Agent 메타데이터
 export interface ClaudeAgentMeta {
   name: string;

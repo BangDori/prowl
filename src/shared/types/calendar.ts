@@ -1,38 +1,23 @@
-/** 캘린더 이벤트·피드·로컬 일정 타입 */
-import type { EventReminder } from "./common";
+/** Task 캘린더 타입 (파일 기반 태스크 관리) */
 
-// 캘린더 이벤트
-export interface CalendarEvent {
-  uid: string;
-  summary: string;
-  description?: string;
-  location?: string;
-  dtstart: string; // ISO 8601
-  dtend: string; // ISO 8601
-  allDay: boolean;
-  feedId: string; // 어떤 피드에서 온 이벤트인지
-}
+/** 태스크 우선순위 */
+export type TaskPriority = "high" | "medium" | "low";
 
-// ICS 피드
-export interface IcsFeed {
-  id: string; // 고유 ID
-  label: string; // "회사", "개인" 등
-  url: string; // ICS URL
-  color: string; // 피드 색상 (hex)
-  filterKeyword?: string; // 포함 키워드 필터 (설정 시 키워드가 포함된 이벤트만 표시)
-}
+/** 우선순위별 색상 */
+export const PRIORITY_COLORS: Record<TaskPriority, string> = {
+  high: "#ef4444",
+  medium: "#f59e0b",
+  low: "#3b82f6",
+} as const;
 
-// 피드 색상 프리셋
-export const FEED_COLORS = [
-  "#3b82f6", // blue
-  "#22c55e", // green
-  "#ef4444", // red
-  "#a855f7", // purple
-  "#ec4899", // pink
-  "#06b6d4", // cyan
-] as const;
+/** 우선순위별 라벨 */
+export const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  high: "높음",
+  medium: "보통",
+  low: "낮음",
+} as const;
 
-// 알림 프리셋 옵션
+/** 알림 프리셋 */
 export const REMINDER_PRESETS: { label: string; minutes: number }[] = [
   { label: "정각", minutes: 0 },
   { label: "5분 전", minutes: 5 },
@@ -46,27 +31,27 @@ export const REMINDER_PRESETS: { label: string; minutes: number }[] = [
   { label: "1주 전", minutes: 10080 },
 ];
 
-// 로컬 이벤트 (사용자가 직접 추가)
-export interface LocalEvent {
+/** 태스크 알림 */
+export interface TaskReminder {
+  minutes: number;
+}
+
+/** 태스크 데이터 모델 (JSON 파일에 저장) */
+export interface Task {
   id: string;
-  summary: string;
+  title: string;
   description?: string;
-  location?: string;
-  dtstart: string; // ISO 문자열 (저장용)
-  dtend: string;
-  allDay: boolean;
-  reminders?: EventReminder[]; // 알림 목록
+  dueTime?: string; // "HH:MM" (없으면 종일)
+  priority: TaskPriority;
+  category?: string;
+  completed: boolean;
+  completedAt?: string; // ISO 8601
+  createdAt: string; // ISO 8601
+  reminders?: TaskReminder[];
 }
 
-// 로컬 이벤트 전용 feedId 및 색상
-export const LOCAL_FEED_ID = "__local__";
-export const LOCAL_EVENT_COLOR = "#f59e0b"; // accent gold
+/** 날짜별 태스크 맵 (month 단위 조회 결과) */
+export type TasksByDate = Record<string, Task[]>;
 
-// 캘린더 설정
-export interface CalendarSettings {
-  feeds: IcsFeed[];
-}
-
-export const DEFAULT_CALENDAR_SETTINGS: CalendarSettings = {
-  feeds: [],
-};
+/** 태스크 폴더 기본 경로 */
+export const TASK_FOLDER_NAME = "prowl-task-calendar";

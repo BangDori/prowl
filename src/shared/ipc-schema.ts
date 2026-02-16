@@ -1,8 +1,6 @@
 /** IPC 채널별 파라미터·반환 타입 스키마 */
 import type {
   AppSettings,
-  CalendarEvent,
-  CalendarSettings,
   ChatMessage,
   ChatSendResult,
   ClaudeConfig,
@@ -12,8 +10,9 @@ import type {
   JobCustomization,
   JobCustomizations,
   LaunchdJob,
-  LocalEvent,
   LogContent,
+  Task,
+  TasksByDate,
   UpdateCheckResult,
 } from "./types";
 
@@ -73,14 +72,24 @@ export interface IpcInvokeSchema {
   "chat:resize": { params: [height: number]; return: void };
   "chat:close": { params: []; return: void };
 
-  // Calendar (7 channels)
-  "calendar:list-events": { params: []; return: CalendarEvent[] };
-  "calendar:get-settings": { params: []; return: CalendarSettings };
-  "calendar:set-settings": { params: [settings: CalendarSettings]; return: IpcResult };
-  "calendar:local-events": { params: []; return: LocalEvent[] };
-  "calendar:add-local-event": { params: [event: LocalEvent]; return: IpcResult };
-  "calendar:update-local-event": { params: [event: LocalEvent]; return: IpcResult };
-  "calendar:delete-local-event": { params: [eventId: string]; return: IpcResult };
+  // Tasks (5 channels)
+  "tasks:list-month": {
+    params: [year: number, month: number];
+    return: TasksByDate;
+  };
+  "tasks:update-task": {
+    params: [date: string, task: Task];
+    return: IpcResult;
+  };
+  "tasks:toggle-complete": {
+    params: [date: string, taskId: string];
+    return: IpcResult;
+  };
+  "tasks:delete-task": {
+    params: [date: string, taskId: string];
+    return: IpcResult;
+  };
+  "tasks:scan-dates": { params: []; return: string[] };
 
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };
