@@ -1,6 +1,6 @@
 /** 단일 태스크 행: 체크박스, 제목, 우선순위, 리마인더, 인라인 편집 */
 import type { Task, TaskPriority, TaskReminder } from "@shared/types";
-import { PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
+import { DEFAULT_REMINDERS, PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
 import { Bell, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import ReminderPicker from "./ReminderPicker";
@@ -17,7 +17,9 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
-  const [reminders, setReminders] = useState<TaskReminder[]>(task.reminders ?? []);
+  const [reminders, setReminders] = useState<TaskReminder[]>(
+    task.reminders && task.reminders.length > 0 ? task.reminders : DEFAULT_REMINDERS,
+  );
 
   const handleSave = () => {
     if (!title.trim()) return;
