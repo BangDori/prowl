@@ -2,7 +2,6 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "../constants";
-import { showChatWindow } from "./chat-window";
 import { showDashboardWindow } from "./dashboard-window";
 
 let tray: Tray | null = null;
@@ -155,23 +154,10 @@ export function popUpTrayMenu(): void {
     },
     { type: "separator" },
     {
-      label: "Background Monitor",
-      icon: loadMenuIcon("monitor"),
-      click: () => showSubPage("monitor"),
-    },
-    {
-      label: "Prowl Chat",
-      icon: loadMenuIcon("message-circle"),
-      accelerator: "CommandOrControl+Shift+P",
-      click: () => showChatWindow(),
-    },
-    { type: "separator" },
-    {
       label: "Open GitHub Repository",
       icon: loadMenuIcon("github"),
       click: () => shell.openExternal("https://github.com/BangDori/prowl"),
     },
-    { type: "separator" },
     {
       label: "Quit Prowl",
       icon: loadMenuIcon("power"),

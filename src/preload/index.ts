@@ -50,11 +50,6 @@ const electronAPI = {
   installUpdate: invokeIpc("app:install-update"),
   relaunchApp: invokeIpc("app:relaunch"),
 
-  // Chat
-  sendChatMessage: invokeIpc("chat:send"),
-  resizeChatWindow: invokeIpc("chat:resize"),
-  closeChatWindow: invokeIpc("chat:close"),
-
   // Tasks
   listTasksByMonth: invokeIpc("tasks:list-month"),
   updateTask: invokeIpc("tasks:update-task"),

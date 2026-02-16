@@ -68,7 +68,8 @@ describe("tray", () => {
 
       expect(Menu.buildFromTemplate).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ label: "Background Monitor" }),
+          expect.objectContaining({ label: "Go to Dashboard" }),
+          expect.objectContaining({ label: "Open GitHub Repository" }),
           expect.objectContaining({ label: "Quit Prowl" }),
         ]),
       );
