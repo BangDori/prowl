@@ -41,7 +41,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
 
   if (editing) {
     return (
-      <div className="rounded-lg border border-white/[0.06] bg-prowl-card/50 backdrop-blur-xl px-2.5 py-2 space-y-1.5">
+      <div className="glass-card-3d rounded-lg border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl px-2.5 py-2 space-y-1.5">
         <input
           type="text"
           value={title}
@@ -99,7 +99,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   }
 
   return (
-    <div className="group flex items-start gap-1.5 px-2 py-1 rounded-md hover:bg-white/5 transition-colors">
+    <div className="glass-card-3d group flex items-start gap-1.5 px-2 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
       <button
         type="button"
         onClick={onToggleComplete}

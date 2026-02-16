@@ -55,9 +55,9 @@ export default function CalendarSection() {
 
   const calendarDays = useMemo(() => getCalendarDays(viewYear, viewMonth), [viewYear, viewMonth]);
 
-  const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString("ko-KR", {
+  const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
   });
 
   if (isLoading) {

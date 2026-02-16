@@ -51,7 +51,7 @@ export default function TaskListPanel({
             <p className="text-[11px] text-gray-600">태스크 없음</p>
           </div>
         ) : (
-          <div className="px-1 pb-3 space-y-0.5">
+          <div className="px-2 pb-3 space-y-2">
             {tasks.map((task) => (
               <TaskItem
                 key={task.id}
@@ -117,7 +117,7 @@ function AgendaView({
               {formatDateKr(group.date)}
               {isToday(dateObj) && <span className="ml-1.5 text-accent">오늘</span>}
             </span>
-            <div className="mt-0.5 space-y-0.5">
+            <div className="mt-1 space-y-2">
               {group.tasks.map((task) => (
                 <TaskItem
                   key={task.id}
