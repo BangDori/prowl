@@ -100,3 +100,67 @@ export function deleteTask(date: string, taskId: string): void {
   const tasks = readDateFile(date).filter((t) => t.id !== taskId);
   writeDateFile(date, tasks);
 }
+
+// ── Backlog ──────────────────────────────────────────
+
+const BACKLOG_FILE = "backlog.json";
+
+/** backlog.json 파일 경로 */
+function backlogFilePath(): string {
+  return join(ensureFolder(), BACKLOG_FILE);
+}
+
+/** 백로그 태스크 목록 읽기 */
+function readBacklogFile(): Task[] {
+  const filePath = backlogFilePath();
+  if (!existsSync(filePath)) return [];
+  try {
+    const raw = readFileSync(filePath, "utf-8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/** 백로그 태스크 목록 쓰기 */
+function writeBacklogFile(tasks: Task[]): void {
+  writeFileSync(backlogFilePath(), JSON.stringify(tasks, null, 2), "utf-8");
+}
+
+/** 백로그 전체 조회 */
+export function listBacklogTasks(): Task[] {
+  return readBacklogFile();
+}
+
+/** 백로그에 태스크 추가 */
+export function addTaskToBacklog(task: Task): void {
+  const tasks = readBacklogFile();
+  tasks.push(task);
+  writeBacklogFile(tasks);
+}
+
+/** 백로그 태스크 수정 */
+export function updateBacklogTask(task: Task): void {
+  const tasks = readBacklogFile();
+  const idx = tasks.findIndex((t) => t.id === task.id);
+  if (idx === -1) throw new Error(`Backlog task not found: ${task.id}`);
+  tasks[idx] = task;
+  writeBacklogFile(tasks);
+}
+
+/** 백로그 태스크 완료 토글 */
+export function toggleBacklogComplete(taskId: string): void {
+  const tasks = readBacklogFile();
+  const task = tasks.find((t) => t.id === taskId);
+  if (!task) throw new Error(`Backlog task not found: ${taskId}`);
+  task.completed = !task.completed;
+  task.completedAt = task.completed ? new Date().toISOString() : undefined;
+  writeBacklogFile(tasks);
+}
+
+/** 백로그 태스크 삭제 */
+export function deleteBacklogTask(taskId: string): void {
+  const tasks = readBacklogFile().filter((t) => t.id !== taskId);
+  writeBacklogFile(tasks);
+}

@@ -8,9 +8,11 @@ import TaskItem from "./TaskItem";
 interface TaskListPanelProps {
   selectedDate: Date | null;
   tasksByDate: TasksByDate;
+  backlogTasks: Task[];
   showCompleted: boolean;
   filterPriority: TaskPriority | null;
   onToggleComplete: (date: string, taskId: string) => void;
+  onToggleBacklogComplete: (taskId: string) => void;
   onUpdateTask: (date: string, task: Task) => void;
   onDeleteTask: (date: string, taskId: string) => void;
 }
@@ -18,9 +20,11 @@ interface TaskListPanelProps {
 export default function TaskListPanel({
   selectedDate,
   tasksByDate,
+  backlogTasks,
   showCompleted,
   filterPriority,
   onToggleComplete,
+  onToggleBacklogComplete,
   onUpdateTask,
   onDeleteTask,
 }: TaskListPanelProps) {
@@ -73,9 +77,11 @@ export default function TaskListPanel({
   return (
     <AgendaView
       tasksByDate={tasksByDate}
+      backlogTasks={backlogTasks}
       showCompleted={showCompleted}
       filterPriority={filterPriority}
       onToggleComplete={onToggleComplete}
+      onToggleBacklogComplete={onToggleBacklogComplete}
       onUpdateTask={onUpdateTask}
       onDeleteTask={onDeleteTask}
     />
@@ -85,9 +91,11 @@ export default function TaskListPanel({
 /** 어젠다 뷰: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
 function AgendaView({
   tasksByDate,
+  backlogTasks,
   showCompleted,
   filterPriority,
   onToggleComplete,
+  onToggleBacklogComplete,
   onUpdateTask,
   onDeleteTask,
 }: Omit<TaskListPanelProps, "selectedDate">) {
@@ -99,7 +107,16 @@ function AgendaView({
       .filter((g) => g.tasks.length > 0);
   }, [tasksByDate, showCompleted, filterPriority]);
 
-  if (groups.length === 0) {
+  const filteredBacklog = useMemo(() => {
+    let filtered = backlogTasks;
+    if (!showCompleted) filtered = filtered.filter((t) => !t.completed);
+    if (filterPriority) filtered = filtered.filter((t) => t.priority === filterPriority);
+    return sortTasks(filtered);
+  }, [backlogTasks, showCompleted, filterPriority]);
+
+  const isEmpty = groups.length === 0 && filteredBacklog.length === 0;
+
+  if (isEmpty) {
     return (
       <div className="flex-1 border-t border-prowl-border overflow-y-auto">
         <div className="flex items-center justify-center py-6">
@@ -139,6 +156,26 @@ function AgendaView({
           </div>
         );
       })}
+
+      {filteredBacklog.length > 0 && (
+        <div className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-medium text-gray-500">날짜 미정</span>
+            <span className="text-[10px] text-gray-600">{filteredBacklog.length}건</span>
+          </div>
+          <div className="space-y-1.5">
+            {filteredBacklog.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggleComplete={() => onToggleBacklogComplete(task.id)}
+                onUpdate={() => {}}
+                onDelete={() => {}}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

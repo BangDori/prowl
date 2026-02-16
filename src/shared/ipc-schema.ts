@@ -69,7 +69,7 @@ export interface IpcInvokeSchema {
   "compact:toggle": { params: []; return: IpcResult };
   "compact:resize": { params: [height: number]; return: void };
 
-  // Tasks (5 channels)
+  // Tasks (10 channels)
   "tasks:list-month": {
     params: [year: number, month: number];
     return: TasksByDate;
@@ -87,6 +87,16 @@ export interface IpcInvokeSchema {
     return: IpcResult;
   };
   "tasks:scan-dates": { params: []; return: string[] };
+
+  // Tasks – Backlog
+  "tasks:list-backlog": { params: []; return: Task[] };
+  "tasks:add-backlog": { params: [task: Task]; return: IpcResult };
+  "tasks:update-backlog": { params: [task: Task]; return: IpcResult };
+  "tasks:toggle-backlog-complete": {
+    params: [taskId: string];
+    return: IpcResult;
+  };
+  "tasks:delete-backlog": { params: [taskId: string]; return: IpcResult };
 
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };

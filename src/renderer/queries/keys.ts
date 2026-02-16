@@ -19,6 +19,7 @@ export const queryKeys = {
     all: ["tasks"] as const,
     month: (year: number, month: number) => [...queryKeys.tasks.all, "month", year, month] as const,
     dates: () => [...queryKeys.tasks.all, "dates"] as const,
+    backlog: () => [...queryKeys.tasks.all, "backlog"] as const,
   },
   claude: {
     all: ["claude"] as const,
