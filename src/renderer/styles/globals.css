@@ -222,6 +222,24 @@ select.input-field {
   @apply text-5xl mb-3 opacity-50;
 }
 
+/* 3D 글래스 카드 */
+.glass-card-3d {
+  transform: perspective(800px) rotateX(1deg);
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.glass-card-3d:hover {
+  transform: perspective(800px) rotateX(0deg) translateY(-2px);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 /* ============================================
    대시보드 윈도우 드래그 영역
    ============================================ */
