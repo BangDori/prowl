@@ -69,3 +69,13 @@ export const DASHBOARD = {
   MIN_WIDTH: 700,
   MIN_HEIGHT: 400,
 } as const;
+
+// ============================================
+// Task Manager 윈도우 설정
+// ============================================
+export const COMPACT = {
+  WIDTH: 280,
+  HEIGHT: 400,
+  HEADER_HEIGHT: 28,
+  MARGIN: 16,
+} as const;

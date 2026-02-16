@@ -50,6 +50,10 @@ const electronAPI = {
   installUpdate: invokeIpc("app:install-update"),
   relaunchApp: invokeIpc("app:relaunch"),
 
+  // Compact
+  toggleCompactView: invokeIpc("compact:toggle"),
+  resizeCompactView: invokeIpc("compact:resize"),
+
   // Tasks
   listTasksByMonth: invokeIpc("tasks:list-month"),
   updateTask: invokeIpc("tasks:update-task"),
