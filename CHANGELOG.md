@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.18.0] - 2026-02-17
+- 백로그(날짜 미정) 태스크 관리 기능 추가
+- Compact View 및 대시보드 어젠다 뷰에 날짜 미정 섹션 표시
+
 ## [1.17.0] - 2026-02-17
 - Task Manager 태스크 정렬 기능 추가 (우선순위순/시간순 토글)
 - 태스크 행 펼침 상세 보기 추가 (우선순위, 시간, 카테고리, 설명 표시)
