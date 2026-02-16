@@ -2,6 +2,14 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.15.3] - 2026-02-16
+- macOS vibrancy 기반 Liquid Glass 투명 배경 적용
+- 전 섹션 카드에 3D 글래스 효과 적용 (Settings, Version History, Background Monitor, Calendar)
+- 캘린더 태스크 목록 글래스 카드 통합 및 정렬 개선
+- 오늘 날짜 숫자가 보이지 않는 문제 수정
+- 알림 드롭다운 위치 오류 수정 (createPortal 적용)
+- 태스크 기본 알림 1일 전 UI 표시
+
 ## [1.15.2] - 2026-02-16
 - 채팅 기능 전체 제거 (서비스, 윈도우, UI, IPC, 타입)
 - 트레이 메뉴에서 Background Monitor, Prowl Chat 항목 제거
