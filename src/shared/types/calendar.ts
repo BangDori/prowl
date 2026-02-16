@@ -36,6 +36,9 @@ export interface TaskReminder {
   minutes: number;
 }
 
+/** 기본 알림: 1일 전 */
+export const DEFAULT_REMINDERS: TaskReminder[] = [{ minutes: 1440 }];
+
 /** 태스크 데이터 모델 (JSON 파일에 저장) */
 export interface Task {
   id: string;

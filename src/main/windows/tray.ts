@@ -76,6 +76,9 @@ function showSubPage(hash: string): void {
     skipTaskbar: true,
     show: false,
     frame: false,
+    vibrancy: "under-window",
+    visualEffectState: "active",
+    backgroundColor: "#00000000",
     webPreferences: {
       preload: path.join(__dirname, "../../preload/index.js"),
       contextIsolation: true,

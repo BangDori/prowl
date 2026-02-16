@@ -3,6 +3,7 @@ import type { TaskReminder } from "@shared/types";
 import { REMINDER_PRESETS } from "@shared/types";
 import { Bell, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface ReminderPickerProps {
   reminders: TaskReminder[];
@@ -17,7 +18,13 @@ export default function ReminderPicker({ reminders, onChange }: ReminderPickerPr
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setShowDropdown(false);
+      if (
+        ref.current &&
+        !ref.current.contains(e.target as Node) &&
+        !(e.target as Element).closest("[data-reminder-dropdown]")
+      ) {
+        setShowDropdown(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -74,31 +81,35 @@ export default function ReminderPicker({ reminders, onChange }: ReminderPickerPr
           </span>
         ))}
       </div>
-      {showDropdown && dropdownPos && (
-        <div
-          className="fixed z-[9999] p-1 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl min-w-[120px]"
-          style={{ top: dropdownPos.top, left: dropdownPos.left, transform: "translateY(-100%)" }}
-        >
-          {REMINDER_PRESETS.map((preset) => {
-            const isAdded = reminders.some((r) => r.minutes === preset.minutes);
-            return (
-              <button
-                key={preset.minutes}
-                type="button"
-                disabled={isAdded}
-                onClick={() => addReminder(preset.minutes)}
-                className={`w-full text-left px-2 py-1 rounded text-[10px] transition-colors ${
-                  isAdded
-                    ? "text-gray-600 cursor-not-allowed"
-                    : "text-gray-300 hover:bg-white/10 cursor-pointer"
-                }`}
-              >
-                {preset.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {showDropdown &&
+        dropdownPos &&
+        createPortal(
+          <div
+            data-reminder-dropdown
+            className="fixed z-[9999] p-1 rounded-lg border border-white/[0.08] bg-[#1a1a1a] backdrop-blur-2xl shadow-xl min-w-[120px]"
+            style={{ top: dropdownPos.top, left: dropdownPos.left, transform: "translateY(-100%)" }}
+          >
+            {REMINDER_PRESETS.map((preset) => {
+              const isAdded = reminders.some((r) => r.minutes === preset.minutes);
+              return (
+                <button
+                  key={preset.minutes}
+                  type="button"
+                  disabled={isAdded}
+                  onClick={() => addReminder(preset.minutes)}
+                  className={`w-full text-left px-2 py-1 rounded text-[10px] transition-colors ${
+                    isAdded
+                      ? "text-gray-600 cursor-not-allowed"
+                      : "text-gray-300 hover:bg-white/10 cursor-pointer"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

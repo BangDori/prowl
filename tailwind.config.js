@@ -5,13 +5,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 다크 테마 기반 색상 (로고 컨셉)
+        // 다크 테마 기반 색상 (Liquid Glass)
         prowl: {
-          bg: '#0d0d0d',
-          surface: '#161616',
-          card: '#1e1e1e',
-          border: '#2a2a2a',
-          'border-hover': '#3a3a3a',
+          bg: 'transparent',
+          surface: 'rgba(255, 255, 255, 0.06)',
+          card: 'rgba(255, 255, 255, 0.04)',
+          border: 'rgba(255, 255, 255, 0.08)',
+          'border-hover': 'rgba(255, 255, 255, 0.15)',
         },
         // 골드 액센트 (고양이 눈 색상)
         accent: {

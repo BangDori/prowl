@@ -126,7 +126,7 @@ function ContentPanel({ selected, content, loading, onOpenInFinder }: ContentPan
   return (
     <div className="h-full flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-prowl-border bg-prowl-surface/50">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-white/[0.03] backdrop-blur-xl">
         <div className="flex-1 min-w-0">
           <h2 className="text-xs font-medium truncate">{title}</h2>
           <p className="text-[10px] text-gray-500 font-mono">{subtitle}</p>

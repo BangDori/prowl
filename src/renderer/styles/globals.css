@@ -9,13 +9,17 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  background: transparent !important;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
-  @apply bg-surface-light dark:bg-surface-dark;
 }
 
 /* 스크롤바 숨기기 */
@@ -82,7 +86,7 @@ body {
 /* 로그 뷰어 - 터미널 스타일 */
 .log-viewer {
   @apply font-mono text-xs leading-relaxed;
-  @apply bg-black/90 text-green-400 p-4 rounded-lg;
+  @apply bg-black/40 text-green-400 p-4 rounded-lg backdrop-blur-md;
   @apply overflow-auto max-h-64;
   @apply border border-prowl-border;
   white-space: pre-wrap;
@@ -92,7 +96,7 @@ body {
 /* 인풋 필드 */
 .input-field {
   @apply px-3 py-2 text-sm rounded-lg transition-all duration-200;
-  @apply bg-white dark:bg-prowl-card;
+  @apply bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm;
   @apply border border-gray-300 dark:border-prowl-border;
   @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
   @apply placeholder:text-gray-400 dark:placeholder:text-gray-600;
@@ -179,9 +183,9 @@ select.input-field {
 /* 헤더 */
 .app-header {
   @apply sticky top-0 z-10 px-4 py-3;
-  @apply bg-surface-light/80 dark:bg-surface-dark/80;
+  @apply bg-white/[0.03] dark:bg-white/[0.03];
   @apply backdrop-blur-xl;
-  @apply border-b border-gray-200 dark:border-prowl-border;
+  @apply border-b border-white/[0.06];
 }
 
 /* 메뉴 항목 */
@@ -216,6 +220,24 @@ select.input-field {
 
 .empty-state-icon {
   @apply text-5xl mb-3 opacity-50;
+}
+
+/* 3D 글래스 카드 */
+.glass-card-3d {
+  transform: perspective(800px) rotateX(1deg);
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.glass-card-3d:hover {
+  transform: perspective(800px) rotateX(0deg) translateY(-2px);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ============================================

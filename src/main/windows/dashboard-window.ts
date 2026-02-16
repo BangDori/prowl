@@ -43,7 +43,9 @@ export function showDashboardWindow(): void {
     frame: false,
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 12, y: 12 },
-    vibrancy: "sidebar",
+    vibrancy: "under-window",
+    visualEffectState: "active",
+    backgroundColor: "#00000000",
     webPreferences: {
       preload: path.join(__dirname, "../../preload/index.js"),
       contextIsolation: true,

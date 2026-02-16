@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Task } from "@shared/types";
-import { TASK_FOLDER_NAME } from "@shared/types";
+import { DEFAULT_REMINDERS, TASK_FOLDER_NAME } from "@shared/types";
 import { app, Notification } from "electron";
 import { scanDates } from "./tasks";
 
@@ -18,7 +18,7 @@ function loadTasksForDate(date: string): Task[] {
 }
 
 const POLL_INTERVAL_MS = 30000;
-const DEFAULT_REMINDER_MINUTES = 1440; // 1일 전 기본 알림
+const DEFAULT_REMINDER_MINUTES = DEFAULT_REMINDERS[0].minutes;
 const DEFAULT_DUE_TIME = "09:00"; // dueTime 없는 태스크 기준 시각
 const firedReminders = new Set<string>();
 let pollTimer: ReturnType<typeof setInterval> | null = null;

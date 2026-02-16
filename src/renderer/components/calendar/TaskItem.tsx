@@ -1,6 +1,6 @@
 /** 단일 태스크 행: 체크박스, 제목, 우선순위, 리마인더, 인라인 편집 */
 import type { Task, TaskPriority, TaskReminder } from "@shared/types";
-import { PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
+import { DEFAULT_REMINDERS, PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
 import { Bell, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import ReminderPicker from "./ReminderPicker";
@@ -17,7 +17,9 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
-  const [reminders, setReminders] = useState<TaskReminder[]>(task.reminders ?? []);
+  const [reminders, setReminders] = useState<TaskReminder[]>(
+    task.reminders && task.reminders.length > 0 ? task.reminders : DEFAULT_REMINDERS,
+  );
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -41,7 +43,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
 
   if (editing) {
     return (
-      <div className="rounded-lg border border-prowl-border bg-prowl-card/50 px-2.5 py-2 space-y-1.5">
+      <div className="glass-card-3d rounded-lg border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl px-2.5 py-2 space-y-1.5">
         <input
           type="text"
           value={title}
@@ -99,11 +101,11 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   }
 
   return (
-    <div className="group flex items-start gap-1.5 px-2 py-1 rounded-md hover:bg-white/5 transition-colors">
+    <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-white/[0.03] border border-white/[0.04] hover:bg-white/[0.06] transition-colors">
       <button
         type="button"
         onClick={onToggleComplete}
-        className={`mt-0.5 w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+        className={`w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
           task.completed
             ? "bg-emerald-500/30 border-emerald-500/50"
             : "border-gray-600 hover:border-gray-400"

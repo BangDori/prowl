@@ -13,15 +13,6 @@ import UpdateBanner from "./UpdateBanner";
 /** 네비게이션 아이템 타입 */
 type NavItem = "jobs" | "calendar" | "changelog" | "settings" | "claude-config";
 
-/** 네비게이션 아이템별 레이블 */
-const NAV_LABELS: Record<NavItem, string> = {
-  jobs: "Background Monitor",
-  calendar: "Calendar",
-  changelog: "Version History",
-  settings: "Settings",
-  "claude-config": "Claude Config",
-};
-
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
   /** 아이콘 React 노드 */
@@ -71,9 +62,9 @@ export default function DashboardLayout() {
   const [activeNav, setActiveNav] = useState<NavItem>("jobs");
 
   return (
-    <div className="flex h-screen bg-prowl-bg text-gray-100">
+    <div className="flex h-screen bg-transparent text-gray-100">
       {/* Sidebar */}
-      <aside className="w-52 flex-shrink-0 bg-prowl-surface border-r border-prowl-border flex flex-col">
+      <aside className="w-52 flex-shrink-0 bg-white/[0.02] border-r border-white/[0.06] flex flex-col">
         {/* Drag region for window */}
         <div className="h-10 -webkit-app-region-drag" />
 
@@ -124,14 +115,8 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Header with drag region */}
-        <header className="h-10 border-b border-prowl-border flex items-center px-4 -webkit-app-region-drag">
-          <h1 className="text-sm font-medium">{NAV_LABELS[activeNav]}</h1>
-        </header>
-
-        {/* Content - 탭 전환 시 상태 유지를 위해 CSS로 보이기/숨기기 */}
-        <div className="flex-1 overflow-hidden relative">
+      <main className="flex-1 min-w-0">
+        <div className="h-full overflow-hidden relative">
           <div className={`h-full ${activeNav === "jobs" ? "" : "hidden"}`}>
             <ErrorBoundary section="Background Monitor">
               <JobsSection />

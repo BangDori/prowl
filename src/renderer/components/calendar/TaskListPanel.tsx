@@ -38,31 +38,33 @@ export default function TaskListPanel({
     const isDateToday = isToday(selectedDate);
 
     return (
-      <div className="flex-1 border-t border-prowl-border overflow-y-auto">
-        <div className="flex items-center justify-between px-3 py-1.5">
-          <span className="text-[10px] font-medium text-gray-500">
-            {formatDateKr(dateStr)}
-            {isDateToday && <span className="ml-1.5 text-accent">오늘</span>}
-          </span>
-          <span className="text-[10px] text-gray-600">{tasks.length}건</span>
+      <div className="flex-1 border-t border-prowl-border overflow-y-auto px-3 py-2">
+        <div className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-medium text-gray-500">
+              {formatDateKr(dateStr)}
+              {isDateToday && <span className="ml-1.5 text-accent">오늘</span>}
+            </span>
+            <span className="text-[10px] text-gray-600">{tasks.length}건</span>
+          </div>
+          {tasks.length === 0 ? (
+            <div className="flex items-center justify-center py-4">
+              <p className="text-[11px] text-gray-600">태스크 없음</p>
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {tasks.map((task) => (
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  onToggleComplete={() => onToggleComplete(dateStr, task.id)}
+                  onUpdate={(updated) => onUpdateTask(dateStr, updated)}
+                  onDelete={() => onDeleteTask(dateStr, task.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {tasks.length === 0 ? (
-          <div className="flex items-center justify-center py-6">
-            <p className="text-[11px] text-gray-600">태스크 없음</p>
-          </div>
-        ) : (
-          <div className="px-1 pb-3 space-y-0.5">
-            {tasks.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onToggleComplete={() => onToggleComplete(dateStr, task.id)}
-                onUpdate={(updated) => onUpdateTask(dateStr, updated)}
-                onDelete={() => onDeleteTask(dateStr, task.id)}
-              />
-            ))}
-          </div>
-        )}
       </div>
     );
   }
@@ -108,16 +110,22 @@ function AgendaView({
   }
 
   return (
-    <div className="flex-1 border-t border-prowl-border overflow-y-auto px-1 pb-3">
+    <div className="flex-1 border-t border-prowl-border overflow-y-auto px-3 py-2 space-y-2">
       {groups.map((group) => {
         const dateObj = new Date(`${group.date}T00:00:00`);
         return (
-          <div key={group.date} className="mt-2 first:mt-1">
-            <span className="text-[10px] font-medium text-gray-500 px-2">
-              {formatDateKr(group.date)}
-              {isToday(dateObj) && <span className="ml-1.5 text-accent">오늘</span>}
-            </span>
-            <div className="mt-0.5 space-y-0.5">
+          <div
+            key={group.date}
+            className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2"
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-medium text-gray-500">
+                {formatDateKr(group.date)}
+                {isToday(dateObj) && <span className="ml-1.5 text-accent">오늘</span>}
+              </span>
+              <span className="text-[10px] text-gray-600">{group.tasks.length}건</span>
+            </div>
+            <div className="space-y-1.5">
               {group.tasks.map((task) => (
                 <TaskItem
                   key={task.id}
