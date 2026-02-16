@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useTaskData } from "../../hooks/useTaskData";
 import { toDateStr } from "../../utils/calendar";
-import { getTasksForDate, getUpcomingTasks } from "../../utils/task-helpers";
+import { getTasksForDate, getUpcomingTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactCompleted from "./CompactCompleted";
 import CompactHeader from "./CompactHeader";
 import CompactTaskList from "./CompactTaskList";
@@ -13,6 +13,7 @@ const HEADER_HEIGHT = 32;
 
 export default function CompactView() {
   const [minimized, setMinimized] = useState(false);
+  const [sortMode, setSortMode] = useState<TaskSortMode>("priority");
 
   const now = new Date();
   const year = now.getFullYear();
@@ -24,9 +25,9 @@ export default function CompactView() {
   const todayTasks = useMemo(() => getTasksForDate(tasksByDate, todayStr), [tasksByDate, todayStr]);
 
   const upcomingGroups = useMemo(() => {
-    const all = getUpcomingTasks(tasksByDate, false);
+    const all = getUpcomingTasks(tasksByDate, false, sortMode);
     return all.filter((g) => g.date > todayStr);
-  }, [tasksByDate, todayStr]);
+  }, [tasksByDate, todayStr, sortMode]);
 
   const completedGroups = useMemo(() => {
     return Object.entries(tasksByDate)
@@ -62,7 +63,13 @@ export default function CompactView() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
-            <CompactTaskList tasks={todayTasks} date={todayStr} onToggleComplete={toggleComplete} />
+            <CompactTaskList
+              tasks={todayTasks}
+              date={todayStr}
+              sortMode={sortMode}
+              onSortModeChange={setSortMode}
+              onToggleComplete={toggleComplete}
+            />
             {upcomingGroups.length > 0 && (
               <CompactUpcoming groups={upcomingGroups} onToggleComplete={toggleComplete} />
             )}

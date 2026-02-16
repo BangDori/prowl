@@ -1,22 +1,47 @@
 /** 오늘의 태스크 목록 (체크박스 토글 가능) */
 import type { Task } from "@shared/types";
 import { PRIORITY_COLORS } from "@shared/types";
-import { sortTasks } from "../../utils/task-helpers";
+import { Clock, Flag } from "lucide-react";
+import { sortTasks, type TaskSortMode } from "../../utils/task-helpers";
 
 interface CompactTaskListProps {
   tasks: Task[];
   date: string;
+  sortMode: TaskSortMode;
+  onSortModeChange: (mode: TaskSortMode) => void;
   onToggleComplete: (date: string, taskId: string) => void;
 }
 
-export default function CompactTaskList({ tasks, date, onToggleComplete }: CompactTaskListProps) {
-  const sorted = sortTasks(tasks);
+export default function CompactTaskList({
+  tasks,
+  date,
+  sortMode,
+  onSortModeChange,
+  onToggleComplete,
+}: CompactTaskListProps) {
+  const sorted = sortTasks(tasks, sortMode);
   const incompleteCount = tasks.filter((t) => !t.completed).length;
+
+  const toggleSort = () => onSortModeChange(sortMode === "priority" ? "time" : "priority");
+  const SortIcon = sortMode === "priority" ? Flag : Clock;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5 px-0.5">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-accent">오늘</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-accent">
+            오늘
+          </span>
+          <button
+            type="button"
+            onClick={toggleSort}
+            className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-colors"
+            title={sortMode === "priority" ? "우선순위순" : "시간순"}
+          >
+            <SortIcon className="w-2.5 h-2.5" />
+            <span>{sortMode === "priority" ? "우선순위" : "시간"}</span>
+          </button>
+        </div>
         <span className="text-[9px] text-white/30">
           {incompleteCount > 0 ? `${incompleteCount}건 남음` : "모두 완료"}
         </span>
