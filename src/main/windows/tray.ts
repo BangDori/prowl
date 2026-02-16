@@ -2,6 +2,7 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "../constants";
+import { isCompactVisible, toggleCompactWindow } from "./compact-window";
 import { showDashboardWindow } from "./dashboard-window";
 
 let tray: Tray | null = null;
@@ -154,6 +155,12 @@ export function popUpTrayMenu(): void {
       label: "Go to Dashboard",
       icon: loadMenuIcon("layout-dashboard"),
       click: () => showDashboardWindow(),
+    },
+    {
+      label: "Compact View",
+      type: "checkbox",
+      checked: isCompactVisible(),
+      click: () => toggleCompactWindow(),
     },
     { type: "separator" },
     {

@@ -25,7 +25,7 @@ import {
   updateTask,
 } from "./services/tasks";
 import { checkForUpdates } from "./services/update-checker";
-import { getSubWindow, popUpTrayMenu } from "./windows";
+import { getSubWindow, popUpTrayMenu, toggleCompactWindow } from "./windows";
 
 /**
  * 타입 안전한 IPC 핸들러 등록
@@ -220,6 +220,16 @@ export function registerIpcHandlers(): void {
   handleIpc("app:relaunch", async () => {
     app.relaunch();
     app.quit();
+  });
+
+  // 컴팩트 뷰 토글
+  handleIpc("compact:toggle", async () => {
+    try {
+      toggleCompactWindow();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 월 단위 태스크 조회

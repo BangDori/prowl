@@ -69,3 +69,12 @@ export const DASHBOARD = {
   MIN_WIDTH: 700,
   MIN_HEIGHT: 400,
 } as const;
+
+// ============================================
+// 컴팩트 뷰 윈도우 설정
+// ============================================
+export const COMPACT = {
+  WIDTH: 280,
+  HEIGHT: 400,
+  MARGIN: 16,
+} as const;

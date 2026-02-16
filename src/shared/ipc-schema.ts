@@ -65,6 +65,9 @@ export interface IpcInvokeSchema {
   "app:install-update": { params: []; return: IpcResult };
   "app:relaunch": { params: []; return: void };
 
+  // Compact (1 channel)
+  "compact:toggle": { params: []; return: IpcResult };
+
   // Tasks (5 channels)
   "tasks:list-month": {
     params: [year: number, month: number];
