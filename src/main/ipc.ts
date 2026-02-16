@@ -3,18 +3,8 @@ import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
-import {
-  addLocalEvent,
-  deleteLocalEvent,
-  fetchCalendarEvents,
-  getCalendarSettings,
-  getLocalEvents,
-  setCalendarSettings,
-  updateLocalEvent,
-} from "./services/calendar";
 import { sendChatMessage } from "./services/chat";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
-import { refreshReminders } from "./services/event-reminder";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
@@ -27,6 +17,14 @@ import {
   setJobCustomization,
   setSettings,
 } from "./services/settings";
+import { refreshReminders } from "./services/task-reminder";
+import {
+  deleteTask,
+  listTasksByMonth,
+  scanDates,
+  toggleTaskComplete,
+  updateTask,
+} from "./services/tasks";
 import { checkForUpdates } from "./services/update-checker";
 import { closeChatWindow, getSubWindow, popUpTrayMenu, resizeChatWindow } from "./windows";
 
@@ -240,35 +238,15 @@ export function registerIpcHandlers(): void {
     app.quit();
   });
 
-  // 캘린더 이벤트 조회
-  handleIpc("calendar:list-events", async () => {
-    return fetchCalendarEvents();
+  // 월 단위 태스크 조회
+  handleIpc("tasks:list-month", async (year, month) => {
+    return listTasksByMonth(year, month);
   });
 
-  // 캘린더 설정 조회
-  handleIpc("calendar:get-settings", async () => {
-    return getCalendarSettings();
-  });
-
-  // 캘린더 설정 저장
-  handleIpc("calendar:set-settings", async (settings) => {
+  // 태스크 수정
+  handleIpc("tasks:update-task", async (date, task) => {
     try {
-      setCalendarSettings(settings);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  });
-
-  // 로컬 이벤트 목록 조회
-  handleIpc("calendar:local-events", async () => {
-    return getLocalEvents();
-  });
-
-  // 로컬 이벤트 추가
-  handleIpc("calendar:add-local-event", async (localEvent) => {
-    try {
-      addLocalEvent(localEvent);
+      updateTask(date, task);
       refreshReminders();
       return { success: true };
     } catch (error) {
@@ -276,10 +254,20 @@ export function registerIpcHandlers(): void {
     }
   });
 
-  // 로컬 이벤트 수정
-  handleIpc("calendar:update-local-event", async (localEvent) => {
+  // 태스크 완료 토글
+  handleIpc("tasks:toggle-complete", async (date, taskId) => {
     try {
-      updateLocalEvent(localEvent);
+      toggleTaskComplete(date, taskId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // 태스크 삭제
+  handleIpc("tasks:delete-task", async (date, taskId) => {
+    try {
+      deleteTask(date, taskId);
       refreshReminders();
       return { success: true };
     } catch (error) {
@@ -287,15 +275,9 @@ export function registerIpcHandlers(): void {
     }
   });
 
-  // 로컬 이벤트 삭제
-  handleIpc("calendar:delete-local-event", async (eventId) => {
-    try {
-      deleteLocalEvent(eventId);
-      refreshReminders();
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
+  // 날짜 파일 목록 조회
+  handleIpc("tasks:scan-dates", async () => {
+    return scanDates();
   });
 
   // Claude Config 조회

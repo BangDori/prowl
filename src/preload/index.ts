@@ -55,14 +55,12 @@ const electronAPI = {
   resizeChatWindow: invokeIpc("chat:resize"),
   closeChatWindow: invokeIpc("chat:close"),
 
-  // Calendar
-  getCalendarEvents: invokeIpc("calendar:list-events"),
-  getCalendarSettings: invokeIpc("calendar:get-settings"),
-  setCalendarSettings: invokeIpc("calendar:set-settings"),
-  getLocalEvents: invokeIpc("calendar:local-events"),
-  addLocalEvent: invokeIpc("calendar:add-local-event"),
-  updateLocalEvent: invokeIpc("calendar:update-local-event"),
-  deleteLocalEvent: invokeIpc("calendar:delete-local-event"),
+  // Tasks
+  listTasksByMonth: invokeIpc("tasks:list-month"),
+  updateTask: invokeIpc("tasks:update-task"),
+  toggleTaskComplete: invokeIpc("tasks:toggle-complete"),
+  deleteTask: invokeIpc("tasks:delete-task"),
+  scanTaskDates: invokeIpc("tasks:scan-dates"),
 
   // Claude Config
   getClaudeConfig: invokeIpc("claude-config:list"),
