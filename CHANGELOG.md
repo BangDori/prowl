@@ -2,6 +2,15 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.16.0] - 2026-02-17
+- Task Manager 스티키 윈도우 추가 (화면 좌상단 항상 위 고정)
+- 오늘 태스크, 다가오는 일정, 완료된 태스크 토글 섹션 표시
+- 최소화 모드 및 세로 리사이즈 지원
+- Liquid Glass 디자인 적용
+- 트레이 메뉴에 Task Manager 체크박스 토글 추가
+- Compact View / Calendar → Task Manager 네이밍 통일
+- Task Manager 월 인덱스 버그 수정
+
 ## [1.15.4] - 2026-02-16
 - brew upgrade 시 cask outdated 사전 검증으로 빈 업그레이드 방지
 - 설치 후 불필요한 쿼리 재확인 제거 (배너 재표시 방지)
