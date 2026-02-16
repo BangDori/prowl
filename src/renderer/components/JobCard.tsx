@@ -119,7 +119,7 @@ export default function JobCard({
   };
 
   return (
-    <div className="job-card group">
+    <div className="glass-card-3d rounded-lg bg-prowl-card border border-white/[0.06] px-4 py-3 group">
       {isEditing ? (
         // 편집 모드
         <div className="space-y-3">

@@ -64,7 +64,7 @@ export default function JobList({
   onUpdateCustomization,
 }: JobListProps) {
   return (
-    <div className="space-y-0">
+    <div className="space-y-2 p-4">
       {jobs.map((job) => (
         <JobCard
           key={job.id}
