@@ -71,9 +71,9 @@ export default function DashboardLayout() {
   const [activeNav, setActiveNav] = useState<NavItem>("jobs");
 
   return (
-    <div className="flex h-screen bg-prowl-bg text-gray-100">
+    <div className="flex h-screen bg-transparent text-gray-100">
       {/* Sidebar */}
-      <aside className="w-52 flex-shrink-0 bg-prowl-surface border-r border-prowl-border flex flex-col">
+      <aside className="w-52 flex-shrink-0 bg-white/[0.02] border-r border-white/[0.06] flex flex-col">
         {/* Drag region for window */}
         <div className="h-10 -webkit-app-region-drag" />
 
@@ -126,7 +126,7 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0">
         {/* Header with drag region */}
-        <header className="h-10 border-b border-prowl-border flex items-center px-4 -webkit-app-region-drag">
+        <header className="h-10 border-b border-white/[0.06] flex items-center px-4 -webkit-app-region-drag">
           <h1 className="text-sm font-medium">{NAV_LABELS[activeNav]}</h1>
         </header>
 

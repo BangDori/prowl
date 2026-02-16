@@ -41,7 +41,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
 
   if (editing) {
     return (
-      <div className="rounded-lg border border-prowl-border bg-prowl-card/50 px-2.5 py-2 space-y-1.5">
+      <div className="rounded-lg border border-white/[0.06] bg-prowl-card/50 backdrop-blur-xl px-2.5 py-2 space-y-1.5">
         <input
           type="text"
           value={title}

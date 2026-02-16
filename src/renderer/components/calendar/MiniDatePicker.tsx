@@ -72,7 +72,7 @@ export default function MiniDatePicker({
   return (
     <div
       ref={ref}
-      className="fixed z-[9999] p-2 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl"
+      className="fixed z-[9999] p-2 rounded-lg border border-white/[0.08] bg-prowl-surface backdrop-blur-2xl shadow-xl"
       style={{ width: "210px", top: pos.top, left: pos.left, transform: "translateY(-100%)" }}
     >
       {/* 헤더 */}

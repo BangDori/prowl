@@ -80,7 +80,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
             Night Watch
           </h3>
-          <div className="rounded-lg bg-prowl-card border border-prowl-border">
+          <div className="rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
             <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
             Notifications
           </h3>
-          <div className="p-3 rounded-lg bg-prowl-card border border-prowl-border">
+          <div className="p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-gray-400" />
@@ -111,7 +111,7 @@ export default function SettingsSection() {
             <button
               type="button"
               onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-              className="w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card border border-prowl-border text-left hover:border-gray-600 transition-colors"
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06] text-left hover:border-gray-600 transition-colors"
             >
               <ExternalLink className="w-4 h-4 text-gray-400" />
               <div>
@@ -119,7 +119,7 @@ export default function SettingsSection() {
                 <p className="text-[10px] text-gray-500">View source code and contribute</p>
               </div>
             </button>
-            <div className="p-3 rounded-lg bg-prowl-card border border-prowl-border">
+            <div className="p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <RefreshCw
