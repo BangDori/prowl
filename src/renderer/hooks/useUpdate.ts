@@ -1,6 +1,6 @@
 /** 업데이트 체크 및 설치 관련 훅 */
 import type { IpcResult } from "@shared/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../queries/keys";
 
 /** 업데이트 확인 (5분 캐시) */
@@ -15,13 +15,8 @@ export function useUpdateCheck() {
 
 /** brew upgrade 실행 */
 export function useInstallUpdate() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (): Promise<IpcResult> => window.electronAPI.installUpdate(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.app.update() });
-    },
   });
 }
 

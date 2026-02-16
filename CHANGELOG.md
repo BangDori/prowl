@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.15.4] - 2026-02-16
+- brew upgrade 시 cask outdated 사전 검증으로 빈 업그레이드 방지
+- 설치 후 불필요한 쿼리 재확인 제거 (배너 재표시 방지)
+- 업데이트 실패 시 GitHub 다운로드 폴백 버튼 추가
+
 ## [1.15.3] - 2026-02-16
 - macOS vibrancy 기반 Liquid Glass 투명 배경 적용
 - 전 섹션 카드에 3D 글래스 효과 적용 (Settings, Version History, Background Monitor, Calendar)
