@@ -1,33 +1,49 @@
-/** Compact View 헤더: 드래그 영역 + 최소화/닫기 버튼 */
-import { Minus, Plus, X } from "lucide-react";
+/** Task Manager 헤더: 드래그 영역 + 새로고침/최소화/닫기 버튼 */
+import { Minus, Plus, RefreshCw, X } from "lucide-react";
 
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
 
 interface CompactHeaderProps {
   minimized: boolean;
+  refreshing: boolean;
   onToggleMinimize: () => void;
+  onRefresh: () => void;
 }
 
-export default function CompactHeader({ minimized, onToggleMinimize }: CompactHeaderProps) {
+export default function CompactHeader({
+  minimized,
+  refreshing,
+  onToggleMinimize,
+  onRefresh,
+}: CompactHeaderProps) {
   return (
     <div
-      className="flex items-center justify-between px-3 h-7 border-b border-white/[0.06]"
+      className="flex items-center justify-between px-3.5 h-8 border-b border-prowl-border"
       style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
     >
-      <span className="text-[10px] font-medium text-gray-400">Task Manager</span>
+      <span className="text-[11px] font-semibold tracking-wide text-white/60">Task Manager</span>
 
-      <div className="flex items-center gap-0.5" style={noDrag}>
+      <div className="flex items-center gap-1" style={noDrag}>
+        {!minimized && (
+          <button
+            type="button"
+            onClick={onRefresh}
+            className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
+          >
+            <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+          </button>
+        )}
         <button
           type="button"
           onClick={onToggleMinimize}
-          className="p-0.5 rounded text-gray-600 hover:text-gray-300 transition-colors"
+          className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
         >
           {minimized ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
         </button>
         <button
           type="button"
           onClick={() => window.electronAPI.toggleCompactView()}
-          className="p-0.5 rounded text-gray-600 hover:text-gray-300 transition-colors"
+          className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
         >
           <X className="w-3 h-3" />
         </button>
