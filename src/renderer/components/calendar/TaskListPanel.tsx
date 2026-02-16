@@ -118,11 +118,14 @@ function AgendaView({
             key={group.date}
             className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2"
           >
-            <span className="text-[10px] font-medium text-gray-500">
-              {formatDateKr(group.date)}
-              {isToday(dateObj) && <span className="ml-1.5 text-accent">오늘</span>}
-            </span>
-            <div className="mt-1.5 space-y-1.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[10px] font-medium text-gray-500">
+                {formatDateKr(group.date)}
+                {isToday(dateObj) && <span className="ml-1.5 text-accent">오늘</span>}
+              </span>
+              <span className="text-[10px] text-gray-600">{group.tasks.length}건</span>
+            </div>
+            <div className="space-y-1.5">
               {group.tasks.map((task) => (
                 <TaskItem
                   key={task.id}
