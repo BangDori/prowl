@@ -77,9 +77,18 @@ export default function UpdateBanner() {
         </div>
       )}
 
-      {/* Error message */}
+      {/* Error message + download fallback */}
       {phase === "error" && (
-        <p className="text-[10px] text-red-400/80 truncate mb-1.5">{errorMsg}</p>
+        <>
+          <p className="text-[10px] text-red-400/80 truncate mb-1.5">{errorMsg}</p>
+          <button
+            type="button"
+            onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
+            className="w-full py-1 text-[11px] rounded-md bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium"
+          >
+            Download from GitHub
+          </button>
+        </>
       )}
 
       {/* Action button */}
