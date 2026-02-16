@@ -39,7 +39,7 @@ export default function TaskDayCell({
       <span
         className={`
           text-[11px] leading-none w-5 h-5 flex items-center justify-center rounded-full
-          ${today ? "bg-accent text-prowl-bg font-bold" : ""}
+          ${today ? "bg-accent text-gray-900 font-bold" : ""}
           ${selected && !today ? "text-accent font-medium" : ""}
           ${!selected && !today && isCurrentMonth ? "text-gray-300" : ""}
         `}
