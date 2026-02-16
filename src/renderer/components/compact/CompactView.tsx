@@ -25,7 +25,10 @@ export default function CompactView() {
   const { tasksByDate, toggleComplete, refreshing, refetch } = useTaskData(year, month);
   const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
 
-  const todayTasks = useMemo(() => getTasksForDate(tasksByDate, todayStr), [tasksByDate, todayStr]);
+  const todayTasks = useMemo(
+    () => getTasksForDate(tasksByDate, todayStr).filter((t) => !t.completed),
+    [tasksByDate, todayStr],
+  );
 
   const upcomingGroups = useMemo(() => {
     const all = getUpcomingTasks(tasksByDate, false, sortMode);
