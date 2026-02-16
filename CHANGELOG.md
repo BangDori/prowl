@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.15.2] - 2026-02-16
+- 채팅 기능 전체 제거 (서비스, 윈도우, UI, IPC, 타입)
+- 트레이 메뉴에서 Background Monitor, Prowl Chat 항목 제거
+
 ## [1.15.1] - 2026-02-16
 - 업데이트 인디케이터를 사이드바 하단으로 이동
 
