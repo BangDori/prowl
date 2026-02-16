@@ -1,0 +1,182 @@
+/** 단일 태스크 행: 체크박스, 제목, 우선순위, 리마인더, 인라인 편집 */
+import type { Task, TaskPriority, TaskReminder } from "@shared/types";
+import { PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
+import { Bell, Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import ReminderPicker from "./ReminderPicker";
+
+interface TaskItemProps {
+  task: Task;
+  onToggleComplete: () => void;
+  onUpdate: (task: Task) => void;
+  onDelete: () => void;
+}
+
+export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }: TaskItemProps) {
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description ?? "");
+  const [priority, setPriority] = useState<TaskPriority>(task.priority);
+  const [reminders, setReminders] = useState<TaskReminder[]>(task.reminders ?? []);
+
+  const handleSave = () => {
+    if (!title.trim()) return;
+    onUpdate({
+      ...task,
+      title: title.trim(),
+      description: description.trim() || undefined,
+      priority,
+      reminders: reminders.length > 0 ? reminders : undefined,
+    });
+    setEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTitle(task.title);
+    setDescription(task.description ?? "");
+    setPriority(task.priority);
+    setReminders(task.reminders ?? []);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="rounded-lg border border-prowl-border bg-prowl-card/50 px-2.5 py-2 space-y-1.5">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSave()}
+          className="w-full bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
+          // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
+          autoFocus
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="설명 (선택)"
+          rows={2}
+          className="w-full bg-transparent text-[10px] text-gray-300 placeholder-gray-600 outline-none resize-none"
+        />
+        <div className="flex items-center gap-1 flex-wrap">
+          {(["high", "medium", "low"] as const).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setPriority(p)}
+              className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
+                priority === p
+                  ? "ring-1 ring-white/30 text-white"
+                  : "text-gray-500 hover:text-gray-300"
+              }`}
+              style={priority === p ? { backgroundColor: `${PRIORITY_COLORS[p]}30` } : undefined}
+            >
+              {PRIORITY_LABELS[p]}
+            </button>
+          ))}
+        </div>
+        <ReminderPicker reminders={reminders} onChange={setReminders} />
+        <div className="flex items-center gap-1">
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!title.trim()}
+            className="px-2 py-0.5 rounded text-[10px] font-medium bg-accent/15 text-accent hover:bg-accent/25 transition-colors disabled:opacity-20"
+          >
+            저장
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="group flex items-start gap-1.5 px-2 py-1 rounded-md hover:bg-white/5 transition-colors">
+      <button
+        type="button"
+        onClick={onToggleComplete}
+        className={`mt-0.5 w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+          task.completed
+            ? "bg-emerald-500/30 border-emerald-500/50"
+            : "border-gray-600 hover:border-gray-400"
+        }`}
+      >
+        {task.completed && (
+          <svg
+            className="w-2 h-2 text-emerald-400"
+            viewBox="0 0 12 12"
+            fill="none"
+            role="img"
+            aria-label="완료"
+          >
+            <path
+              d="M2 6l3 3 5-5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </button>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`text-[11px] leading-tight ${
+              task.completed ? "line-through text-gray-600" : "text-gray-200"
+            }`}
+          >
+            {task.title}
+          </span>
+          <div
+            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
+            title={PRIORITY_LABELS[task.priority]}
+          />
+          {task.reminders && task.reminders.length > 0 && (
+            <Bell className="w-2.5 h-2.5 text-amber-500/70 flex-shrink-0" />
+          )}
+          {task.dueTime && (
+            <span className="text-[9px] text-gray-500 flex-shrink-0">{task.dueTime}</span>
+          )}
+        </div>
+        {task.description && (
+          <p
+            className={`text-[10px] mt-0.5 truncate ${task.completed ? "text-gray-700" : "text-gray-500"}`}
+          >
+            {task.description}
+          </p>
+        )}
+        {task.category && (
+          <span className="inline-block mt-0.5 px-1 py-px rounded text-[8px] bg-white/5 text-gray-500">
+            {task.category}
+          </span>
+        )}
+      </div>
+      <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="p-0.5 rounded text-gray-600 hover:text-gray-300 transition-colors"
+        >
+          <Pencil className="w-2.5 h-2.5" />
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="p-0.5 rounded text-gray-600 hover:text-red-400 transition-colors"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
+        </button>
+      </div>
+    </div>
+  );
+}

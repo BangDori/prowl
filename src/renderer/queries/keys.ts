@@ -15,11 +15,10 @@ export const queryKeys = {
     all: ["focusMode"] as const,
     get: () => [...queryKeys.focusMode.all, "get"] as const,
   },
-  calendar: {
-    all: ["calendar"] as const,
-    events: () => [...queryKeys.calendar.all, "events"] as const,
-    settings: () => [...queryKeys.calendar.all, "settings"] as const,
-    localEvents: () => [...queryKeys.calendar.all, "localEvents"] as const,
+  tasks: {
+    all: ["tasks"] as const,
+    month: (year: number, month: number) => [...queryKeys.tasks.all, "month", year, month] as const,
+    dates: () => [...queryKeys.tasks.all, "dates"] as const,
   },
   claude: {
     all: ["claude"] as const,

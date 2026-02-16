@@ -2,6 +2,14 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.15.0] - 2026-02-16
+- Calendar 탭을 파일 기반 Task Manager Calendar로 전환
+- ~/prowl-task-calendar/ 폴더의 JSON 파일로 태스크 관리
+- 캘린더 그리드에서 날짜별 태스크 표시 및 인라인 편집
+- 우선순위·카테고리 필터, 완료 토글, 어젠다 뷰 지원
+- 태스크 마감 알림 스케줄러 (1일 전 기본 알림 자동 적용)
+- task-manager 통합 커맨드 추가 (조회/추가/완료/삭제/수정)
+
 ## [1.14.0] - 2026-02-13
 - Homebrew Cask 기반 앱 내 자동 업데이트 시스템 추가
 - 앱 시작 시 업데이트 자동 체크 및 UpdateBanner 표시
