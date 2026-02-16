@@ -1,6 +1,6 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Bot, Calendar, Cog, History, LayoutDashboard } from "lucide-react";
+import { Bot, Cog, History, LayoutDashboard, ListTodo } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
@@ -85,8 +85,8 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("jobs")}
           />
           <SidebarItem
-            icon={<Calendar className="w-4 h-4" />}
-            label="Calendar"
+            icon={<ListTodo className="w-4 h-4" />}
+            label="Task Manager"
             active={activeNav === "calendar"}
             onClick={() => setActiveNav("calendar")}
           />
@@ -123,7 +123,7 @@ export default function DashboardLayout() {
             </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Calendar">
+            <ErrorBoundary section="Task Manager">
               <CalendarSection />
             </ErrorBoundary>
           </div>

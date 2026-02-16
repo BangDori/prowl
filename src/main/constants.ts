@@ -71,7 +71,7 @@ export const DASHBOARD = {
 } as const;
 
 // ============================================
-// 컴팩트 뷰 윈도우 설정
+// Task Manager 윈도우 설정
 // ============================================
 export const COMPACT = {
   WIDTH: 280,

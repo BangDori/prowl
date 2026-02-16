@@ -222,7 +222,7 @@ export function registerIpcHandlers(): void {
     app.quit();
   });
 
-  // 컴팩트 뷰 토글
+  // Task Manager 토글
   handleIpc("compact:toggle", async () => {
     try {
       toggleCompactWindow();
@@ -232,7 +232,7 @@ export function registerIpcHandlers(): void {
     }
   });
 
-  // 컴팩트 뷰 리사이즈
+  // Task Manager 리사이즈
   handleIpc("compact:resize", async (height) => {
     const win = getCompactWindow();
     if (!win || win.isDestroyed()) return;

@@ -157,7 +157,8 @@ export function popUpTrayMenu(): void {
       click: () => showDashboardWindow(),
     },
     {
-      label: "Compact View",
+      label: "Task Manager",
+      icon: loadMenuIcon("list-todo"),
       type: "checkbox",
       checked: isCompactVisible(),
       click: () => toggleCompactWindow(),
