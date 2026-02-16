@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.18.2] - 2026-02-17
+- 스티키 윈도우 정렬 라벨을 "시간"에서 "마감기한"으로 변경
+- 기본 정렬 모드를 마감기한순으로 설정
+
 ## [1.18.1] - 2026-02-17
 - brew upgrade 실행 전 brew update로 로컬 캐시를 갱신하여 tap 업데이트 인식 오류 수정
 

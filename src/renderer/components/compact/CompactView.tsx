@@ -15,7 +15,7 @@ const HEADER_HEIGHT = 32;
 
 export default function CompactView() {
   const [minimized, setMinimized] = useState(false);
-  const [sortMode, setSortMode] = useState<TaskSortMode>("priority");
+  const [sortMode, setSortMode] = useState<TaskSortMode>("time");
 
   const now = new Date();
   const year = now.getFullYear();
