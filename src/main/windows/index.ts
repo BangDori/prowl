@@ -1,8 +1,4 @@
 /** 윈도우 모듈 배럴 export */
-// Splash window
-
-// Chat window
-export { closeChatWindow, getChatWindow, resizeChatWindow, showChatWindow } from "./chat-window";
 // Dashboard window
 export { closeDashboardWindow, getDashboardWindow, showDashboardWindow } from "./dashboard-window";
 export { createSplashWindow, dismissSplash, getSplashWindow } from "./splash";
