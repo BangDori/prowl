@@ -164,3 +164,22 @@ export interface Memory {
   content: string;
   createdAt: string; // ISO 8601
 }
+
+// 채팅 룸 요약 (목록 조회용, 메시지 미포함)
+export interface ChatRoomSummary {
+  id: string;
+  title: string;
+  lastMessage?: string; // 마지막 메시지 미리보기 (80자)
+  messageCount: number;
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+}
+
+// 채팅 룸 전체 데이터 (메시지 포함)
+export interface ChatRoom {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: string; // ISO 8601
+  updatedAt: string; // ISO 8601
+}

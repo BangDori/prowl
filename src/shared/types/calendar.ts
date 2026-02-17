@@ -81,5 +81,8 @@ export const PROWL_DATA_DIR = ".prowl";
 /** 태스크 서브폴더 (~/.prowl/task-calendar) */
 export const TASK_SUBFOLDER = "task-calendar";
 
+/** 채팅 룸 서브폴더 (~/.prowl/chat-rooms) */
+export const CHAT_ROOMS_SUBFOLDER = "chat-rooms";
+
 /** @deprecated 마이그레이션용 — 기존 태스크 폴더명 */
 export const LEGACY_TASK_FOLDER = "prowl-task-calendar";
