@@ -126,7 +126,7 @@ function UpcomingTaskRow({
   );
 }
 
-const RANGES: UpcomingRange[] = ["1w", "2w", "1m", "3m"];
+const RANGES: UpcomingRange[] = ["1w", "2w", "1m", "1y"];
 
 function RangeSelector({
   range,
