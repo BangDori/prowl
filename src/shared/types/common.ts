@@ -18,17 +18,30 @@ export const DEFAULT_FOCUS_MODE: FocusMode = {
   endTime: "07:00",
 };
 
+// 글로벌 단축키 설정
+export interface ShortcutConfig {
+  toggleChat: string; // Prowl Chat 토글 (빈 문자열 = 비활성화)
+  toggleTaskManager: string; // Task Manager 토글 (빈 문자열 = 비활성화)
+}
+
+export const DEFAULT_SHORTCUTS: ShortcutConfig = {
+  toggleChat: "CommandOrControl+Shift+P",
+  toggleTaskManager: "CommandOrControl+Shift+O",
+};
+
 // 앱 설정
 export interface AppSettings {
   patterns: string[]; // 감지할 plist 패턴 목록 (예: ['com.claude.', 'com.myapp.'])
   focusMode: FocusMode;
   notificationsEnabled: boolean; // Job 완료 알림 활성화
+  shortcuts: ShortcutConfig; // 글로벌 단축키
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   patterns: [],
   focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
+  shortcuts: DEFAULT_SHORTCUTS,
 };
 
 // AI 프로바이더
