@@ -1,6 +1,8 @@
 /** 태스크 펼침 상세 패널 */
 import type { Task } from "@shared/types";
 import { PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
+import { Check, Copy } from "lucide-react";
+import { useCallback, useState } from "react";
 
 interface CompactTaskDetailProps {
   task: Task;
@@ -8,6 +10,14 @@ interface CompactTaskDetailProps {
 
 export default function CompactTaskDetail({ task }: CompactTaskDetailProps) {
   const hasMeta = task.dueTime || task.category;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const text = `제목: ${task.title}\n내용: ${task.description ?? ""}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [task.title, task.description]);
 
   return (
     <div className="px-2.5 pb-2 pt-0.5 pl-8">
@@ -39,6 +49,25 @@ export default function CompactTaskDetail({ task }: CompactTaskDetailProps) {
         </p>
       )}
       {!hasMeta && !task.description && <p className="text-[9px] text-white/20">상세 정보 없음</p>}
+
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="flex items-center gap-1 mt-1.5 px-1.5 py-0.5 rounded text-[9px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-colors"
+        title="태스크 복사"
+      >
+        {copied ? (
+          <>
+            <Check className="w-2.5 h-2.5 text-emerald-400" />
+            <span className="text-emerald-400">복사됨</span>
+          </>
+        ) : (
+          <>
+            <Copy className="w-2.5 h-2.5" />
+            <span>복사</span>
+          </>
+        )}
+      </button>
     </div>
   );
 }
