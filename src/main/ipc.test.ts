@@ -28,6 +28,8 @@ vi.mock("./services/settings", () => ({
   setJobCustomization: vi.fn(),
   getFocusMode: vi.fn(),
   setFocusMode: vi.fn(),
+  getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-4o" }),
+  setChatConfig: vi.fn(),
 }));
 
 vi.mock("./services/focus-mode", () => ({
@@ -36,6 +38,7 @@ vi.mock("./services/focus-mode", () => ({
 
 vi.mock("./services/chat", () => ({
   sendChatMessage: vi.fn(),
+  getProviderStatuses: vi.fn().mockReturnValue([]),
 }));
 
 vi.mock("./windows", () => ({
@@ -312,12 +315,15 @@ describe("registerIpcHandlers", () => {
   it("채팅 관련 IPC 채널을 등록한다", () => {
     const channels = mockIpcHandle.mock.calls.map((c) => c[0]);
     expect(channels).toContain("chat:send");
+    expect(channels).toContain("chat:get-config");
+    expect(channels).toContain("chat:set-config");
+    expect(channels).toContain("chat:providers");
     expect(channels).toContain("chat:resize");
     expect(channels).toContain("chat:close");
   });
 
   describe("chat:send", () => {
-    it("sendChatMessage를 호출하고 결과를 반환한다", async () => {
+    it("getChatConfig 결과와 함께 sendChatMessage를 호출한다", async () => {
       const mockResult = {
         success: true,
         message: { id: "msg_1", role: "assistant" as const, content: "응답", timestamp: 1000 },
@@ -327,7 +333,10 @@ describe("registerIpcHandlers", () => {
       const handler = getHandler("chat:send");
       const result = await handler({}, "안녕", []);
 
-      expect(sendChatMessage).toHaveBeenCalledWith("안녕", []);
+      expect(sendChatMessage).toHaveBeenCalledWith("안녕", [], {
+        provider: "openai",
+        model: "gpt-4o",
+      });
       expect(result).toEqual(mockResult);
     });
   });

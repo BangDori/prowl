@@ -3,7 +3,7 @@ import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
-import { sendChatMessage } from "./services/chat";
+import { getProviderStatuses, sendChatMessage } from "./services/chat";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
@@ -11,8 +11,10 @@ import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launch
 import { readLogContent } from "./services/log-reader";
 import {
   getAllJobCustomizations,
+  getChatConfig,
   getFocusMode,
   getSettings,
+  setChatConfig,
   setFocusMode,
   setJobCustomization,
   setSettings,
@@ -217,7 +219,28 @@ export function registerIpcHandlers(): void {
 
   // 채팅 메시지 전송
   handleIpc("chat:send", async (content, history) => {
-    return sendChatMessage(content, history);
+    const config = getChatConfig();
+    return sendChatMessage(content, history, config);
+  });
+
+  // 채팅 설정 조회
+  handleIpc("chat:get-config", async () => {
+    return getChatConfig();
+  });
+
+  // 채팅 설정 저장
+  handleIpc("chat:set-config", async (config) => {
+    try {
+      setChatConfig(config);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // 사용 가능한 프로바이더 목록 조회
+  handleIpc("chat:providers", async () => {
+    return getProviderStatuses();
   });
 
   // 채팅 윈도우 리사이즈

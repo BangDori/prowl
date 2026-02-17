@@ -1,16 +1,17 @@
 /** AI 채팅 인터페이스 뷰 */
 import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
-import type { ChatMessage } from "@shared/types";
+import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import ModelSelector from "./ModelSelector";
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
-  "아직은 나랑 얘기할 수 없다냥...",
-  "준비 중이다냥~ 조금만 기다려라냥",
-  "곧 대화할 수 있을 거다냥~",
-  "지금은 낮잠 중이다냥... zZZ",
+  "무엇이든 물어봐라냥~",
+  "오늘은 뭘 도와줄까냥?",
+  "궁금한 게 있으면 말해라냥~",
+  "나한테 맡겨라냥! 🐾",
 ];
 
 /**
@@ -88,10 +89,27 @@ export default function ChatView() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [placeholder, setPlaceholder] = useState(getRandomPlaceholder);
+  const [chatConfig, setChatConfig] = useState<ChatConfig | null>(null);
+  const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
+
+  // 채팅 설정 및 프로바이더 목록 로드
+  useEffect(() => {
+    Promise.all([window.electronAPI.getChatConfig(), window.electronAPI.getChatProviders()]).then(
+      ([config, providerList]) => {
+        setChatConfig(config);
+        setProviders(providerList);
+      },
+    );
+  }, []);
+
+  const handleConfigChange = useCallback((config: ChatConfig) => {
+    setChatConfig(config);
+    window.electronAPI.setChatConfig(config);
+  }, []);
 
   // 글로벌 ESC 키로 채팅창 닫기
   useEffect(() => {
@@ -213,7 +231,7 @@ export default function ChatView() {
 
       {/* 고양이 로고: 메시지가 없을 때 입력바 위에 누워있기 */}
       {!hasMessages && (
-        <div className="relative flex justify-start pl-0 z-10">
+        <div className="relative flex justify-end pr-0 z-10">
           <img
             src={prowlLying}
             alt="Prowl"
@@ -225,6 +243,9 @@ export default function ChatView() {
 
       {/* 하단 입력바 */}
       <div className="chat-input-bar">
+        {chatConfig && providers.length > 0 && (
+          <ModelSelector config={chatConfig} providers={providers} onSelect={handleConfigChange} />
+        )}
         <textarea
           ref={textareaRef}
           value={input}

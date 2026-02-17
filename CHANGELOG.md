@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.21.0] - 2026-02-17
+- 채팅 입력바에 모델 선택 드롭다운 추가 (GPT-5.2 / GPT-4o 전환)
+- OpenAI Responses API로 전환하여 최신 모델 지원
+- 선택한 모델이 앱 재시작 후에도 유지되도록 저장
+- 채팅 플레이스홀더를 활성 상태 메시지로 변경
+
 ## [1.20.0] - 2026-02-17
 - Prowl Chat 기능 복원 (Cmd+Shift+P)
 - AI SDK (OpenAI GPT-4o-mini) 채팅 백엔드 연동

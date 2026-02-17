@@ -52,6 +52,9 @@ const electronAPI = {
 
   // Chat
   sendChatMessage: invokeIpc("chat:send"),
+  getChatConfig: invokeIpc("chat:get-config"),
+  setChatConfig: invokeIpc("chat:set-config"),
+  getChatProviders: invokeIpc("chat:providers"),
   resizeChatWindow: invokeIpc("chat:resize"),
   closeChatWindow: invokeIpc("chat:close"),
 
