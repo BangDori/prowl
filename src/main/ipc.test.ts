@@ -37,7 +37,7 @@ vi.mock("./services/focus-mode", () => ({
 }));
 
 vi.mock("./services/chat", () => ({
-  sendChatMessage: vi.fn(),
+  streamChatMessage: vi.fn().mockResolvedValue(undefined),
   getProviderStatuses: vi.fn().mockReturnValue([]),
 }));
 
@@ -50,7 +50,7 @@ vi.mock("./windows", () => ({
 
 import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
-import { sendChatMessage } from "./services/chat";
+import { streamChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
@@ -323,21 +323,15 @@ describe("registerIpcHandlers", () => {
   });
 
   describe("chat:send", () => {
-    it("getChatConfig 결과와 함께 sendChatMessage를 호출한다", async () => {
-      const mockResult = {
-        success: true,
-        message: { id: "msg_1", role: "assistant" as const, content: "응답", timestamp: 1000 },
-      };
-      vi.mocked(sendChatMessage).mockResolvedValue(mockResult);
-
+    it("streamChatMessage를 fire-and-forget으로 호출하고 즉시 success를 반환한다", async () => {
       const handler = getHandler("chat:send");
       const result = await handler({}, "안녕", []);
 
-      expect(sendChatMessage).toHaveBeenCalledWith("안녕", [], {
+      expect(streamChatMessage).toHaveBeenCalledWith("안녕", [], {
         provider: "openai",
         model: "gpt-4o",
       });
-      expect(result).toEqual(mockResult);
+      expect(result).toEqual({ success: true });
     });
   });
 

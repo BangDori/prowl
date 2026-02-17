@@ -6,8 +6,11 @@ vi.mock("./memory", () => ({
   addMemory: vi.fn(),
 }));
 
+const mockTextStream = vi.fn();
 vi.mock("ai", () => ({
-  generateText: vi.fn(),
+  streamText: vi.fn().mockImplementation(() => ({
+    textStream: mockTextStream(),
+  })),
   stepCountIs: vi.fn().mockReturnValue("mock-stop-condition"),
   tool: vi.fn((def: unknown) => def),
 }));
@@ -21,10 +24,23 @@ vi.mock("@ai-sdk/openai", () => ({
   }),
 }));
 
-import { generateText } from "ai";
-import { getProviderStatuses, sendChatMessage } from "./chat";
+const mockSend = vi.fn();
+vi.mock("../windows", () => ({
+  getChatWindow: vi.fn().mockReturnValue({
+    isDestroyed: () => false,
+    webContents: { send: (...args: unknown[]) => mockSend(...args) },
+  }),
+}));
 
-const mockGenerateText = vi.mocked(generateText);
+import { streamText } from "ai";
+import { getProviderStatuses, streamChatMessage } from "./chat";
+
+const mockStreamText = vi.mocked(streamText);
+
+/** async iterable 헬퍼 */
+async function* toAsyncIterable(chunks: string[]) {
+  for (const chunk of chunks) yield chunk;
+}
 
 describe("chat 서비스", () => {
   beforeEach(() => {
@@ -32,60 +48,58 @@ describe("chat 서비스", () => {
     process.env.OPENAI_API_KEY = "test-key";
   });
 
-  it("API 키가 없으면 안내 메시지를 반환한다", async () => {
+  it("API 키가 없으면 안내 메시지를 stream-message로 전송한다", async () => {
     delete process.env.OPENAI_API_KEY;
 
-    const result = await sendChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
 
-    expect(result.success).toBe(true);
-    expect(result.message?.content).toContain("OPENAI_API_KEY");
-    expect(mockGenerateText).not.toHaveBeenCalled();
+    expect(mockSend).toHaveBeenCalledWith(
+      "chat:stream-message",
+      expect.objectContaining({ content: expect.stringContaining("OPENAI_API_KEY") }),
+    );
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-done");
+    expect(mockStreamText).not.toHaveBeenCalled();
   });
 
-  it("generateText를 호출하고 응답을 반환한다", async () => {
-    mockGenerateText.mockResolvedValue({ text: "안녕하세요!" } as Awaited<
-      ReturnType<typeof generateText>
-    >);
+  it("streamText를 호출하고 메시지를 전송한다", async () => {
+    mockTextStream.mockReturnValue(toAsyncIterable(["안녕하세요!"]));
 
-    const result = await sendChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
 
-    expect(result.success).toBe(true);
-    expect(result.message?.role).toBe("assistant");
-    expect(result.message?.content).toBe("안녕하세요!");
-    expect(mockGenerateText).toHaveBeenCalledWith(
+    expect(mockStreamText).toHaveBeenCalledWith(
       expect.objectContaining({
         model: "mock-openai-model",
         messages: [{ role: "user", content: "안녕" }],
       }),
     );
+    expect(mockSend).toHaveBeenCalledWith(
+      "chat:stream-message",
+      expect.objectContaining({ role: "assistant", content: "안녕하세요!" }),
+    );
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-done");
   });
 
   it("config 없으면 OpenAI 기본값을 사용한다", async () => {
-    mockGenerateText.mockResolvedValue({ text: "응답" } as Awaited<
-      ReturnType<typeof generateText>
-    >);
+    mockTextStream.mockReturnValue(toAsyncIterable(["응답"]));
 
-    const result = await sendChatMessage("안녕", []);
+    await streamChatMessage("안녕", []);
 
-    expect(result.success).toBe(true);
-    expect(mockGenerateText).toHaveBeenCalledWith(
+    expect(mockStreamText).toHaveBeenCalledWith(
       expect.objectContaining({ model: "mock-openai-model" }),
     );
   });
 
   it("히스토리를 messages에 포함한다", async () => {
-    mockGenerateText.mockResolvedValue({ text: "응답" } as Awaited<
-      ReturnType<typeof generateText>
-    >);
+    mockTextStream.mockReturnValue(toAsyncIterable(["응답"]));
 
     const history = [
       { id: "1", role: "user" as const, content: "이전 질문", timestamp: 1000 },
       { id: "2", role: "assistant" as const, content: "이전 답변", timestamp: 2000 },
     ];
 
-    await sendChatMessage("새 질문", history, { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("새 질문", history, { provider: "openai", model: "gpt-4o" });
 
-    expect(mockGenerateText).toHaveBeenCalledWith(
+    expect(mockStreamText).toHaveBeenCalledWith(
       expect.objectContaining({
         messages: [
           { role: "user", content: "이전 질문" },
@@ -96,13 +110,14 @@ describe("chat 서비스", () => {
     );
   });
 
-  it("API 에러 시 실패를 반환한다", async () => {
-    mockGenerateText.mockRejectedValue(new Error("Rate limit exceeded"));
+  it("API 에러 시 stream-error를 전송한다", async () => {
+    mockTextStream.mockImplementation(() => {
+      throw new Error("Rate limit exceeded");
+    });
 
-    const result = await sendChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("안녕", [], { provider: "openai", model: "gpt-4o" });
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBe("Rate limit exceeded");
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-error", "Rate limit exceeded");
   });
 });
 
