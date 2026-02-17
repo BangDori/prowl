@@ -126,16 +126,7 @@ export default function ChatView() {
     setLoading(true);
 
     if (textareaRef.current) {
-      // IME 조합 강제 종료: 포커스를 임시 요소로 옮겨 composition 중단
-      const tmp = document.createElement("input");
-      tmp.style.position = "fixed";
-      tmp.style.opacity = "0";
-      document.body.appendChild(tmp);
-      tmp.focus();
-      document.body.removeChild(tmp);
-      textareaRef.current.value = "";
       textareaRef.current.style.height = "auto";
-      textareaRef.current.focus();
     }
 
     const result = await window.electronAPI.sendChatMessage(content, messagesRef.current);
@@ -159,7 +150,7 @@ export default function ChatView() {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
         e.preventDefault();
         handleSend();
       }
