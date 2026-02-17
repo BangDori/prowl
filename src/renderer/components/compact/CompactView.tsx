@@ -1,7 +1,10 @@
 /** Compact Sticky View: 오늘의 태스크와 다가오는 일정 미리보기 */
+
+import type { UpcomingRange } from "@shared/types";
 import { useCallback, useMemo, useState } from "react";
 import { useBacklogData } from "../../hooks/useBacklogData";
 import { useTaskData } from "../../hooks/useTaskData";
+import { useUpcomingTasks } from "../../hooks/useUpcomingTasks";
 import { toDateStr } from "../../utils/calendar";
 import { getTasksForDate, getUpcomingTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactBacklog from "./CompactBacklog";
@@ -16,6 +19,7 @@ const HEADER_HEIGHT = 32;
 export default function CompactView() {
   const [minimized, setMinimized] = useState(false);
   const [sortMode, setSortMode] = useState<TaskSortMode>("time");
+  const [upcomingRange, setUpcomingRange] = useState<UpcomingRange>("1m");
 
   const now = new Date();
   const year = now.getFullYear();
@@ -24,16 +28,18 @@ export default function CompactView() {
 
   const { tasksByDate, toggleComplete, refreshing, refetch } = useTaskData(year, month);
   const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
+  const { tasksByDate: upcomingTasksByDate, toggleComplete: toggleUpcomingComplete } =
+    useUpcomingTasks(upcomingRange);
 
   const todayTasks = useMemo(
     () => getTasksForDate(tasksByDate, todayStr).filter((t) => !t.completed),
     [tasksByDate, todayStr],
   );
 
-  const upcomingGroups = useMemo(() => {
-    const all = getUpcomingTasks(tasksByDate, false, sortMode);
-    return all.filter((g) => g.date > todayStr);
-  }, [tasksByDate, todayStr, sortMode]);
+  const upcomingGroups = useMemo(
+    () => getUpcomingTasks(upcomingTasksByDate, false, sortMode),
+    [upcomingTasksByDate, sortMode],
+  );
 
   const completedGroups = useMemo(() => {
     return Object.entries(tasksByDate)
@@ -79,7 +85,12 @@ export default function CompactView() {
               onToggleComplete={toggleComplete}
             />
             {upcomingGroups.length > 0 && (
-              <CompactUpcoming groups={upcomingGroups} onToggleComplete={toggleComplete} />
+              <CompactUpcoming
+                groups={upcomingGroups}
+                range={upcomingRange}
+                onRangeChange={setUpcomingRange}
+                onToggleComplete={toggleUpcomingComplete}
+              />
             )}
             {hasBacklog && (
               <CompactBacklog tasks={backlogTasks} onToggleComplete={toggleBacklogComplete} />

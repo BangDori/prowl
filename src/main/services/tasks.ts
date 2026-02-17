@@ -63,6 +63,27 @@ export function listTasksByMonth(year: number, month: number): TasksByDate {
   return result;
 }
 
+/** 날짜 범위 기반 태스크 조회 (ISO 8601 "YYYY-MM-DD") */
+export function listTasksByDateRange(startDate: string, endDate: string): TasksByDate {
+  const folder = ensureFolder();
+  const result: TasksByDate = {};
+
+  try {
+    const files = readdirSync(folder).filter((f) => DATE_FILE_RE.test(f));
+    for (const file of files) {
+      const date = file.replace(".json", "");
+      if (date >= startDate && date <= endDate) {
+        const tasks = readDateFile(date);
+        if (tasks.length > 0) result[date] = tasks;
+      }
+    }
+  } catch {
+    // 폴더 읽기 실패 시 빈 결과 반환
+  }
+
+  return result;
+}
+
 /** 존재하는 모든 날짜 파일명 목록 */
 export function scanDates(): string[] {
   const folder = ensureFolder();
