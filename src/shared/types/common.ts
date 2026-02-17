@@ -81,7 +81,7 @@ export interface ChatMessage {
 
 export interface ChatSendResult {
   success: boolean;
-  message?: ChatMessage;
+  messages?: ChatMessage[];
   error?: string;
 }
 

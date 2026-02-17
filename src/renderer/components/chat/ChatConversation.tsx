@@ -112,8 +112,8 @@ export default function ChatConversation({
       const result = await window.electronAPI.sendChatMessage(content, messagesRef.current);
 
       let updatedMessages: ChatMessage[];
-      if (result.success && result.message) {
-        updatedMessages = [...messagesRef.current, result.message];
+      if (result.success && result.messages) {
+        updatedMessages = [...messagesRef.current, ...result.messages];
         setMessages(updatedMessages);
       } else {
         const errMsg: ChatMessage = {

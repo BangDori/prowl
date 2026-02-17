@@ -37,7 +37,13 @@ update_memory to change an existing memory, and delete_memory to remove one.
 Always call list_memories first when the user asks to update or delete a memory, so you can find the correct ID.
 
 Match the user's language (Korean if they write in Korean).
-Use bold (**) only on key words or phrases that deserve emphasis. Do not bold entire sentences.`;
+Use bold (**) only on key words or phrases that deserve emphasis. Do not bold entire sentences.
+
+Respond in multiple short messages like a messenger chat.
+Put "---" on its own line between messages.
+Keep each message to 1-3 sentences.
+Never put "---" as a separator inside code blocks (\`\`\`).
+Do not split lists, tables, or code blocks across messages.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
@@ -46,6 +52,48 @@ Use bold (**) only on key words or phrases that deserve emphasis. Do not bold en
   }
 
   return prompt;
+}
+
+/** AI 응답을 --- 구분자로 분리하여 여러 ChatMessage로 변환 */
+function splitIntoMessages(rawText: string, baseTimestamp: number): ChatMessage[] {
+  // 코드 블록 범위 추출 (내부 --- 무시용)
+  const codeBlockRanges = [...rawText.matchAll(/```[\s\S]*?```/g)].map((m) => ({
+    start: m.index,
+    end: m.index + m[0].length,
+  }));
+
+  const isInCodeBlock = (pos: number): boolean =>
+    codeBlockRanges.some((r) => pos >= r.start && pos < r.end);
+
+  // ---를 기준으로 분리 (앞뒤 빈 줄 허용, 코드 블록 내부 제외)
+  const chunks: string[] = [];
+  let lastIndex = 0;
+  for (const m of rawText.matchAll(/\n+\s*---\s*\n+/g)) {
+    if (!isInCodeBlock(m.index)) {
+      chunks.push(rawText.slice(lastIndex, m.index).trim());
+      lastIndex = m.index + m[0].length;
+    }
+  }
+  chunks.push(rawText.slice(lastIndex).trim());
+
+  const filtered = chunks.filter((c) => c.length > 0);
+  if (filtered.length === 0) {
+    return [
+      {
+        id: `msg_${baseTimestamp}`,
+        role: "assistant",
+        content: rawText.trim(),
+        timestamp: baseTimestamp,
+      },
+    ];
+  }
+
+  return filtered.map((content, i) => ({
+    id: `msg_${baseTimestamp}_${i}`,
+    role: "assistant" as const,
+    content,
+    timestamp: baseTimestamp + i,
+  }));
 }
 
 /** 환경변수 키 */
@@ -59,14 +107,17 @@ const MODELS: AiModelOption[] = [
 
 /** API 키 미등록 시 안내 메시지 생성 */
 function createApiKeyGuideMessage(): ChatSendResult {
+  const ts = Date.now();
   return {
     success: true,
-    message: {
-      id: `msg_${Date.now()}`,
-      role: "assistant",
-      content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
-      timestamp: Date.now(),
-    },
+    messages: [
+      {
+        id: `msg_${ts}`,
+        role: "assistant",
+        content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
+        timestamp: ts,
+      },
+    ],
   };
 }
 
@@ -111,14 +162,10 @@ export async function sendChatMessage(
       stopWhen: stepCountIs(5),
     });
 
+    const timestamp = Date.now();
     return {
       success: true,
-      message: {
-        id: `msg_${Date.now()}`,
-        role: "assistant",
-        content: text,
-        timestamp: Date.now(),
-      },
+      messages: splitIntoMessages(text, timestamp),
     };
   } catch (error) {
     return {
