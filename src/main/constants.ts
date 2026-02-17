@@ -50,6 +50,16 @@ export const WINDOW = {
 export const DEV_SERVER_PORT = 5173;
 
 // ============================================
+// 채팅 윈도우 설정
+// ============================================
+export const CHAT_WINDOW = {
+  WIDTH: 680,
+  INPUT_HEIGHT: 72,
+  EXPANDED_HEIGHT: 520,
+  BOTTOM_MARGIN: 160,
+} as const;
+
+// ============================================
 // 스플래시 윈도우 설정
 // ============================================
 export const SPLASH = {

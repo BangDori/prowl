@@ -241,6 +241,68 @@ select.input-field {
 }
 
 /* ============================================
+   채팅 플로팅 윈도우
+   ============================================ */
+
+.chat-floating-root {
+  @apply flex flex-col justify-end h-screen w-full;
+  background: transparent;
+}
+
+.chat-messages-area {
+  @apply flex-1 flex flex-col min-h-0;
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+}
+
+.chat-input-bar {
+  @apply flex items-center gap-3 px-4 py-3;
+  background: rgba(13, 13, 13, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.chat-messages-area + .chat-input-bar {
+  border-radius: 0 0 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-send-btn {
+  @apply flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all;
+  @apply bg-accent text-black;
+  @apply disabled:opacity-20 disabled:bg-white/10 disabled:text-white/30;
+}
+
+.chat-send-btn:not(:disabled):hover {
+  @apply bg-accent-hover;
+}
+
+.chat-send-btn:not(:disabled):active {
+  @apply scale-95;
+}
+
+@keyframes chat-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-bubble-enter {
+  animation: chat-bubble-in 0.25s ease-out;
+}
+
+/* ============================================
    대시보드 윈도우 드래그 영역
    ============================================ */
 

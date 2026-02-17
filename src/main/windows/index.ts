@@ -1,4 +1,6 @@
 /** 윈도우 모듈 배럴 export */
+// Chat window
+export { closeChatWindow, getChatWindow, resizeChatWindow, showChatWindow } from "./chat-window";
 // Compact sticky view
 export {
   getCompactWindow,

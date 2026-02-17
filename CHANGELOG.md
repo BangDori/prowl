@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.20.0] - 2026-02-17
+- Prowl Chat 기능 복원 (Cmd+Shift+P)
+- AI SDK (OpenAI GPT-4o-mini) 채팅 백엔드 연동
+- Task Manager 글로벌 단축키 추가 (Cmd+Shift+O)
+- 채팅 한국어 IME 조합 중 Enter 시 마지막 글자 잔류 버그 수정
+
 ## [1.19.0] - 2026-02-17
 - 스티키 윈도우 다가오는 일정 조회 범위 선택 기능 추가 (1주/2주/1개월/1년)
 - 월 경계를 넘는 태스크가 보이지 않던 문제 해결
