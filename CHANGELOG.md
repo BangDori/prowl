@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.26.1] - 2026-02-17
+- AI 채팅에서 메모리 조회/수정/삭제 가능 (기존 저장만 가능)
+
 ## [1.26.0] - 2026-02-17
 - 채팅방 관리 기능 추가 (생성, 이름 변경, 삭제)
 - 대화 내역 디스크 영속 저장 (~/.prowl/chat-rooms/)
