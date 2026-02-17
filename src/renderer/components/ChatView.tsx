@@ -2,9 +2,46 @@
 import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
-import { Plus, Send, X } from "lucide-react";
+import { ArrowUpRight, Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Markdown from "react-markdown";
 import ModelSelector from "./ModelSelector";
+
+/** 채팅 버블용 마크다운 커스텀 컴포넌트 (헤더는 bold로 축소) */
+const markdownComponents = {
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="block mt-2 mb-1">{children}</strong>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="block mt-2 mb-1">{children}</strong>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="block mt-1.5 mb-0.5">{children}</strong>
+  ),
+  p: ({ children }: { children?: React.ReactNode }) => <p className="mb-1 last:mb-0">{children}</p>,
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="list-disc pl-4 mb-1">{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="list-decimal pl-4 mb-1">{children}</ol>
+  ),
+  code: ({ children }: { children?: React.ReactNode }) => (
+    <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
+  ),
+  pre: ({ children }: { children?: React.ReactNode }) => (
+    <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px]">{children}</pre>
+  ),
+  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+    <button
+      type="button"
+      onClick={() => href && window.electronAPI.openExternal(href)}
+      className="inline-flex items-center gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
+    >
+      {children}
+      <ArrowUpRight className="w-3 h-3 flex-shrink-0" />
+    </button>
+  ),
+};
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
@@ -50,13 +87,17 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       <div className={`max-w-[75%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
         {!isUser && <span className="text-[10px] text-white/40 mb-0.5 ml-1">Prowl</span>}
         <div
-          className={`px-3 py-2 rounded-2xl text-[13px] leading-relaxed whitespace-pre-wrap break-words ${
+          className={`px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
             isUser
-              ? "bg-accent text-black rounded-br-sm"
+              ? "bg-accent text-black rounded-br-sm whitespace-pre-wrap"
               : "bg-white/10 text-white/90 rounded-bl-sm"
           }`}
         >
-          {message.content}
+          {isUser ? (
+            message.content
+          ) : (
+            <Markdown components={markdownComponents}>{message.content}</Markdown>
+          )}
         </div>
         <span className="text-[10px] text-white/30 mt-0.5 mx-1">{time}</span>
       </div>
