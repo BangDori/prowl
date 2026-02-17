@@ -57,10 +57,10 @@ export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProp
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // 미열람 변경 이벤트 수신 → unread 쿼리 갱신
+  // 미열람 변경 이벤트 수신 → 룸 목록 + unread 쿼리 갱신
   useEffect(() => {
     return window.electronAPI.onChatUnreadChanged(() => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.unreadCounts() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
   }, [queryClient]);
 

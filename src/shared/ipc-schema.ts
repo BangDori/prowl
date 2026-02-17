@@ -72,7 +72,10 @@ export interface IpcInvokeSchema {
   "app:relaunch": { params: []; return: void };
 
   // Chat (6 channels)
-  "chat:send": { params: [content: string, history: ChatMessage[]]; return: IpcResult };
+  "chat:send": {
+    params: [roomId: string, content: string, history: ChatMessage[]];
+    return: IpcResult;
+  };
   "chat:get-config": { params: []; return: ChatConfig };
   "chat:set-config": { params: [config: ChatConfig]; return: IpcResult };
   "chat:providers": { params: []; return: ProviderStatus[] };

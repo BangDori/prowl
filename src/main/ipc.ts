@@ -238,10 +238,10 @@ export function registerIpcHandlers(): void {
     app.quit();
   });
 
-  // 채팅 메시지 스트리밍 전송 (fire-and-forget)
-  handleIpc("chat:send", async (content, history) => {
+  // 채팅 메시지 스트리밍 전송 (fire-and-forget, main에서 저장)
+  handleIpc("chat:send", async (roomId, content, history) => {
     const config = getChatConfig();
-    streamChatMessage(content, history, config).catch((err) =>
+    streamChatMessage(roomId, content, history, config).catch((err) =>
       console.error("[IPC] chat:send stream error:", err),
     );
     return { success: true };
