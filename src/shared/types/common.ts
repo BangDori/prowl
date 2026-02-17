@@ -79,12 +79,6 @@ export interface ChatMessage {
   timestamp: number;
 }
 
-export interface ChatSendResult {
-  success: boolean;
-  message?: ChatMessage;
-  error?: string;
-}
-
 // Homebrew 설치 상태
 export type BrewInstallStatus =
   | "brew-ready" // brew 설치됨 + prowl이 brew로 설치됨

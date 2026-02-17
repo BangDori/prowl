@@ -5,7 +5,6 @@ import type {
   ChatMessage,
   ChatRoom,
   ChatRoomSummary,
-  ChatSendResult,
   ClaudeConfig,
   FocusMode,
   IpcResult,
@@ -73,21 +72,17 @@ export interface IpcInvokeSchema {
   "app:relaunch": { params: []; return: void };
 
   // Chat (6 channels)
-  "chat:send": { params: [content: string, history: ChatMessage[]]; return: ChatSendResult };
+  "chat:send": { params: [content: string, history: ChatMessage[]]; return: IpcResult };
   "chat:get-config": { params: []; return: ChatConfig };
   "chat:set-config": { params: [config: ChatConfig]; return: IpcResult };
   "chat:providers": { params: []; return: ProviderStatus[] };
   "chat:resize": { params: [height: number]; return: void };
   "chat:close": { params: []; return: void };
 
-  // Chat Rooms (6 channels)
+  // Chat Rooms (5 channels)
   "chat-rooms:list": { params: []; return: ChatRoomSummary[] };
   "chat-rooms:get": { params: [roomId: string]; return: ChatRoom };
   "chat-rooms:create": { params: [title?: string]; return: ChatRoom };
-  "chat-rooms:update": {
-    params: [roomId: string, title: string];
-    return: IpcResult;
-  };
   "chat-rooms:delete": { params: [roomId: string]; return: IpcResult };
   "chat-rooms:save-messages": {
     params: [roomId: string, messages: ChatMessage[]];
@@ -149,6 +144,9 @@ export interface IpcInvokeSchema {
 export interface IpcEventSchema {
   "window:show": { params: [] };
   "tasks:changed": { params: [] };
+  "chat:stream-message": { params: [message: ChatMessage] };
+  "chat:stream-done": { params: [] };
+  "chat:stream-error": { params: [error: string] };
 }
 
 // 유틸리티 타입

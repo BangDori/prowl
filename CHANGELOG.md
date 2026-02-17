@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.27.0] - 2026-02-17
+- AI 채팅 실시간 스트리밍 멀티 메시지 응답 (메신저 스타일)
+- 채팅방 제목 수정 기능 제거 (자동 제목 생성으로 대체)
+
 ## [1.26.2] - 2026-02-17
 - Compact 모드 태스크 상세 패널에 복사 버튼 추가
 

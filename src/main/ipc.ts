@@ -4,14 +4,13 @@ import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
-import { getProviderStatuses, sendChatMessage } from "./services/chat";
+import { getProviderStatuses, streamChatMessage } from "./services/chat";
 import {
   createChatRoom,
   deleteChatRoom,
   getChatRoom,
   listChatRooms,
   saveChatMessages,
-  updateChatRoom,
 } from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -233,10 +232,13 @@ export function registerIpcHandlers(): void {
     app.quit();
   });
 
-  // 채팅 메시지 전송
+  // 채팅 메시지 스트리밍 전송 (fire-and-forget)
   handleIpc("chat:send", async (content, history) => {
     const config = getChatConfig();
-    return sendChatMessage(content, history, config);
+    streamChatMessage(content, history, config).catch((err) =>
+      console.error("[IPC] chat:send stream error:", err),
+    );
+    return { success: true };
   });
 
   // 채팅 설정 조회
@@ -461,15 +463,6 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:get", async (roomId) => getChatRoom(roomId));
 
   handleIpc("chat-rooms:create", async (title) => createChatRoom(title));
-
-  handleIpc("chat-rooms:update", async (roomId, title) => {
-    try {
-      updateChatRoom(roomId, title);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  });
 
   handleIpc("chat-rooms:delete", async (roomId) => {
     try {

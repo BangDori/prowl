@@ -90,15 +90,6 @@ export function createChatRoom(title?: string): ChatRoom {
   return room;
 }
 
-/** 룸 이름 변경 */
-export function updateChatRoom(roomId: string, title: string): void {
-  const room = readRoomFile(roomId);
-  if (!room) throw new Error(`Chat room not found: ${roomId}`);
-  room.title = title;
-  room.updatedAt = new Date().toISOString();
-  writeRoomFile(room);
-}
-
 /** 룸 삭제 */
 export function deleteChatRoom(roomId: string): void {
   const filePath = roomFilePath(roomId);

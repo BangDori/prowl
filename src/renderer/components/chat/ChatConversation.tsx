@@ -97,6 +97,33 @@ export default function ChatConversation({
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new messages
   useEffect(scrollToBottom, [messages, scrollToBottom]);
 
+  // 스트림 이벤트 리스너
+  useEffect(() => {
+    const offMessage = window.electronAPI.onChatStreamMessage((msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+    const offDone = window.electronAPI.onChatStreamDone(() => {
+      setLoading(false);
+      saveMessages.mutate({ roomId, messages: messagesRef.current });
+    });
+    const offError = window.electronAPI.onChatStreamError((error) => {
+      setLoading(false);
+      const errMsg: ChatMessage = {
+        id: `err_${Date.now()}`,
+        role: "assistant",
+        content: error || "오류가 발생했습니다.",
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errMsg]);
+      saveMessages.mutate({ roomId, messages: messagesRef.current });
+    });
+    return () => {
+      offMessage();
+      offDone();
+      offError();
+    };
+  }, [roomId, saveMessages]);
+
   /** 메시지 전송 핵심 로직 (입력 및 초기 메시지 양쪽에서 사용) */
   const sendMessage = useCallback(
     async (content: string) => {
@@ -110,24 +137,18 @@ export default function ChatConversation({
       setLoading(true);
 
       const result = await window.electronAPI.sendChatMessage(content, messagesRef.current);
-
-      let updatedMessages: ChatMessage[];
-      if (result.success && result.message) {
-        updatedMessages = [...messagesRef.current, result.message];
-        setMessages(updatedMessages);
-      } else {
+      if (!result.success) {
+        setLoading(false);
         const errMsg: ChatMessage = {
           id: `err_${Date.now()}`,
           role: "assistant",
           content: result.error || "오류가 발생했습니다.",
           timestamp: Date.now(),
         };
-        updatedMessages = [...messagesRef.current, errMsg];
-        setMessages(updatedMessages);
+        setMessages((prev) => [...prev, errMsg]);
+        saveMessages.mutate({ roomId, messages: messagesRef.current });
       }
-
-      saveMessages.mutate({ roomId, messages: updatedMessages });
-      setLoading(false);
+      // success → 메시지는 stream 이벤트로 도착
     },
     [roomId, saveMessages],
   );
