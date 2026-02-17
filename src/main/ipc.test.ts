@@ -325,9 +325,9 @@ describe("registerIpcHandlers", () => {
   describe("chat:send", () => {
     it("streamChatMessage를 fire-and-forget으로 호출하고 즉시 success를 반환한다", async () => {
       const handler = getHandler("chat:send");
-      const result = await handler({}, "안녕", []);
+      const result = await handler({}, "room1", "안녕", []);
 
-      expect(streamChatMessage).toHaveBeenCalledWith("안녕", [], {
+      expect(streamChatMessage).toHaveBeenCalledWith("room1", "안녕", [], {
         provider: "openai",
         model: "gpt-4o",
       });
