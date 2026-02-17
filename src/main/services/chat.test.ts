@@ -1,6 +1,11 @@
 /** 채팅 서비스 유닛 테스트 */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("./memory", () => ({
+  listMemories: vi.fn().mockReturnValue([]),
+  addMemory: vi.fn(),
+}));
+
 vi.mock("ai", () => ({
   generateText: vi.fn(),
   stepCountIs: vi.fn().mockReturnValue("mock-stop-condition"),
