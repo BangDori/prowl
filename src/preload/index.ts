@@ -68,6 +68,7 @@ const electronAPI = {
   updateTask: invokeIpc("tasks:update-task"),
   toggleTaskComplete: invokeIpc("tasks:toggle-complete"),
   deleteTask: invokeIpc("tasks:delete-task"),
+  addDateTask: invokeIpc("tasks:add-task"),
   scanTaskDates: invokeIpc("tasks:scan-dates"),
 
   // Tasks – Backlog
@@ -86,6 +87,11 @@ const electronAPI = {
     const handler = () => callback();
     ipcRenderer.on("window:show", handler);
     return () => ipcRenderer.removeListener("window:show", handler);
+  },
+  onTasksChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("tasks:changed", handler);
+    return () => ipcRenderer.removeListener("tasks:changed", handler);
   },
 };
 

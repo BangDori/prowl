@@ -1,10 +1,12 @@
 /** Compact Sticky View: 오늘의 태스크와 다가오는 일정 미리보기 */
 
 import type { UpcomingRange } from "@shared/types";
-import { useCallback, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBacklogData } from "../../hooks/useBacklogData";
 import { useTaskData } from "../../hooks/useTaskData";
 import { useUpcomingTasks } from "../../hooks/useUpcomingTasks";
+import { queryKeys } from "../../queries/keys";
 import { toDateStr } from "../../utils/calendar";
 import { getTasksForDate, getUpcomingTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactBacklog from "./CompactBacklog";
@@ -17,9 +19,18 @@ const FULL_HEIGHT = 400;
 const HEADER_HEIGHT = 32;
 
 export default function CompactView() {
+  const queryClient = useQueryClient();
   const [minimized, setMinimized] = useState(false);
   const [sortMode, setSortMode] = useState<TaskSortMode>("time");
   const [upcomingRange, setUpcomingRange] = useState<UpcomingRange>("1m");
+
+  // Chat에서 태스크 변경 시 자동 새로고침
+  useEffect(() => {
+    const unsubscribe = window.electronAPI.onTasksChanged(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    });
+    return unsubscribe;
+  }, [queryClient]);
 
   const now = new Date();
   const year = now.getFullYear();

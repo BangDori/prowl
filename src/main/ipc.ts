@@ -21,6 +21,7 @@ import {
 } from "./services/settings";
 import { refreshReminders } from "./services/task-reminder";
 import {
+  addDateTask,
   addTaskToBacklog,
   deleteBacklogTask,
   deleteTask,
@@ -327,6 +328,17 @@ export function registerIpcHandlers(): void {
   handleIpc("tasks:delete-task", async (date, taskId) => {
     try {
       deleteTask(date, taskId);
+      refreshReminders();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // 태스크 추가
+  handleIpc("tasks:add-task", async (date, task) => {
+    try {
+      addDateTask(date, task);
       refreshReminders();
       return { success: true };
     } catch (error) {

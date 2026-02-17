@@ -1,4 +1,4 @@
-/** 채팅 메시지 전송 서비스 (AI SDK + OpenAI) */
+/** 채팅 메시지 전송 서비스 (AI SDK + OpenAI + Tool Calling) */
 import type {
   AiModelOption,
   ChatConfig,
@@ -6,9 +6,22 @@ import type {
   ChatSendResult,
   ProviderStatus,
 } from "@shared/types";
+import { getChatTools } from "./chat-tools";
 
-const SYSTEM_PROMPT = `You are Prowl, a helpful macOS assistant.
-Respond concisely and helpfully. Use Korean if the user writes in Korean.`;
+/** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
+function buildSystemPrompt(): string {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const time = now.toTimeString().slice(0, 5);
+  const weekday = ["일", "월", "화", "수", "목", "금", "토"][now.getDay()];
+  return `You are Prowl, a helpful macOS assistant that manages tasks and answers questions.
+Today is ${today} (${weekday}요일), current time is ${time}.
+You can manage the user's tasks using the provided tools.
+Use "YYYY-MM-DD" format for dates. Use backlog for tasks without a specific date.
+When listing tasks, format them clearly with status, title, priority, and time.
+After creating, updating, or deleting a task, tell the user to check the Task Manager (Cmd+Shift+O).
+Respond concisely. Use Korean if the user writes in Korean.`;
+}
 
 /** 환경변수 키 */
 const ENV_KEY = "OPENAI_API_KEY";
@@ -44,7 +57,7 @@ export async function sendChatMessage(
   }
 
   try {
-    const { generateText } = await import("ai");
+    const { generateText, stepCountIs } = await import("ai");
     const { openai } = await import("@ai-sdk/openai");
     const model = openai.responses(modelId);
 
@@ -56,8 +69,11 @@ export async function sendChatMessage(
 
     const { text } = await generateText({
       model,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(),
       messages,
+      tools: getChatTools(),
+      toolChoice: "auto",
+      stopWhen: stepCountIs(5),
     });
 
     return {
