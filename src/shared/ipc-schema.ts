@@ -74,6 +74,10 @@ export interface IpcInvokeSchema {
     params: [year: number, month: number];
     return: TasksByDate;
   };
+  "tasks:list-date-range": {
+    params: [startDate: string, endDate: string];
+    return: TasksByDate;
+  };
   "tasks:update-task": {
     params: [date: string, task: Task];
     return: IpcResult;

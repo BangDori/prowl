@@ -22,6 +22,7 @@ import {
   deleteBacklogTask,
   deleteTask,
   listBacklogTasks,
+  listTasksByDateRange,
   listTasksByMonth,
   scanDates,
   toggleBacklogComplete,
@@ -248,6 +249,11 @@ export function registerIpcHandlers(): void {
   // 월 단위 태스크 조회
   handleIpc("tasks:list-month", async (year, month) => {
     return listTasksByMonth(year, month);
+  });
+
+  // 날짜 범위 태스크 조회
+  handleIpc("tasks:list-date-range", async (startDate, endDate) => {
+    return listTasksByDateRange(startDate, endDate);
   });
 
   // 태스크 수정

@@ -56,6 +56,7 @@ const electronAPI = {
 
   // Tasks
   listTasksByMonth: invokeIpc("tasks:list-month"),
+  listTasksByDateRange: invokeIpc("tasks:list-date-range"),
   updateTask: invokeIpc("tasks:update-task"),
   toggleTaskComplete: invokeIpc("tasks:toggle-complete"),
   deleteTask: invokeIpc("tasks:delete-task"),

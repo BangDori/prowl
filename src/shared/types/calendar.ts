@@ -56,5 +56,24 @@ export interface Task {
 /** 날짜별 태스크 맵 (month 단위 조회 결과) */
 export type TasksByDate = Record<string, Task[]>;
 
+/** 다가오는 일정 범위 프리셋 */
+export type UpcomingRange = "1w" | "2w" | "1m" | "1y";
+
+/** 범위별 일수 매핑 */
+export const UPCOMING_RANGE_DAYS: Record<UpcomingRange, number> = {
+  "1w": 7,
+  "2w": 14,
+  "1m": 30,
+  "1y": 365,
+} as const;
+
+/** 범위별 라벨 */
+export const UPCOMING_RANGE_LABELS: Record<UpcomingRange, string> = {
+  "1w": "1주",
+  "2w": "2주",
+  "1m": "1개월",
+  "1y": "1년",
+} as const;
+
 /** 태스크 폴더 기본 경로 */
 export const TASK_FOLDER_NAME = "prowl-task-calendar";

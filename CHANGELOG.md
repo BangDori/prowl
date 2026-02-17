@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.19.0] - 2026-02-17
+- 스티키 윈도우 다가오는 일정 조회 범위 선택 기능 추가 (1주/2주/1개월/1년)
+- 월 경계를 넘는 태스크가 보이지 않던 문제 해결
+
 ## [1.18.4] - 2026-02-17
 - brew outdated 타임아웃으로 인한 Cask 업데이트 실패 수정
 

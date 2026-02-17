@@ -1,6 +1,6 @@
 /** 다가오는 일정: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
-import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
+import type { Task, UpcomingRange } from "@shared/types";
+import { PRIORITY_COLORS, UPCOMING_RANGE_LABELS } from "@shared/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
@@ -13,10 +13,17 @@ interface UpcomingGroup {
 
 interface CompactUpcomingProps {
   groups: UpcomingGroup[];
+  range: UpcomingRange;
+  onRangeChange: (range: UpcomingRange) => void;
   onToggleComplete: (date: string, taskId: string) => void;
 }
 
-export default function CompactUpcoming({ groups, onToggleComplete }: CompactUpcomingProps) {
+export default function CompactUpcoming({
+  groups,
+  range,
+  onRangeChange,
+  onToggleComplete,
+}: CompactUpcomingProps) {
   if (groups.length === 0) return null;
 
   return (
@@ -25,6 +32,7 @@ export default function CompactUpcoming({ groups, onToggleComplete }: CompactUpc
         <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
           다가오는 일정
         </span>
+        <RangeSelector range={range} onRangeChange={onRangeChange} />
       </div>
 
       <div className="space-y-1.5">
@@ -114,6 +122,35 @@ function UpcomingTaskRow({
       </div>
 
       {expanded && <CompactTaskDetail task={task} />}
+    </div>
+  );
+}
+
+const RANGES: UpcomingRange[] = ["1w", "2w", "1m", "1y"];
+
+function RangeSelector({
+  range,
+  onRangeChange,
+}: {
+  range: UpcomingRange;
+  onRangeChange: (range: UpcomingRange) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {RANGES.map((r) => (
+        <button
+          key={r}
+          type="button"
+          onClick={() => onRangeChange(r)}
+          className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
+            range === r
+              ? "bg-white/10 text-white/70"
+              : "text-white/30 hover:text-white/50 hover:bg-white/[0.06]"
+          }`}
+        >
+          {UPCOMING_RANGE_LABELS[r]}
+        </button>
+      ))}
     </div>
   );
 }
