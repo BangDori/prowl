@@ -252,12 +252,19 @@ export default function ChatConversation({
           />
           <div className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
-              {messages.map((msg) => (
-                <Fragment key={msg.id}>
-                  {msg.id === unreadDividerMsgId.current && <UnreadDivider />}
-                  <MessageBubble message={msg} />
-                </Fragment>
-              ))}
+              {messages.map((msg, idx) => {
+                const next = messages[idx + 1];
+                const isLastInGroup =
+                  !next ||
+                  next.role !== msg.role ||
+                  Math.abs(next.timestamp - msg.timestamp) > 10 * 60 * 1000;
+                return (
+                  <Fragment key={msg.id}>
+                    {msg.id === unreadDividerMsgId.current && <UnreadDivider />}
+                    <MessageBubble message={msg} isLastInGroup={isLastInGroup} />
+                  </Fragment>
+                );
+              })}
               {loading && <LoadingIndicator />}
               <div ref={messagesEndRef} />
             </div>

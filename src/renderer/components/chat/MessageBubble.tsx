@@ -43,7 +43,13 @@ const markdownComponents = {
   ),
 };
 
-export default function MessageBubble({ message }: { message: ChatMessage }) {
+interface MessageBubbleProps {
+  message: ChatMessage;
+  /** 같은 발신자의 연속 메시지 그룹에서 마지막 메시지인지 여부 */
+  isLastInGroup?: boolean;
+}
+
+export default function MessageBubble({ message, isLastInGroup = true }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
   const time = new Date(message.timestamp).toLocaleTimeString("ko-KR", {
@@ -57,19 +63,26 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
     setTimeout(() => setCopied(false), 2000);
   }, [message.content]);
 
+  const showMeta = isLastInGroup;
+
   return (
     <div
-      className={`flex ${isUser ? "justify-end" : "justify-start"} mb-3 chat-bubble-enter group`}
+      className={`flex ${isUser ? "justify-end" : "justify-start"} ${showMeta ? "mb-3" : "mb-1"} chat-bubble-enter group`}
     >
-      {!isUser && (
-        <img
-          src={prowlProfile}
-          alt="Prowl"
-          className="flex-shrink-0 w-7 h-7 rounded-full mr-2 mt-1 object-cover"
-        />
-      )}
-      <div className={`max-w-[85%] flex flex-col ${isUser ? "items-end" : "items-start"}`}>
-        {!isUser && <span className="text-[10px] text-white/40 mb-0.5 ml-1">Prowl</span>}
+      {!isUser &&
+        (showMeta ? (
+          <img
+            src={prowlProfile}
+            alt="Prowl"
+            className="flex-shrink-0 w-7 h-7 rounded-full mr-2 mt-1 object-cover"
+          />
+        ) : (
+          <div className="w-7 mr-2 flex-shrink-0" />
+        ))}
+      <div className={`max-w-[85%] flex ${isUser ? "items-end" : "items-end"} gap-1`}>
+        {showMeta && isUser && (
+          <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
+        )}
         <div
           className={`relative px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
             isUser
@@ -94,7 +107,9 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
             {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
           </button>
         </div>
-        <span className="text-[10px] text-white/30 mt-0.5 mx-1">{time}</span>
+        {showMeta && !isUser && (
+          <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
+        )}
       </div>
     </div>
   );
