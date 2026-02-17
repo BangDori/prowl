@@ -1,6 +1,7 @@
 /** IPC 채널 핸들러 등록 및 라우팅 */
 import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
+import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
 import { getProviderStatuses, sendChatMessage } from "./services/chat";
@@ -19,6 +20,7 @@ import {
   setJobCustomization,
   setSettings,
 } from "./services/settings";
+import { registerGlobalShortcuts } from "./services/shortcuts";
 import { refreshReminders } from "./services/task-reminder";
 import {
   addDateTask,
@@ -148,6 +150,10 @@ export function registerIpcHandlers(): void {
   handleIpc("settings:set", async (settings) => {
     try {
       setSettings(settings);
+      const shortcutResult = registerGlobalShortcuts(settings.shortcuts ?? DEFAULT_SHORTCUTS);
+      if (!shortcutResult.success) {
+        return { success: false, error: shortcutResult.error };
+      }
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

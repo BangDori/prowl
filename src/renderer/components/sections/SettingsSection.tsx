@@ -1,11 +1,17 @@
 /** 앱 설정 탭 섹션 */
-import { DEFAULT_FOCUS_MODE, type FocusMode } from "@shared/types";
+import {
+  DEFAULT_FOCUS_MODE,
+  DEFAULT_SHORTCUTS,
+  type FocusMode,
+  type ShortcutConfig,
+} from "@shared/types";
 import { Bell, ExternalLink, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
 import { useInstallUpdate, useRelaunchApp, useUpdateCheck } from "../../hooks/useUpdate";
 import FocusModePanel from "../FocusModePanel";
+import ShortcutsPanel from "../ShortcutsPanel";
 import ToggleSwitch from "../ToggleSwitch";
 
 type InstallPhase = "idle" | "installing" | "done" | "error";
@@ -40,6 +46,11 @@ export default function SettingsSection() {
 
   const saveFocusMode = (updated: FocusMode) => {
     updateFocusMode.mutate(updated);
+  };
+
+  const saveShortcuts = (updated: ShortcutConfig) => {
+    if (!settings) return;
+    updateSettings.mutate({ ...settings, shortcuts: updated });
   };
 
   const handleCheckForUpdates = async () => {
@@ -101,6 +112,19 @@ export default function SettingsSection() {
               </div>
               <ToggleSwitch enabled={notificationsEnabled} onChange={toggleNotifications} />
             </div>
+          </div>
+        </div>
+
+        {/* 단축키 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+            Shortcuts
+          </h3>
+          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+            <ShortcutsPanel
+              shortcuts={settings?.shortcuts ?? DEFAULT_SHORTCUTS}
+              onUpdate={saveShortcuts}
+            />
           </div>
         </div>
 
