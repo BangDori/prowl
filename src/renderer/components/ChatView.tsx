@@ -5,6 +5,8 @@ import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { ArrowUpRight, Plus, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 import ModelSelector from "./ModelSelector";
 
 /** 채팅 버블용 마크다운 커스텀 컴포넌트 (헤더는 bold로 축소) */
@@ -35,10 +37,10 @@ const markdownComponents = {
     <button
       type="button"
       onClick={() => href && window.electronAPI.openExternal(href)}
-      className="inline-flex items-center gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
+      className="inline-flex items-baseline gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
     >
-      {children}
-      <ArrowUpRight className="w-3 h-3 flex-shrink-0" />
+      <span>{children}</span>
+      <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 inline-block translate-y-[1px]" />
     </button>
   ),
 };
@@ -96,7 +98,9 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           {isUser ? (
             message.content
           ) : (
-            <Markdown components={markdownComponents}>{message.content}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
+              {message.content}
+            </Markdown>
           )}
         </div>
         <span className="text-[10px] text-white/30 mt-0.5 mx-1">{time}</span>
