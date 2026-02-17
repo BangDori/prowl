@@ -303,6 +303,43 @@ select.input-field {
 }
 
 /* ============================================
+   채팅 로비 (대화방 목록 + 입력바)
+   ============================================ */
+
+.chat-lobby {
+  @apply flex-1 flex flex-col min-h-0;
+  background: rgba(13, 13, 13, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px 16px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: none;
+}
+
+.chat-lobby + .chat-input-bar {
+  border-radius: 0 0 16px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-room-header {
+  @apply flex items-center justify-between px-4 py-3;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-room-item {
+  @apply flex items-center gap-2 px-4 py-3 cursor-pointer transition-colors;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.chat-room-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chat-room-item:last-child {
+  border-bottom: none;
+}
+
+/* ============================================
    대시보드 윈도우 드래그 영역
    ============================================ */
 
