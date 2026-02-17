@@ -71,23 +71,60 @@ function refreshBrewCache(brewPath: string): Promise<void> {
 }
 
 /**
- * Homebrew cask에 업그레이드 가능한 버전이 있는지 확인
+ * Cask formula 버전 조회 (brew info 텍스트 파싱)
+ *
+ * brew outdated --cask 이 서드파티 탭에서 불안정하므로
+ * formula 버전과 설치 버전을 직접 비교한다.
  */
-function isCaskOutdated(brewPath: string): Promise<boolean> {
+function getCaskFormulaVersion(brewPath: string): Promise<string | null> {
   return new Promise((resolve) => {
     execFile(
       brewPath,
-      ["outdated", "--cask", CASK_NAME],
-      { encoding: "utf-8", timeout: 30_000 },
+      ["info", "--cask", CASK_NAME],
+      { encoding: "utf-8", timeout: 15_000 },
       (error, stdout) => {
         if (error) {
-          resolve(false);
+          resolve(null);
           return;
         }
-        resolve(stdout.includes(CASK_NAME));
+        const match = stdout.match(/(\d+\.\d+\.\d+)/);
+        resolve(match?.[1] ?? null);
       },
     );
   });
+}
+
+/**
+ * 설치된 Cask 버전 조회
+ */
+function getInstalledCaskVersion(brewPath: string): Promise<string | null> {
+  return new Promise((resolve) => {
+    execFile(
+      brewPath,
+      ["list", "--cask", "--versions", CASK_NAME],
+      { encoding: "utf-8", timeout: 10_000 },
+      (error, stdout) => {
+        if (error) {
+          resolve(null);
+          return;
+        }
+        const match = stdout.match(/(\d+\.\d+\.\d+)/);
+        resolve(match?.[1] ?? null);
+      },
+    );
+  });
+}
+
+/**
+ * Cask formula 버전과 설치 버전을 비교하여 업그레이드 가능 여부 확인
+ */
+function isCaskUpgradable(brewPath: string): Promise<boolean> {
+  return Promise.all([getCaskFormulaVersion(brewPath), getInstalledCaskVersion(brewPath)]).then(
+    ([formulaVersion, installedVersion]) => {
+      if (!formulaVersion || !installedVersion) return false;
+      return formulaVersion !== installedVersion;
+    },
+  );
 }
 
 /**
@@ -104,7 +141,7 @@ export function runBrewUpgrade(): Promise<IpcResult> {
   }
 
   return refreshBrewCache(brewPath)
-    .then(() => isCaskOutdated(brewPath))
+    .then(() => isCaskUpgradable(brewPath))
     .then((outdated) => {
       if (!outdated) {
         return {

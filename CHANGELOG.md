@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.18.4] - 2026-02-17
+- brew outdated 타임아웃으로 인한 Cask 업데이트 실패 수정
+
 ## [1.18.3] - 2026-02-17
 - 스티키 윈도우 오늘 섹션에서 완료된 태스크가 노출되지 않도록 수정
 
