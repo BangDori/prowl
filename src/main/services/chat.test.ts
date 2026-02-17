@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("ai", () => ({
   generateText: vi.fn(),
+  stepCountIs: vi.fn().mockReturnValue("mock-stop-condition"),
+  tool: vi.fn((def: unknown) => def),
 }));
 
 const mockResponsesFn = vi.fn().mockReturnValue("mock-openai-model");
