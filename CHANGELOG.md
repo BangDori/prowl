@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.26.2] - 2026-02-17
+- Compact 모드 태스크 상세 패널에 복사 버튼 추가
+
 ## [1.26.1] - 2026-02-17
 - AI 채팅에서 메모리 조회/수정/삭제 가능 (기존 저장만 가능)
 
