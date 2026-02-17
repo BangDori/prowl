@@ -162,6 +162,7 @@ export function popUpTrayMenu(): void {
       icon: loadMenuIcon("list-todo"),
       type: "checkbox",
       checked: isCompactVisible(),
+      accelerator: "CommandOrControl+Shift+O",
       click: () => toggleCompactWindow(),
     },
     {

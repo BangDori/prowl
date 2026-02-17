@@ -6,7 +6,13 @@ import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
 import { startTaskReminderScheduler } from "./services/task-reminder";
 import { checkForUpdates } from "./services/update-checker";
-import { createSplashWindow, createTray, dismissSplash, showChatWindow } from "./windows";
+import {
+  createSplashWindow,
+  createTray,
+  dismissSplash,
+  showChatWindow,
+  toggleCompactWindow,
+} from "./windows";
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -29,9 +35,12 @@ if (!gotTheLock) {
       createTray();
       updateFocusModeMonitor(getFocusMode());
 
-      // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+      // 글로벌 단축키
       globalShortcut.register("CommandOrControl+Shift+P", () => {
         showChatWindow();
+      });
+      globalShortcut.register("CommandOrControl+Shift+O", () => {
+        toggleCompactWindow();
       });
     } else {
       // 프로덕션: 스플래시 윈도우 표시 후 트레이 전환
@@ -41,9 +50,12 @@ if (!gotTheLock) {
         createTray();
         updateFocusModeMonitor(getFocusMode());
 
-        // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+        // 글로벌 단축키
         globalShortcut.register("CommandOrControl+Shift+P", () => {
           showChatWindow();
+        });
+        globalShortcut.register("CommandOrControl+Shift+O", () => {
+          toggleCompactWindow();
         });
       }, SPLASH.DISPLAY_DURATION_MS);
     }
