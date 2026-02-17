@@ -11,7 +11,6 @@ import {
   getChatRoom,
   listChatRooms,
   saveChatMessages,
-  updateChatRoom,
 } from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -461,15 +460,6 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:get", async (roomId) => getChatRoom(roomId));
 
   handleIpc("chat-rooms:create", async (title) => createChatRoom(title));
-
-  handleIpc("chat-rooms:update", async (roomId, title) => {
-    try {
-      updateChatRoom(roomId, title);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
-  });
 
   handleIpc("chat-rooms:delete", async (roomId) => {
     try {

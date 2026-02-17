@@ -31,18 +31,6 @@ export function useCreateChatRoom() {
   });
 }
 
-/** 채팅 룸 이름 변경 */
-export function useUpdateChatRoom() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ roomId, title }: { roomId: string; title: string }) =>
-      window.electronAPI.updateChatRoom(roomId, title),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
-    },
-  });
-}
-
 /** 채팅 룸 삭제 */
 export function useDeleteChatRoom() {
   const queryClient = useQueryClient();
