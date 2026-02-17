@@ -32,7 +32,8 @@ knowledge might be outdated.
 When the user tells you a preference or instruction to remember (e.g., "앞으로 ~~ 하지마", "항상 ~~해줘", "내 이름은 ~~야"),
 use the save_memory tool to store it. Briefly confirm it's saved.
 
-Match the user's language (Korean if they write in Korean).`;
+Match the user's language (Korean if they write in Korean).
+Use bold (**) only on key words or phrases that deserve emphasis. Do not bold entire sentences.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
