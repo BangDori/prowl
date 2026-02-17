@@ -5,7 +5,6 @@ import type {
   ChatMessage,
   ChatRoom,
   ChatRoomSummary,
-  ChatSendResult,
   ClaudeConfig,
   FocusMode,
   IpcResult,
@@ -73,7 +72,7 @@ export interface IpcInvokeSchema {
   "app:relaunch": { params: []; return: void };
 
   // Chat (6 channels)
-  "chat:send": { params: [content: string, history: ChatMessage[]]; return: ChatSendResult };
+  "chat:send": { params: [content: string, history: ChatMessage[]]; return: IpcResult };
   "chat:get-config": { params: []; return: ChatConfig };
   "chat:set-config": { params: [config: ChatConfig]; return: IpcResult };
   "chat:providers": { params: []; return: ProviderStatus[] };
@@ -145,6 +144,9 @@ export interface IpcInvokeSchema {
 export interface IpcEventSchema {
   "window:show": { params: [] };
   "tasks:changed": { params: [] };
+  "chat:stream-message": { params: [message: ChatMessage] };
+  "chat:stream-done": { params: [] };
+  "chat:stream-error": { params: [error: string] };
 }
 
 // 유틸리티 타입

@@ -106,6 +106,26 @@ const electronAPI = {
     ipcRenderer.on("tasks:changed", handler);
     return () => ipcRenderer.removeListener("tasks:changed", handler);
   },
+
+  // Chat stream events
+  onChatStreamMessage: (
+    callback: (message: import("@shared/types").ChatMessage) => void,
+  ): (() => void) => {
+    const handler = (_e: unknown, message: import("@shared/types").ChatMessage) =>
+      callback(message);
+    ipcRenderer.on("chat:stream-message", handler as never);
+    return () => ipcRenderer.removeListener("chat:stream-message", handler as never);
+  },
+  onChatStreamDone: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("chat:stream-done", handler);
+    return () => ipcRenderer.removeListener("chat:stream-done", handler);
+  },
+  onChatStreamError: (callback: (error: string) => void): (() => void) => {
+    const handler = (_e: unknown, error: string) => callback(error);
+    ipcRenderer.on("chat:stream-error", handler as never);
+    return () => ipcRenderer.removeListener("chat:stream-error", handler as never);
+  },
 };
 
 // contextBridge로 API 노출

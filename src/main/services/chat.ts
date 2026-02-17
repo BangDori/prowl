@@ -1,11 +1,6 @@
-/** 채팅 메시지 전송 서비스 (AI SDK + OpenAI + Tool Calling) */
-import type {
-  AiModelOption,
-  ChatConfig,
-  ChatMessage,
-  ChatSendResult,
-  ProviderStatus,
-} from "@shared/types";
+/** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling) */
+import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
+import { getChatWindow } from "../windows";
 import { getChatTools } from "./chat-tools";
 import { listMemories } from "./memory";
 
@@ -54,46 +49,19 @@ Do not split lists, tables, or code blocks across messages.`;
   return prompt;
 }
 
-/** AI 응답을 --- 구분자로 분리하여 여러 ChatMessage로 변환 */
-function splitIntoMessages(rawText: string, baseTimestamp: number): ChatMessage[] {
-  // 코드 블록 범위 추출 (내부 --- 무시용)
-  const codeBlockRanges = [...rawText.matchAll(/```[\s\S]*?```/g)].map((m) => ({
-    start: m.index,
-    end: m.index + m[0].length,
-  }));
+/** 구분자 위치가 코드 블록 내부인지 판별 (``` 개수가 홀수면 내부) */
+function isInsideCodeBlock(text: string, pos: number): boolean {
+  const before = text.slice(0, pos);
+  const count = (before.match(/```/g) || []).length;
+  return count % 2 === 1;
+}
 
-  const isInCodeBlock = (pos: number): boolean =>
-    codeBlockRanges.some((r) => pos >= r.start && pos < r.end);
-
-  // ---를 기준으로 분리 (앞뒤 빈 줄 허용, 코드 블록 내부 제외)
-  const chunks: string[] = [];
-  let lastIndex = 0;
-  for (const m of rawText.matchAll(/\n+\s*---\s*\n+/g)) {
-    if (!isInCodeBlock(m.index)) {
-      chunks.push(rawText.slice(lastIndex, m.index).trim());
-      lastIndex = m.index + m[0].length;
-    }
+/** 채팅 윈도우에 이벤트 전송 (윈도우 없으면 무시) */
+function sendToChat(channel: string, ...args: unknown[]): void {
+  const win = getChatWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send(channel, ...args);
   }
-  chunks.push(rawText.slice(lastIndex).trim());
-
-  const filtered = chunks.filter((c) => c.length > 0);
-  if (filtered.length === 0) {
-    return [
-      {
-        id: `msg_${baseTimestamp}`,
-        role: "assistant",
-        content: rawText.trim(),
-        timestamp: baseTimestamp,
-      },
-    ];
-  }
-
-  return filtered.map((content, i) => ({
-    id: `msg_${baseTimestamp}_${i}`,
-    role: "assistant" as const,
-    content,
-    timestamp: baseTimestamp + i,
-  }));
 }
 
 /** 환경변수 키 */
@@ -105,35 +73,28 @@ const MODELS: AiModelOption[] = [
   { id: "gpt-4o", label: "GPT-4o", provider: "openai" },
 ];
 
-/** API 키 미등록 시 안내 메시지 생성 */
-function createApiKeyGuideMessage(): ChatSendResult {
-  const ts = Date.now();
-  return {
-    success: true,
-    messages: [
-      {
-        id: `msg_${ts}`,
-        role: "assistant",
-        content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
-        timestamp: ts,
-      },
-    ],
-  };
-}
-
-export async function sendChatMessage(
+/** 스트리밍 채팅 메시지 전송 (fire-and-forget) */
+export async function streamChatMessage(
   userContent: string,
   history: ChatMessage[],
   config?: ChatConfig,
-): Promise<ChatSendResult> {
+): Promise<void> {
   const modelId = config?.model ?? "gpt-4o";
 
   if (!process.env[ENV_KEY]) {
-    return createApiKeyGuideMessage();
+    const ts = Date.now();
+    sendToChat("chat:stream-message", {
+      id: `msg_${ts}`,
+      role: "assistant",
+      content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
+      timestamp: ts,
+    });
+    sendToChat("chat:stream-done");
+    return;
   }
 
   try {
-    const { generateText, stepCountIs } = await import("ai");
+    const { streamText, stepCountIs } = await import("ai");
     const { openai } = await import("@ai-sdk/openai");
     const model = openai.responses(modelId);
 
@@ -143,7 +104,7 @@ export async function sendChatMessage(
     }));
     messages.push({ role: "user", content: userContent });
 
-    const { text } = await generateText({
+    const result = streamText({
       model,
       system: buildSystemPrompt(),
       messages,
@@ -162,16 +123,49 @@ export async function sendChatMessage(
       stopWhen: stepCountIs(5),
     });
 
-    const timestamp = Date.now();
-    return {
-      success: true,
-      messages: splitIntoMessages(text, timestamp),
-    };
+    let buffer = "";
+    let msgIndex = 0;
+    const baseTs = Date.now();
+    const delimiterRegex = /\n+\s*---\s*\n+/;
+
+    for await (const chunk of result.textStream) {
+      buffer += chunk;
+
+      let match = delimiterRegex.exec(buffer);
+      while (match) {
+        if (!isInsideCodeBlock(buffer, match.index)) {
+          const content = buffer.slice(0, match.index).trim();
+          if (content) {
+            sendToChat("chat:stream-message", {
+              id: `msg_${baseTs}_${msgIndex}`,
+              role: "assistant",
+              content,
+              timestamp: baseTs + msgIndex,
+            });
+            msgIndex++;
+          }
+          buffer = buffer.slice(match.index + match[0].length);
+          match = delimiterRegex.exec(buffer);
+        } else {
+          break;
+        }
+      }
+    }
+
+    const remaining = buffer.trim();
+    if (remaining) {
+      sendToChat("chat:stream-message", {
+        id: `msg_${baseTs}_${msgIndex}`,
+        role: "assistant",
+        content: remaining,
+        timestamp: baseTs + msgIndex,
+      });
+    }
+
+    sendToChat("chat:stream-done");
   } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.",
-    };
+    const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+    sendToChat("chat:stream-error", message);
   }
 }
 
