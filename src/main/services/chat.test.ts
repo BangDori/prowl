@@ -13,9 +13,11 @@ vi.mock("ai", () => ({
 }));
 
 const mockResponsesFn = vi.fn().mockReturnValue("mock-openai-model");
+const mockWebSearch = vi.fn().mockReturnValue({ type: "web_search" });
 vi.mock("@ai-sdk/openai", () => ({
   openai: Object.assign(vi.fn().mockReturnValue("mock-openai-model"), {
     responses: mockResponsesFn,
+    tools: { webSearch: mockWebSearch },
   }),
 }));
 
