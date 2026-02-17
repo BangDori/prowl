@@ -82,6 +82,14 @@ const electronAPI = {
   getClaudeConfig: invokeIpc("claude-config:list"),
   readConfigFile: invokeIpc("claude-config:read-file"),
 
+  // Chat Rooms
+  listChatRooms: invokeIpc("chat-rooms:list"),
+  getChatRoom: invokeIpc("chat-rooms:get"),
+  createChatRoom: invokeIpc("chat-rooms:create"),
+  updateChatRoom: invokeIpc("chat-rooms:update"),
+  deleteChatRoom: invokeIpc("chat-rooms:delete"),
+  saveChatMessages: invokeIpc("chat-rooms:save-messages"),
+
   // Memory
   listMemories: invokeIpc("memory:list"),
   addMemory: invokeIpc("memory:add"),
