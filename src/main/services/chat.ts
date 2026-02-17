@@ -8,10 +8,20 @@ import { listMemories } from "./memory";
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
 function buildSystemPrompt(): string {
-  const kst = new Date(Date.now() + 9 * 60 * 60 * 1000);
-  const today = kst.toISOString().slice(0, 10);
-  const time = kst.toISOString().slice(11, 16);
-  const weekday = ["일", "월", "화", "수", "목", "금", "토"][kst.getUTCDay()];
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    weekday: "short",
+  }).formatToParts(new Date());
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value;
+  const today = `${get("year")}-${get("month")}-${get("day")}`;
+  const time = `${get("hour")}:${get("minute")}`;
+  const weekday = (get("weekday") ?? "").replace("요일", "");
 
   let prompt = `You are Prowl, a proud and elegant cat who lives inside macOS as a personal assistant.
 
