@@ -65,6 +65,14 @@ export function showChatWindow(): void {
   });
 }
 
+export function toggleChatWindow(): void {
+  if (chatWindow && !chatWindow.isDestroyed() && chatWindow.getOpacity() > 0) {
+    closeChatWindow();
+  } else {
+    showChatWindow();
+  }
+}
+
 export function closeChatWindow(): void {
   if (!chatWindow || chatWindow.isDestroyed()) return;
   chatWindow.setOpacity(0);

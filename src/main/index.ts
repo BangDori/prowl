@@ -10,7 +10,7 @@ import {
   createSplashWindow,
   createTray,
   dismissSplash,
-  showChatWindow,
+  toggleChatWindow,
   toggleCompactWindow,
 } from "./windows";
 
@@ -37,7 +37,7 @@ if (!gotTheLock) {
 
       // 글로벌 단축키
       globalShortcut.register("CommandOrControl+Shift+P", () => {
-        showChatWindow();
+        toggleChatWindow();
       });
       globalShortcut.register("CommandOrControl+Shift+O", () => {
         toggleCompactWindow();
@@ -52,7 +52,7 @@ if (!gotTheLock) {
 
         // 글로벌 단축키
         globalShortcut.register("CommandOrControl+Shift+P", () => {
-          showChatWindow();
+          toggleChatWindow();
         });
         globalShortcut.register("CommandOrControl+Shift+O", () => {
           toggleCompactWindow();
