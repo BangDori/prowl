@@ -125,6 +125,7 @@ export interface IpcInvokeSchema {
  */
 export interface IpcEventSchema {
   "window:show": { params: [] };
+  "tasks:changed": { params: [] };
 }
 
 // 유틸리티 타입

@@ -88,6 +88,11 @@ const electronAPI = {
     ipcRenderer.on("window:show", handler);
     return () => ipcRenderer.removeListener("window:show", handler);
   },
+  onTasksChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("tasks:changed", handler);
+    return () => ipcRenderer.removeListener("tasks:changed", handler);
+  },
 };
 
 // contextBridge로 API 노출

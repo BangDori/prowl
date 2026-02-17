@@ -3,6 +3,7 @@
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
+import { getCompactWindow } from "../windows";
 import { refreshReminders } from "./task-reminder";
 import {
   addDateTask,
@@ -21,6 +22,14 @@ import {
 /** 고유 ID 생성 */
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+}
+
+/** Task Manager(Compact View)에 태스크 변경 알림 */
+function notifyTasksChanged(): void {
+  const win = getCompactWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send("tasks:changed");
+  }
 }
 
 const get_today_info = tool({
@@ -85,6 +94,7 @@ const add_task = tool({
         addDateTask(date, task);
       }
       refreshReminders();
+      notifyTasksChanged();
       return { success: true, task, date: date ?? "backlog" };
     } catch (error) {
       return { error: String(error) };
@@ -145,6 +155,7 @@ const update_task = tool({
       }
 
       refreshReminders();
+      notifyTasksChanged();
       return { success: true, task: merged };
     } catch (error) {
       return { error: String(error) };
@@ -169,6 +180,7 @@ const delete_task = tool({
         return { error: "Provide date or set backlog: true" };
       }
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };
@@ -192,6 +204,7 @@ const toggle_task_complete = tool({
       } else {
         return { error: "Provide date or set backlog: true" };
       }
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };

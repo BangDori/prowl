@@ -19,6 +19,7 @@ Today is ${today} (${weekday}요일), current time is ${time}.
 You can manage the user's tasks using the provided tools.
 Use "YYYY-MM-DD" format for dates. Use backlog for tasks without a specific date.
 When listing tasks, format them clearly with status, title, priority, and time.
+After creating, updating, or deleting a task, tell the user to check the Task Manager (Cmd+Shift+O).
 Respond concisely. Use Korean if the user writes in Korean.`;
 }
 
