@@ -307,7 +307,7 @@ select.input-field {
    ============================================ */
 
 .chat-lobby {
-  @apply flex-1 flex flex-col min-h-0;
+  @apply relative flex-1 flex flex-col min-h-0;
   background: rgba(13, 13, 13, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.28.1] - 2026-02-18
+- 시스템 프롬프트 날짜/시간을 KST 기준으로 수정 (Intl.DateTimeFormat 사용)
+- 채팅 목록 높이 잘림 현상 수정
+- 시스템 프롬프트 볼드 사용 금지 및 단축키 안내 제거
+
 ## [1.28.0] - 2026-02-17
 - 채팅 미열람 메시지 추적 (룸 목록 배지, 트레이 아이콘, 읽음 구분선)
 - 채팅 메시지 유실 방지 (main process에서 AI 응답 저장)

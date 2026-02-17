@@ -110,12 +110,9 @@ export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProp
         {/* 대화방 목록 */}
         {hasRooms && <ChatRoomList onSelectRoom={onSelectRoom} />}
 
-        {/* 빈 공간 */}
-        <div className="flex-1" />
-
-        {/* 고양이 이미지 */}
+        {/* 고양이 이미지 (레이아웃 흐름 밖, 우하단 오버레이) */}
         {hasRooms ? (
-          <div className="relative flex justify-end pr-0 z-10">
+          <div className="absolute bottom-0 right-0 z-10 pointer-events-none">
             <img
               src={prowlLying}
               alt="Prowl"
@@ -124,7 +121,7 @@ export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProp
             />
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-3 pb-4">
+          <div className="flex-1 flex flex-col items-center justify-center gap-3 pb-4">
             <img src={prowlLying} alt="Prowl" className="w-24 h-auto object-contain opacity-50" />
             <p className="text-[12px] text-white/30">대화를 시작해보세요</p>
           </div>

@@ -36,7 +36,7 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
   if (isLoading || rooms.length === 0) return null;
 
   return (
-    <div className="overflow-y-auto max-h-[50%] min-h-0">
+    <div className="flex-1 overflow-y-auto min-h-0">
       {rooms.map((room) => (
         <RoomItem
           key={room.id}

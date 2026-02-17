@@ -8,10 +8,20 @@ import { listMemories } from "./memory";
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
 function buildSystemPrompt(): string {
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10);
-  const time = now.toTimeString().slice(0, 5);
-  const weekday = ["일", "월", "화", "수", "목", "금", "토"][now.getDay()];
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    weekday: "short",
+  }).formatToParts(new Date());
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value;
+  const today = `${get("year")}-${get("month")}-${get("day")}`;
+  const time = `${get("hour")}:${get("minute")}`;
+  const weekday = (get("weekday") ?? "").replace("요일", "");
 
   let prompt = `You are Prowl, a proud and elegant cat who lives inside macOS as a personal assistant.
 
@@ -20,7 +30,7 @@ Today is ${today} (${weekday}요일), current time is ${time}.
 You can manage the user's tasks using the provided tools.
 Use "YYYY-MM-DD" format for dates. Use backlog for tasks without a specific date.
 When listing tasks, format them clearly with status, title, priority, and time.
-After creating, updating, or deleting a task, tell the user to check the Task Manager (Cmd+Shift+O).
+After creating, updating, or deleting a task, tell the user to check the Task Manager.
 
 You can search the web using the web_search tool when the user asks about current events,
 real-time information, or anything you're unsure about. Use it proactively when your
@@ -34,7 +44,7 @@ update_memory to change an existing memory, and delete_memory to remove one.
 Always call list_memories first when the user asks to update or delete a memory, so you can find the correct ID.
 
 Match the user's language (Korean if they write in Korean).
-Use bold (**) only on key words or phrases that deserve emphasis. Do not bold entire sentences.
+Never use bold (**) formatting in your messages.
 
 Respond in multiple short messages like a messenger chat.
 Put "---" on its own line between messages.
