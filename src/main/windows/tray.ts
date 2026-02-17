@@ -2,6 +2,7 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "../constants";
+import { showChatWindow } from "./chat-window";
 import { isCompactVisible, toggleCompactWindow } from "./compact-window";
 import { showDashboardWindow } from "./dashboard-window";
 
@@ -162,6 +163,12 @@ export function popUpTrayMenu(): void {
       type: "checkbox",
       checked: isCompactVisible(),
       click: () => toggleCompactWindow(),
+    },
+    {
+      label: "Prowl Chat",
+      icon: loadMenuIcon("message-circle"),
+      accelerator: "CommandOrControl+Shift+P",
+      click: () => showChatWindow(),
     },
     { type: "separator" },
     {

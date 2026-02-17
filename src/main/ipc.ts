@@ -3,6 +3,7 @@ import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
+import { sendChatMessage } from "./services/chat";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
@@ -31,7 +32,14 @@ import {
   updateTask,
 } from "./services/tasks";
 import { checkForUpdates } from "./services/update-checker";
-import { getCompactWindow, getSubWindow, popUpTrayMenu, toggleCompactWindow } from "./windows";
+import {
+  closeChatWindow,
+  getCompactWindow,
+  getSubWindow,
+  popUpTrayMenu,
+  resizeChatWindow,
+  toggleCompactWindow,
+} from "./windows";
 
 /**
  * 타입 안전한 IPC 핸들러 등록
@@ -205,6 +213,21 @@ export function registerIpcHandlers(): void {
   // 앱 종료
   handleIpc("app:quit", async () => {
     app.quit();
+  });
+
+  // 채팅 메시지 전송
+  handleIpc("chat:send", async (content, history) => {
+    return sendChatMessage(content, history);
+  });
+
+  // 채팅 윈도우 리사이즈
+  handleIpc("chat:resize", async (height) => {
+    resizeChatWindow(height);
+  });
+
+  // 채팅 윈도우 닫기
+  handleIpc("chat:close", async () => {
+    closeChatWindow();
   });
 
   // 앱 버전 조회

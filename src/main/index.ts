@@ -1,12 +1,12 @@
 /** Electron Main 프로세스 진입점 */
-import { app } from "electron";
+import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode } from "./services/settings";
 import { startTaskReminderScheduler } from "./services/task-reminder";
 import { checkForUpdates } from "./services/update-checker";
-import { createSplashWindow, createTray, dismissSplash } from "./windows";
+import { createSplashWindow, createTray, dismissSplash, showChatWindow } from "./windows";
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -28,6 +28,11 @@ if (!gotTheLock) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
       createTray();
       updateFocusModeMonitor(getFocusMode());
+
+      // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+      globalShortcut.register("CommandOrControl+Shift+P", () => {
+        showChatWindow();
+      });
     } else {
       // 프로덕션: 스플래시 윈도우 표시 후 트레이 전환
       createSplashWindow();
@@ -35,6 +40,11 @@ if (!gotTheLock) {
         await dismissSplash();
         createTray();
         updateFocusModeMonitor(getFocusMode());
+
+        // 글로벌 단축키: Cmd+Shift+P로 채팅 열기
+        globalShortcut.register("CommandOrControl+Shift+P", () => {
+          showChatWindow();
+        });
       }, SPLASH.DISPLAY_DURATION_MS);
     }
   });
@@ -43,6 +53,10 @@ if (!gotTheLock) {
   setTimeout(() => {
     checkForUpdates().catch((err) => console.error("[Update] Startup check failed:", err));
   }, 5000);
+
+  app.on("will-quit", () => {
+    globalShortcut.unregisterAll();
+  });
 
   // 모든 창이 닫혀도 앱 종료하지 않음 (메뉴바 앱이므로)
   app.on("window-all-closed", () => {

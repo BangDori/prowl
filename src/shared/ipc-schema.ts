@@ -1,6 +1,8 @@
 /** IPC 채널별 파라미터·반환 타입 스키마 */
 import type {
   AppSettings,
+  ChatMessage,
+  ChatSendResult,
   ClaudeConfig,
   FocusMode,
   IpcResult,
@@ -64,6 +66,11 @@ export interface IpcInvokeSchema {
   "app:check-update": { params: []; return: UpdateCheckResult };
   "app:install-update": { params: []; return: IpcResult };
   "app:relaunch": { params: []; return: void };
+
+  // Chat (3 channels)
+  "chat:send": { params: [content: string, history: ChatMessage[]]; return: ChatSendResult };
+  "chat:resize": { params: [height: number]; return: void };
+  "chat:close": { params: []; return: void };
 
   // Compact (2 channels)
   "compact:toggle": { params: []; return: IpcResult };
