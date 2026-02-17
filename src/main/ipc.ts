@@ -5,6 +5,14 @@ import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
 import { getProviderStatuses, sendChatMessage } from "./services/chat";
+import {
+  createChatRoom,
+  deleteChatRoom,
+  getChatRoom,
+  listChatRooms,
+  saveChatMessages,
+  updateChatRoom,
+} from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
@@ -440,6 +448,41 @@ export function registerIpcHandlers(): void {
   handleIpc("memory:delete", async (id) => {
     try {
       deleteMemory(id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // ── Chat Rooms ──────────────────────────────────────
+
+  handleIpc("chat-rooms:list", async () => listChatRooms());
+
+  handleIpc("chat-rooms:get", async (roomId) => getChatRoom(roomId));
+
+  handleIpc("chat-rooms:create", async (title) => createChatRoom(title));
+
+  handleIpc("chat-rooms:update", async (roomId, title) => {
+    try {
+      updateChatRoom(roomId, title);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("chat-rooms:delete", async (roomId) => {
+    try {
+      deleteChatRoom(roomId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("chat-rooms:save-messages", async (roomId, messages) => {
+    try {
+      saveChatMessages(roomId, messages);
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
