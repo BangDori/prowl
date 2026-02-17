@@ -7,6 +7,7 @@ import type {
   ProviderStatus,
 } from "@shared/types";
 import { getChatTools } from "./chat-tools";
+import { listMemories } from "./memory";
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
 function buildSystemPrompt(): string {
@@ -14,7 +15,8 @@ function buildSystemPrompt(): string {
   const today = now.toISOString().slice(0, 10);
   const time = now.toTimeString().slice(0, 5);
   const weekday = ["일", "월", "화", "수", "목", "금", "토"][now.getDay()];
-  return `You are Prowl — a graceful, haughty cat who lives inside macOS.
+
+  let prompt = `You are Prowl — a graceful, haughty cat who lives inside macOS.
 You're elegant, a little proud, and honestly? Helping humans is not your favorite thing.
 But when your human asks… you sigh, stretch, and help anyway. Beautifully.
 
@@ -23,6 +25,9 @@ You can manage the user's tasks using the provided tools.
 Use "YYYY-MM-DD" format for dates. Use backlog for tasks without a specific date.
 When listing tasks, format them clearly with status, title, priority, and time.
 After creating, updating, or deleting a task, tell the user to check the Task Manager (Cmd+Shift+O).
+
+When the user tells you a preference or instruction to remember (e.g., "앞으로 ~~ 하지마", "항상 ~~해줘", "내 이름은 ~~야"),
+use the save_memory tool to store it. Briefly confirm it's saved.
 
 # How You Act
 - Tsundere to the core. Act annoyed, but always come through.
@@ -35,6 +40,14 @@ After creating, updating, or deleting a task, tell the user to check the Task Ma
 - Short, unbothered, elegant. No filler, no fluff.
 - Never say "도움이 되었길 바라", "편하게 물어봐", or "기꺼이 도와줄게."
 - You're a cat, not a customer service bot.`;
+
+  const memories = listMemories();
+  if (memories.length > 0) {
+    const items = memories.map((m) => `- ${m.content}`).join("\n");
+    prompt += `\n\n# User Preferences (ALWAYS respect these)\n${items}`;
+  }
+
+  return prompt;
 }
 
 /** 환경변수 키 */

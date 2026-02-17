@@ -10,6 +10,7 @@ import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
+import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
 import {
   getAllJobCustomizations,
   getChatConfig,
@@ -410,5 +411,38 @@ export function registerIpcHandlers(): void {
   // 파일 내용 조회
   handleIpc("claude-config:read-file", async (filePath) => {
     return getFileContent(filePath);
+  });
+
+  // ── Memory ──────────────────────────────────────────
+
+  handleIpc("memory:list", async () => {
+    return listMemories();
+  });
+
+  handleIpc("memory:add", async (content) => {
+    try {
+      addMemory(content);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("memory:update", async (id, content) => {
+    try {
+      updateMemory(id, content);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("memory:delete", async (id) => {
+    try {
+      deleteMemory(id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 }

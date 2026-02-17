@@ -1,17 +1,18 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Bot, Cog, History, LayoutDashboard, ListTodo } from "lucide-react";
+import { Bot, Brain, Cog, History, LayoutDashboard, ListTodo } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
 import JobsSection from "./sections/JobsSection";
+import MemorySection from "./sections/MemorySection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "jobs" | "calendar" | "changelog" | "settings" | "claude-config";
+type NavItem = "jobs" | "calendar" | "memory" | "changelog" | "settings" | "claude-config";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -91,6 +92,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("calendar")}
           />
           <SidebarItem
+            icon={<Brain className="w-4 h-4" />}
+            label="Memory"
+            active={activeNav === "memory"}
+            onClick={() => setActiveNav("memory")}
+          />
+          <SidebarItem
             icon={<Bot className="w-4 h-4" />}
             label="Claude Config"
             active={activeNav === "claude-config"}
@@ -125,6 +132,11 @@ export default function DashboardLayout() {
           <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
             <ErrorBoundary section="Task Manager">
               <CalendarSection />
+            </ErrorBoundary>
+          </div>
+          <div className={`h-full ${activeNav === "memory" ? "" : "hidden"}`}>
+            <ErrorBoundary section="Memory">
+              <MemorySection />
             </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "changelog" ? "" : "hidden"}`}>

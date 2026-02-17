@@ -75,5 +75,11 @@ export const UPCOMING_RANGE_LABELS: Record<UpcomingRange, string> = {
   "1y": "1년",
 } as const;
 
-/** 태스크 폴더 기본 경로 */
-export const TASK_FOLDER_NAME = "prowl-task-calendar";
+/** Prowl 데이터 루트 디렉터리 (~/.prowl) */
+export const PROWL_DATA_DIR = ".prowl";
+
+/** 태스크 서브폴더 (~/.prowl/task-calendar) */
+export const TASK_SUBFOLDER = "task-calendar";
+
+/** @deprecated 마이그레이션용 — 기존 태스크 폴더명 */
+export const LEGACY_TASK_FOLDER = "prowl-task-calendar";
