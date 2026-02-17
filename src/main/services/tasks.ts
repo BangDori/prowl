@@ -1,23 +1,50 @@
-/** 파일 기반 Task CRUD 서비스 (~/prowl-task-calendar/*.json) */
+/** 파일 기반 Task CRUD 서비스 (~/.prowl/task-calendar/*.json) */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import type { Task, TasksByDate } from "@shared/types";
-import { TASK_FOLDER_NAME } from "@shared/types";
+import { LEGACY_TASK_FOLDER, PROWL_DATA_DIR, TASK_SUBFOLDER } from "@shared/types";
 import { app } from "electron";
 
 const DATE_FILE_RE = /^\d{4}-\d{2}-\d{2}\.json$/;
 
-/** 태스크 폴더 절대 경로 */
+/** 태스크 폴더 절대 경로 (~/.prowl/task-calendar) */
 function getTaskFolder(): string {
-  return join(app.getPath("home"), TASK_FOLDER_NAME);
+  return join(app.getPath("home"), PROWL_DATA_DIR, TASK_SUBFOLDER);
 }
 
-/** 폴더가 없으면 생성 */
+/** 폴더가 없으면 생성 + 기존 데이터 마이그레이션 */
 function ensureFolder(): string {
   const folder = getTaskFolder();
-  if (!existsSync(folder)) mkdirSync(folder, { recursive: true });
+  if (!existsSync(folder)) {
+    mkdirSync(folder, { recursive: true });
+    migrateLegacyData(folder);
+  }
   return folder;
+}
+
+/** ~/prowl-task-calendar/ → ~/.prowl/task-calendar/ 마이그레이션 */
+function migrateLegacyData(newFolder: string): void {
+  const legacyFolder = join(app.getPath("home"), LEGACY_TASK_FOLDER);
+  if (!existsSync(legacyFolder)) return;
+  try {
+    const files = readdirSync(legacyFolder).filter((f) => f.endsWith(".json"));
+    for (const file of files) {
+      const src = join(legacyFolder, file);
+      const dest = join(newFolder, file);
+      if (!existsSync(dest)) copyFileSync(src, dest);
+    }
+    console.log(`[Tasks] Migrated ${files.length} files from ${legacyFolder}`);
+  } catch (error) {
+    console.error("[Tasks] Migration failed:", error);
+  }
 }
 
 /** 특정 날짜 파일 경로 */

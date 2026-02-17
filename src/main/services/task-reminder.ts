@@ -3,12 +3,12 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Task } from "@shared/types";
-import { DEFAULT_REMINDERS, TASK_FOLDER_NAME } from "@shared/types";
+import { DEFAULT_REMINDERS, PROWL_DATA_DIR, TASK_SUBFOLDER } from "@shared/types";
 import { app, Notification } from "electron";
 import { scanDates } from "./tasks";
 
 function loadTasksForDate(date: string): Task[] {
-  const filePath = join(app.getPath("home"), TASK_FOLDER_NAME, `${date}.json`);
+  const filePath = join(app.getPath("home"), PROWL_DATA_DIR, TASK_SUBFOLDER, `${date}.json`);
   if (!existsSync(filePath)) return [];
   try {
     return JSON.parse(readFileSync(filePath, "utf-8"));
