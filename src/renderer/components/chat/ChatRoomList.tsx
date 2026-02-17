@@ -73,9 +73,7 @@ function RoomItem({
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
-            <span className="text-[10px] text-white/30">
-              {formatRelativeTime(room.updatedAt)}
-            </span>
+            <span className="text-[10px] text-white/30">{formatRelativeTime(room.updatedAt)}</span>
           </div>
         </div>
         {room.lastMessage && (
