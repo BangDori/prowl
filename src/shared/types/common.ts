@@ -31,6 +31,33 @@ export const DEFAULT_SETTINGS: AppSettings = {
   notificationsEnabled: true,
 };
 
+// AI 프로바이더
+export type AiProvider = "openai";
+
+export interface AiModelOption {
+  id: string; // "gpt-4o-mini"
+  label: string; // "GPT-4o Mini"
+  provider: AiProvider;
+}
+
+export interface ChatConfig {
+  provider: AiProvider;
+  model: string; // 선택된 모델 ID
+}
+
+export const DEFAULT_CHAT_CONFIG: ChatConfig = {
+  provider: "openai",
+  model: "gpt-4o",
+};
+
+// 프로바이더별 사용 가능 모델 + API 키 상태
+export interface ProviderStatus {
+  provider: AiProvider;
+  label: string;
+  available: boolean; // API 키 존재 여부
+  models: AiModelOption[];
+}
+
 // 채팅
 export interface ChatMessage {
   id: string;

@@ -1,6 +1,8 @@
 /** electron-store 기반 앱 설정 읽기/쓰기 */
 import {
   type AppSettings,
+  type ChatConfig,
+  DEFAULT_CHAT_CONFIG,
   DEFAULT_FOCUS_MODE,
   DEFAULT_SETTINGS,
   type FocusMode,
@@ -12,12 +14,14 @@ import Store from "electron-store";
 interface StoreSchema {
   settings: AppSettings;
   jobCustomizations: JobCustomizations;
+  chatConfig: ChatConfig;
 }
 
 const store = new Store<StoreSchema>({
   defaults: {
     settings: DEFAULT_SETTINGS,
     jobCustomizations: {},
+    chatConfig: DEFAULT_CHAT_CONFIG,
   },
 });
 
@@ -56,4 +60,13 @@ export function setJobCustomization(jobId: string, customization: JobCustomizati
 // 알림 설정
 export function isNotificationsEnabled(): boolean {
   return getSettings().notificationsEnabled ?? true;
+}
+
+// 채팅 설정
+export function getChatConfig(): ChatConfig {
+  return store.get("chatConfig") ?? DEFAULT_CHAT_CONFIG;
+}
+
+export function setChatConfig(config: ChatConfig): void {
+  store.set("chatConfig", config);
 }
