@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.22.0] - 2026-02-17
+- Prowl Chat에서 자연어로 태스크 생성/조회/수정/삭제/완료 관리 가능
+- AI SDK tool calling으로 6개 태스크 관리 도구 연동
+- 날짜 기반 태스크 추가 IPC 채널 신설
+
 ## [1.21.0] - 2026-02-17
 - 채팅 입력바에 모델 선택 드롭다운 추가 (GPT-5.2 / GPT-4o 전환)
 - OpenAI Responses API로 전환하여 최신 모델 지원
