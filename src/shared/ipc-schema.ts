@@ -12,6 +12,7 @@ import type {
   JobCustomizations,
   LaunchdJob,
   LogContent,
+  Memory,
   ProviderStatus,
   Task,
   TasksByDate,
@@ -118,6 +119,12 @@ export interface IpcInvokeSchema {
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };
   "claude-config:read-file": { params: [filePath: string]; return: string };
+
+  // Memory (4 channels)
+  "memory:list": { params: []; return: Memory[] };
+  "memory:add": { params: [content: string]; return: IpcResult };
+  "memory:update": { params: [id: string, content: string]; return: IpcResult };
+  "memory:delete": { params: [id: string]; return: IpcResult };
 }
 
 /**

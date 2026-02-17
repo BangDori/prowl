@@ -33,4 +33,8 @@ export const queryKeys = {
     version: () => [...queryKeys.app.all, "version"] as const,
     update: () => [...queryKeys.app.all, "update"] as const,
   },
+  memory: {
+    all: ["memory"] as const,
+    list: () => [...queryKeys.memory.all, "list"] as const,
+  },
 };

@@ -82,6 +82,12 @@ const electronAPI = {
   getClaudeConfig: invokeIpc("claude-config:list"),
   readConfigFile: invokeIpc("claude-config:read-file"),
 
+  // Memory
+  listMemories: invokeIpc("memory:list"),
+  addMemory: invokeIpc("memory:add"),
+  updateMemory: invokeIpc("memory:update"),
+  deleteMemory: invokeIpc("memory:delete"),
+
   // Event listener (non-invoke)
   onWindowShow: (callback: () => void): (() => void) => {
     const handler = () => callback();

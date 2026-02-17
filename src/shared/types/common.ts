@@ -157,3 +157,10 @@ export interface ClaudeConfig {
   rules: ClaudeRule[];
   lastUpdated: string; // ISO 8601
 }
+
+// 사용자 메모리 (AI 채팅에서 기억할 선호/지시)
+export interface Memory {
+  id: string;
+  content: string;
+  createdAt: string; // ISO 8601
+}

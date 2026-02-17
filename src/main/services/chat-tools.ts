@@ -1,9 +1,10 @@
-/** 채팅 AI 도구 정의 — Task Manager 연동 */
+/** 채팅 AI 도구 정의 — Task Manager + Memory 연동 */
 
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { getCompactWindow } from "../windows";
+import { addMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
 import {
   addDateTask,
@@ -212,7 +213,31 @@ const toggle_task_complete = tool({
   },
 });
 
+const save_memory = tool({
+  description:
+    "Save a user preference or instruction that should be remembered across conversations. Use when the user explicitly tells you something to always/never do, or personal info to remember.",
+  inputSchema: z.object({
+    content: z.string().describe("The preference or instruction to remember"),
+  }),
+  execute: async ({ content }) => {
+    try {
+      const memory = addMemory(content);
+      return { success: true, memory };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
 /** 채팅에서 사용할 도구 맵 반환 */
 export function getChatTools() {
-  return { get_today_info, list_tasks, add_task, update_task, delete_task, toggle_task_complete };
+  return {
+    get_today_info,
+    list_tasks,
+    add_task,
+    update_task,
+    delete_task,
+    toggle_task_complete,
+    save_memory,
+  };
 }
