@@ -88,7 +88,7 @@ Prowl은 OpenAI 기반 AI 채팅 기능을 내장하고 있습니다. 채팅 입
 
 | 모델 | 환경변수 |
 |------|---------|
-| GPT-5.2 Codex, GPT-4o | `OPENAI_API_KEY` |
+| GPT-5.2, GPT-4o | `OPENAI_API_KEY` |
 
 ### 설정
 

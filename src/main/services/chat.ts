@@ -15,7 +15,7 @@ const ENV_KEY = "OPENAI_API_KEY";
 
 /** 사용 가능 모델 목록 */
 const MODELS: AiModelOption[] = [
-  { id: "gpt-5.2-codex", label: "GPT-5.2 Codex", provider: "openai" },
+  { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
   { id: "gpt-4o", label: "GPT-4o", provider: "openai" },
 ];
 
