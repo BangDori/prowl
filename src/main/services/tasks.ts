@@ -97,6 +97,18 @@ export function scanDates(): string[] {
   }
 }
 
+/** 특정 날짜에 태스크 추가 */
+export function addDateTask(date: string, task: Task): void {
+  const tasks = readDateFile(date);
+  tasks.push(task);
+  writeDateFile(date, tasks);
+}
+
+/** 특정 날짜의 태스크 목록 조회 (외부용) */
+export function getDateTasks(date: string): Task[] {
+  return readDateFile(date);
+}
+
 /** 태스크 수정 (해당 날짜 파일에서 id로 찾아 교체) */
 export function updateTask(date: string, task: Task): void {
   const tasks = readDateFile(date);

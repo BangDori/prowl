@@ -68,6 +68,7 @@ const electronAPI = {
   updateTask: invokeIpc("tasks:update-task"),
   toggleTaskComplete: invokeIpc("tasks:toggle-complete"),
   deleteTask: invokeIpc("tasks:delete-task"),
+  addDateTask: invokeIpc("tasks:add-task"),
   scanTaskDates: invokeIpc("tasks:scan-dates"),
 
   // Tasks – Backlog

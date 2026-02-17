@@ -81,7 +81,7 @@ export interface IpcInvokeSchema {
   "compact:toggle": { params: []; return: IpcResult };
   "compact:resize": { params: [height: number]; return: void };
 
-  // Tasks (10 channels)
+  // Tasks (11 channels)
   "tasks:list-month": {
     params: [year: number, month: number];
     return: TasksByDate;
@@ -102,6 +102,7 @@ export interface IpcInvokeSchema {
     params: [date: string, taskId: string];
     return: IpcResult;
   };
+  "tasks:add-task": { params: [date: string, task: Task]; return: IpcResult };
   "tasks:scan-dates": { params: []; return: string[] };
 
   // Tasks – Backlog
