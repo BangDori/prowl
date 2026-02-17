@@ -72,7 +72,10 @@ export interface IpcInvokeSchema {
   "app:relaunch": { params: []; return: void };
 
   // Chat (6 channels)
-  "chat:send": { params: [content: string, history: ChatMessage[]]; return: IpcResult };
+  "chat:send": {
+    params: [roomId: string, content: string, history: ChatMessage[]];
+    return: IpcResult;
+  };
   "chat:get-config": { params: []; return: ChatConfig };
   "chat:set-config": { params: [config: ChatConfig]; return: IpcResult };
   "chat:providers": { params: []; return: ProviderStatus[] };
@@ -87,6 +90,14 @@ export interface IpcInvokeSchema {
   "chat-rooms:save-messages": {
     params: [roomId: string, messages: ChatMessage[]];
     return: IpcResult;
+  };
+  "chat-rooms:mark-read": {
+    params: [roomId: string, lastMessageId: string];
+    return: IpcResult;
+  };
+  "chat-rooms:unread-counts": {
+    params: [];
+    return: Record<string, number>;
   };
 
   // Compact (2 channels)
@@ -147,6 +158,7 @@ export interface IpcEventSchema {
   "chat:stream-message": { params: [message: ChatMessage] };
   "chat:stream-done": { params: [] };
   "chat:stream-error": { params: [error: string] };
+  "chat-rooms:unread-changed": { params: [totalUnread: number] };
 }
 
 // 유틸리티 타입

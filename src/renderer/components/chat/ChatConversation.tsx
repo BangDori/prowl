@@ -2,11 +2,19 @@
 import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Plus, Send, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useChatRoom, useSaveChatMessages } from "../../hooks/useChatRooms";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  useChatRoom,
+  useChatUnreadCounts,
+  useMarkChatRoomRead,
+  useSaveChatMessages,
+} from "../../hooks/useChatRooms";
+import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
 import MessageBubble from "./MessageBubble";
+import UnreadDivider from "./UnreadDivider";
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
@@ -33,8 +41,11 @@ export default function ChatConversation({
   onBack,
   onNewChat,
 }: ChatConversationProps) {
+  const queryClient = useQueryClient();
   const { data: roomData } = useChatRoom(roomId);
+  const { data: unreadCounts } = useChatUnreadCounts();
   const saveMessages = useSaveChatMessages();
+  const markRead = useMarkChatRoomRead();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -49,6 +60,8 @@ export default function ChatConversation({
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
   const initialMessageProcessed = useRef(false);
+  const unreadDividerMsgId = useRef<string | null>(null);
+  const hasMarkedRead = useRef(false);
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
@@ -56,15 +69,40 @@ export default function ChatConversation({
     setPrevRoomId(roomId);
     setInitialized(false);
     initialMessageProcessed.current = false;
+    unreadDividerMsgId.current = null;
+    hasMarkedRead.current = false;
   }
 
-  // 룸 데이터 로드 시 메시지 초기화
+  // 룸 데이터 로드 시 메시지 초기화 + 백그라운드 refetch 반영
   useEffect(() => {
-    if (roomData && !initialized) {
+    if (!roomData) return;
+    if (!initialized) {
       setMessages(roomData.messages);
       setInitialized(true);
+    } else if (!loading && roomData.messages.length > messagesRef.current.length) {
+      // main에서 저장한 AI 응답이 디스크에 반영된 경우 (뒤로가기 후 복귀)
+      setMessages(roomData.messages);
     }
-  }, [roomData, initialized]);
+  }, [roomData, initialized, loading]);
+
+  // 읽음 구분선 위치 계산 + mark-read (roomData·unreadCounts 둘 다 로드 후 한번만)
+  useEffect(() => {
+    if (!initialized || hasMarkedRead.current || !roomData) return;
+    if (unreadCounts === undefined) return;
+
+    const unreadCount = unreadCounts[roomId] ?? 0;
+    if (unreadCount > 0 && roomData.messages.length > 0) {
+      const firstUnreadIdx = roomData.messages.length - unreadCount;
+      if (firstUnreadIdx > 0 && firstUnreadIdx < roomData.messages.length) {
+        unreadDividerMsgId.current = roomData.messages[firstUnreadIdx].id;
+      }
+    }
+    const lastMsg = roomData.messages.at(-1);
+    if (lastMsg) {
+      markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+    }
+    hasMarkedRead.current = true;
+  }, [initialized, roomData, unreadCounts, roomId, markRead]);
 
   // 채팅 설정 및 프로바이더 목록 로드
   useEffect(() => {
@@ -97,14 +135,17 @@ export default function ChatConversation({
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new messages
   useEffect(scrollToBottom, [messages, scrollToBottom]);
 
-  // 스트림 이벤트 리스너
+  // 스트림 이벤트 리스너 (저장은 main, 읽음 처리는 대화방에 있을 때만 renderer)
   useEffect(() => {
     const offMessage = window.electronAPI.onChatStreamMessage((msg) => {
       setMessages((prev) => [...prev, msg]);
     });
     const offDone = window.electronAPI.onChatStreamDone(() => {
       setLoading(false);
-      saveMessages.mutate({ roomId, messages: messagesRef.current });
+      // 대화방에 있으므로 즉시 읽음 처리
+      const lastMsg = messagesRef.current.at(-1);
+      if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
     const offError = window.electronAPI.onChatStreamError((error) => {
       setLoading(false);
@@ -115,14 +156,17 @@ export default function ChatConversation({
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errMsg]);
-      saveMessages.mutate({ roomId, messages: messagesRef.current });
+      // 대화방에 있으므로 즉시 읽음 처리
+      const lastMsg = messagesRef.current.at(-1);
+      if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
     return () => {
       offMessage();
       offDone();
       offError();
     };
-  }, [roomId, saveMessages]);
+  }, [roomId, queryClient, markRead]);
 
   /** 메시지 전송 핵심 로직 (입력 및 초기 메시지 양쪽에서 사용) */
   const sendMessage = useCallback(
@@ -133,24 +177,32 @@ export default function ChatConversation({
         content,
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, userMsg]);
+      const updated = [...messagesRef.current, userMsg];
+      messagesRef.current = updated;
+      setMessages(updated);
       setLoading(true);
 
-      const result = await window.electronAPI.sendChatMessage(content, messagesRef.current);
+      // 유저 메시지를 즉시 저장 + 읽음 처리 (뒤로가기 시 유실·미열람 방지)
+      saveMessages.mutate({ roomId, messages: updated });
+      markRead.mutate({ roomId, lastMessageId: userMsg.id });
+
+      // main에 roomId + history(유저 메시지 포함) 전달 → main이 AI 응답 저장까지 책임
+      const result = await window.electronAPI.sendChatMessage(roomId, content, updated);
       if (!result.success) {
         setLoading(false);
-        const errMsg: ChatMessage = {
-          id: `err_${Date.now()}`,
-          role: "assistant",
-          content: result.error || "오류가 발생했습니다.",
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, errMsg]);
-        saveMessages.mutate({ roomId, messages: messagesRef.current });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `err_${Date.now()}`,
+            role: "assistant" as const,
+            content: "오류가 발생했습니다.",
+            timestamp: Date.now(),
+          },
+        ]);
       }
-      // success → 메시지는 stream 이벤트로 도착
+      // success → 메시지는 stream 이벤트로 도착, 저장은 main이 처리
     },
-    [roomId, saveMessages],
+    [roomId, saveMessages, markRead],
   );
 
   // 초기 메시지 자동 전송 (로비에서 메시지 입력 후 진입 시)
@@ -201,7 +253,10 @@ export default function ChatConversation({
           <div className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
               {messages.map((msg) => (
-                <MessageBubble key={msg.id} message={msg} />
+                <Fragment key={msg.id}>
+                  {msg.id === unreadDividerMsgId.current && <UnreadDivider />}
+                  <MessageBubble message={msg} />
+                </Fragment>
               ))}
               {loading && <LoadingIndicator />}
               <div ref={messagesEndRef} />

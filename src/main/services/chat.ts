@@ -1,6 +1,8 @@
 /** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling) */
 import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { getChatWindow } from "../windows";
+import { updateTrayBadge } from "./chat-read-state";
+import { saveChatMessages } from "./chat-rooms";
 import { getChatTools } from "./chat-tools";
 import { listMemories } from "./memory";
 
@@ -73,22 +75,27 @@ const MODELS: AiModelOption[] = [
   { id: "gpt-4o", label: "GPT-4o", provider: "openai" },
 ];
 
-/** 스트리밍 채팅 메시지 전송 (fire-and-forget) */
+/** 스트리밍 채팅 메시지 전송 (fire-and-forget, 완료 후 main에서 직접 저장) */
 export async function streamChatMessage(
-  userContent: string,
+  roomId: string,
+  _userContent: string,
   history: ChatMessage[],
   config?: ChatConfig,
 ): Promise<void> {
   const modelId = config?.model ?? "gpt-4o";
+  const aiMessages: ChatMessage[] = [];
 
   if (!process.env[ENV_KEY]) {
     const ts = Date.now();
-    sendToChat("chat:stream-message", {
+    const msg: ChatMessage = {
       id: `msg_${ts}`,
       role: "assistant",
       content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
       timestamp: ts,
-    });
+    };
+    sendToChat("chat:stream-message", msg);
+    aiMessages.push(msg);
+    persistAfterStream(roomId, history, aiMessages);
     sendToChat("chat:stream-done");
     return;
   }
@@ -98,11 +105,11 @@ export async function streamChatMessage(
     const { openai } = await import("@ai-sdk/openai");
     const model = openai.responses(modelId);
 
+    // history에 유저 메시지가 이미 포함되어 있음 (renderer에서 추가)
     const messages = history.map((m) => ({
       role: m.role as "user" | "assistant",
       content: m.content,
     }));
-    messages.push({ role: "user", content: userContent });
 
     const result = streamText({
       model,
@@ -136,12 +143,14 @@ export async function streamChatMessage(
         if (!isInsideCodeBlock(buffer, match.index)) {
           const content = buffer.slice(0, match.index).trim();
           if (content) {
-            sendToChat("chat:stream-message", {
+            const msg: ChatMessage = {
               id: `msg_${baseTs}_${msgIndex}`,
               role: "assistant",
               content,
               timestamp: baseTs + msgIndex,
-            });
+            };
+            sendToChat("chat:stream-message", msg);
+            aiMessages.push(msg);
             msgIndex++;
           }
           buffer = buffer.slice(match.index + match[0].length);
@@ -154,19 +163,41 @@ export async function streamChatMessage(
 
     const remaining = buffer.trim();
     if (remaining) {
-      sendToChat("chat:stream-message", {
+      const msg: ChatMessage = {
         id: `msg_${baseTs}_${msgIndex}`,
         role: "assistant",
         content: remaining,
         timestamp: baseTs + msgIndex,
-      });
+      };
+      sendToChat("chat:stream-message", msg);
+      aiMessages.push(msg);
     }
 
+    persistAfterStream(roomId, history, aiMessages);
     sendToChat("chat:stream-done");
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
+    const errMsg: ChatMessage = {
+      id: `err_${Date.now()}`,
+      role: "assistant",
+      content: message,
+      timestamp: Date.now(),
+    };
+    aiMessages.push(errMsg);
+    persistAfterStream(roomId, history, aiMessages);
     sendToChat("chat:stream-error", message);
   }
+}
+
+/** 스트림 완료 후 메시지 저장 + 트레이 배지 갱신 (읽음 처리는 renderer가 담당) */
+function persistAfterStream(
+  roomId: string,
+  history: ChatMessage[],
+  aiMessages: ChatMessage[],
+): void {
+  const allMessages = [...history, ...aiMessages];
+  saveChatMessages(roomId, allMessages);
+  updateTrayBadge();
 }
 
 /** OpenAI 프로바이더의 API 키 상태와 사용 가능 모델 목록 반환 */

@@ -41,5 +41,6 @@ export const queryKeys = {
     all: ["chatRooms"] as const,
     list: () => [...queryKeys.chatRooms.all, "list"] as const,
     detail: (id: string) => [...queryKeys.chatRooms.all, "detail", id] as const,
+    unreadCounts: () => [...queryKeys.chatRooms.all, "unread"] as const,
   },
 };

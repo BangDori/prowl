@@ -84,5 +84,8 @@ export const TASK_SUBFOLDER = "task-calendar";
 /** 채팅 룸 서브폴더 (~/.prowl/chat-rooms) */
 export const CHAT_ROOMS_SUBFOLDER = "chat-rooms";
 
+/** 채팅 읽음 상태 파일 (~/.prowl/chat-read-state.json) */
+export const CHAT_READ_STATE_FILE = "chat-read-state.json";
+
 /** @deprecated 마이그레이션용 — 기존 태스크 폴더명 */
 export const LEGACY_TASK_FOLDER = "prowl-task-calendar";
