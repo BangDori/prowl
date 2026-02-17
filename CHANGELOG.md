@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.23.0] - 2026-02-17
+- 채팅 에이전트에 츤데레 고양이 시스템 프롬프트 적용
+- 채팅 버블 마크다운 렌더링 및 외부 링크 지원 추가
+- Settings 탭에서 글로벌 단축키 변경/제거 가능
+
 ## [1.22.0] - 2026-02-17
 - Prowl Chat에서 자연어로 태스크 생성/조회/수정/삭제/완료 관리 가능
 - AI SDK tool calling으로 6개 태스크 관리 도구 연동
