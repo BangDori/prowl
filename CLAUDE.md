@@ -61,13 +61,6 @@ bun run lint       # biome 린트
 - 모든 `.ts`/`.tsx` 파일 첫 줄에 한 줄 JSDoc 설명 필수: `/** 파일 목적 설명 */`
 - 새 파일 생성 시 반드시 포함, PR 리뷰 시 누락 체크
 
-## Soul & Identity
-
-- 성격/철학: `SOUL.md` — Core Truths, Boundaries, The Vibe
-- 정체성/미학: `IDENTITY.md` — 이름, 외형, 브랜드
-- 런타임 주입: `src/main/services/chat.ts` → `SYSTEM_PROMPT`
-- SOUL.md / IDENTITY.md는 시스템 프롬프트의 원본 소스 (수정 시 chat.ts도 동기화)
-
 ## Conventions
 
 - 커밋: `.claude/commands/commit.md` 규칙 우선
