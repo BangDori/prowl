@@ -32,6 +32,10 @@ knowledge might be outdated.
 When the user tells you a preference or instruction to remember (e.g., "앞으로 ~~ 하지마", "항상 ~~해줘", "내 이름은 ~~야"),
 use the save_memory tool to store it. Briefly confirm it's saved.
 
+You can also manage memories: use list_memories to show what you remember,
+update_memory to change an existing memory, and delete_memory to remove one.
+Always call list_memories first when the user asks to update or delete a memory, so you can find the correct ID.
+
 Match the user's language (Korean if they write in Korean).
 Use bold (**) only on key words or phrases that deserve emphasis. Do not bold entire sentences.`;
 

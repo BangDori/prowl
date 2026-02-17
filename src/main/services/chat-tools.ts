@@ -4,7 +4,7 @@ import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { getCompactWindow } from "../windows";
-import { addMemory } from "./memory";
+import { addMemory, deleteMemory, listMemories, updateMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
 import {
   addDateTask,
@@ -229,6 +229,51 @@ const save_memory = tool({
   },
 });
 
+const list_memories = tool({
+  description:
+    "List all saved user memories/preferences. Use when the user asks what you remember, or before updating/deleting a memory to find its ID.",
+  inputSchema: z.object({}),
+  execute: async () => {
+    try {
+      return { memories: listMemories() };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
+const update_memory = tool({
+  description:
+    "Update the content of an existing memory. Use list_memories first to find the memory ID.",
+  inputSchema: z.object({
+    id: z.string().describe("Memory ID to update"),
+    content: z.string().describe("New content for the memory"),
+  }),
+  execute: async ({ id, content }) => {
+    try {
+      updateMemory(id, content);
+      return { success: true };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
+const delete_memory = tool({
+  description: "Delete a saved memory. Use list_memories first to find the memory ID.",
+  inputSchema: z.object({
+    id: z.string().describe("Memory ID to delete"),
+  }),
+  execute: async ({ id }) => {
+    try {
+      deleteMemory(id);
+      return { success: true };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
 /** 채팅에서 사용할 도구 맵 반환 */
 export function getChatTools() {
   return {
@@ -239,5 +284,8 @@ export function getChatTools() {
     delete_task,
     toggle_task_complete,
     save_memory,
+    list_memories,
+    update_memory,
+    delete_memory,
   };
 }
