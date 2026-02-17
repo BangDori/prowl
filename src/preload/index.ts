@@ -88,6 +88,8 @@ const electronAPI = {
   createChatRoom: invokeIpc("chat-rooms:create"),
   deleteChatRoom: invokeIpc("chat-rooms:delete"),
   saveChatMessages: invokeIpc("chat-rooms:save-messages"),
+  markChatRoomRead: invokeIpc("chat-rooms:mark-read"),
+  getChatUnreadCounts: invokeIpc("chat-rooms:unread-counts"),
 
   // Memory
   listMemories: invokeIpc("memory:list"),
@@ -125,6 +127,11 @@ const electronAPI = {
     const handler = (_e: unknown, error: string) => callback(error);
     ipcRenderer.on("chat:stream-error", handler as never);
     return () => ipcRenderer.removeListener("chat:stream-error", handler as never);
+  },
+  onChatUnreadChanged: (callback: (totalUnread: number) => void): (() => void) => {
+    const handler = (_event: unknown, totalUnread: number) => callback(totalUnread);
+    ipcRenderer.on("chat-rooms:unread-changed", handler);
+    return () => ipcRenderer.removeListener("chat-rooms:unread-changed", handler);
   },
 };
 

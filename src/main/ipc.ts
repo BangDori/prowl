@@ -6,6 +6,12 @@ import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
 import { getProviderStatuses, streamChatMessage } from "./services/chat";
 import {
+  getAllUnreadCounts,
+  markRoomAsRead,
+  removeRoomReadState,
+  updateTrayBadge,
+} from "./services/chat-read-state";
+import {
   createChatRoom,
   deleteChatRoom,
   getChatRoom,
@@ -467,6 +473,8 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:delete", async (roomId) => {
     try {
       deleteChatRoom(roomId);
+      removeRoomReadState(roomId);
+      updateTrayBadge();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -476,9 +484,23 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:save-messages", async (roomId, messages) => {
     try {
       saveChatMessages(roomId, messages);
+      updateTrayBadge();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
     }
+  });
+
+  handleIpc("chat-rooms:mark-read", async (roomId, lastMessageId) => {
+    try {
+      markRoomAsRead(roomId, lastMessageId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("chat-rooms:unread-counts", async () => {
+    return getAllUnreadCounts();
   });
 }

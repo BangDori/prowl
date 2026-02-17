@@ -2,7 +2,7 @@
 import type { ChatRoomSummary } from "@shared/types";
 import { Trash2 } from "lucide-react";
 import { useCallback } from "react";
-import { useChatRooms, useDeleteChatRoom } from "../../hooks/useChatRooms";
+import { useChatRooms, useChatUnreadCounts, useDeleteChatRoom } from "../../hooks/useChatRooms";
 
 interface ChatRoomListProps {
   onSelectRoom: (roomId: string) => void;
@@ -23,6 +23,7 @@ function formatRelativeTime(isoDate: string): string {
 
 export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
   const { data: rooms = [], isLoading } = useChatRooms();
+  const { data: unreadCounts = {} } = useChatUnreadCounts();
   const deleteRoom = useDeleteChatRoom();
 
   const handleDeleteRoom = useCallback(
@@ -40,6 +41,7 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
         <RoomItem
           key={room.id}
           room={room}
+          unreadCount={unreadCounts[room.id] ?? 0}
           onSelect={() => onSelectRoom(room.id)}
           onDelete={() => handleDeleteRoom(room.id)}
         />
@@ -51,10 +53,12 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
 /** 개별 룸 아이템 */
 function RoomItem({
   room,
+  unreadCount,
   onSelect,
   onDelete,
 }: {
   room: ChatRoomSummary;
+  unreadCount: number;
   onSelect: () => void;
   onDelete: () => void;
 }) {
@@ -63,9 +67,16 @@ function RoomItem({
       <button type="button" onClick={onSelect} className="flex-1 min-w-0 text-left">
         <div className="flex items-center justify-between gap-2">
           <span className="text-[13px] text-white/90 truncate">{room.title}</span>
-          <span className="text-[10px] text-white/30 flex-shrink-0">
-            {formatRelativeTime(room.updatedAt)}
-          </span>
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {unreadCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-black text-[10px] font-semibold flex items-center justify-center">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+            <span className="text-[10px] text-white/30">
+              {formatRelativeTime(room.updatedAt)}
+            </span>
+          </div>
         </div>
         {room.lastMessage && (
           <p className="text-[11px] text-white/40 truncate mt-0.5">{room.lastMessage}</p>

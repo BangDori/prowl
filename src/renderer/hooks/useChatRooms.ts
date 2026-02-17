@@ -1,4 +1,4 @@
-/** ChatRoom CRUD 훅 (TanStack Query) */
+/** ChatRoom CRUD 훅 (TanStack Query) + 읽음 상태 */
 import type { ChatMessage } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queries/keys";
@@ -42,6 +42,26 @@ export function useDeleteChatRoom() {
   });
 }
 
+/** 모든 룸의 안 읽은 메시지 수 조회 */
+export function useChatUnreadCounts() {
+  return useQuery({
+    queryKey: queryKeys.chatRooms.unreadCounts(),
+    queryFn: () => window.electronAPI.getChatUnreadCounts(),
+  });
+}
+
+/** 룸 읽음 처리 */
+export function useMarkChatRoomRead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roomId, lastMessageId }: { roomId: string; lastMessageId: string }) =>
+      window.electronAPI.markChatRoomRead(roomId, lastMessageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.unreadCounts() });
+    },
+  });
+}
+
 /** 메시지 저장 */
 export function useSaveChatMessages() {
   const queryClient = useQueryClient();
@@ -53,6 +73,7 @@ export function useSaveChatMessages() {
         queryKey: queryKeys.chatRooms.detail(variables.roomId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.list() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.unreadCounts() });
     },
   });
 }

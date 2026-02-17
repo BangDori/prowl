@@ -1,9 +1,11 @@
 /** 채팅 로비 (대화방 목록 + 즉시 입력 가능한 인터페이스) */
 import prowlLying from "@assets/prowl-lying.png";
 import type { ChatConfig, ProviderStatus } from "@shared/types";
+import { useQueryClient } from "@tanstack/react-query";
 import { Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChatRooms } from "../../hooks/useChatRooms";
+import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
 import ChatRoomList from "./ChatRoomList";
 
@@ -24,6 +26,7 @@ interface ChatLobbyProps {
 }
 
 export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProps) {
+  const queryClient = useQueryClient();
   const { data: rooms = [] } = useChatRooms();
   const [input, setInput] = useState("");
   const [placeholder] = useState(getRandomPlaceholder);
@@ -53,6 +56,13 @@ export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProp
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  // 미열람 변경 이벤트 수신 → unread 쿼리 갱신
+  useEffect(() => {
+    return window.electronAPI.onChatUnreadChanged(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.unreadCounts() });
+    });
+  }, [queryClient]);
 
   const handleSend = useCallback(() => {
     const content = input.trim();

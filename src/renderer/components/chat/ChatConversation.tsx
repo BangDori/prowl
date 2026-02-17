@@ -3,10 +3,16 @@ import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { ChevronLeft, Plus, Send, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useChatRoom, useSaveChatMessages } from "../../hooks/useChatRooms";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  useChatRoom,
+  useChatUnreadCounts,
+  useMarkChatRoomRead,
+  useSaveChatMessages,
+} from "../../hooks/useChatRooms";
 import ModelSelector from "../ModelSelector";
 import MessageBubble from "./MessageBubble";
+import UnreadDivider from "./UnreadDivider";
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
@@ -34,7 +40,9 @@ export default function ChatConversation({
   onNewChat,
 }: ChatConversationProps) {
   const { data: roomData } = useChatRoom(roomId);
+  const { data: unreadCounts } = useChatUnreadCounts();
   const saveMessages = useSaveChatMessages();
+  const markRead = useMarkChatRoomRead();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -49,6 +57,8 @@ export default function ChatConversation({
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
   const initialMessageProcessed = useRef(false);
+  const unreadDividerMsgId = useRef<string | null>(null);
+  const hasMarkedRead = useRef(false);
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
@@ -56,6 +66,8 @@ export default function ChatConversation({
     setPrevRoomId(roomId);
     setInitialized(false);
     initialMessageProcessed.current = false;
+    unreadDividerMsgId.current = null;
+    hasMarkedRead.current = false;
   }
 
   // 룸 데이터 로드 시 메시지 초기화
@@ -65,6 +77,25 @@ export default function ChatConversation({
       setInitialized(true);
     }
   }, [roomData, initialized]);
+
+  // 읽음 구분선 위치 계산 + mark-read (roomData·unreadCounts 둘 다 로드 후 한번만)
+  useEffect(() => {
+    if (!initialized || hasMarkedRead.current || !roomData) return;
+    if (unreadCounts === undefined) return;
+
+    const unreadCount = unreadCounts[roomId] ?? 0;
+    if (unreadCount > 0 && roomData.messages.length > 0) {
+      const firstUnreadIdx = roomData.messages.length - unreadCount;
+      if (firstUnreadIdx > 0 && firstUnreadIdx < roomData.messages.length) {
+        unreadDividerMsgId.current = roomData.messages[firstUnreadIdx].id;
+      }
+    }
+    const lastMsg = roomData.messages.at(-1);
+    if (lastMsg) {
+      markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+    }
+    hasMarkedRead.current = true;
+  }, [initialized, roomData, unreadCounts, roomId, markRead]);
 
   // 채팅 설정 및 프로바이더 목록 로드
   useEffect(() => {
@@ -105,6 +136,11 @@ export default function ChatConversation({
     const offDone = window.electronAPI.onChatStreamDone(() => {
       setLoading(false);
       saveMessages.mutate({ roomId, messages: messagesRef.current });
+      // 활성 대화 중이므로 즉시 읽음 처리
+      const lastMsg = messagesRef.current.at(-1);
+      if (lastMsg) {
+        markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+      }
     });
     const offError = window.electronAPI.onChatStreamError((error) => {
       setLoading(false);
@@ -116,13 +152,18 @@ export default function ChatConversation({
       };
       setMessages((prev) => [...prev, errMsg]);
       saveMessages.mutate({ roomId, messages: messagesRef.current });
+      // 에러 시에도 읽음 처리
+      const lastMsg = messagesRef.current.at(-1);
+      if (lastMsg) {
+        markRead.mutate({ roomId, lastMessageId: lastMsg.id });
+      }
     });
     return () => {
       offMessage();
       offDone();
       offError();
     };
-  }, [roomId, saveMessages]);
+  }, [roomId, saveMessages, markRead]);
 
   /** 메시지 전송 핵심 로직 (입력 및 초기 메시지 양쪽에서 사용) */
   const sendMessage = useCallback(
@@ -142,7 +183,7 @@ export default function ChatConversation({
         const errMsg: ChatMessage = {
           id: `err_${Date.now()}`,
           role: "assistant",
-          content: result.error || "오류가 발생했습니다.",
+          content: "오류가 발생했습니다.",
           timestamp: Date.now(),
         };
         setMessages((prev) => [...prev, errMsg]);
@@ -201,7 +242,10 @@ export default function ChatConversation({
           <div className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
               {messages.map((msg) => (
-                <MessageBubble key={msg.id} message={msg} />
+                <Fragment key={msg.id}>
+                  {msg.id === unreadDividerMsgId.current && <UnreadDivider />}
+                  <MessageBubble message={msg} />
+                </Fragment>
               ))}
               {loading && <LoadingIndicator />}
               <div ref={messagesEndRef} />
