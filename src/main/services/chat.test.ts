@@ -14,6 +14,10 @@ vi.mock("./chat-read-state", () => ({
   updateTrayBadge: vi.fn(),
 }));
 
+vi.mock("./settings", () => ({
+  getSettings: vi.fn().mockReturnValue({ openaiApiKey: "" }),
+}));
+
 const mockTextStream = vi.fn();
 vi.mock("ai", () => ({
   streamText: vi.fn().mockImplementation(() => ({
@@ -26,10 +30,12 @@ vi.mock("ai", () => ({
 const mockResponsesFn = vi.fn().mockReturnValue("mock-openai-model");
 const mockWebSearch = vi.fn().mockReturnValue({ type: "web_search" });
 vi.mock("@ai-sdk/openai", () => ({
-  openai: Object.assign(vi.fn().mockReturnValue("mock-openai-model"), {
-    responses: mockResponsesFn,
-    tools: { webSearch: mockWebSearch },
-  }),
+  createOpenAI: vi.fn().mockReturnValue(
+    Object.assign(vi.fn().mockReturnValue("mock-openai-model"), {
+      responses: mockResponsesFn,
+      tools: { webSearch: mockWebSearch },
+    }),
+  ),
 }));
 
 const mockSend = vi.fn();
@@ -42,6 +48,7 @@ vi.mock("../windows", () => ({
 
 import { streamText } from "ai";
 import { getProviderStatuses, streamChatMessage } from "./chat";
+import { getSettings } from "./settings";
 
 const mockStreamText = vi.mocked(streamText);
 
@@ -51,19 +58,22 @@ async function* toAsyncIterable(chunks: string[]) {
 }
 
 describe("chat 서비스", () => {
+  const mockGetSettings = vi.mocked(getSettings);
+
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.OPENAI_API_KEY = "test-key";
+    mockGetSettings.mockReturnValue({ openaiApiKey: "test-key" } as ReturnType<typeof getSettings>);
+    delete process.env.OPENAI_API_KEY;
   });
 
   it("API 키가 없으면 안내 메시지를 stream-message로 전송한다", async () => {
-    delete process.env.OPENAI_API_KEY;
+    mockGetSettings.mockReturnValue({ openaiApiKey: "" } as ReturnType<typeof getSettings>);
 
     await streamChatMessage("room1", "안녕", [], { provider: "openai", model: "gpt-4o" });
 
     expect(mockSend).toHaveBeenCalledWith(
       "chat:stream-message",
-      expect.objectContaining({ content: expect.stringContaining("OPENAI_API_KEY") }),
+      expect.objectContaining({ content: expect.stringContaining("Settings") }),
     );
     expect(mockSend).toHaveBeenCalledWith("chat:stream-done");
     expect(mockStreamText).not.toHaveBeenCalled();
@@ -143,12 +153,16 @@ describe("chat 서비스", () => {
 });
 
 describe("getProviderStatuses", () => {
+  const mockGetSettings = vi.mocked(getSettings);
+
   beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetSettings.mockReturnValue({ openaiApiKey: "" } as ReturnType<typeof getSettings>);
     delete process.env.OPENAI_API_KEY;
   });
 
   it("OpenAI 프로바이더 상태를 반환한다", () => {
-    process.env.OPENAI_API_KEY = "test";
+    mockGetSettings.mockReturnValue({ openaiApiKey: "test" } as ReturnType<typeof getSettings>);
 
     const statuses = getProviderStatuses();
 

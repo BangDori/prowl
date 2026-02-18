@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.29.0] - 2026-02-18
+- Settings에서 OpenAI API 키를 직접 입력·저장할 수 있도록 지원
+- API 키 저장 시 입력창 대신 Change 버튼만 표시하도록 UX 개선
+- 환경변수 없이도 앱 설정에서 API 키 관리 가능
+
 ## [1.28.1] - 2026-02-18
 - 시스템 프롬프트 날짜/시간을 KST 기준으로 수정 (Intl.DateTimeFormat 사용)
 - 채팅 목록 높이 잘림 현상 수정

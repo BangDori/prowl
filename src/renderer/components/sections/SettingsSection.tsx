@@ -5,7 +5,7 @@ import {
   type FocusMode,
   type ShortcutConfig,
 } from "@shared/types";
-import { Bell, ExternalLink, RefreshCw } from "lucide-react";
+import { Bell, ExternalLink, KeyRound, Pencil, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
@@ -35,9 +35,28 @@ export default function SettingsSection() {
 
   const [cooldown, setCooldown] = useState(0);
   const [installPhase, setInstallPhase] = useState<InstallPhase>("idle");
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [apiKeyEditing, setApiKeyEditing] = useState(false);
 
   const loading = settingsLoading || focusLoading;
   const notificationsEnabled = settings?.notificationsEnabled ?? true;
+
+  // settings 초기 로드 시 API 키 입력창 초기화
+  useEffect(() => {
+    if (settings?.openaiApiKey && !apiKeyEditing) {
+      setApiKeyInput(settings.openaiApiKey);
+    }
+  }, [settings?.openaiApiKey, apiKeyEditing]);
+
+  const saveApiKey = () => {
+    if (!settings) return;
+    updateSettings.mutate(
+      { ...settings, openaiApiKey: apiKeyInput.trim() },
+      { onSuccess: () => setApiKeyEditing(false) },
+    );
+  };
+
+  const hasSavedApiKey = !!settings?.openaiApiKey;
 
   const toggleNotifications = async () => {
     if (!settings) return;
@@ -111,6 +130,51 @@ export default function SettingsSection() {
                 </div>
               </div>
               <ToggleSwitch enabled={notificationsEnabled} onChange={toggleNotifications} />
+            </div>
+          </div>
+        </div>
+
+        {/* API 키 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+            API Keys
+          </h3>
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+            <div className="flex items-center gap-3">
+              <KeyRound className="w-4 h-4 text-gray-400 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm">OpenAI API Key</p>
+                <p className="text-[10px] text-gray-500">Used for Prowl Chat (GPT models)</p>
+              </div>
+              {hasSavedApiKey && !apiKeyEditing ? (
+                <button
+                  type="button"
+                  onClick={() => setApiKeyEditing(true)}
+                  className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors shrink-0"
+                >
+                  <Pencil className="w-2.5 h-2.5" />
+                  Change
+                </button>
+              ) : (
+                <div className="flex gap-2 shrink-0">
+                  <input
+                    type="password"
+                    value={apiKeyInput}
+                    onChange={(e) => setApiKeyInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
+                    placeholder="sk-proj-..."
+                    className="w-40 text-[11px] px-2 py-1 rounded bg-black/30 border border-white/[0.08] text-gray-200 placeholder:text-gray-600 outline-none focus:border-accent/50"
+                  />
+                  <button
+                    type="button"
+                    onClick={saveApiKey}
+                    disabled={updateSettings.isPending}
+                    className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-50"
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
