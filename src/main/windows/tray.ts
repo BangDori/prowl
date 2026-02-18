@@ -187,12 +187,6 @@ export function popUpTrayMenu(): void {
   tray.popUpContextMenu(menu);
 }
 
-/** 트레이 아이콘 옆 미열람 배지 표시/해제 */
-export function setTrayBadge(count: number): void {
-  if (!tray) return;
-  tray.setTitle(count > 0 ? String(count) : "");
-}
-
 export function getTray(): Tray | null {
   return tray;
 }

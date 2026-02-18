@@ -1,10 +1,11 @@
 /** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling) */
 import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
-import { getChatWindow } from "../windows";
+import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
 import { getChatTools } from "./chat-tools";
 import { listMemories } from "./memory";
+import { sendChatNotification } from "./notification";
 import { getSettings } from "./settings";
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
@@ -209,7 +210,7 @@ export async function streamChatMessage(
   }
 }
 
-/** 스트림 완료 후 메시지 저장 + 트레이 배지 갱신 (읽음 처리는 renderer가 담당) */
+/** 스트림 완료 후 메시지 저장 + 배지 갱신 + 알림 (읽음 처리는 renderer가 담당) */
 function persistAfterStream(
   roomId: string,
   history: ChatMessage[],
@@ -218,6 +219,7 @@ function persistAfterStream(
   const allMessages = [...history, ...aiMessages];
   saveChatMessages(roomId, allMessages);
   updateTrayBadge();
+  if (!isChatWindowActive()) sendChatNotification();
 }
 
 /** OpenAI 프로바이더의 API 키 상태와 사용 가능 모델 목록 반환 */

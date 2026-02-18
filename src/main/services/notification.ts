@@ -53,3 +53,20 @@ export function sendJobNotification({ jobName, success, message }: JobNotificati
 
   notification.show();
 }
+
+/**
+ * 채팅 새 메시지 알림 발송
+ */
+export function sendChatNotification(): void {
+  if (!checkNotificationSupport() || !isNotificationsEnabled()) {
+    return;
+  }
+
+  const notification = new Notification({
+    title: "Prowl",
+    body: "Prowl이 보낸 메시지",
+    silent: false,
+  });
+
+  notification.show();
+}
