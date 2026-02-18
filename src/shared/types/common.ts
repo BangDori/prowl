@@ -35,6 +35,7 @@ export interface AppSettings {
   focusMode: FocusMode;
   notificationsEnabled: boolean; // Job 완료 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
+  openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -42,6 +43,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
+  openaiApiKey: "",
 };
 
 // AI 프로바이더

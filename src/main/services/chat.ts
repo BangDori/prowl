@@ -5,6 +5,7 @@ import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
 import { getChatTools } from "./chat-tools";
 import { listMemories } from "./memory";
+import { getSettings } from "./settings";
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
 function buildSystemPrompt(): string {
@@ -76,8 +77,13 @@ function sendToChat(channel: string, ...args: unknown[]): void {
   }
 }
 
-/** 환경변수 키 */
+/** 환경변수 키 (fallback용) */
 const ENV_KEY = "OPENAI_API_KEY";
+
+/** 앱 설정 또는 환경변수에서 API 키 조회 */
+function getOpenAiApiKey(): string | undefined {
+  return getSettings().openaiApiKey || process.env[ENV_KEY] || undefined;
+}
 
 /** 사용 가능 모델 목록 */
 const MODELS: AiModelOption[] = [
@@ -95,12 +101,15 @@ export async function streamChatMessage(
   const modelId = config?.model ?? "gpt-4o";
   const aiMessages: ChatMessage[] = [];
 
-  if (!process.env[ENV_KEY]) {
+  const apiKey = getOpenAiApiKey();
+
+  if (!apiKey) {
     const ts = Date.now();
     const msg: ChatMessage = {
       id: `msg_${ts}`,
       role: "assistant",
-      content: `OpenAI 모델을 사용하려면 ${ENV_KEY} 환경변수를 등록해주세요 🔑\n\n터미널에서:\nexport ${ENV_KEY}=your-api-key\n\n또는 ~/.zshrc에 추가하면 영구적으로 적용됩니다.`,
+      content:
+        "OpenAI 모델을 사용하려면 Settings에서 API 키를 입력해주세요 🔑\n\n앱 설정 → API Keys → OpenAI API Key",
       timestamp: ts,
     };
     sendToChat("chat:stream-message", msg);
@@ -112,7 +121,8 @@ export async function streamChatMessage(
 
   try {
     const { streamText, stepCountIs } = await import("ai");
-    const { openai } = await import("@ai-sdk/openai");
+    const { createOpenAI } = await import("@ai-sdk/openai");
+    const openai = createOpenAI({ apiKey });
     const model = openai.responses(modelId);
 
     // history에 유저 메시지가 이미 포함되어 있음 (renderer에서 추가)
@@ -216,7 +226,7 @@ export function getProviderStatuses(): ProviderStatus[] {
     {
       provider: "openai",
       label: "OpenAI",
-      available: !!process.env[ENV_KEY],
+      available: !!getOpenAiApiKey(),
       models: MODELS,
     },
   ];
