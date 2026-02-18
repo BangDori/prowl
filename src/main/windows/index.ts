@@ -3,6 +3,7 @@
 export {
   closeChatWindow,
   getChatWindow,
+  isChatWindowActive,
   resizeChatWindow,
   showChatWindow,
   toggleChatWindow,

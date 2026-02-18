@@ -83,6 +83,12 @@ export function getChatWindow(): BrowserWindow | null {
   return chatWindow;
 }
 
+/** 채팅 윈도우가 보이고 포커스된 상태인지 확인 */
+export function isChatWindowActive(): boolean {
+  if (!chatWindow || chatWindow.isDestroyed()) return false;
+  return chatWindow.getOpacity() > 0 && chatWindow.isFocused();
+}
+
 export function resizeChatWindow(height: number): void {
   if (!chatWindow || chatWindow.isDestroyed()) return;
 
