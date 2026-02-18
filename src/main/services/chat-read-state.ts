@@ -5,7 +5,6 @@ import { join } from "node:path";
 import type { ChatRoom } from "@shared/types";
 import { CHAT_READ_STATE_FILE, CHAT_ROOMS_SUBFOLDER, PROWL_DATA_DIR } from "@shared/types";
 import { app, BrowserWindow } from "electron";
-import { setTrayBadge } from "../windows/tray";
 
 /** 읽음 상태: roomId → lastReadMessageId */
 type ChatReadState = Record<string, string>;
@@ -97,11 +96,10 @@ export function removeRoomReadState(roomId: string): void {
   writeState(state);
 }
 
-/** 트레이 배지 및 렌더러 이벤트 업데이트 */
+/** 렌더러에 미읽음 수 변경 이벤트 전송 (트레이 배지 미표시) */
 export function updateTrayBadge(): void {
   const counts = getAllUnreadCounts();
   const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
-  setTrayBadge(total);
 
   for (const win of BrowserWindow.getAllWindows()) {
     if (!win.isDestroyed()) {
