@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.30.0] - 2026-02-18
+- 채팅 윈도우 비활성 시 AI 응답에 대한 macOS 네이티브 알림 발송
+- 메뉴바 트레이 아이콘의 미읽음 배지 숫자 표시 제거
+
 ## [1.29.0] - 2026-02-18
 - Settings에서 OpenAI API 키를 직접 입력·저장할 수 있도록 지원
 - API 키 저장 시 입력창 대신 Change 버튼만 표시하도록 UX 개선
