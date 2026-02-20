@@ -74,7 +74,7 @@ describe("chat 서비스", () => {
   it("API 키가 없으면 안내 메시지를 stream-message로 전송한다", async () => {
     mockGetSettings.mockReturnValue({ openaiApiKey: "" } as ReturnType<typeof getSettings>);
 
-    await streamChatMessage("room1", "안녕", [], { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("room1", "안녕", [], { provider: "openai", model: "gpt-5-mini" });
 
     expect(mockSend).toHaveBeenCalledWith(
       "chat:stream-message",
@@ -91,7 +91,7 @@ describe("chat 서비스", () => {
       "room1",
       "안녕",
       [{ id: "u1", role: "user", content: "안녕", timestamp: 1 }],
-      { provider: "openai", model: "gpt-4o" },
+      { provider: "openai", model: "gpt-5-mini" },
     );
 
     expect(mockStreamText).toHaveBeenCalledWith(
@@ -128,7 +128,10 @@ describe("chat 서비스", () => {
       { id: "3", role: "user" as const, content: "새 질문", timestamp: 3000 },
     ];
 
-    await streamChatMessage("room1", "새 질문", history, { provider: "openai", model: "gpt-4o" });
+    await streamChatMessage("room1", "새 질문", history, {
+      provider: "openai",
+      model: "gpt-5-mini",
+    });
 
     expect(mockStreamText).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -150,7 +153,7 @@ describe("chat 서비스", () => {
       "room1",
       "안녕",
       [{ id: "u1", role: "user", content: "안녕", timestamp: 1 }],
-      { provider: "openai", model: "gpt-4o" },
+      { provider: "openai", model: "gpt-5-mini" },
     );
 
     expect(mockSend).toHaveBeenCalledWith("chat:stream-error", "Rate limit exceeded");

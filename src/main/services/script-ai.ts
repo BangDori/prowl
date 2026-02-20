@@ -39,7 +39,7 @@ export async function generateScriptFromPrompt(prompt: string): Promise<ScriptDr
   const openai = createOpenAI({ apiKey });
 
   const { text } = await generateText({
-    model: openai("gpt-4o"),
+    model: openai("gpt-5-mini"),
     system: SYSTEM_PROMPT,
     prompt,
     maxOutputTokens: 800,
