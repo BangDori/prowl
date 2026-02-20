@@ -20,6 +20,16 @@ export default function ScriptsSection() {
 
   const [showCreate, setShowCreate] = useState(false);
   const [runningId, setRunningId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const handleToggle = async (id: string) => {
+    setTogglingId(id);
+    try {
+      await toggleScript.mutateAsync(id);
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   const handleCreate = async (prompt: string) => {
     const result = await createScript.mutateAsync(prompt);
@@ -39,9 +49,11 @@ export default function ScriptsSection() {
     return (
       <div className="p-4 space-y-2">
         {[1, 2].map((i) => (
-          <div key={i} className="rounded-lg border border-white/[0.04] p-3">
-            <div className="skeleton h-4 w-32 mb-2" />
-            <div className="skeleton h-3 w-24" />
+          <div key={i} className="job-card">
+            <div className="flex-1">
+              <div className="skeleton h-4 w-32 mb-2" />
+              <div className="skeleton h-3 w-48" />
+            </div>
           </div>
         ))}
       </div>
@@ -76,10 +88,11 @@ export default function ScriptsSection() {
             <ScriptCard
               key={script.id}
               script={script}
-              onToggle={(id) => toggleScript.mutate(id)}
+              onToggle={handleToggle}
               onRun={handleRun}
               onDelete={(id) => deleteScript.mutate(id)}
               isRunning={runningId === script.id}
+              isToggling={togglingId === script.id}
             />
           ))}
         </div>
