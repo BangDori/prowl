@@ -2,9 +2,10 @@
 import * as path from "node:path";
 import { app, BrowserWindow, Menu, nativeImage, screen, shell, Tray } from "electron";
 import { DEV_SERVER_PORT, WINDOW } from "../constants";
+import { getSettings } from "../services/settings";
 import { showChatWindow } from "./chat-window";
 import { isCompactVisible, toggleCompactWindow } from "./compact-window";
-import { showDashboardWindow } from "./dashboard-window";
+import { toggleDashboardWindow } from "./dashboard-window";
 
 let tray: Tray | null = null;
 let subWindow: BrowserWindow | null = null;
@@ -151,24 +152,27 @@ export function createTray(): Tray {
 export function popUpTrayMenu(): void {
   if (!tray) return;
 
+  const shortcuts = getSettings().shortcuts;
+
   const menu = Menu.buildFromTemplate([
     {
       label: "Go to Dashboard",
       icon: loadMenuIcon("layout-dashboard"),
-      click: () => showDashboardWindow(),
+      ...(shortcuts.openDashboard ? { accelerator: shortcuts.openDashboard } : {}),
+      click: () => toggleDashboardWindow(),
     },
     {
       label: "Task Manager",
       icon: loadMenuIcon("list-todo"),
       type: "checkbox",
       checked: isCompactVisible(),
-      accelerator: "CommandOrControl+Shift+O",
+      ...(shortcuts.toggleTaskManager ? { accelerator: shortcuts.toggleTaskManager } : {}),
       click: () => toggleCompactWindow(),
     },
     {
       label: "Prowl Chat",
       icon: loadMenuIcon("message-circle"),
-      accelerator: "CommandOrControl+Shift+P",
+      ...(shortcuts.toggleChat ? { accelerator: shortcuts.toggleChat } : {}),
       click: () => showChatWindow(),
     },
     { type: "separator" },
