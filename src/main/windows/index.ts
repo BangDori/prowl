@@ -17,7 +17,12 @@ export {
   toggleCompactWindow,
 } from "./compact-window";
 // Dashboard window
-export { closeDashboardWindow, getDashboardWindow, showDashboardWindow } from "./dashboard-window";
+export {
+  closeDashboardWindow,
+  getDashboardWindow,
+  showDashboardWindow,
+  toggleDashboardWindow,
+} from "./dashboard-window";
 export { createSplashWindow, dismissSplash, getSplashWindow } from "./splash";
 // Tray and sub-window
 export { createTray, getSubWindow, getTray, popUpTrayMenu } from "./tray";

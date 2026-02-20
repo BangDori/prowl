@@ -1,6 +1,6 @@
 /** 글로벌 단축키 설정 패널 */
 import type { ShortcutConfig } from "@shared/types";
-import { Command, LayoutGrid } from "lucide-react";
+import { Command, LayoutGrid, Monitor } from "lucide-react";
 import { useMemo } from "react";
 import ShortcutRecorder from "./ShortcutRecorder";
 
@@ -28,6 +28,12 @@ const ROWS: ShortcutRow[] = [
     label: "Task Manager",
     description: "Toggle the task manager",
     icon: <LayoutGrid className="w-4 h-4 text-gray-400" />,
+  },
+  {
+    key: "openDashboard",
+    label: "Dashboard",
+    description: "Open the dashboard",
+    icon: <Monitor className="w-4 h-4 text-gray-400" />,
   },
 ];
 

@@ -128,6 +128,26 @@ function AgendaView({
 
   return (
     <div className="flex-1 border-t border-prowl-border overflow-y-auto px-3 py-2 space-y-2">
+      {filteredBacklog.length > 0 && (
+        <div className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px] font-medium text-gray-500">날짜 미정</span>
+            <span className="text-[10px] text-gray-600">{filteredBacklog.length}건</span>
+          </div>
+          <div className="space-y-1.5">
+            {filteredBacklog.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onToggleComplete={() => onToggleBacklogComplete(task.id)}
+                onUpdate={() => {}}
+                onDelete={() => {}}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
       {groups.map((group) => {
         const dateObj = new Date(`${group.date}T00:00:00`);
         return (
@@ -156,26 +176,6 @@ function AgendaView({
           </div>
         );
       })}
-
-      {filteredBacklog.length > 0 && (
-        <div className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[10px] font-medium text-gray-500">날짜 미정</span>
-            <span className="text-[10px] text-gray-600">{filteredBacklog.length}건</span>
-          </div>
-          <div className="space-y-1.5">
-            {filteredBacklog.map((task) => (
-              <TaskItem
-                key={task.id}
-                task={task}
-                onToggleComplete={() => onToggleBacklogComplete(task.id)}
-                onUpdate={() => {}}
-                onDelete={() => {}}
-              />
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

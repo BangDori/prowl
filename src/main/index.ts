@@ -8,6 +8,7 @@ import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getFocusMode, getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { startTaskReminderScheduler } from "./services/task-reminder";
+import { startOverdueMigrationScheduler } from "./services/tasks";
 import { checkForUpdates } from "./services/update-checker";
 import { createSplashWindow, createTray, dismissSplash } from "./windows";
 
@@ -23,6 +24,9 @@ if (!gotTheLock) {
   app.on("ready", () => {
     // IPC 핸들러 등록
     registerIpcHandlers();
+
+    // 지난 미완료 태스크 → 백로그 이동 (즉시 + 매일 자정)
+    startOverdueMigrationScheduler();
 
     // 일정 알림 스케줄러 시작
     startTaskReminderScheduler();

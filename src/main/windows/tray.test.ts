@@ -8,6 +8,16 @@ const mockTrayInstance = {
   popUpContextMenu: vi.fn(),
 };
 
+vi.mock("../services/settings", () => ({
+  getSettings: vi.fn().mockReturnValue({
+    shortcuts: {
+      toggleChat: "CommandOrControl+Shift+P",
+      toggleTaskManager: "CommandOrControl+Shift+O",
+      openDashboard: "",
+    },
+  }),
+}));
+
 vi.mock("electron", () => ({
   Tray: vi.fn().mockImplementation(() => mockTrayInstance),
   BrowserWindow: vi.fn().mockImplementation(() => ({

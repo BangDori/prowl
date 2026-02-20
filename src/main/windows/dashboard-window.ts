@@ -66,6 +66,14 @@ export function closeDashboardWindow(): void {
   }
 }
 
+export function toggleDashboardWindow(): void {
+  if (dashboardWindow && !dashboardWindow.isDestroyed() && dashboardWindow.isVisible()) {
+    closeDashboardWindow();
+  } else {
+    showDashboardWindow();
+  }
+}
+
 export function getDashboardWindow(): BrowserWindow | null {
   return dashboardWindow;
 }
