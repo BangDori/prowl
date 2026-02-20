@@ -256,7 +256,20 @@ export default function ChatConversation({
 
   const hasMessages = messages.length > 0 || loading;
   const htmlContent = extractLatestHtml(messages);
-  const isSplitView = isExpanded && !!htmlContent;
+  const [dismissedHtml, setDismissedHtml] = useState<string | null>(null);
+  const isSplitView = isExpanded && !!htmlContent && htmlContent !== dismissedHtml;
+
+  // 분할 뷰 열림 → 프리뷰 닫기, 전체화면+dismissed → 프리뷰 재표시, 비전체화면 → expand
+  const handleTogglePreview = useCallback(async () => {
+    if (isSplitView) {
+      setDismissedHtml(htmlContent);
+    } else if (isExpanded) {
+      setDismissedHtml(null);
+    } else {
+      setDismissedHtml(null);
+      await onToggleExpand();
+    }
+  }, [isSplitView, isExpanded, htmlContent, onToggleExpand]);
 
   const chatArea = (
     <>
@@ -284,7 +297,7 @@ export default function ChatConversation({
                     <MessageBubble
                       message={msg}
                       isLastInGroup={isLastInGroup}
-                      onExpandForPreview={onToggleExpand}
+                      onExpandForPreview={handleTogglePreview}
                     />
                   </Fragment>
                 );
@@ -381,7 +394,7 @@ export default function ChatConversation({
     return (
       <div className="chat-split-wrapper">
         <div className="chat-split-left">{chatArea}</div>
-        <HtmlPreviewPanel html={htmlContent} />
+        <HtmlPreviewPanel html={htmlContent} onClose={() => setDismissedHtml(htmlContent)} />
       </div>
     );
   }

@@ -389,6 +389,7 @@ select.input-field {
 }
 
 .chat-html-preview {
+  position: relative;
   flex: 1;
   background: #ffffff;
   overflow: hidden;

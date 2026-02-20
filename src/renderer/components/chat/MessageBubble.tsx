@@ -174,7 +174,7 @@ export default function MessageBubble({
                   className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                  전체화면에서 확인하기
+                  HTML 보기
                 </button>
               )}
             </>
