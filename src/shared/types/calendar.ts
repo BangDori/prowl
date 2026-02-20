@@ -51,6 +51,7 @@ export interface Task {
   completedAt?: string; // ISO 8601
   createdAt: string; // ISO 8601
   reminders?: TaskReminder[];
+  roomId?: string; // 연결된 채팅방 ID (알림 클릭 시 딥링크)
 }
 
 /** 날짜별 태스크 맵 (month 단위 조회 결과) */
