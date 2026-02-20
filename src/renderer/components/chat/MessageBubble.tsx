@@ -2,14 +2,14 @@
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatMessage, ToolApprovalMeta } from "@shared/types";
 import { ArrowUpRight, Check, Copy, Play, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
 /** 도구 실행 승인/거부 버튼 패널 */
 function ApprovalButtons({
-  approval,
+  approval: _approval,
   state,
   onApprove,
   onReject,
@@ -59,48 +59,25 @@ function ApprovalButtons({
   );
 }
 
-/** 채팅 버블용 마크다운 커스텀 컴포넌트 (헤더는 bold로 축소) */
-const markdownComponents = {
-  h1: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="block mt-2 mb-1">{children}</strong>
-  ),
-  h2: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="block mt-2 mb-1">{children}</strong>
-  ),
-  h3: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="block mt-1.5 mb-0.5">{children}</strong>
-  ),
-  p: ({ children }: { children?: React.ReactNode }) => <p className="mb-1 last:mb-0">{children}</p>,
-  ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="list-disc pl-4 mb-1">{children}</ul>
-  ),
-  ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="list-decimal pl-4 mb-1">{children}</ol>
-  ),
-  code: ({ children }: { children?: React.ReactNode }) => (
-    <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
-  ),
-  pre: ({ children }: { children?: React.ReactNode }) => (
-    <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px]">{children}</pre>
-  ),
-  a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-    <button
-      type="button"
-      onClick={() => href && window.electronAPI.openExternal(href)}
-      className="inline-flex items-baseline gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
-    >
-      <span>{children}</span>
-      <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 inline-block translate-y-[1px]" />
-    </button>
-  ),
-};
+/** 링크 클릭 시 표시할 레이블 생성 */
+function getLinkLabel(href: string, children: React.ReactNode): string {
+  const text = String(children ?? "").trim();
+  if (text && text !== href) return text;
+  try {
+    return new URL(href).hostname;
+  } catch {
+    return href;
+  }
+}
 
 interface MessageBubbleProps {
   message: ChatMessage;
   /** 같은 발신자의 연속 메시지 그룹에서 마지막 메시지인지 여부 */
   isLastInGroup?: boolean;
-  /** HTML 프리뷰 확인을 위한 전체화면 전환 콜백 (비전체화면일 때만 전달) */
-  onExpandForPreview?: () => void;
+  /** HTML 프리뷰 탭 열기 콜백 */
+  onOpenHtml?: (html: string) => void;
+  /** 외부 링크 탭 열기 콜백 */
+  onOpenLink?: (url: string, label: string) => void;
 }
 
 /** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
@@ -111,12 +88,17 @@ function stripProwlUi(content: string): string {
 export default function MessageBubble({
   message,
   isLastInGroup = true,
-  onExpandForPreview,
+  onOpenHtml,
+  onOpenLink,
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
   const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
   const displayContent = hasHtmlOutput ? stripProwlUi(message.content) : message.content;
+  const htmlContent = useMemo(() => {
+    if (!hasHtmlOutput) return null;
+    return message.content.match(/<prowl-ui>([\s\S]*?)<\/prowl-ui>/)?.[1] ?? null;
+  }, [hasHtmlOutput, message.content]);
   const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
     message.approval?.status ?? "pending",
   );
@@ -130,6 +112,56 @@ export default function MessageBubble({
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [message.content]);
+
+  /** 마크다운 커스텀 컴포넌트 — 링크 핸들러는 onOpenLink를 캡처 */
+  const markdownComponents = useMemo(
+    () => ({
+      h1: ({ children }: { children?: React.ReactNode }) => (
+        <strong className="block mt-2 mb-1">{children}</strong>
+      ),
+      h2: ({ children }: { children?: React.ReactNode }) => (
+        <strong className="block mt-2 mb-1">{children}</strong>
+      ),
+      h3: ({ children }: { children?: React.ReactNode }) => (
+        <strong className="block mt-1.5 mb-0.5">{children}</strong>
+      ),
+      p: ({ children }: { children?: React.ReactNode }) => (
+        <p className="mb-1 last:mb-0">{children}</p>
+      ),
+      ul: ({ children }: { children?: React.ReactNode }) => (
+        <ul className="list-disc pl-4 mb-1">{children}</ul>
+      ),
+      ol: ({ children }: { children?: React.ReactNode }) => (
+        <ol className="list-decimal pl-4 mb-1">{children}</ol>
+      ),
+      code: ({ children }: { children?: React.ReactNode }) => (
+        <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
+      ),
+      pre: ({ children }: { children?: React.ReactNode }) => (
+        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px]">
+          {children}
+        </pre>
+      ),
+      a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
+        <button
+          type="button"
+          onClick={() => {
+            if (!href) return;
+            if (onOpenLink) {
+              onOpenLink(href, getLinkLabel(href, children));
+            } else {
+              window.electronAPI.openExternal(href);
+            }
+          }}
+          className="inline-flex items-baseline gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
+        >
+          <span>{children}</span>
+          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 inline-block translate-y-[1px]" />
+        </button>
+      ),
+    }),
+    [onOpenLink],
+  );
 
   const showMeta = isLastInGroup;
 
@@ -167,10 +199,10 @@ export default function MessageBubble({
                   {displayContent}
                 </Markdown>
               )}
-              {hasHtmlOutput && onExpandForPreview && (
+              {hasHtmlOutput && onOpenHtml && htmlContent && (
                 <button
                   type="button"
-                  onClick={onExpandForPreview}
+                  onClick={() => onOpenHtml(htmlContent)}
                   className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors select-none"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
@@ -185,11 +217,11 @@ export default function MessageBubble({
               state={approvalState}
               onApprove={async () => {
                 setApprovalState("approved");
-                await window.electronAPI.approveTool(message.approval!.id);
+                await window.electronAPI.approveTool(message.approval?.id);
               }}
               onReject={async () => {
                 setApprovalState("rejected");
-                await window.electronAPI.rejectTool(message.approval!.id);
+                await window.electronAPI.rejectTool(message.approval?.id);
               }}
             />
           )}
