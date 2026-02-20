@@ -220,8 +220,9 @@ function persistAfterStream(
   saveChatMessages(roomId, allMessages);
   updateTrayBadge();
   if (!isChatWindowActive() && aiMessages.length > 0) {
-    const lastMessage = aiMessages[aiMessages.length - 1].content;
-    sendChatNotification(lastMessage);
+    for (const msg of aiMessages) {
+      sendChatNotification(msg.content);
+    }
   }
 }
 
