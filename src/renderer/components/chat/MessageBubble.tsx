@@ -171,7 +171,7 @@ export default function MessageBubble({
                 <button
                   type="button"
                   onClick={onExpandForPreview}
-                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors"
+                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors select-none"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
                   HTML 보기
@@ -193,15 +193,17 @@ export default function MessageBubble({
               }}
             />
           )}
-          <button
-            type="button"
-            onClick={handleCopy}
-            className={`absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
-              isUser ? "text-black/30 hover:text-black/60" : "text-white/30 hover:text-white/60"
-            }`}
-          >
-            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-          </button>
+          {!hasHtmlOutput && (
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={`absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
+                isUser ? "text-black/30 hover:text-black/60" : "text-white/30 hover:text-white/60"
+              }`}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </button>
+          )}
         </div>
         {showMeta && !isUser && (
           <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
