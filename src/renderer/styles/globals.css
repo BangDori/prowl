@@ -414,6 +414,22 @@ select.input-field {
 .chat-room-header {
   @apply flex items-center justify-between px-4 py-3;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  -webkit-app-region: drag;
+}
+
+.chat-room-header button,
+.chat-room-header a {
+  -webkit-app-region: no-drag;
+}
+
+.chat-conv-header {
+  @apply flex items-center justify-between;
+  -webkit-app-region: drag;
+}
+
+.chat-conv-header button,
+.chat-conv-header a {
+  -webkit-app-region: no-drag;
 }
 
 .chat-room-item {
@@ -457,6 +473,11 @@ select.input-field {
 .chat-floating-root.expanded .chat-messages-area + .chat-input-bar,
 .chat-floating-root.expanded .chat-lobby + .chat-input-bar {
   border-radius: 0;
+}
+
+.chat-floating-root.expanded .chat-room-header,
+.chat-floating-root.expanded .chat-conv-header {
+  -webkit-app-region: no-drag;
 }
 
 /* ============================================

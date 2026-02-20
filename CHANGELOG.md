@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.39.0] - 2026-02-21
+- Prowl Chat 박스 헤더를 드래그해 화면 원하는 위치로 이동 가능
+
 ## [1.38.2] - 2026-02-21
 - OS 라이트모드에서 흰 배경에 흰 텍스트가 겹쳐 아무것도 보이지 않는 문제 수정
 - CSS 변수 기반 라이트/다크 테마 시스템 구축 (prowl-*, app-* 시맨틱 토큰)

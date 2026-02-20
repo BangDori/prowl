@@ -370,7 +370,7 @@ export default function ChatConversation({
       {/* 고양이 로고: 메시지가 없을 때 */}
       {!hasMessages && (
         <>
-          <div className="flex items-center justify-between px-4 py-2">
+          <div className="chat-conv-header px-4 py-2">
             <button
               type="button"
               onClick={onBack}
@@ -489,7 +489,7 @@ function ConversationHeader({
   onToggleExpand: () => void;
 }) {
   return (
-    <div className="flex items-center justify-between px-3 py-2">
+    <div className="chat-conv-header px-3 py-2">
       <button
         type="button"
         onClick={onBack}
