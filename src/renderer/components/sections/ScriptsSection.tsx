@@ -65,8 +65,8 @@ export default function ScriptsSection() {
 
       {/* 스크립트 목록 */}
       {scripts.length === 0 ? (
-        <div className="empty-state flex-1 py-16">
-          <Terminal className="w-12 h-12 text-gray-500 mb-4" />
+        <div className="flex-1 flex flex-col items-center justify-center gap-2 text-center text-gray-400">
+          <Terminal className="w-12 h-12 text-gray-500 mb-2" />
           <p className="text-sm font-medium mb-1">등록된 스크립트가 없습니다</p>
           <p className="text-xs text-gray-500">+ 추가 버튼으로 자연어로 스크립트를 만들어보세요</p>
         </div>
