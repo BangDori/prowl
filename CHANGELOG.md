@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.33.2] - 2026-02-20
+- 대시보드 섹션 헤더 UI 통일: 불필요한 구분선 제거, 추가 버튼 스타일 통일 (accent 컬러)
+
 ## [1.33.1] - 2026-02-20
 - Background Monitor 제거: Script Library가 스케줄링을 대체하므로 시스템 launchd 에이전트 감시 기능 전체 삭제
 - 앱 단순화: 불필요한 IPC 채널 8개, 관련 타입, 서비스 파일 정리
