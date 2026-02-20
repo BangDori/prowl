@@ -171,6 +171,7 @@ export interface ChatRoomSummary {
   messageCount: number;
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
+  locked?: boolean; // 삭제 잠금 여부
 }
 
 // 채팅 룸 전체 데이터 (메시지 포함)
@@ -180,4 +181,5 @@ export interface ChatRoom {
   messages: ChatMessage[];
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
+  locked?: boolean; // 삭제 잠금 여부
 }

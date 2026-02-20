@@ -87,6 +87,7 @@ const electronAPI = {
   getChatRoom: invokeIpc("chat-rooms:get"),
   createChatRoom: invokeIpc("chat-rooms:create"),
   deleteChatRoom: invokeIpc("chat-rooms:delete"),
+  toggleChatRoomLock: invokeIpc("chat-rooms:toggle-lock"),
   saveChatMessages: invokeIpc("chat-rooms:save-messages"),
   markChatRoomRead: invokeIpc("chat-rooms:mark-read"),
   getChatUnreadCounts: invokeIpc("chat-rooms:unread-counts"),

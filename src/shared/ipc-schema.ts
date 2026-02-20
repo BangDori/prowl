@@ -84,11 +84,12 @@ export interface IpcInvokeSchema {
   "chat:resize": { params: [height: number]; return: void };
   "chat:close": { params: []; return: void };
 
-  // Chat Rooms (5 channels)
+  // Chat Rooms (6 channels)
   "chat-rooms:list": { params: []; return: ChatRoomSummary[] };
   "chat-rooms:get": { params: [roomId: string]; return: ChatRoom };
   "chat-rooms:create": { params: [title?: string]; return: ChatRoom };
   "chat-rooms:delete": { params: [roomId: string]; return: IpcResult };
+  "chat-rooms:toggle-lock": { params: [roomId: string]; return: IpcResult };
   "chat-rooms:save-messages": {
     params: [roomId: string, messages: ChatMessage[]];
     return: IpcResult;

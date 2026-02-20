@@ -17,6 +17,7 @@ import {
   getChatRoom,
   listChatRooms,
   saveChatMessages,
+  toggleChatRoomLock,
 } from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -516,6 +517,15 @@ export function registerIpcHandlers(): void {
 
   handleIpc("chat-rooms:unread-counts", async () => {
     return getAllUnreadCounts();
+  });
+
+  handleIpc("chat-rooms:toggle-lock", async (roomId) => {
+    try {
+      toggleChatRoomLock(roomId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // ── Scripts ──────────────────────────────────────────

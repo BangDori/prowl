@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.33.0] - 2026-02-20
+- 채팅방 삭제 잠금 기능 추가: 실수로 채팅방을 삭제하는 것을 방지
+- 호버 시 자물쇠 아이콘으로 잠금/해제 토글, 잠긴 방은 삭제 버튼 숨김
+- 채팅방 목록 액션 버튼 위치 개선: 타임스탬프 아래에 표시
+
 ## [1.32.0] - 2026-02-20
 - 내부 Script Library 추가: 자연어로 스크립트와 스케줄을 동시에 생성 (launchd 독립)
 - daily/weekly/interval/manual 스케줄 지원, 앱 내부 Node.js 스케줄러로 실행
