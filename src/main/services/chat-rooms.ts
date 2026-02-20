@@ -62,6 +62,7 @@ export function listChatRooms(): ChatRoomSummary[] {
         messageCount: room.messages.length,
         createdAt: room.createdAt,
         updatedAt: room.updatedAt,
+        locked: room.locked,
       });
     }
   }
@@ -90,10 +91,20 @@ export function createChatRoom(title?: string): ChatRoom {
   return room;
 }
 
-/** 룸 삭제 */
+/** 룸 삭제 (잠금 상태이면 에러) */
 export function deleteChatRoom(roomId: string): void {
+  const room = readRoomFile(roomId);
+  if (room?.locked) throw new Error("잠금된 채팅방은 삭제할 수 없습니다.");
   const filePath = roomFilePath(roomId);
   if (existsSync(filePath)) unlinkSync(filePath);
+}
+
+/** 룸 잠금 토글 */
+export function toggleChatRoomLock(roomId: string): void {
+  const room = readRoomFile(roomId);
+  if (!room) throw new Error(`Chat room not found: ${roomId}`);
+  room.locked = !room.locked;
+  writeRoomFile(room);
 }
 
 /** 메시지 저장 (전체 교체) + 자동 제목 생성 */
