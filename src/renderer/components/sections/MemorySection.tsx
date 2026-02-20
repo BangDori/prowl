@@ -175,9 +175,9 @@ export default function MemorySection() {
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
             >
-              <Plus className="w-3 h-3" />
+              <Plus className="w-3.5 h-3.5" />
               추가
             </button>
           )}
