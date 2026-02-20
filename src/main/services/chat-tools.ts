@@ -3,7 +3,8 @@
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
-import { getCompactWindow } from "../windows";
+import { getChatWindow, getCompactWindow } from "../windows";
+import { waitForApproval } from "./approval";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
 import {
@@ -24,6 +25,14 @@ import { toolRegistry } from "./tool-registry";
 /** 고유 ID 생성 */
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+}
+
+/** 채팅 윈도우에 이벤트 전송 */
+function sendToChat(channel: string, ...args: unknown[]): void {
+  const win = getChatWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send(channel, ...args);
+  }
 }
 
 /** Task Manager(Compact View)에 태스크 변경 알림 */
@@ -174,6 +183,34 @@ const delete_task = tool({
   }),
   execute: async ({ taskId, date, backlog }) => {
     try {
+      // 삭제 전 태스크 타이틀 조회
+      let taskTitle = taskId;
+      if (backlog) {
+        taskTitle = listBacklogTasks().find((t) => t.id === taskId)?.title ?? taskId;
+      } else if (date) {
+        taskTitle = getDateTasks(date).find((t) => t.id === taskId)?.title ?? taskId;
+      }
+
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", {
+        id: approvalId,
+        role: "assistant",
+        content: `"${taskTitle}" 태스크를 삭제할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "delete_task",
+          displayName: taskTitle,
+          args: { taskId, date, backlog },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+      }
+
       if (backlog) {
         deleteBacklogTask(taskId);
       } else if (date) {
@@ -267,6 +304,30 @@ const delete_memory = tool({
   }),
   execute: async ({ id }) => {
     try {
+      // 삭제 전 메모리 내용 조회
+      const memory = listMemories().find((m) => m.id === id);
+      const displayName = memory ? memory.content.slice(0, 40) : id;
+
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", {
+        id: approvalId,
+        role: "assistant",
+        content: `"${displayName}" 메모리를 삭제할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "delete_memory",
+          displayName,
+          args: { id },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+      }
+
       deleteMemory(id);
       return { success: true };
     } catch (error) {
@@ -277,7 +338,7 @@ const delete_memory = tool({
 
 // 태스크 관리 툴 등록
 toolRegistry.register(
-  { name: "task-manager", label: "태스크 관리", dangerLevel: "safe" },
+  { name: "task-manager", label: "태스크 관리", dangerLevel: "moderate" },
   { get_today_info, list_tasks, add_task, update_task, delete_task, toggle_task_complete },
 );
 
