@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.33.1] - 2026-02-20
+- Background Monitor 제거: Script Library가 스케줄링을 대체하므로 시스템 launchd 에이전트 감시 기능 전체 삭제
+- 앱 단순화: 불필요한 IPC 채널 8개, 관련 타입, 서비스 파일 정리
+
 ## [1.33.0] - 2026-02-20
 - 채팅방 삭제 잠금 기능 추가: 실수로 채팅방을 삭제하는 것을 방지
 - 호버 시 자물쇠 아이콘으로 잠금/해제 토글, 잠긴 방은 삭제 버튼 숨김

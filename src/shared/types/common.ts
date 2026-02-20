@@ -33,15 +33,13 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
 
 // 앱 설정
 export interface AppSettings {
-  patterns: string[]; // 감지할 plist 패턴 목록 (예: ['com.claude.', 'com.myapp.'])
   focusMode: FocusMode;
-  notificationsEnabled: boolean; // Job 완료 알림 활성화
+  notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  patterns: [],
   focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,

@@ -8,11 +8,3 @@ export const TIME = {
   HOUR: 60 * 60 * 1000,
   DAY: 24 * 60 * 60 * 1000,
 } as const;
-
-export const JOB_POLLING_INTERVAL_MS = 30000;
-
-// Job 완료 감지 폴링 설정
-export const JOB_COMPLETION = {
-  POLL_INTERVAL_MS: 1000, // 1초마다 확인
-  TIMEOUT_MS: 60000, // 60초 타임아웃
-} as const;

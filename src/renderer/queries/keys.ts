@@ -1,12 +1,5 @@
 /** TanStack Query 캐시 키 정의 */
 export const queryKeys = {
-  jobs: {
-    all: ["jobs"] as const,
-    list: () => [...queryKeys.jobs.all, "list"] as const,
-    customizations: () => [...queryKeys.jobs.all, "customizations"] as const,
-    logs: (label: string) => [...queryKeys.jobs.all, "logs", label] as const,
-    running: () => [...queryKeys.jobs.all, "running"] as const,
-  },
   settings: {
     all: ["settings"] as const,
     get: () => [...queryKeys.settings.all, "get"] as const,
