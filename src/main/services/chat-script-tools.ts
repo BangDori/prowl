@@ -2,7 +2,7 @@
 import type { ProwlScript } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
-import { getChatWindow, getSubWindow } from "../windows";
+import { getChatWindow, getDashboardWindow } from "../windows";
 import { waitForApproval } from "./approval";
 import { generateScriptFromPrompt } from "./script-ai";
 import { cancelSchedule, refreshSchedule, runScript } from "./script-runner";
@@ -23,7 +23,7 @@ function sendToChat(channel: string, ...args: unknown[]): void {
 }
 
 function notifyScriptsChanged(): void {
-  const win = getSubWindow();
+  const win = getDashboardWindow();
   if (win && !win.isDestroyed()) {
     win.webContents.send("scripts:changed");
   }

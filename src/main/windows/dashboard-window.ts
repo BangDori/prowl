@@ -16,6 +16,7 @@ function getIndexUrl(): string {
 export function showDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed()) {
     dashboardWindow.focus();
+    dashboardWindow.webContents.send("window:show");
     return;
   }
 
@@ -54,7 +55,10 @@ export function showDashboardWindow(): void {
   });
 
   dashboardWindow.loadURL(`${getIndexUrl()}#dashboard`);
-  dashboardWindow.once("ready-to-show", () => dashboardWindow?.show());
+  dashboardWindow.once("ready-to-show", () => {
+    dashboardWindow?.show();
+    dashboardWindow?.webContents.send("window:show");
+  });
   dashboardWindow.on("closed", () => {
     dashboardWindow = null;
   });

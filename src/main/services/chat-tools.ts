@@ -3,7 +3,7 @@
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
-import { getChatWindow, getCompactWindow, getSubWindow } from "../windows";
+import { getChatWindow, getCompactWindow, getDashboardWindow } from "../windows";
 import { waitForApproval } from "./approval";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
@@ -35,9 +35,9 @@ function sendToChat(channel: string, ...args: unknown[]): void {
   }
 }
 
-/** Task Manager(Compact View) + 대시보드(Sub Window)에 태스크 변경 알림 */
+/** Task Manager(Compact View) + 대시보드에 태스크 변경 알림 */
 function notifyTasksChanged(): void {
-  for (const win of [getCompactWindow(), getSubWindow()]) {
+  for (const win of [getCompactWindow(), getDashboardWindow()]) {
     if (win && !win.isDestroyed()) {
       win.webContents.send("tasks:changed");
     }
