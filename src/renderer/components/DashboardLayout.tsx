@@ -1,6 +1,6 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Bot, Brain, Cog, History, LayoutDashboard, ListTodo } from "lucide-react";
+import { Bot, Brain, Cog, History, LayoutDashboard, ListTodo, Terminal } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
@@ -8,11 +8,19 @@ import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
 import JobsSection from "./sections/JobsSection";
 import MemorySection from "./sections/MemorySection";
+import ScriptsSection from "./sections/ScriptsSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "jobs" | "calendar" | "memory" | "changelog" | "settings" | "claude-config";
+type NavItem =
+  | "jobs"
+  | "scripts"
+  | "calendar"
+  | "memory"
+  | "changelog"
+  | "settings"
+  | "claude-config";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -86,6 +94,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("jobs")}
           />
           <SidebarItem
+            icon={<Terminal className="w-4 h-4" />}
+            label="Script Library"
+            active={activeNav === "scripts"}
+            onClick={() => setActiveNav("scripts")}
+          />
+          <SidebarItem
             icon={<ListTodo className="w-4 h-4" />}
             label="Task Manager"
             active={activeNav === "calendar"}
@@ -127,6 +141,11 @@ export default function DashboardLayout() {
           <div className={`h-full ${activeNav === "jobs" ? "" : "hidden"}`}>
             <ErrorBoundary section="Background Monitor">
               <JobsSection />
+            </ErrorBoundary>
+          </div>
+          <div className={`h-full ${activeNav === "scripts" ? "" : "hidden"}`}>
+            <ErrorBoundary section="Script Library">
+              <ScriptsSection />
             </ErrorBoundary>
           </div>
           <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
