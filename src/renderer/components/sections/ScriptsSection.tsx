@@ -6,13 +6,13 @@ import {
   useScripts,
   useToggleScript,
 } from "@renderer/hooks/useScripts";
-import { FolderOpen, Plus, Terminal } from "lucide-react";
+import { FolderOpen, Plus, RefreshCw, Terminal } from "lucide-react";
 import { useState } from "react";
 import ScriptCard from "../scripts/ScriptCard";
 import ScriptCreateDialog from "../scripts/ScriptCreateDialog";
 
 export default function ScriptsSection() {
-  const { data: scripts = [], isLoading } = useScripts();
+  const { data: scripts = [], isLoading, isFetching, refetch } = useScripts();
   const createScript = useCreateScript();
   const toggleScript = useToggleScript();
   const deleteScript = useDeleteScript();
@@ -70,6 +70,15 @@ export default function ScriptsSection() {
       <div className="flex-shrink-0 flex items-center justify-between px-4 py-2">
         <span className="text-xs text-gray-500">{scripts.length}개 스크립트</span>
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors disabled:opacity-40"
+            title="새로고침"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin" : ""}`} />
+          </button>
           <button
             type="button"
             onClick={handleOpenStoragePath}

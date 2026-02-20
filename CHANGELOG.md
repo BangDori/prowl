@@ -2,6 +2,13 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.35.0] - 2026-02-20
+- Prowl Chat에서 스크립트 조회/생성/토글/실행/삭제 지원 (AI 스크립트 도구)
+- 위험 도구(삭제, 스크립트 실행) 실행 전 채팅 내 사용자 승인 UI 표시 (HITL)
+- 채팅 AI가 스크립트/태스크/메모리를 변경하면 대시보드 즉시 자동 새로고침
+- Script Library 수동 새로고침 버튼 추가
+- 채팅 AI 툴 레지스트리 도입으로 도구 등록/관리 구조 개선
+
 ## [1.34.0] - 2026-02-20
 - Prowl Chat 전체화면 토글 기능 추가: 헤더 버튼 또는 Cmd+Enter로 전체화면 전환
 

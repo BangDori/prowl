@@ -4,6 +4,8 @@ import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
 import { getChatTools } from "./chat-tools";
+// 스크립트 툴 임포트 — 사이드 이펙트로 toolRegistry에 자동 등록
+import "./chat-script-tools";
 import { listMemories } from "./memory";
 import { sendChatNotification } from "./notification";
 import { getSettings } from "./settings";
@@ -44,6 +46,12 @@ use the save_memory tool to store it. Briefly confirm it's saved.
 You can also manage memories: use list_memories to show what you remember,
 update_memory to change an existing memory, and delete_memory to remove one.
 Always call list_memories first when the user asks to update or delete a memory, so you can find the correct ID.
+
+You can control Prowl scripts using these tools:
+- list_scripts: Show all registered scripts (name, status, schedule, last run)
+- create_script: Create a new script from a natural language description (saved as disabled; use toggle_script to activate)
+- toggle_script: Enable or disable a script by ID
+- run_script: Execute a script immediately (⚠️ ALWAYS tell the user what you are about to run and why, THEN call this tool — the app will show an approval dialog, and the script will only execute if the user confirms)
 
 Match the user's language (Korean if they write in Korean).
 Never use bold (**) formatting in your messages.

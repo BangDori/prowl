@@ -48,6 +48,8 @@ const electronAPI = {
   resizeChatWindow: invokeIpc("chat:resize"),
   closeChatWindow: invokeIpc("chat:close"),
   toggleChatExpand: invokeIpc("chat:expand-toggle"),
+  approveTool: invokeIpc("chat:approve-tool"),
+  rejectTool: invokeIpc("chat:reject-tool"),
 
   // Compact
   toggleCompactView: invokeIpc("compact:toggle"),
@@ -109,6 +111,16 @@ const electronAPI = {
     const handler = () => callback();
     ipcRenderer.on("tasks:changed", handler);
     return () => ipcRenderer.removeListener("tasks:changed", handler);
+  },
+  onScriptsChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("scripts:changed", handler);
+    return () => ipcRenderer.removeListener("scripts:changed", handler);
+  },
+  onMemoryChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("memory:changed", handler);
+    return () => ipcRenderer.removeListener("memory:changed", handler);
   },
 
   // Chat stream events

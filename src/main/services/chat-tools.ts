@@ -1,9 +1,10 @@
-/** 채팅 AI 도구 정의 — Task Manager + Memory 연동 */
+/** 채팅 AI 도구 정의 — Task Manager + Memory 연동, 툴 레지스트리 등록 */
 
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
-import { getCompactWindow } from "../windows";
+import { getChatWindow, getCompactWindow, getDashboardWindow } from "../windows";
+import { waitForApproval } from "./approval";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
 import {
@@ -19,17 +20,35 @@ import {
   updateBacklogTask,
   updateTask,
 } from "./tasks";
+import { toolRegistry } from "./tool-registry";
 
 /** 고유 ID 생성 */
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
 }
 
-/** Task Manager(Compact View)에 태스크 변경 알림 */
-function notifyTasksChanged(): void {
-  const win = getCompactWindow();
+/** 채팅 윈도우에 이벤트 전송 */
+function sendToChat(channel: string, ...args: unknown[]): void {
+  const win = getChatWindow();
   if (win && !win.isDestroyed()) {
-    win.webContents.send("tasks:changed");
+    win.webContents.send(channel, ...args);
+  }
+}
+
+/** 대시보드에 메모리 변경 알림 */
+function notifyMemoryChanged(): void {
+  const win = getDashboardWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send("memory:changed");
+  }
+}
+
+/** Task Manager(Compact View) + 대시보드에 태스크 변경 알림 */
+function notifyTasksChanged(): void {
+  for (const win of [getCompactWindow(), getDashboardWindow()]) {
+    if (win && !win.isDestroyed()) {
+      win.webContents.send("tasks:changed");
+    }
   }
 }
 
@@ -173,6 +192,34 @@ const delete_task = tool({
   }),
   execute: async ({ taskId, date, backlog }) => {
     try {
+      // 삭제 전 태스크 타이틀 조회
+      let taskTitle = taskId;
+      if (backlog) {
+        taskTitle = listBacklogTasks().find((t) => t.id === taskId)?.title ?? taskId;
+      } else if (date) {
+        taskTitle = getDateTasks(date).find((t) => t.id === taskId)?.title ?? taskId;
+      }
+
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", {
+        id: approvalId,
+        role: "assistant",
+        content: `"${taskTitle}" 태스크를 삭제할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "delete_task",
+          displayName: taskTitle,
+          args: { taskId, date, backlog },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+      }
+
       if (backlog) {
         deleteBacklogTask(taskId);
       } else if (date) {
@@ -222,6 +269,7 @@ const save_memory = tool({
   execute: async ({ content }) => {
     try {
       const memory = addMemory(content);
+      notifyMemoryChanged();
       return { success: true, memory };
     } catch (error) {
       return { error: String(error) };
@@ -252,6 +300,7 @@ const update_memory = tool({
   execute: async ({ id, content }) => {
     try {
       updateMemory(id, content);
+      notifyMemoryChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };
@@ -266,7 +315,32 @@ const delete_memory = tool({
   }),
   execute: async ({ id }) => {
     try {
+      // 삭제 전 메모리 내용 조회
+      const memory = listMemories().find((m) => m.id === id);
+      const displayName = memory ? memory.content.slice(0, 40) : id;
+
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", {
+        id: approvalId,
+        role: "assistant",
+        content: `"${displayName}" 메모리를 삭제할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "delete_memory",
+          displayName,
+          args: { id },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+      }
+
       deleteMemory(id);
+      notifyMemoryChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };
@@ -274,18 +348,19 @@ const delete_memory = tool({
   },
 });
 
-/** 채팅에서 사용할 도구 맵 반환 */
+// 태스크 관리 툴 등록
+toolRegistry.register(
+  { name: "task-manager", label: "태스크 관리", dangerLevel: "moderate" },
+  { get_today_info, list_tasks, add_task, update_task, delete_task, toggle_task_complete },
+);
+
+// 메모리 관리 툴 등록
+toolRegistry.register(
+  { name: "memory-manager", label: "메모리 관리", dangerLevel: "safe" },
+  { save_memory, list_memories, update_memory, delete_memory },
+);
+
+/** 레지스트리에 등록된 전체 도구 반환 (chat.ts에서 사용) */
 export function getChatTools() {
-  return {
-    get_today_info,
-    list_tasks,
-    add_task,
-    update_task,
-    delete_task,
-    toggle_task_complete,
-    save_memory,
-    list_memories,
-    update_memory,
-    delete_memory,
-  };
+  return toolRegistry.getAllTools();
 }
