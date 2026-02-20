@@ -146,7 +146,7 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
           disabled={!content.trim()}
           className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-50"
         >
-          Add
+          추가
         </button>
       </div>
     </div>
@@ -168,25 +168,22 @@ export default function MemorySection() {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="p-4 space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
-            Memory ({memories.length})
-          </h3>
+      <div className="p-4 space-y-3">
+        {/* 추가 버튼 */}
+        <div className="flex justify-end">
           {!adding && (
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
             >
-              <Plus className="w-3 h-3" />
-              Add
+              <Plus className="w-3.5 h-3.5" />
+              추가
             </button>
           )}
         </div>
 
-        {/* Add form */}
+        {/* 추가 form */}
         {adding && <AddMemoryForm onClose={() => setAdding(false)} />}
 
         {/* Memory list */}

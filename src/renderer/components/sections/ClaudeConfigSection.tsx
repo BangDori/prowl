@@ -276,7 +276,7 @@ export default function ClaudeConfigSection() {
       {/* 좌측 트리 패널 */}
       <div className="w-48 flex-shrink-0 border-r border-prowl-border flex flex-col">
         {/* 트리 헤더 */}
-        <div className="flex items-center justify-between px-2 py-1.5 border-b border-prowl-border">
+        <div className="flex items-center justify-between px-2 py-1.5">
           <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">
             Explorer
           </span>

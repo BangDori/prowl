@@ -67,8 +67,7 @@ export default function ScriptsSection() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* 툴바 */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-prowl-border">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2">
         <span className="text-xs text-gray-500">{scripts.length}개 스크립트</span>
         <div className="flex items-center gap-1">
           <button
@@ -82,7 +81,7 @@ export default function ScriptsSection() {
           <button
             type="button"
             onClick={() => setShowCreate(true)}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             추가
