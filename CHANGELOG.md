@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.30.1] - 2026-02-20
+- Task Manager 윈도우가 macOS Space 전환 시 사라지는 현상 수정
+
 ## [1.30.0] - 2026-02-18
 - 채팅 윈도우 비활성 시 AI 응답에 대한 macOS 네이티브 알림 발송
 - 메뉴바 트레이 아이콘의 미읽음 배지 숫자 표시 제거
