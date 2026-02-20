@@ -464,6 +464,7 @@ export default function ChatConversation({
           activeTabId={activeTabId}
           onActivateTab={setActiveTabId}
           onCloseTab={closeTab}
+          onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
           isDragging={isDragging}
         />
       </div>

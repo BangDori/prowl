@@ -11,23 +11,42 @@ interface PreviewPanelProps {
   activeTabId: string | null;
   onActivateTab: (id: string) => void;
   onCloseTab: (id: string) => void;
+  onOpenLink?: (url: string, label: string) => void;
   isDragging?: boolean;
 }
 
-/** HTML 콘텐츠를 iframe으로 렌더링 */
-function HtmlContent({ content }: { content: string }) {
+/** HTML 콘텐츠를 iframe으로 렌더링 — 링크 클릭 시 탭 열기 콜백 호출 */
+function HtmlContent({
+  content,
+  onOpenLink,
+}: {
+  content: string;
+  onOpenLink?: (url: string, label: string) => void;
+}) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
     const doc = iframe.contentDocument ?? iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(content);
-      doc.close();
-    }
-  }, [content]);
+    if (!doc) return;
+
+    doc.open();
+    doc.write(content);
+    doc.close();
+
+    const handleClick = (e: MouseEvent) => {
+      const anchor = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
+      if (!anchor?.href) return;
+      if (!anchor.href.startsWith("http://") && !anchor.href.startsWith("https://")) return;
+      e.preventDefault();
+      const label = anchor.textContent?.trim() || new URL(anchor.href).hostname;
+      onOpenLink?.(anchor.href, label);
+    };
+
+    doc.addEventListener("click", handleClick);
+    return () => doc.removeEventListener("click", handleClick);
+  }, [content, onOpenLink]);
 
   return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
 }
@@ -42,6 +61,7 @@ export default function PreviewPanel({
   activeTabId,
   onActivateTab,
   onCloseTab,
+  onOpenLink,
   isDragging,
 }: PreviewPanelProps) {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs.at(-1);
@@ -74,7 +94,9 @@ export default function PreviewPanel({
 
       {/* 콘텐츠 영역 */}
       <div className="chat-preview-content">
-        {activeTab?.type === "html" && <HtmlContent content={activeTab.content} />}
+        {activeTab?.type === "html" && (
+          <HtmlContent content={activeTab.content} onOpenLink={onOpenLink} />
+        )}
         {activeTab?.type === "url" && <UrlContent url={activeTab.url} />}
       </div>
     </div>
