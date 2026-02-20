@@ -88,6 +88,9 @@ export default function CompactView() {
           </div>
         ) : (
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
+            {hasBacklog && (
+              <CompactBacklog tasks={backlogTasks} onToggleComplete={toggleBacklogComplete} />
+            )}
             <CompactTaskList
               tasks={todayTasks}
               date={todayStr}
@@ -102,9 +105,6 @@ export default function CompactView() {
                 onRangeChange={setUpcomingRange}
                 onToggleComplete={toggleUpcomingComplete}
               />
-            )}
-            {hasBacklog && (
-              <CompactBacklog tasks={backlogTasks} onToggleComplete={toggleBacklogComplete} />
             )}
             {hasCompleted && (
               <CompactCompleted groups={completedGroups} onToggleComplete={toggleComplete} />
