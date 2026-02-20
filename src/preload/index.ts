@@ -97,6 +97,15 @@ const electronAPI = {
   updateMemory: invokeIpc("memory:update"),
   deleteMemory: invokeIpc("memory:delete"),
 
+  // Scripts
+  listScripts: invokeIpc("scripts:list"),
+  createScript: invokeIpc("scripts:create"),
+  updateScript: invokeIpc("scripts:update"),
+  deleteScript: invokeIpc("scripts:delete"),
+  toggleScript: invokeIpc("scripts:toggle"),
+  runScript: invokeIpc("scripts:run"),
+  getScriptLogs: invokeIpc("scripts:logs"),
+
   // Event listener (non-invoke)
   onWindowShow: (callback: () => void): (() => void) => {
     const handler = () => callback();
