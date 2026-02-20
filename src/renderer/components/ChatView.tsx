@@ -27,6 +27,14 @@ export default function ChatView() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleToggleExpand]);
 
+  // 알림 클릭 딥링크: 특정 채팅방으로 이동
+  useEffect(() => {
+    return window.electronAPI.onChatNavigateToRoom((roomId) => {
+      setPendingMessage(null);
+      setSelectedRoomId(roomId);
+    });
+  }, []);
+
   /** 로비에서 메시지 전송 시: 룸 생성 → 대화 진입 (초기 메시지 전달) */
   const handleSendFromLobby = useCallback(
     async (content: string) => {
