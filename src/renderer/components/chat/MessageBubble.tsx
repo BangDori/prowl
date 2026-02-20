@@ -99,11 +99,24 @@ interface MessageBubbleProps {
   message: ChatMessage;
   /** 같은 발신자의 연속 메시지 그룹에서 마지막 메시지인지 여부 */
   isLastInGroup?: boolean;
+  /** HTML 프리뷰 확인을 위한 전체화면 전환 콜백 (비전체화면일 때만 전달) */
+  onExpandForPreview?: () => void;
 }
 
-export default function MessageBubble({ message, isLastInGroup = true }: MessageBubbleProps) {
+/** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
+function stripProwlUi(content: string): string {
+  return content.replace(/<prowl-ui>[\s\S]*?<\/prowl-ui>/g, "").trim();
+}
+
+export default function MessageBubble({
+  message,
+  isLastInGroup = true,
+  onExpandForPreview,
+}: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
+  const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
+  const displayContent = hasHtmlOutput ? stripProwlUi(message.content) : message.content;
   const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
     message.approval?.status ?? "pending",
   );
@@ -146,11 +159,25 @@ export default function MessageBubble({ message, isLastInGroup = true }: Message
           }`}
         >
           {isUser ? (
-            message.content
+            displayContent
           ) : (
-            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
-              {message.content}
-            </Markdown>
+            <>
+              {displayContent && (
+                <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
+                  {displayContent}
+                </Markdown>
+              )}
+              {hasHtmlOutput && onExpandForPreview && (
+                <button
+                  type="button"
+                  onClick={onExpandForPreview}
+                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors select-none"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                  HTML 보기
+                </button>
+              )}
+            </>
           )}
           {message.approval && (
             <ApprovalButtons
@@ -166,15 +193,17 @@ export default function MessageBubble({ message, isLastInGroup = true }: Message
               }}
             />
           )}
-          <button
-            type="button"
-            onClick={handleCopy}
-            className={`absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
-              isUser ? "text-black/30 hover:text-black/60" : "text-white/30 hover:text-white/60"
-            }`}
-          >
-            {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-          </button>
+          {!hasHtmlOutput && (
+            <button
+              type="button"
+              onClick={handleCopy}
+              className={`absolute top-1 right-1 p-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ${
+                isUser ? "text-black/30 hover:text-black/60" : "text-white/30 hover:text-white/60"
+              }`}
+            >
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+            </button>
+          )}
         </div>
         {showMeta && !isUser && (
           <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>

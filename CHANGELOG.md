@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.37.0] - 2026-02-20
+- Prowl Chat HTML 구조화 출력 UI 추가: AI 응답에 `<prowl-ui>` 태그 포함 시 전체화면에서 좌(채팅)/우(HTML 프리뷰) 분할 레이아웃으로 전환
+- HTML 프리뷰 패널 X 버튼으로 패널만 닫기 (전체화면 유지)
+- "HTML 보기" 버튼으로 비전체화면에서 전체화면 전환 및 프리뷰 표시
+- HTML 출력이 있는 메시지는 복사 버튼 비활성화
+
 ## [1.36.0] - 2026-02-20
 - 태스크 알림 클릭 시 연결된 채팅방으로 딥링크 이동
 - TaskItem 편집 폼에서 채팅방 연결 드롭다운 선택 지원

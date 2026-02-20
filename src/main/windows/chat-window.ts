@@ -26,12 +26,13 @@ export function showChatWindow(): void {
   const y = dispY + fullH - CHAT_WINDOW.EXPANDED_HEIGHT - CHAT_WINDOW.BOTTOM_MARGIN;
 
   if (chatWindow && !chatWindow.isDestroyed()) {
-    // 전체화면 상태라면 기본 크기로 복귀
+    // 전체화면 상태라면 기본 크기로 복귀, renderer에 상태 동기화 이벤트 전송
     if (isExpanded) {
       isExpanded = false;
       savedBounds = null;
       chatWindow.setMovable(true);
       chatWindow.setSize(CHAT_WINDOW.WIDTH, CHAT_WINDOW.EXPANDED_HEIGHT);
+      chatWindow.webContents.send("chat:expand-reset");
     }
     chatWindow.setPosition(x, y);
     chatWindow.setOpacity(1);

@@ -370,6 +370,32 @@ select.input-field {
 }
 
 /* ============================================
+   채팅 HTML 프리뷰 분할 레이아웃
+   ============================================ */
+
+.chat-split-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-height: 0;
+}
+
+.chat-split-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-html-preview {
+  position: relative;
+  flex: 1;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ============================================
    대시보드 윈도우 드래그 영역
    ============================================ */
 

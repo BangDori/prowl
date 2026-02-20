@@ -166,6 +166,7 @@ export interface IpcEventSchema {
   "chat:stream-error": { params: [error: string] };
   "chat-rooms:unread-changed": { params: [totalUnread: number] };
   "chat:navigate-to-room": { params: [roomId: string] };
+  "chat:expand-reset": { params: [] };
 }
 
 // 유틸리티 타입
