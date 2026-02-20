@@ -141,3 +141,20 @@ export function toggleExpandChatWindow(): boolean {
 export function isChatWindowExpanded(): boolean {
   return isExpanded;
 }
+
+/** 채팅 윈도우를 열고 특정 룸으로 네비게이션 이벤트 전송 */
+export function navigateToChatRoom(roomId: string): void {
+  const wasAlreadyOpen = !!(chatWindow && !chatWindow.isDestroyed() && chatWindow.getOpacity() > 0);
+  showChatWindow();
+
+  if (wasAlreadyOpen) {
+    chatWindow?.webContents.send("chat:navigate-to-room", roomId);
+  } else if (chatWindow && !chatWindow.isDestroyed()) {
+    chatWindow.once("ready-to-show", () => {
+      // React가 마운트될 시간을 확보 후 이벤트 전송
+      setTimeout(() => {
+        chatWindow?.webContents.send("chat:navigate-to-room", roomId);
+      }, 500);
+    });
+  }
+}
