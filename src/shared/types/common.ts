@@ -50,8 +50,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
 export type AiProvider = "openai";
 
 export interface AiModelOption {
-  id: string; // "gpt-4o-mini"
-  label: string; // "GPT-4o Mini"
+  id: string; // "gpt-5-mini"
+  label: string; // "GPT-5 Mini"
   provider: AiProvider;
 }
 
@@ -62,7 +62,7 @@ export interface ChatConfig {
 
 export const DEFAULT_CHAT_CONFIG: ChatConfig = {
   provider: "openai",
-  model: "gpt-4o",
+  model: "gpt-5-mini",
 };
 
 // 프로바이더별 사용 가능 모델 + API 키 상태

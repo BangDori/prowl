@@ -104,7 +104,7 @@ function getOpenAiApiKey(): string | undefined {
 /** 사용 가능 모델 목록 */
 const MODELS: AiModelOption[] = [
   { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
-  { id: "gpt-4o", label: "GPT-4o", provider: "openai" },
+  { id: "gpt-5-mini", label: "GPT-5 Mini", provider: "openai" },
 ];
 
 /** 스트리밍 채팅 메시지 전송 (fire-and-forget, 완료 후 main에서 직접 저장) */
@@ -114,7 +114,7 @@ export async function streamChatMessage(
   history: ChatMessage[],
   config?: ChatConfig,
 ): Promise<void> {
-  const modelId = config?.model ?? "gpt-4o";
+  const modelId = config?.model ?? "gpt-5-mini";
   const aiMessages: ChatMessage[] = [];
 
   const apiKey = getOpenAiApiKey();

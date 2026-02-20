@@ -15,7 +15,7 @@ vi.mock("./services/settings", () => ({
   setSettings: vi.fn(),
   getFocusMode: vi.fn(),
   setFocusMode: vi.fn(),
-  getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-4o" }),
+  getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-5-mini" }),
   setChatConfig: vi.fn(),
 }));
 
@@ -174,7 +174,7 @@ describe("registerIpcHandlers", () => {
 
       expect(streamChatMessage).toHaveBeenCalledWith("room1", "안녕", [], {
         provider: "openai",
-        model: "gpt-4o",
+        model: "gpt-5-mini",
       });
       expect(result).toEqual({ success: true });
     });
