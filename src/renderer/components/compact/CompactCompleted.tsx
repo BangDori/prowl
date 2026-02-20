@@ -31,14 +31,14 @@ export default function CompactCompleted({ groups, onToggleComplete }: CompactCo
         className="flex items-center gap-1.5 w-full px-0.5 py-1 text-left group"
       >
         {expanded ? (
-          <ChevronDown className="w-3 h-3 text-white/30 group-hover:text-white/50 transition-colors" />
+          <ChevronDown className="w-3 h-3 text-app-text-ghost group-hover:text-app-text-faint transition-colors" />
         ) : (
-          <ChevronRight className="w-3 h-3 text-white/30 group-hover:text-white/50 transition-colors" />
+          <ChevronRight className="w-3 h-3 text-app-text-ghost group-hover:text-app-text-faint transition-colors" />
         )}
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-app-text-faint">
           완료됨
         </span>
-        <span className="text-[9px] text-white/25">{totalCount}건</span>
+        <span className="text-[9px] text-app-text-ghost">{totalCount}건</span>
       </button>
 
       {expanded && (
@@ -49,10 +49,10 @@ export default function CompactCompleted({ groups, onToggleComplete }: CompactCo
               className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
             >
               <div className="flex items-center justify-between px-2.5 pt-2 pb-1">
-                <span className="text-[10px] font-medium text-white/40">
+                <span className="text-[10px] font-medium text-app-text-faint">
                   {formatDateKr(group.date)}
                 </span>
-                <span className="text-[9px] text-white/20">{group.tasks.length}건</span>
+                <span className="text-[9px] text-app-text-ghost">{group.tasks.length}건</span>
               </div>
 
               {group.tasks.map((task, idx) => (
@@ -111,8 +111,8 @@ function CompletedTaskRow({
           className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
           onClick={() => setRowExpanded(!rowExpanded)}
         >
-          <Chevron className="w-2.5 h-2.5 text-white/15 flex-shrink-0" />
-          <span className="flex-1 text-[11px] leading-tight truncate text-left line-through text-white/20">
+          <Chevron className="w-2.5 h-2.5 text-app-text-ghost flex-shrink-0" />
+          <span className="flex-1 text-[11px] leading-tight truncate text-left line-through text-app-text-ghost">
             {task.title}
           </span>
           <span
@@ -120,7 +120,7 @@ function CompletedTaskRow({
             style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
           />
           {task.dueTime && (
-            <span className="text-[9px] text-white/15 flex-shrink-0 tabular-nums">
+            <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}
             </span>
           )}

@@ -23,7 +23,7 @@ export default function ScriptCard({
   isToggling,
 }: ScriptCardProps) {
   return (
-    <div className="glass-card-3d rounded-lg bg-prowl-card border border-white/[0.06] px-4 py-3 group">
+    <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border px-4 py-3 group">
       <div className="flex items-center justify-between">
         {/* 왼쪽: 이름 + 스케줄 + 마지막 실행 */}
         <div className="min-w-0">

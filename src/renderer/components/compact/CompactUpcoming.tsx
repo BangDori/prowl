@@ -29,7 +29,7 @@ export default function CompactUpcoming({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5 px-0.5">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-app-text-faint">
           다가오는 일정
         </span>
         <RangeSelector range={range} onRangeChange={onRangeChange} />
@@ -42,10 +42,10 @@ export default function CompactUpcoming({
             className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
           >
             <div className="flex items-center justify-between px-2.5 pt-2 pb-1">
-              <span className="text-[10px] font-medium text-white/50">
+              <span className="text-[10px] font-medium text-app-text-muted">
                 {formatDateKr(group.date)}
               </span>
-              <span className="text-[9px] text-white/25">{group.tasks.length}건</span>
+              <span className="text-[9px] text-app-text-ghost">{group.tasks.length}건</span>
             </div>
 
             {group.tasks.map((task, idx) => (
@@ -79,7 +79,7 @@ function UpcomingTaskRow({
     <div className={showBorder ? "border-b border-prowl-border" : ""}>
       <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
-          <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-white/15 hover:border-white/30 transition-colors">
+          <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors">
             {task.completed && (
               <svg
                 className="w-2 h-2 text-emerald-400"
@@ -105,8 +105,8 @@ function UpcomingTaskRow({
           className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
           onClick={() => setExpanded(!expanded)}
         >
-          <Chevron className="w-2.5 h-2.5 text-white/20 flex-shrink-0" />
-          <span className="flex-1 text-[11px] leading-tight truncate text-left text-white/70">
+          <Chevron className="w-2.5 h-2.5 text-app-text-ghost flex-shrink-0" />
+          <span className="flex-1 text-[11px] leading-tight truncate text-left text-app-text-secondary">
             {task.title}
           </span>
           <span
@@ -114,7 +114,7 @@ function UpcomingTaskRow({
             style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
           />
           {task.dueTime && (
-            <span className="text-[9px] text-white/30 flex-shrink-0 tabular-nums">
+            <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}
             </span>
           )}
@@ -144,8 +144,8 @@ function RangeSelector({
           onClick={() => onRangeChange(r)}
           className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
             range === r
-              ? "bg-white/10 text-white/70"
-              : "text-white/30 hover:text-white/50 hover:bg-white/[0.06]"
+              ? "bg-app-active-bg text-app-text-secondary"
+              : "text-app-text-ghost hover:text-app-text-faint hover:bg-app-hover-bg"
           }`}
         >
           {UPCOMING_RANGE_LABELS[r]}

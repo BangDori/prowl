@@ -74,7 +74,7 @@ export default function ScriptsSection() {
             type="button"
             onClick={() => refetch()}
             disabled={isFetching}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors disabled:opacity-40"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-app-text-muted hover:text-app-text-primary hover:bg-app-hover-bg transition-colors disabled:opacity-40"
             title="새로고침"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? "animate-spin" : ""}`} />
@@ -82,7 +82,7 @@ export default function ScriptsSection() {
           <button
             type="button"
             onClick={handleOpenStoragePath}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-app-text-muted hover:text-app-text-primary hover:bg-app-hover-bg transition-colors"
             title="파일 위치 열기"
           >
             <FolderOpen className="w-3.5 h-3.5" />

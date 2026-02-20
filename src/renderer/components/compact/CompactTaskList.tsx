@@ -38,21 +38,21 @@ export default function CompactTaskList({
           <button
             type="button"
             onClick={toggleSort}
-            className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-colors"
+            className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] text-app-text-ghost hover:text-app-text-muted hover:bg-app-hover-bg transition-colors"
             title={sortLabel}
           >
             <SortIcon className="w-2.5 h-2.5" />
             <span>{sortLabel}</span>
           </button>
         </div>
-        <span className="text-[9px] text-white/30">
+        <span className="text-[9px] text-app-text-ghost">
           {incompleteCount > 0 ? `${incompleteCount}건 남음` : "모두 완료"}
         </span>
       </div>
 
       {sorted.length === 0 ? (
         <div className="flex items-center justify-center py-4">
-          <p className="text-[10px] text-white/25">오늘 태스크 없음</p>
+          <p className="text-[10px] text-app-text-ghost">오늘 태스크 없음</p>
         </div>
       ) : (
         <div className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden">
@@ -90,7 +90,7 @@ function CompactTaskRow({
             className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-colors ${
               task.completed
                 ? "bg-emerald-500/25 border-emerald-500/40"
-                : "border-white/15 hover:border-white/30"
+                : "border-app-input-border hover:border-prowl-border-hover"
             }`}
           >
             {task.completed && (
@@ -118,10 +118,10 @@ function CompactTaskRow({
           className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer"
           onClick={() => setExpanded(!expanded)}
         >
-          <Chevron className="w-2.5 h-2.5 text-white/20 flex-shrink-0" />
+          <Chevron className="w-2.5 h-2.5 text-app-text-ghost flex-shrink-0" />
           <span
             className={`flex-1 text-[11px] leading-tight truncate text-left ${
-              task.completed ? "line-through text-white/25" : "text-white/80"
+              task.completed ? "line-through text-app-text-ghost" : "text-app-text-primary"
             }`}
           >
             {task.title}
@@ -131,7 +131,7 @@ function CompactTaskRow({
             style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
           />
           {task.dueTime && (
-            <span className="text-[9px] text-white/30 flex-shrink-0 tabular-nums">
+            <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}
             </span>
           )}

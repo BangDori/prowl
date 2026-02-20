@@ -48,13 +48,13 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
 
   if (editing) {
     return (
-      <div className="glass-card-3d rounded-lg border border-white/[0.06] bg-white/[0.04] backdrop-blur-xl px-2.5 py-2 space-y-1.5">
+      <div className="glass-card-3d rounded-lg border border-prowl-border bg-prowl-card backdrop-blur-xl px-2.5 py-2 space-y-1.5">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSave()}
-          className="w-full bg-transparent text-[11px] text-gray-200 placeholder-gray-600 outline-none"
+          className="w-full bg-transparent text-[11px] text-app-text-primary placeholder-app-text-ghost outline-none"
           // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
           autoFocus
         />
@@ -63,7 +63,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           onChange={(e) => setDescription(e.target.value)}
           placeholder="설명 (선택)"
           rows={2}
-          className="w-full bg-transparent text-[10px] text-gray-300 placeholder-gray-600 outline-none resize-none"
+          className="w-full bg-transparent text-[10px] text-app-text-secondary placeholder-app-text-ghost outline-none resize-none"
         />
         <div className="flex items-center gap-1 flex-wrap">
           {(["high", "medium", "low"] as const).map((p) => (
@@ -73,8 +73,8 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
               onClick={() => setPriority(p)}
               className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
                 priority === p
-                  ? "ring-1 ring-white/30 text-white"
-                  : "text-gray-500 hover:text-gray-300"
+                  ? "ring-1 ring-prowl-border-hover text-app-text-primary"
+                  : "text-app-text-muted hover:text-app-text-secondary"
               }`}
               style={priority === p ? { backgroundColor: `${PRIORITY_COLORS[p]}30` } : undefined}
             >
@@ -89,7 +89,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
             <select
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
-              className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded text-[10px] text-gray-300 px-1 py-0.5 outline-none appearance-none cursor-pointer hover:border-white/20 transition-colors"
+              className="flex-1 bg-app-input-bg border border-app-input-border rounded text-[10px] text-app-text-secondary px-1 py-0.5 outline-none appearance-none cursor-pointer hover:border-prowl-border-hover transition-colors"
             >
               <option value="">채팅방 연결 안 함</option>
               {chatRooms.map((room) => (
@@ -105,7 +105,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           <button
             type="button"
             onClick={handleCancel}
-            className="text-[10px] text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-[10px] text-app-text-muted hover:text-app-text-secondary transition-colors"
           >
             취소
           </button>
@@ -123,7 +123,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   }
 
   return (
-    <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-white/[0.03] border border-white/[0.04] hover:bg-white/[0.06] transition-colors">
+    <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-prowl-card border border-prowl-border hover:bg-app-hover-bg transition-colors">
       <button
         type="button"
         onClick={onToggleComplete}
@@ -155,7 +155,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
         <div className="flex items-center gap-1.5">
           <span
             className={`text-[11px] leading-tight ${
-              task.completed ? "line-through text-gray-600" : "text-gray-200"
+              task.completed ? "line-through text-app-text-ghost" : "text-app-text-primary"
             }`}
           >
             {task.title}
@@ -180,13 +180,13 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
         </div>
         {task.description && (
           <p
-            className={`text-[10px] mt-0.5 truncate ${task.completed ? "text-gray-700" : "text-gray-500"}`}
+            className={`text-[10px] mt-0.5 truncate ${task.completed ? "text-app-text-ghost" : "text-app-text-muted"}`}
           >
             {task.description}
           </p>
         )}
         {task.category && (
-          <span className="inline-block mt-0.5 px-1 py-px rounded text-[8px] bg-white/5 text-gray-500">
+          <span className="inline-block mt-0.5 px-1 py-px rounded text-[8px] bg-app-hover-bg text-app-text-muted">
             {task.category}
           </span>
         )}
@@ -195,14 +195,14 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="p-0.5 rounded text-gray-600 hover:text-gray-300 transition-colors"
+          className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
         >
           <Pencil className="w-2.5 h-2.5" />
         </button>
         <button
           type="button"
           onClick={onDelete}
-          className="p-0.5 rounded text-gray-600 hover:text-red-400 transition-colors"
+          className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
         >
           <Trash2 className="w-2.5 h-2.5" />
         </button>

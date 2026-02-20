@@ -72,7 +72,7 @@ export default function MiniDatePicker({
   return (
     <div
       ref={ref}
-      className="fixed z-[9999] p-2 rounded-lg border border-white/[0.08] bg-prowl-surface backdrop-blur-2xl shadow-xl"
+      className="fixed z-[9999] p-2 rounded-lg border border-prowl-border bg-prowl-surface backdrop-blur-2xl shadow-xl"
       style={{ width: "210px", top: pos.top, left: pos.left, transform: "translateY(-100%)" }}
     >
       {/* 헤더 */}
@@ -80,15 +80,15 @@ export default function MiniDatePicker({
         <button
           type="button"
           onClick={goPrev}
-          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+          className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
         >
           <ChevronLeft className="w-3 h-3" />
         </button>
-        <span className="text-[10px] font-medium text-gray-300">{monthLabel}</span>
+        <span className="text-[10px] font-medium text-app-text-secondary">{monthLabel}</span>
         <button
           type="button"
           onClick={goNext}
-          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+          className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
         >
           <ChevronRight className="w-3 h-3" />
         </button>
@@ -126,10 +126,10 @@ export default function MiniDatePicker({
               }}
               className={`
                 text-[10px] w-full py-1 rounded transition-colors
-                ${isDisabled ? "opacity-20 cursor-not-allowed" : "cursor-pointer hover:bg-white/10"}
+                ${isDisabled ? "opacity-20 cursor-not-allowed" : "cursor-pointer hover:bg-app-active-bg"}
                 ${isSelected ? "bg-accent/25 text-accent font-medium" : ""}
                 ${!isSelected && today ? "text-accent font-medium" : ""}
-                ${!isSelected && !today && isCurrentMonth ? "text-gray-300" : ""}
+                ${!isSelected && !today && isCurrentMonth ? "text-app-text-secondary" : ""}
                 ${!isCurrentMonth && !isSelected ? "opacity-30" : ""}
               `}
             >

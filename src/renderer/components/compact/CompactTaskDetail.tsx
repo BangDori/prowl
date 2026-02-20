@@ -31,29 +31,31 @@ export default function CompactTaskDetail({ task }: CompactTaskDetailProps) {
           </span>
           {task.dueTime && (
             <>
-              <span className="text-[9px] text-white/20">·</span>
-              <span className="text-[9px] text-white/40 tabular-nums">{task.dueTime}</span>
+              <span className="text-[9px] text-app-text-ghost">·</span>
+              <span className="text-[9px] text-app-text-faint tabular-nums">{task.dueTime}</span>
             </>
           )}
           {task.category && (
             <>
-              <span className="text-[9px] text-white/20">·</span>
-              <span className="text-[9px] text-white/40">#{task.category}</span>
+              <span className="text-[9px] text-app-text-ghost">·</span>
+              <span className="text-[9px] text-app-text-faint">#{task.category}</span>
             </>
           )}
         </div>
       )}
       {task.description && (
-        <p className="text-[10px] leading-relaxed text-white/35 mt-1 whitespace-pre-wrap break-words">
+        <p className="text-[10px] leading-relaxed text-app-text-faint mt-1 whitespace-pre-wrap break-words">
           {task.description}
         </p>
       )}
-      {!hasMeta && !task.description && <p className="text-[9px] text-white/20">상세 정보 없음</p>}
+      {!hasMeta && !task.description && (
+        <p className="text-[9px] text-app-text-ghost">상세 정보 없음</p>
+      )}
 
       <button
         type="button"
         onClick={handleCopy}
-        className="flex items-center gap-1 mt-1.5 px-1.5 py-0.5 rounded text-[9px] text-white/30 hover:text-white/60 hover:bg-white/[0.06] transition-colors"
+        className="flex items-center gap-1 mt-1.5 px-1.5 py-0.5 rounded text-[9px] text-app-text-ghost hover:text-app-text-muted hover:bg-app-hover-bg transition-colors"
         title="태스크 복사"
       >
         {copied ? (

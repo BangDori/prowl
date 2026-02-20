@@ -42,14 +42,14 @@ function MemoryCard({
   };
 
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06] group">
+    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border group">
       {editing ? (
         <div className="space-y-2">
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-sm text-gray-200 resize-none focus:outline-none focus:border-accent/50"
+            className="w-full bg-app-input-bg border border-app-input-border rounded px-2 py-1.5 text-sm text-app-text-primary resize-none focus:outline-none focus:border-accent/50"
             rows={2}
             // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
             autoFocus
@@ -58,7 +58,7 @@ function MemoryCard({
             <button
               type="button"
               onClick={onCancelEdit}
-              className="px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+              className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors"
             >
               Cancel
             </button>
@@ -73,12 +73,14 @@ function MemoryCard({
         </div>
       ) : (
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm text-gray-200 flex-1 whitespace-pre-wrap">{memory.content}</p>
+          <p className="text-sm text-app-text-primary flex-1 whitespace-pre-wrap">
+            {memory.content}
+          </p>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
             <button
               type="button"
               onClick={onEdit}
-              className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-gray-200 transition-colors"
+              className="p-1 rounded hover:bg-app-active-bg text-app-text-muted hover:text-app-text-primary transition-colors"
             >
               <Pencil className="w-3 h-3" />
             </button>
@@ -127,7 +129,7 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="예: 항상 한국어로 대답해줘, 이모지 쓰지마..."
-        className="w-full bg-white/5 border border-white/10 rounded px-2 py-1.5 text-sm text-gray-200 placeholder-gray-500 resize-none focus:outline-none focus:border-accent/50"
+        className="w-full bg-app-input-bg border border-app-input-border rounded px-2 py-1.5 text-sm text-app-text-primary placeholder-app-text-ghost resize-none focus:outline-none focus:border-accent/50"
         rows={2}
         // biome-ignore lint/a11y/noAutofocus: 추가 폼 열릴 때 즉시 입력 가능해야 함
         autoFocus
@@ -136,7 +138,7 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
         <button
           type="button"
           onClick={onClose}
-          className="px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors"
+          className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-app-input-border transition-colors"
         >
           Cancel
         </button>

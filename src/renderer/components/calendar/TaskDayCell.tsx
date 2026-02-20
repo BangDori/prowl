@@ -32,7 +32,7 @@ export default function TaskDayCell({
       onClick={onClick}
       className={`
         relative flex flex-col items-center py-1 transition-colors min-h-[36px]
-        ${selected ? "bg-accent/20 ring-1 ring-accent/40 rounded-md" : "hover:bg-white/5 rounded-md"}
+        ${selected ? "bg-accent/20 ring-1 ring-accent/40 rounded-md" : "hover:bg-app-hover-bg rounded-md"}
         ${!isCurrentMonth ? "opacity-30" : ""}
       `}
     >
@@ -41,7 +41,7 @@ export default function TaskDayCell({
           text-[11px] leading-none w-5 h-5 flex items-center justify-center rounded-full
           ${today ? "bg-accent text-white font-bold" : ""}
           ${selected && !today ? "text-accent font-medium" : ""}
-          ${!selected && !today && isCurrentMonth ? "text-gray-300" : ""}
+          ${!selected && !today && isCurrentMonth ? "text-app-text-secondary" : ""}
         `}
       >
         {date.getDate()}

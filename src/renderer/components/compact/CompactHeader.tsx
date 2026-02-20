@@ -21,14 +21,16 @@ export default function CompactHeader({
       className="flex items-center justify-between px-3.5 h-8 border-b border-prowl-border"
       style={{ WebkitAppRegion: "drag" } as React.CSSProperties}
     >
-      <span className="text-[11px] font-semibold tracking-wide text-white/60">Task Manager</span>
+      <span className="text-[11px] font-semibold tracking-wide text-app-text-secondary">
+        Task Manager
+      </span>
 
       <div className="flex items-center gap-1" style={noDrag}>
         {!minimized && (
           <button
             type="button"
             onClick={onRefresh}
-            className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
+            className="p-1 rounded-md text-app-text-ghost hover:text-app-text-secondary hover:bg-app-hover-bg transition-colors"
           >
             <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
           </button>
@@ -36,14 +38,14 @@ export default function CompactHeader({
         <button
           type="button"
           onClick={onToggleMinimize}
-          className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
+          className="p-1 rounded-md text-app-text-ghost hover:text-app-text-secondary hover:bg-app-hover-bg transition-colors"
         >
           {minimized ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
         </button>
         <button
           type="button"
           onClick={() => window.electronAPI.toggleCompactView()}
-          className="p-1 rounded-md text-white/30 hover:text-white/70 hover:bg-white/[0.06] transition-colors"
+          className="p-1 rounded-md text-app-text-ghost hover:text-app-text-secondary hover:bg-app-hover-bg transition-colors"
         >
           <X className="w-3 h-3" />
         </button>

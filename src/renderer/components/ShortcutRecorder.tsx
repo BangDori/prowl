@@ -80,8 +80,8 @@ export default function ShortcutRecorder({ value, onChange }: ShortcutRecorderPr
           recording
             ? "border-accent bg-accent/10 text-accent animate-pulse"
             : value
-              ? "border-white/10 bg-white/5 text-white/80 hover:bg-white/10"
-              : "border-white/10 bg-white/5 text-white/30 hover:bg-white/10"
+              ? "border-prowl-border bg-app-hover-bg text-app-text-primary hover:bg-app-active-bg"
+              : "border-prowl-border bg-app-hover-bg text-app-text-faint hover:bg-app-active-bg"
         }`}
       >
         {recording ? "Press keys..." : value ? formatAccelerator(value) : "Not set"}
@@ -90,7 +90,7 @@ export default function ShortcutRecorder({ value, onChange }: ShortcutRecorderPr
         <button
           type="button"
           onClick={() => onChange("")}
-          className="p-0.5 rounded text-white/30 hover:text-white/60 transition-colors"
+          className="p-0.5 rounded text-app-text-faint hover:text-app-text-muted transition-colors"
           title="Remove shortcut"
         >
           <X className="w-3.5 h-3.5" />

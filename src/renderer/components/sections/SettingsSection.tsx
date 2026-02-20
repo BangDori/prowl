@@ -107,20 +107,20 @@ export default function SettingsSection() {
       <div className="p-4 space-y-6">
         {/* Night Watch 설정 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Night Watch
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
             <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
           </div>
         </div>
 
         {/* 알림 설정 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Notifications
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-gray-400" />
@@ -136,10 +136,10 @@ export default function SettingsSection() {
 
         {/* API 키 설정 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             API Keys
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
             <div className="flex items-center gap-3">
               <KeyRound className="w-4 h-4 text-gray-400 shrink-0" />
               <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ export default function SettingsSection() {
                 <button
                   type="button"
                   onClick={() => setApiKeyEditing(true)}
-                  className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors shrink-0"
+                  className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors shrink-0"
                 >
                   <Pencil className="w-2.5 h-2.5" />
                   Change
@@ -163,7 +163,7 @@ export default function SettingsSection() {
                     onChange={(e) => setApiKeyInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
                     placeholder="sk-proj-..."
-                    className="w-40 text-[11px] px-2 py-1 rounded bg-black/30 border border-white/[0.08] text-gray-200 placeholder:text-gray-600 outline-none focus:border-accent/50"
+                    className="w-40 text-[11px] px-2 py-1 rounded bg-app-input-bg border border-app-input-border text-app-text-primary placeholder:text-app-text-ghost outline-none focus:border-accent/50"
                   />
                   <button
                     type="button"
@@ -181,10 +181,10 @@ export default function SettingsSection() {
 
         {/* 단축키 설정 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Shortcuts
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
             <ShortcutsPanel
               shortcuts={settings?.shortcuts ?? DEFAULT_SHORTCUTS}
               onUpdate={saveShortcuts}
@@ -194,12 +194,14 @@ export default function SettingsSection() {
 
         {/* 링크 */}
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">Links</h3>
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
+            Links
+          </h3>
           <div className="space-y-2">
             <button
               type="button"
               onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06] text-left"
+              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border text-left"
             >
               <ExternalLink className="w-4 h-4 text-gray-400" />
               <div>
@@ -207,7 +209,7 @@ export default function SettingsSection() {
                 <p className="text-[10px] text-gray-500">View source code and contribute</p>
               </div>
             </button>
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <RefreshCw
@@ -268,7 +270,7 @@ export default function SettingsSection() {
                       </button>
                     ))}
                   {installPhase === "installing" && (
-                    <span className="text-[10px] text-gray-400">Installing...</span>
+                    <span className="text-[10px] text-app-text-muted">Installing...</span>
                   )}
                   {installPhase === "done" && (
                     <button
@@ -283,7 +285,7 @@ export default function SettingsSection() {
                     type="button"
                     onClick={handleCheckForUpdates}
                     disabled={updateChecking || cooldown > 0}
-                    className="px-2 py-1 text-[10px] rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-colors disabled:opacity-50"
+                    className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors disabled:opacity-50"
                   >
                     {updateChecking ? "Checking" : cooldown > 0 ? "Checked" : "Check"}
                   </button>
