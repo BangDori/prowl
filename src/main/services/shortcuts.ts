@@ -2,13 +2,13 @@
 
 import type { IpcResult, ShortcutConfig } from "@shared/types";
 import { globalShortcut } from "electron";
-import { showDashboardWindow, toggleChatWindow, toggleCompactWindow } from "../windows";
+import { toggleChatWindow, toggleCompactWindow, toggleDashboardWindow } from "../windows";
 
 /** 단축키 액션 → 핸들러 매핑 */
 const ACTION_MAP: Record<keyof ShortcutConfig, () => void> = {
   toggleChat: () => toggleChatWindow(),
   toggleTaskManager: () => toggleCompactWindow(),
-  openDashboard: () => showDashboardWindow(),
+  openDashboard: () => toggleDashboardWindow(),
 };
 
 /**
