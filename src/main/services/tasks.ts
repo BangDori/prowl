@@ -224,3 +224,72 @@ export function deleteBacklogTask(taskId: string): void {
   const tasks = readBacklogFile().filter((t) => t.id !== taskId);
   writeBacklogFile(tasks);
 }
+
+// ── Overdue Migration ──────────────────────────────────────────
+
+let overdueTimer: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * 지난 날짜의 미완료 태스크를 백로그(날짜 미정)로 이동
+ * - 과거 날짜: 미완료 태스크 전부 이동
+ * - 오늘 날짜: dueTime이 현재 시각보다 이른 미완료 태스크 이동
+ */
+export function moveOverdueTasksToBacklog(): void {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+  let moved = 0;
+  try {
+    const folder = ensureFolder();
+    const files = readdirSync(folder).filter((f) => DATE_FILE_RE.test(f));
+
+    for (const file of files) {
+      const date = file.replace(".json", "");
+      if (date > today) continue;
+
+      const tasks = readDateFile(date);
+      const toMove: Task[] = [];
+      const toKeep: Task[] = [];
+
+      for (const task of tasks) {
+        if (task.completed) {
+          toKeep.push(task);
+          continue;
+        }
+        if (date < today || (date === today && task.dueTime && task.dueTime < currentTime)) {
+          toMove.push(task);
+        } else {
+          toKeep.push(task);
+        }
+      }
+
+      if (toMove.length > 0) {
+        writeBacklogFile([...readBacklogFile(), ...toMove]);
+        writeDateFile(date, toKeep);
+        moved += toMove.length;
+        console.log(`[Tasks] Moved ${toMove.length} overdue task(s) from ${date} to backlog`);
+      }
+    }
+  } catch (error) {
+    console.error("[Tasks] moveOverdueTasksToBacklog failed:", error);
+  }
+
+  if (moved > 0) console.log(`[Tasks] Total overdue tasks moved to backlog: ${moved}`);
+}
+
+/** 앱 시작 시 즉시 실행 + 60초마다 자동 실행 (dueTime 실시간 감지) */
+export function startOverdueMigrationScheduler(): void {
+  moveOverdueTasksToBacklog();
+  if (!overdueTimer) {
+    overdueTimer = setInterval(moveOverdueTasksToBacklog, 60_000);
+  }
+}
+
+/** 스케줄러 정지 */
+export function stopOverdueMigrationScheduler(): void {
+  if (overdueTimer) {
+    clearInterval(overdueTimer);
+    overdueTimer = null;
+  }
+}
