@@ -81,49 +81,50 @@ function RoomItem({
   return (
     <div className="chat-room-item group">
       <button type="button" onClick={onSelect} className="flex-1 min-w-0 text-left">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1 min-w-0">
-            {room.locked && <Lock className="w-2.5 h-2.5 text-white/40 flex-shrink-0" />}
-            <span className="text-[13px] text-white/90 truncate">{room.title}</span>
-          </div>
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            {unreadCount > 0 && (
-              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-black text-[10px] font-semibold flex items-center justify-center">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-            <span className="text-[10px] text-white/30">{formatRelativeTime(room.updatedAt)}</span>
-          </div>
+        <div className="flex items-center gap-1 min-w-0">
+          {room.locked && <Lock className="w-2.5 h-2.5 text-white/40 flex-shrink-0" />}
+          <span className="text-[13px] text-white/90 truncate">{room.title}</span>
         </div>
         {room.lastMessage && (
           <p className="text-[11px] text-white/40 truncate mt-0.5">{room.lastMessage}</p>
         )}
       </button>
 
-      <div className="hidden group-hover:flex items-center gap-0.5 flex-shrink-0">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleLock();
-          }}
-          className="p-1 rounded text-white/30 hover:text-white/70 transition-colors"
-          title={room.locked ? "잠금 해제" : "삭제 잠금"}
-        >
-          {room.locked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-        </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          disabled={room.locked}
-          className="p-1 rounded text-white/30 hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-white/30"
-          title={room.locked ? "잠금 해제 후 삭제 가능" : "삭제"}
-        >
-          <Trash2 className="w-3 h-3" />
-        </button>
+      <div className="flex flex-col items-end flex-shrink-0">
+        <div className="flex items-center gap-1.5">
+          {unreadCount > 0 && (
+            <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-accent text-black text-[10px] font-semibold flex items-center justify-center">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+          <span className="text-[10px] text-white/30">{formatRelativeTime(room.updatedAt)}</span>
+        </div>
+        <div className="hidden group-hover:flex items-center gap-0.5 mt-0.5">
+          {!room.locked && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="p-1 rounded text-white/30 hover:text-red-400 transition-colors"
+              title="삭제"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleLock();
+            }}
+            className="p-1 rounded text-white/30 hover:text-white/70 transition-colors"
+            title={room.locked ? "잠금 해제" : "삭제 잠금"}
+          >
+            {room.locked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+          </button>
+        </div>
       </div>
     </div>
   );
