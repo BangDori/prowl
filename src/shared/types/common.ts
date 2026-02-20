@@ -22,11 +22,13 @@ export const DEFAULT_FOCUS_MODE: FocusMode = {
 export interface ShortcutConfig {
   toggleChat: string; // Prowl Chat 토글 (빈 문자열 = 비활성화)
   toggleTaskManager: string; // Task Manager 토글 (빈 문자열 = 비활성화)
+  openDashboard: string; // Dashboard 열기 (빈 문자열 = 비활성화)
 }
 
 export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   toggleChat: "CommandOrControl+Shift+P",
   toggleTaskManager: "CommandOrControl+Shift+O",
+  openDashboard: "",
 };
 
 // 앱 설정
