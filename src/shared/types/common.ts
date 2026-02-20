@@ -73,12 +73,23 @@ export interface ProviderStatus {
   models: AiModelOption[];
 }
 
+// 위험 도구 실행 전 사용자 승인 메타데이터
+export interface ToolApprovalMeta {
+  id: string;
+  status: "pending" | "approved" | "rejected";
+  toolName: string;
+  displayName: string;
+  args: Record<string, unknown>;
+}
+
 // 채팅
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: number;
+  /** 위험 도구 승인 요청 메시지일 때 존재 */
+  approval?: ToolApprovalMeta;
 }
 
 // Homebrew 설치 상태

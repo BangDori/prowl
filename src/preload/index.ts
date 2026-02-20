@@ -48,6 +48,8 @@ const electronAPI = {
   resizeChatWindow: invokeIpc("chat:resize"),
   closeChatWindow: invokeIpc("chat:close"),
   toggleChatExpand: invokeIpc("chat:expand-toggle"),
+  approveTool: invokeIpc("chat:approve-tool"),
+  rejectTool: invokeIpc("chat:reject-tool"),
 
   // Compact
   toggleCompactView: invokeIpc("compact:toggle"),

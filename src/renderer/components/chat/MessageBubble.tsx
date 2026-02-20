@@ -1,11 +1,63 @@
 /** 개별 채팅 메시지 버블 컴포넌트 */
 import prowlProfile from "@assets/prowl-profile.png";
-import type { ChatMessage } from "@shared/types";
-import { ArrowUpRight, Check, Copy } from "lucide-react";
+import type { ChatMessage, ToolApprovalMeta } from "@shared/types";
+import { ArrowUpRight, Check, Copy, Play, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+
+/** 도구 실행 승인/거부 버튼 패널 */
+function ApprovalButtons({
+  approval,
+  state,
+  onApprove,
+  onReject,
+}: {
+  approval: ToolApprovalMeta;
+  state: "pending" | "approved" | "rejected";
+  onApprove: () => Promise<void>;
+  onReject: () => Promise<void>;
+}) {
+  if (state === "approved") {
+    return (
+      <div className="mt-2 flex items-center gap-1.5 text-[11px] text-white/40">
+        <Check className="w-3 h-3 text-green-400" />
+        <span>실행됨</span>
+      </div>
+    );
+  }
+
+  if (state === "rejected") {
+    return (
+      <div className="mt-2 flex items-center gap-1.5 text-[11px] text-white/40">
+        <X className="w-3 h-3" />
+        <span>취소됨</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 flex gap-2">
+      <button
+        type="button"
+        onClick={onApprove}
+        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] bg-accent text-black font-medium hover:bg-accent-hover transition-colors"
+      >
+        <Play className="w-3 h-3" />
+        실행
+      </button>
+      <button
+        type="button"
+        onClick={onReject}
+        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[12px] bg-white/10 text-white/70 hover:bg-white/15 transition-colors"
+      >
+        <X className="w-3 h-3" />
+        취소
+      </button>
+    </div>
+  );
+}
 
 /** 채팅 버블용 마크다운 커스텀 컴포넌트 (헤더는 bold로 축소) */
 const markdownComponents = {
@@ -52,6 +104,9 @@ interface MessageBubbleProps {
 export default function MessageBubble({ message, isLastInGroup = true }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
+  const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
+    message.approval?.status ?? "pending",
+  );
   const time = new Date(message.timestamp).toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -96,6 +151,20 @@ export default function MessageBubble({ message, isLastInGroup = true }: Message
             <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
               {message.content}
             </Markdown>
+          )}
+          {message.approval && (
+            <ApprovalButtons
+              approval={message.approval}
+              state={approvalState}
+              onApprove={async () => {
+                setApprovalState("approved");
+                await window.electronAPI.approveTool(message.approval!.id);
+              }}
+              onReject={async () => {
+                setApprovalState("rejected");
+                await window.electronAPI.rejectTool(message.approval!.id);
+              }}
+            />
           )}
           <button
             type="button"

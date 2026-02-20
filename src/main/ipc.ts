@@ -3,6 +3,7 @@ import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { WINDOW } from "./constants";
+import { resolveApproval } from "./services/approval";
 import { runBrewUpgrade } from "./services/brew-updater";
 import { getProviderStatuses, streamChatMessage } from "./services/chat";
 import {
@@ -203,6 +204,17 @@ export function registerIpcHandlers(): void {
   // 채팅 윈도우 전체화면 토글 (isExpanded 반환)
   handleIpc("chat:expand-toggle", async () => {
     return toggleExpandChatWindow();
+  });
+
+  // 도구 실행 승인/거부
+  handleIpc("chat:approve-tool", async (approvalId) => {
+    const ok = resolveApproval(approvalId, true);
+    return { success: ok };
+  });
+
+  handleIpc("chat:reject-tool", async (approvalId) => {
+    const ok = resolveApproval(approvalId, false);
+    return { success: ok };
   });
 
   // 앱 버전 조회
