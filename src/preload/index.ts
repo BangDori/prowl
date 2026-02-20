@@ -147,6 +147,11 @@ const electronAPI = {
     ipcRenderer.on("chat-rooms:unread-changed", handler);
     return () => ipcRenderer.removeListener("chat-rooms:unread-changed", handler);
   },
+  onChatNavigateToRoom: (callback: (roomId: string) => void): (() => void) => {
+    const handler = (_event: unknown, roomId: string) => callback(roomId);
+    ipcRenderer.on("chat:navigate-to-room", handler as never);
+    return () => ipcRenderer.removeListener("chat:navigate-to-room", handler as never);
+  },
 };
 
 // contextBridge로 API 노출
