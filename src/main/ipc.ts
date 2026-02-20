@@ -24,6 +24,15 @@ import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/j
 import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
 import { readLogContent } from "./services/log-reader";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
+import { generateScriptFromPrompt } from "./services/script-ai";
+import { cancelSchedule, refreshSchedule, runScript } from "./services/script-runner";
+import {
+  deleteScriptById,
+  getAllScripts,
+  getScriptById,
+  saveScript,
+  toggleScriptEnabled,
+} from "./services/script-store";
 import {
   getAllJobCustomizations,
   getChatConfig,
@@ -506,5 +515,80 @@ export function registerIpcHandlers(): void {
 
   handleIpc("chat-rooms:unread-counts", async () => {
     return getAllUnreadCounts();
+  });
+
+  // ── Scripts ──────────────────────────────────────────
+
+  handleIpc("scripts:list", async () => {
+    return getAllScripts();
+  });
+
+  handleIpc("scripts:create", async (prompt) => {
+    try {
+      const draft = await generateScriptFromPrompt(prompt);
+      const script = {
+        ...draft,
+        id: `script_${Date.now()}`,
+        isEnabled: true,
+        createdAt: new Date().toISOString(),
+        lastRun: null,
+      };
+      saveScript(script);
+      refreshSchedule(script);
+      return { success: true, script };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("scripts:update", async (id, updates) => {
+    try {
+      const script = getScriptById(id);
+      if (!script) return { success: false, error: "스크립트를 찾을 수 없습니다." };
+      const updated = { ...script, ...updates };
+      saveScript(updated);
+      refreshSchedule(updated);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("scripts:delete", async (id) => {
+    try {
+      cancelSchedule(id);
+      deleteScriptById(id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("scripts:toggle", async (id) => {
+    try {
+      const isEnabled = toggleScriptEnabled(id);
+      const script = getScriptById(id);
+      if (script) refreshSchedule(script);
+      return { success: true, error: isEnabled ? undefined : "비활성화됨" };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("scripts:run", async (id) => {
+    try {
+      const script = getScriptById(id);
+      if (!script) return { success: false, error: "스크립트를 찾을 수 없습니다." };
+      const run = await runScript(script);
+      return { success: run.success, error: run.success ? undefined : run.output };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("scripts:logs", async (id) => {
+    const script = getScriptById(id);
+    if (!script?.lastRun) return [];
+    return [script.lastRun];
   });
 }

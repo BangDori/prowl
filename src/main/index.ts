@@ -5,6 +5,7 @@ import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { updateFocusModeMonitor } from "./services/focus-mode";
+import { initScriptRunner } from "./services/script-runner";
 import { getFocusMode, getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { startTaskReminderScheduler } from "./services/task-reminder";
@@ -30,6 +31,9 @@ if (!gotTheLock) {
 
     // 일정 알림 스케줄러 시작
     startTaskReminderScheduler();
+
+    // 내부 스크립트 스케줄러 시작
+    initScriptRunner();
 
     if (isDev) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
