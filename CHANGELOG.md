@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.31.1] - 2026-02-20
+- 채팅 알림 개선: AI 응답의 모든 메시지를 개별 macOS 알림으로 전송
+
 ## [1.31.0] - 2026-02-20
 - 기한이 지난 미완료 태스크를 날짜 미정(백로그)으로 자동 이동 (앱 시작 시, 60초 인터벌, 조회 시)
 - 날짜 미정 섹션을 캘린더 어젠다 뷰 및 Task Manager 최상단으로 이동
