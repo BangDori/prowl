@@ -35,6 +35,11 @@ export function createSplashWindow(): BrowserWindow {
   const splashPath = path.join(__dirname, "../../../splash.html");
   splashWindow.loadFile(splashPath);
 
+  splashWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+    skipTransformProcessType: true,
+  });
+
   splashWindow.once("ready-to-show", () => {
     splashWindow?.show();
   });

@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.37.1] - 2026-02-20
+- 스플래시 화면이 데스크탑 전환 시 따라오지 않던 문제 수정
+
 ## [1.37.0] - 2026-02-20
 - Prowl Chat HTML 구조화 출력 UI 추가: AI 응답에 `<prowl-ui>` 태그 포함 시 전체화면에서 좌(채팅)/우(HTML 프리뷰) 분할 레이아웃으로 전환
 - HTML 프리뷰 패널 X 버튼으로 패널만 닫기 (전체화면 유지)
