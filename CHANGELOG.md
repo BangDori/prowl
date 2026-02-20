@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.32.0] - 2026-02-20
+- 내부 Script Library 추가: 자연어로 스크립트와 스케줄을 동시에 생성 (launchd 독립)
+- daily/weekly/interval/manual 스케줄 지원, 앱 내부 Node.js 스케줄러로 실행
+- 스크립트 데이터를 `~/.prowl/scripts.json`에 저장하여 다른 데이터와 경로 통일
+- Script Library 툴바에서 파일 위치 Finder 열기 지원
+
 ## [1.31.1] - 2026-02-20
 - 채팅 알림 개선: AI 응답의 모든 메시지를 개별 macOS 알림으로 전송
 
