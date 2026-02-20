@@ -67,8 +67,7 @@ export default function ScriptsSection() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* 툴바 */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-prowl-border">
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-2">
         <span className="text-xs text-gray-500">{scripts.length}개 스크립트</span>
         <div className="flex items-center gap-1">
           <button
