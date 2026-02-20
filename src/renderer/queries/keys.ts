@@ -37,6 +37,11 @@ export const queryKeys = {
     all: ["memory"] as const,
     list: () => [...queryKeys.memory.all, "list"] as const,
   },
+  scripts: {
+    all: ["scripts"] as const,
+    list: () => [...queryKeys.scripts.all, "list"] as const,
+    logs: (id: string) => [...queryKeys.scripts.all, "logs", id] as const,
+  },
   chatRooms: {
     all: ["chatRooms"] as const,
     list: () => [...queryKeys.chatRooms.all, "list"] as const,
