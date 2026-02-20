@@ -1,10 +1,17 @@
 /** 파일 기반 태스크 조회 및 mutation 훅 */
 import type { Task, TasksByDate } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { queryKeys } from "../queries/keys";
 
 export function useTaskData(year: number, month: number) {
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    return window.electronAPI.onTasksChanged(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    });
+  }, [queryClient]);
 
   const {
     data: tasksByDate = {} as TasksByDate,
