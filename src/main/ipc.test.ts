@@ -10,22 +10,9 @@ vi.mock("electron", () => ({
   },
 }));
 
-vi.mock("./services/launchd", () => ({
-  listAllJobs: vi.fn(),
-  findJobById: vi.fn(),
-  toggleJob: vi.fn(),
-  startJob: vi.fn(),
-}));
-
-vi.mock("./services/log-reader", () => ({
-  readLogContent: vi.fn(),
-}));
-
 vi.mock("./services/settings", () => ({
   getSettings: vi.fn(),
   setSettings: vi.fn(),
-  getAllJobCustomizations: vi.fn(),
-  setJobCustomization: vi.fn(),
   getFocusMode: vi.fn(),
   setFocusMode: vi.fn(),
   getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-4o" }),
@@ -52,20 +39,10 @@ import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
 import { streamChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
-import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
-import { readLogContent } from "./services/log-reader";
-import {
-  getAllJobCustomizations,
-  getSettings,
-  setFocusMode,
-  setJobCustomization,
-  setSettings,
-} from "./services/settings";
+import { getSettings, setFocusMode, setSettings } from "./services/settings";
 import { closeChatWindow, getSubWindow, resizeChatWindow } from "./windows";
 
 const mockIpcHandle = vi.mocked(ipcMain.handle);
-const mockFindJobById = vi.mocked(findJobById);
-const mockListAllJobs = vi.mocked(listAllJobs);
 
 // 핸들러를 채널명으로 추출하는 헬퍼
 function getHandler(channel: string): (...args: unknown[]) => Promise<unknown> {
@@ -82,128 +59,14 @@ describe("registerIpcHandlers", () => {
 
   it("모든 IPC 채널을 등록한다", () => {
     const channels = mockIpcHandle.mock.calls.map((c) => c[0]);
-    expect(channels).toContain("jobs:list");
-    expect(channels).toContain("jobs:refresh");
-    expect(channels).toContain("jobs:toggle");
-    expect(channels).toContain("jobs:run");
-    expect(channels).toContain("jobs:logs");
     expect(channels).toContain("settings:get");
     expect(channels).toContain("settings:set");
     expect(channels).toContain("shell:showInFolder");
     expect(channels).toContain("shell:openExternal");
-    expect(channels).toContain("jobs:getCustomizations");
-    expect(channels).toContain("jobs:setCustomization");
     expect(channels).toContain("focusMode:get");
     expect(channels).toContain("focusMode:set");
     expect(channels).toContain("window:resize");
     expect(channels).toContain("app:quit");
-  });
-
-  describe("jobs:list", () => {
-    it("listAllJobs를 호출한다", async () => {
-      mockListAllJobs.mockReturnValue([]);
-      const handler = getHandler("jobs:list");
-      const result = await handler({});
-      expect(result).toEqual([]);
-      expect(listAllJobs).toHaveBeenCalled();
-    });
-  });
-
-  describe("jobs:toggle", () => {
-    it("작업을 찾을 수 없으면 실패를 반환한다", async () => {
-      mockFindJobById.mockReturnValue(null);
-      const handler = getHandler("jobs:toggle");
-      const result = await handler({}, "nonexistent");
-      expect(result).toEqual({ success: false, message: "작업을 찾을 수 없습니다." });
-    });
-
-    it("작업을 찾으면 toggleJob을 호출한다", async () => {
-      mockFindJobById.mockReturnValue({
-        id: "com.test",
-        label: "com.test",
-        plistPath: "/path.plist",
-      } as ReturnType<typeof findJobById>);
-      vi.mocked(toggleJob).mockReturnValue({ success: true, message: "ok" });
-
-      const handler = getHandler("jobs:toggle");
-      await handler({}, "com.test");
-
-      expect(toggleJob).toHaveBeenCalledWith("/path.plist", "com.test");
-    });
-  });
-
-  describe("jobs:run", () => {
-    it("작업을 찾을 수 없으면 실패를 반환한다", async () => {
-      mockFindJobById.mockReturnValue(null);
-      const handler = getHandler("jobs:run");
-      const result = await handler({}, "nonexistent");
-      expect(result).toEqual({ success: false, message: "작업을 찾을 수 없습니다." });
-    });
-
-    it("비활성화 상태이면 실패를 반환한다", async () => {
-      mockFindJobById.mockReturnValue({
-        id: "com.test",
-        label: "com.test",
-        isLoaded: false,
-      } as ReturnType<typeof findJobById>);
-
-      const handler = getHandler("jobs:run");
-      const result = await handler({}, "com.test");
-      expect(result).toEqual({
-        success: false,
-        message: "작업이 비활성화 상태입니다. 먼저 활성화해주세요.",
-      });
-    });
-
-    it("활성화 상태이면 startJob을 호출한다", async () => {
-      mockFindJobById.mockReturnValue({
-        id: "com.test",
-        label: "com.test",
-        isLoaded: true,
-      } as ReturnType<typeof findJobById>);
-      vi.mocked(startJob).mockReturnValue({ success: true, message: "시작됨" });
-
-      const handler = getHandler("jobs:run");
-      await handler({}, "com.test");
-
-      expect(startJob).toHaveBeenCalledWith("com.test");
-    });
-  });
-
-  describe("jobs:logs", () => {
-    it("작업을 찾을 수 없으면 에러 메시지를 반환한다", async () => {
-      mockFindJobById.mockReturnValue(null);
-      const handler = getHandler("jobs:logs");
-      const result = await handler({}, "nonexistent");
-      expect(result).toEqual({ content: "작업을 찾을 수 없습니다.", lastModified: null });
-    });
-
-    it("logPath가 없으면 안내 메시지를 반환한다", async () => {
-      mockFindJobById.mockReturnValue({
-        id: "com.test",
-        logPath: null,
-      } as ReturnType<typeof findJobById>);
-
-      const handler = getHandler("jobs:logs");
-      const result = await handler({}, "com.test");
-      expect(result).toEqual({
-        content: "이 작업은 로그 파일이 설정되지 않았습니다.",
-        lastModified: null,
-      });
-    });
-
-    it("logPath가 있으면 readLogContent를 호출한다", async () => {
-      mockFindJobById.mockReturnValue({
-        id: "com.test",
-        logPath: "/tmp/test.log",
-      } as ReturnType<typeof findJobById>);
-      vi.mocked(readLogContent).mockReturnValue({ content: "log data", lastModified: null });
-
-      const handler = getHandler("jobs:logs");
-      await handler({}, "com.test", 100);
-
-      expect(readLogContent).toHaveBeenCalledWith("/tmp/test.log", 100);
-    });
   });
 
   describe("settings:get / settings:set", () => {
@@ -246,24 +109,6 @@ describe("registerIpcHandlers", () => {
 
       expect(setFocusMode).toHaveBeenCalledWith(fm);
       expect(updateFocusModeMonitor).toHaveBeenCalledWith(fm);
-    });
-  });
-
-  describe("jobs:getCustomizations", () => {
-    it("getAllJobCustomizations를 호출한다", async () => {
-      vi.mocked(getAllJobCustomizations).mockReturnValue({ "com.test": { displayName: "테스트" } });
-      const handler = getHandler("jobs:getCustomizations");
-      const result = await handler({});
-      expect(getAllJobCustomizations).toHaveBeenCalled();
-      expect(result).toEqual({ "com.test": { displayName: "테스트" } });
-    });
-  });
-
-  describe("jobs:setCustomization", () => {
-    it("setJobCustomization을 호출한다", async () => {
-      const handler = getHandler("jobs:setCustomization");
-      await handler({}, "com.test", { displayName: "새이름" });
-      expect(setJobCustomization).toHaveBeenCalledWith("com.test", { displayName: "새이름" });
     });
   });
 

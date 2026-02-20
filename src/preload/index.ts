@@ -17,16 +17,6 @@ function invokeIpc<C extends IpcChannel>(
  * 렌더러 프로세스에 노출할 API
  */
 const electronAPI = {
-  // Jobs
-  listJobs: invokeIpc("jobs:list"),
-  refreshJobs: invokeIpc("jobs:refresh"),
-  toggleJob: invokeIpc("jobs:toggle"),
-  runJob: invokeIpc("jobs:run"),
-  getRunningJobs: invokeIpc("jobs:running"),
-  getJobLogs: invokeIpc("jobs:logs"),
-  getJobCustomizations: invokeIpc("jobs:getCustomizations"),
-  setJobCustomization: invokeIpc("jobs:setCustomization"),
-
   // Settings
   getSettings: invokeIpc("settings:get"),
   setSettings: invokeIpc("settings:set"),

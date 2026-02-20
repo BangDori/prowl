@@ -1,26 +1,18 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Bot, Brain, Cog, History, LayoutDashboard, ListTodo, Terminal } from "lucide-react";
+import { Bot, Brain, Cog, History, ListTodo, Terminal } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
-import JobsSection from "./sections/JobsSection";
 import MemorySection from "./sections/MemorySection";
 import ScriptsSection from "./sections/ScriptsSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem =
-  | "jobs"
-  | "scripts"
-  | "calendar"
-  | "memory"
-  | "changelog"
-  | "settings"
-  | "claude-config";
+type NavItem = "scripts" | "calendar" | "memory" | "changelog" | "settings" | "claude-config";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -68,7 +60,7 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
  * - SettingsSection: 앱 설정 (Night Watch 포함)
  */
 export default function DashboardLayout() {
-  const [activeNav, setActiveNav] = useState<NavItem>("jobs");
+  const [activeNav, setActiveNav] = useState<NavItem>("scripts");
 
   return (
     <div className="flex h-screen bg-transparent text-gray-100">
@@ -87,12 +79,6 @@ export default function DashboardLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 px-2 space-y-1">
-          <SidebarItem
-            icon={<LayoutDashboard className="w-4 h-4" />}
-            label="Background Monitor"
-            active={activeNav === "jobs"}
-            onClick={() => setActiveNav("jobs")}
-          />
           <SidebarItem
             icon={<Terminal className="w-4 h-4" />}
             label="Script Library"
@@ -138,11 +124,6 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 min-w-0">
         <div className="h-full overflow-hidden relative">
-          <div className={`h-full ${activeNav === "jobs" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Background Monitor">
-              <JobsSection />
-            </ErrorBoundary>
-          </div>
           <div className={`h-full ${activeNav === "scripts" ? "" : "hidden"}`}>
             <ErrorBoundary section="Script Library">
               <ScriptsSection />

@@ -15,15 +15,7 @@ vi.mock("electron-store", () => ({
 }));
 
 import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "@shared/types";
-import {
-  getAllJobCustomizations,
-  getFocusMode,
-  getPatterns,
-  getSettings,
-  setFocusMode,
-  setJobCustomization,
-  setSettings,
-} from "./settings";
+import { getFocusMode, getSettings, setFocusMode, setSettings } from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {
@@ -55,14 +47,6 @@ describe("settings 서비스", () => {
     });
   });
 
-  describe("getPatterns", () => {
-    it("settings에서 patterns 배열을 반환한다", () => {
-      mockGet.mockReturnValue({ patterns: ["com.claude.*"], focusMode: DEFAULT_FOCUS_MODE });
-
-      expect(getPatterns()).toEqual(["com.claude.*"]);
-    });
-  });
-
   describe("getFocusMode", () => {
     it("focusMode가 있으면 반환한다", () => {
       const fm = { enabled: true, startTime: "22:00", endTime: "07:00" };
@@ -89,29 +73,6 @@ describe("settings 서비스", () => {
       expect(mockSet).toHaveBeenCalledWith("settings", {
         patterns: ["com.test.*"],
         focusMode: newFm,
-      });
-    });
-  });
-
-  describe("getAllJobCustomizations", () => {
-    it("저장된 커스터마이징을 반환한다", () => {
-      const customs = { "com.test.job": { displayName: "테스트" } };
-      mockGet.mockReturnValue(customs);
-
-      expect(getAllJobCustomizations()).toEqual(customs);
-    });
-  });
-
-  describe("setJobCustomization", () => {
-    it("특정 작업의 커스터마이징을 저장한다", () => {
-      const existing = { "com.old.job": { displayName: "기존" } };
-      mockGet.mockReturnValue(existing);
-
-      setJobCustomization("com.new.job", { displayName: "신규" });
-
-      expect(mockSet).toHaveBeenCalledWith("jobCustomizations", {
-        "com.old.job": { displayName: "기존" },
-        "com.new.job": { displayName: "신규" },
       });
     });
   });

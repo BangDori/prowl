@@ -8,11 +8,6 @@ import type {
   ClaudeConfig,
   FocusMode,
   IpcResult,
-  JobActionResult,
-  JobCustomization,
-  JobCustomizations,
-  LaunchdJob,
-  LogContent,
   Memory,
   ProviderStatus,
   ProwlScript,
@@ -35,19 +30,6 @@ import type {
  * → renderer 타입은 자동 반영됨
  */
 export interface IpcInvokeSchema {
-  // Jobs (8 channels)
-  "jobs:list": { params: []; return: LaunchdJob[] };
-  "jobs:refresh": { params: []; return: LaunchdJob[] };
-  "jobs:toggle": { params: [jobId: string]; return: JobActionResult };
-  "jobs:run": { params: [jobId: string]; return: JobActionResult };
-  "jobs:running": { params: []; return: string[] };
-  "jobs:logs": { params: [jobId: string, lines?: number]; return: LogContent };
-  "jobs:getCustomizations": { params: []; return: JobCustomizations };
-  "jobs:setCustomization": {
-    params: [jobId: string, customization: JobCustomization];
-    return: IpcResult;
-  };
-
   // Settings (2 channels)
   "settings:get": { params: []; return: AppSettings };
   "settings:set": { params: [settings: AppSettings]; return: IpcResult };

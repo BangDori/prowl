@@ -2,7 +2,7 @@
 import { app, ipcMain, shell } from "electron";
 import type { IpcChannel, IpcParams, IpcReturn } from "../shared/ipc-schema";
 import { DEFAULT_SHORTCUTS } from "../shared/types";
-import { LOG_LINES_DEFAULT, WINDOW } from "./constants";
+import { WINDOW } from "./constants";
 import { runBrewUpgrade } from "./services/brew-updater";
 import { getProviderStatuses, streamChatMessage } from "./services/chat";
 import {
@@ -21,9 +21,6 @@ import {
 } from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
-import { getRunningJobIds, isJobRunning, startMonitoringJob } from "./services/job-monitor";
-import { findJobById, listAllJobs, startJob, toggleJob } from "./services/launchd";
-import { readLogContent } from "./services/log-reader";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
 import { generateScriptFromPrompt } from "./services/script-ai";
 import { cancelSchedule, refreshSchedule, runScript } from "./services/script-runner";
@@ -36,13 +33,11 @@ import {
   toggleScriptEnabled,
 } from "./services/script-store";
 import {
-  getAllJobCustomizations,
   getChatConfig,
   getFocusMode,
   getSettings,
   setChatConfig,
   setFocusMode,
-  setJobCustomization,
   setSettings,
 } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
@@ -97,76 +92,6 @@ function handleIpc<C extends IpcChannel>(
  * IPC 핸들러 등록
  */
 export function registerIpcHandlers(): void {
-  // 작업 목록 조회
-  handleIpc("jobs:list", async () => {
-    return listAllJobs();
-  });
-
-  // 작업 목록 새로고침 (list와 동일하지만 명시적)
-  handleIpc("jobs:refresh", async () => {
-    return listAllJobs();
-  });
-
-  // 작업 토글 (활성화/비활성화)
-  handleIpc("jobs:toggle", async (jobId) => {
-    const job = findJobById(jobId);
-    if (!job) {
-      return { success: false, message: "작업을 찾을 수 없습니다." };
-    }
-    return toggleJob(job.plistPath, job.label);
-  });
-
-  // 작업 수동 실행
-  handleIpc("jobs:run", async (jobId) => {
-    const job = findJobById(jobId);
-    if (!job) {
-      return { success: false, message: "작업을 찾을 수 없습니다." };
-    }
-    if (!job.isLoaded) {
-      return {
-        success: false,
-        message: "작업이 비활성화 상태입니다. 먼저 활성화해주세요.",
-      };
-    }
-    if (isJobRunning(jobId)) {
-      return {
-        success: false,
-        message: "작업이 이미 실행 중입니다.",
-      };
-    }
-    const result = startJob(job.label);
-
-    // Job 완료 모니터링 시작 (알림용)
-    if (result.success) {
-      startMonitoringJob(job.id, job.name, job.logPath);
-    }
-
-    return result;
-  });
-
-  // 실행 중인 작업 ID 목록 조회
-  handleIpc("jobs:running", async () => {
-    return getRunningJobIds();
-  });
-
-  // 로그 조회
-  handleIpc("jobs:logs", async (jobId, lines = LOG_LINES_DEFAULT) => {
-    const job = findJobById(jobId);
-    if (!job) {
-      return {
-        content: "작업을 찾을 수 없습니다.",
-        lastModified: null,
-      };
-    }
-    if (!job.logPath) {
-      return {
-        content: "이 작업은 로그 파일이 설정되지 않았습니다.",
-        lastModified: null,
-      };
-    }
-    return readLogContent(job.logPath, lines);
-  });
-
   // 설정 조회
   handleIpc("settings:get", async () => {
     return getSettings();
@@ -194,21 +119,6 @@ export function registerIpcHandlers(): void {
   // 외부 URL 열기
   handleIpc("shell:openExternal", async (url) => {
     shell.openExternal(url);
-  });
-
-  // 모든 작업 커스터마이징 조회
-  handleIpc("jobs:getCustomizations", async () => {
-    return getAllJobCustomizations();
-  });
-
-  // 작업 커스터마이징 저장
-  handleIpc("jobs:setCustomization", async (jobId, customization) => {
-    try {
-      setJobCustomization(jobId, customization);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
   });
 
   // 집중 모드 조회
