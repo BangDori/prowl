@@ -64,8 +64,8 @@ bun run lint       # biome 린트
 ## Conventions
 
 - 커밋: `.claude/commands/commit.md` 규칙 우선
-- UI: `.claude/skills/design-system.md`
-- IPC 추가/수정: `.claude/skills/ipc-development.md`
-- 데이터 페칭 패턴: `.claude/skills/data-fetching.md`
+- UI: `.claude/skills/design-system/SKILL.md`
+- IPC 추가/수정: `.claude/skills/ipc-development/SKILL.md`
+- 데이터 페칭 패턴: `.claude/skills/data-fetching/SKILL.md`
 - 네이밍: `docs/naming-convention.md`
 - 컴포넌트 패턴: `docs/component-patterns.md`
