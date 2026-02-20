@@ -79,6 +79,10 @@ export default function ChatConversation({
   const unreadDividerMsgId = useRef<string | null>(null);
   const hasMarkedRead = useRef(false);
 
+  const [splitRatio, setSplitRatio] = useState(0.5);
+  const [isDragging, setIsDragging] = useState(false);
+  const splitWrapperRef = useRef<HTMLDivElement>(null);
+
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
   if (prevRoomId !== roomId) {
@@ -271,6 +275,32 @@ export default function ChatConversation({
     }
   }, [isSplitView, isExpanded, htmlContent, onToggleExpand]);
 
+  const handleDividerMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const wrapper = splitWrapperRef.current;
+    if (!wrapper) return;
+    setIsDragging(true);
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+
+    const handleMouseMove = (moveE: MouseEvent) => {
+      const rect = wrapper.getBoundingClientRect();
+      const ratio = (moveE.clientX - rect.left) / rect.width;
+      setSplitRatio(Math.min(Math.max(ratio, 0.2), 0.8));
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  }, []);
+
   const chatArea = (
     <>
       {/* 대화 영역 */}
@@ -392,8 +422,15 @@ export default function ChatConversation({
 
   if (isSplitView) {
     return (
-      <div className="chat-split-wrapper">
-        <div className="chat-split-left">{chatArea}</div>
+      <div
+        ref={splitWrapperRef}
+        className={`chat-split-wrapper${isDragging ? " is-dragging" : ""}`}
+      >
+        <div className="chat-split-left" style={{ width: `${splitRatio * 100}%` }}>
+          {chatArea}
+        </div>
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
+        <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
         <HtmlPreviewPanel html={htmlContent} onClose={() => setDismissedHtml(htmlContent)} />
       </div>
     );
