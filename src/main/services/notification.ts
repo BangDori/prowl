@@ -57,14 +57,14 @@ export function sendJobNotification({ jobName, success, message }: JobNotificati
 /**
  * 채팅 새 메시지 알림 발송
  */
-export function sendChatNotification(): void {
+export function sendChatNotification(message: string): void {
   if (!checkNotificationSupport() || !isNotificationsEnabled()) {
     return;
   }
 
   const notification = new Notification({
     title: "Prowl",
-    body: "Prowl이 보낸 메시지",
+    body: message,
     silent: false,
   });
 

@@ -219,7 +219,10 @@ function persistAfterStream(
   const allMessages = [...history, ...aiMessages];
   saveChatMessages(roomId, allMessages);
   updateTrayBadge();
-  if (!isChatWindowActive()) sendChatNotification();
+  if (!isChatWindowActive() && aiMessages.length > 0) {
+    const lastMessage = aiMessages[aiMessages.length - 1].content;
+    sendChatNotification(lastMessage);
+  }
 }
 
 /** OpenAI 프로바이더의 API 키 상태와 사용 가능 모델 목록 반환 */
