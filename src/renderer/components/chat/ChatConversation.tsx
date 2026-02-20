@@ -3,7 +3,7 @@ import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Plus, Send, X } from "lucide-react";
+import { ChevronLeft, Maximize2, Minimize2, Plus, Send, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   useChatRoom,
@@ -33,6 +33,8 @@ interface ChatConversationProps {
   initialMessage?: string | null;
   onBack: () => void;
   onNewChat: () => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
 export default function ChatConversation({
@@ -40,6 +42,8 @@ export default function ChatConversation({
   initialMessage,
   onBack,
   onNewChat,
+  isExpanded,
+  onToggleExpand,
 }: ChatConversationProps) {
   const queryClient = useQueryClient();
   const { data: roomData } = useChatRoom(roomId);
@@ -249,6 +253,8 @@ export default function ChatConversation({
             title={roomData?.title}
             onBack={onBack}
             onClose={() => window.electronAPI.closeChatWindow()}
+            isExpanded={isExpanded}
+            onToggleExpand={onToggleExpand}
           />
           <div className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
@@ -283,13 +289,27 @@ export default function ChatConversation({
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <button
-              type="button"
-              onClick={() => window.electronAPI.closeChatWindow()}
-              className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-0.5">
+              <button
+                type="button"
+                onClick={onToggleExpand}
+                title={isExpanded ? "기본 크기로" : "전체화면"}
+                className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+              >
+                {isExpanded ? (
+                  <Minimize2 className="w-3.5 h-3.5" />
+                ) : (
+                  <Maximize2 className="w-3.5 h-3.5" />
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => window.electronAPI.closeChatWindow()}
+                className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
           <div className="flex-1" />
           <div className="relative flex justify-end pr-0 z-10">
@@ -340,15 +360,19 @@ export default function ChatConversation({
   );
 }
 
-/** 대화 헤더 (뒤로가기 + 제목 + 닫기) */
+/** 대화 헤더 (뒤로가기 + 제목 + 전체화면 + 닫기) */
 function ConversationHeader({
   title,
   onBack,
   onClose,
+  isExpanded,
+  onToggleExpand,
 }: {
   title?: string;
   onBack: () => void;
   onClose: () => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }) {
   return (
     <div className="flex items-center justify-between px-3 py-2">
@@ -360,13 +384,27 @@ function ConversationHeader({
         <ChevronLeft className="w-4 h-4" />
       </button>
       <span className="text-[12px] text-white/50 truncate max-w-[60%]">{title || "새 대화"}</span>
-      <button
-        type="button"
-        onClick={onClose}
-        className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-      >
-        <X className="w-3.5 h-3.5" />
-      </button>
+      <div className="flex items-center gap-0.5">
+        <button
+          type="button"
+          onClick={onToggleExpand}
+          title={isExpanded ? "기본 크기로" : "전체화면"}
+          className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+        >
+          {isExpanded ? (
+            <Minimize2 className="w-3.5 h-3.5" />
+          ) : (
+            <Maximize2 className="w-3.5 h-3.5" />
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

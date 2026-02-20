@@ -2,7 +2,7 @@
 import prowlLying from "@assets/prowl-lying.png";
 import type { ChatConfig, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { Send, X } from "lucide-react";
+import { Maximize2, Minimize2, Send, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChatRooms } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";
@@ -23,9 +23,16 @@ function getRandomPlaceholder(): string {
 interface ChatLobbyProps {
   onSelectRoom: (roomId: string) => void;
   onSendMessage: (content: string) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
-export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProps) {
+export default function ChatLobby({
+  onSelectRoom,
+  onSendMessage,
+  isExpanded,
+  onToggleExpand,
+}: ChatLobbyProps) {
   const queryClient = useQueryClient();
   const { data: rooms = [] } = useChatRooms();
   const [input, setInput] = useState("");
@@ -98,13 +105,27 @@ export default function ChatLobby({ onSelectRoom, onSendMessage }: ChatLobbyProp
         {/* 헤더 */}
         <div className="chat-room-header">
           <span className="text-[13px] font-medium text-white/90">Prowl Chat</span>
-          <button
-            type="button"
-            onClick={() => window.electronAPI.closeChatWindow()}
-            className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={onToggleExpand}
+              title={isExpanded ? "기본 크기로" : "전체화면"}
+              className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+            >
+              {isExpanded ? (
+                <Minimize2 className="w-3.5 h-3.5" />
+              ) : (
+                <Maximize2 className="w-3.5 h-3.5" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => window.electronAPI.closeChatWindow()}
+              className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* 대화방 목록 */}

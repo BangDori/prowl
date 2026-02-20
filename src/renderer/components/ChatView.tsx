@@ -1,5 +1,5 @@
 /** AI 채팅 인터페이스 뷰 (로비/대화 내비게이션) */
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useCreateChatRoom } from "../hooks/useChatRooms";
 import ChatConversation from "./chat/ChatConversation";
 import ChatLobby from "./chat/ChatLobby";
@@ -7,7 +7,25 @@ import ChatLobby from "./chat/ChatLobby";
 export default function ChatView() {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const createRoom = useCreateChatRoom();
+
+  const handleToggleExpand = useCallback(async () => {
+    const expanded = await window.electronAPI.toggleChatExpand();
+    setIsExpanded(expanded);
+  }, []);
+
+  // Cmd+Enter: 전체화면 토글
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        handleToggleExpand();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleToggleExpand]);
 
   /** 로비에서 메시지 전송 시: 룸 생성 → 대화 진입 (초기 메시지 전달) */
   const handleSendFromLobby = useCallback(
@@ -33,16 +51,23 @@ export default function ChatView() {
   }, []);
 
   return (
-    <div className="chat-floating-root">
+    <div className={`chat-floating-root${isExpanded ? " expanded" : ""}`}>
       {selectedRoomId ? (
         <ChatConversation
           roomId={selectedRoomId}
           initialMessage={pendingMessage}
           onBack={handleBack}
           onNewChat={handleNewChat}
+          isExpanded={isExpanded}
+          onToggleExpand={handleToggleExpand}
         />
       ) : (
-        <ChatLobby onSelectRoom={setSelectedRoomId} onSendMessage={handleSendFromLobby} />
+        <ChatLobby
+          onSelectRoom={setSelectedRoomId}
+          onSendMessage={handleSendFromLobby}
+          isExpanded={isExpanded}
+          onToggleExpand={handleToggleExpand}
+        />
       )}
     </div>
   );

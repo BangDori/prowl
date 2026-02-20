@@ -47,6 +47,7 @@ const electronAPI = {
   getChatProviders: invokeIpc("chat:providers"),
   resizeChatWindow: invokeIpc("chat:resize"),
   closeChatWindow: invokeIpc("chat:close"),
+  toggleChatExpand: invokeIpc("chat:expand-toggle"),
 
   // Compact
   toggleCompactView: invokeIpc("compact:toggle"),

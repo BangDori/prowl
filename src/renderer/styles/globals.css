@@ -340,6 +340,36 @@ select.input-field {
 }
 
 /* ============================================
+   채팅 전체화면 상태
+   ============================================ */
+
+.chat-floating-root.expanded .chat-messages-area {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.chat-floating-root.expanded .chat-lobby {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.chat-floating-root.expanded .chat-input-bar {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.chat-floating-root.expanded .chat-messages-area + .chat-input-bar,
+.chat-floating-root.expanded .chat-lobby + .chat-input-bar {
+  border-radius: 0;
+}
+
+/* ============================================
    대시보드 윈도우 드래그 영역
    ============================================ */
 

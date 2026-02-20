@@ -4,6 +4,8 @@ import { BrowserWindow, screen } from "electron";
 import { CHAT_WINDOW, DEV_SERVER_PORT } from "../constants";
 
 let chatWindow: BrowserWindow | null = null;
+let isExpanded = false;
+let savedBounds: import("electron").Rectangle | null = null;
 
 const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -24,6 +26,13 @@ export function showChatWindow(): void {
   const y = dispY + fullH - CHAT_WINDOW.EXPANDED_HEIGHT - CHAT_WINDOW.BOTTOM_MARGIN;
 
   if (chatWindow && !chatWindow.isDestroyed()) {
+    // 전체화면 상태라면 기본 크기로 복귀
+    if (isExpanded) {
+      isExpanded = false;
+      savedBounds = null;
+      chatWindow.setMovable(true);
+      chatWindow.setSize(CHAT_WINDOW.WIDTH, CHAT_WINDOW.EXPANDED_HEIGHT);
+    }
     chatWindow.setPosition(x, y);
     chatWindow.setOpacity(1);
     chatWindow.setIgnoreMouseEvents(false);
@@ -62,6 +71,8 @@ export function showChatWindow(): void {
   chatWindow.once("ready-to-show", () => chatWindow?.show());
   chatWindow.on("closed", () => {
     chatWindow = null;
+    isExpanded = false;
+    savedBounds = null;
   });
 }
 
@@ -91,6 +102,7 @@ export function isChatWindowActive(): boolean {
 
 export function resizeChatWindow(height: number): void {
   if (!chatWindow || chatWindow.isDestroyed()) return;
+  if (isExpanded) return; // 전체화면 상태에서는 리사이즈 무시
 
   const clamped = Math.min(Math.max(height, CHAT_WINDOW.INPUT_HEIGHT), CHAT_WINDOW.EXPANDED_HEIGHT);
   const [currentW, currentH] = chatWindow.getSize();
@@ -100,4 +112,32 @@ export function resizeChatWindow(height: number): void {
   const newY = currentY + (currentH - clamped);
 
   chatWindow.setBounds({ x: currentX, y: newY, width: currentW, height: clamped });
+}
+
+/** 채팅 윈도우 전체화면 토글. 전환 후 isExpanded 상태를 반환한다. */
+export function toggleExpandChatWindow(): boolean {
+  if (!chatWindow || chatWindow.isDestroyed()) return false;
+
+  if (!isExpanded) {
+    savedBounds = chatWindow.getBounds();
+    const cursor = screen.getCursorScreenPoint();
+    const display = screen.getDisplayNearestPoint(cursor);
+    chatWindow.setMovable(false);
+    chatWindow.setBounds(display.workArea, true);
+    isExpanded = true;
+  } else {
+    if (savedBounds) {
+      chatWindow.setBounds(savedBounds, true);
+      savedBounds = null;
+    }
+    chatWindow.setMovable(true);
+    isExpanded = false;
+  }
+
+  return isExpanded;
+}
+
+/** 채팅 윈도우 전체화면 여부 반환 */
+export function isChatWindowExpanded(): boolean {
+  return isExpanded;
 }
