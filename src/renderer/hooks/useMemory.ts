@@ -1,9 +1,24 @@
 /** Memory CRUD 훅 (TanStack Query) */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { queryKeys } from "../queries/keys";
 
 /** 전체 메모리 조회 */
 export function useMemories() {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    return window.electronAPI.onMemoryChanged(() => {
+      qc.invalidateQueries({ queryKey: queryKeys.memory.all });
+    });
+  }, [qc]);
+
+  useEffect(() => {
+    return window.electronAPI.onWindowShow(() => {
+      qc.invalidateQueries({ queryKey: queryKeys.memory.all });
+    });
+  }, [qc]);
+
   return useQuery({
     queryKey: queryKeys.memory.list(),
     queryFn: () => window.electronAPI.listMemories(),

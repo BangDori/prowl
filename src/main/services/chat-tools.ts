@@ -35,6 +35,14 @@ function sendToChat(channel: string, ...args: unknown[]): void {
   }
 }
 
+/** 대시보드에 메모리 변경 알림 */
+function notifyMemoryChanged(): void {
+  const win = getDashboardWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send("memory:changed");
+  }
+}
+
 /** Task Manager(Compact View) + 대시보드에 태스크 변경 알림 */
 function notifyTasksChanged(): void {
   for (const win of [getCompactWindow(), getDashboardWindow()]) {
@@ -261,6 +269,7 @@ const save_memory = tool({
   execute: async ({ content }) => {
     try {
       const memory = addMemory(content);
+      notifyMemoryChanged();
       return { success: true, memory };
     } catch (error) {
       return { error: String(error) };
@@ -291,6 +300,7 @@ const update_memory = tool({
   execute: async ({ id, content }) => {
     try {
       updateMemory(id, content);
+      notifyMemoryChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };
@@ -330,6 +340,7 @@ const delete_memory = tool({
       }
 
       deleteMemory(id);
+      notifyMemoryChanged();
       return { success: true };
     } catch (error) {
       return { error: String(error) };
