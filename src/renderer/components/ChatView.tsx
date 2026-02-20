@@ -35,6 +35,13 @@ export default function ChatView() {
     });
   }, []);
 
+  // 창을 닫고 다시 열 때 main이 expand를 리셋하면 renderer state도 동기화
+  useEffect(() => {
+    return window.electronAPI.onChatExpandReset(() => {
+      setIsExpanded(false);
+    });
+  }, []);
+
   /** 로비에서 메시지 전송 시: 룸 생성 → 대화 진입 (초기 메시지 전달) */
   const handleSendFromLobby = useCallback(
     async (content: string) => {
