@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.34.0] - 2026-02-20
+- Prowl Chat 전체화면 토글 기능 추가: 헤더 버튼 또는 Cmd+Enter로 전체화면 전환
+
 ## [1.33.2] - 2026-02-20
 - 대시보드 섹션 헤더 UI 통일: 불필요한 구분선 제거, 추가 버튼 스타일 통일 (accent 컬러)
 
