@@ -101,9 +101,16 @@ interface MessageBubbleProps {
   isLastInGroup?: boolean;
 }
 
+/** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
+function stripProwlUi(content: string): string {
+  return content.replace(/<prowl-ui>[\s\S]*?<\/prowl-ui>/g, "").trim();
+}
+
 export default function MessageBubble({ message, isLastInGroup = true }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
+  const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
+  const displayContent = hasHtmlOutput ? stripProwlUi(message.content) : message.content;
   const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
     message.approval?.status ?? "pending",
   );
@@ -146,11 +153,21 @@ export default function MessageBubble({ message, isLastInGroup = true }: Message
           }`}
         >
           {isUser ? (
-            message.content
+            displayContent
           ) : (
-            <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
-              {message.content}
-            </Markdown>
+            <>
+              {displayContent && (
+                <Markdown remarkPlugins={[remarkGfm, remarkBreaks]} components={markdownComponents}>
+                  {displayContent}
+                </Markdown>
+              )}
+              {hasHtmlOutput && (
+                <div className="mt-1.5 flex items-center gap-1 text-[11px] text-white/40">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                  UI 출력됨
+                </div>
+              )}
+            </>
           )}
           {message.approval && (
             <ApprovalButtons

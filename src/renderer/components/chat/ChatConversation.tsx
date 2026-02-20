@@ -13,8 +13,20 @@ import {
 } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
+import HtmlPreviewPanel from "./HtmlPreviewPanel";
 import MessageBubble from "./MessageBubble";
 import UnreadDivider from "./UnreadDivider";
+
+/** messages에서 가장 마지막 <prowl-ui> 블록의 HTML 콘텐츠를 반환 */
+function extractLatestHtml(messages: ChatMessage[]): string | null {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i].role === "assistant") {
+      const match = messages[i].content.match(/<prowl-ui>([\s\S]*?)<\/prowl-ui>/);
+      if (match) return match[1];
+    }
+  }
+  return null;
+}
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
 const PLACEHOLDERS = [
@@ -243,8 +255,10 @@ export default function ChatConversation({
   }, []);
 
   const hasMessages = messages.length > 0 || loading;
+  const htmlContent = extractLatestHtml(messages);
+  const isSplitView = isExpanded && !!htmlContent;
 
-  return (
+  const chatArea = (
     <>
       {/* 대화 영역 */}
       {hasMessages && (
@@ -358,6 +372,17 @@ export default function ChatConversation({
       </div>
     </>
   );
+
+  if (isSplitView) {
+    return (
+      <div className="chat-split-wrapper">
+        <div className="chat-split-left">{chatArea}</div>
+        <HtmlPreviewPanel html={htmlContent} />
+      </div>
+    );
+  }
+
+  return chatArea;
 }
 
 /** 대화 헤더 (뒤로가기 + 제목 + 전체화면 + 닫기) */

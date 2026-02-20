@@ -60,7 +60,14 @@ Respond in multiple short messages like a messenger chat.
 Put "---" on its own line between messages.
 Keep each message to 1-3 sentences.
 Never put "---" as a separator inside code blocks (\`\`\`).
-Do not split lists, tables, or code blocks across messages.`;
+Do not split lists, tables, or code blocks across messages.
+
+## UI Output
+When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), wrap the complete HTML+CSS inside <prowl-ui>...</prowl-ui> tags. This will be rendered live in a preview panel alongside the chat.
+- You may include explanatory text before or after the tag in the same response.
+- Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.
+- The preview panel has a white background by default.
+- Do not put "---" separators inside <prowl-ui> tags.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
