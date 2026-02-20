@@ -16,6 +16,10 @@ function getIndexUrl(): string {
 export function showCompactWindow(): void {
   if (compactWindow && !compactWindow.isDestroyed()) {
     compactWindow.show();
+    compactWindow.setVisibleOnAllWorkspaces(true, {
+      visibleOnFullScreen: true,
+      skipTransformProcessType: true,
+    });
     compactWindow.focus();
     return;
   }
