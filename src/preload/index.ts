@@ -112,6 +112,11 @@ const electronAPI = {
     ipcRenderer.on("tasks:changed", handler);
     return () => ipcRenderer.removeListener("tasks:changed", handler);
   },
+  onScriptsChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("scripts:changed", handler);
+    return () => ipcRenderer.removeListener("scripts:changed", handler);
+  },
 
   // Chat stream events
   onChatStreamMessage: (

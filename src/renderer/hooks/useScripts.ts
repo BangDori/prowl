@@ -1,8 +1,17 @@
 /** 스크립트 라이브러리 TanStack Query 훅 */
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { queryKeys } from "../queries/keys";
 
 export function useScripts() {
+  const qc = useQueryClient();
+
+  useEffect(() => {
+    return window.electronAPI.onScriptsChanged(() => {
+      qc.invalidateQueries({ queryKey: queryKeys.scripts.all });
+    });
+  }, [qc]);
+
   return useQuery({
     queryKey: queryKeys.scripts.list(),
     queryFn: () => window.electronAPI.listScripts(),

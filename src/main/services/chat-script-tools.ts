@@ -2,17 +2,30 @@
 import type { ProwlScript } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
-import { getChatWindow } from "../windows";
+import { getChatWindow, getSubWindow } from "../windows";
 import { waitForApproval } from "./approval";
 import { generateScriptFromPrompt } from "./script-ai";
-import { refreshSchedule, runScript } from "./script-runner";
-import { getAllScripts, getScriptById, saveScript, toggleScriptEnabled } from "./script-store";
+import { cancelSchedule, refreshSchedule, runScript } from "./script-runner";
+import {
+  deleteScriptById,
+  getAllScripts,
+  getScriptById,
+  saveScript,
+  toggleScriptEnabled,
+} from "./script-store";
 import { toolRegistry } from "./tool-registry";
 
 function sendToChat(channel: string, ...args: unknown[]): void {
   const win = getChatWindow();
   if (win && !win.isDestroyed()) {
     win.webContents.send(channel, ...args);
+  }
+}
+
+function notifyScriptsChanged(): void {
+  const win = getSubWindow();
+  if (win && !win.isDestroyed()) {
+    win.webContents.send("scripts:changed");
   }
 }
 
@@ -104,6 +117,7 @@ const toggle_script = tool({
       toggleScriptEnabled(id);
       const updated = getScriptById(id);
       if (updated) refreshSchedule(updated);
+      notifyScriptsChanged();
     }
 
     return { success: true, id, name: script.name, isEnabled: enable };
@@ -135,6 +149,7 @@ const create_script = tool({
         lastRun: null,
       };
       saveScript(script);
+      notifyScriptsChanged();
       return {
         success: true,
         script: {
@@ -151,12 +166,51 @@ const create_script = tool({
   },
 });
 
+const delete_script = tool({
+  description: "스크립트를 영구 삭제. 활성화된 스크립트는 스케줄도 함께 제거된다.",
+  inputSchema: z.object({
+    id: z.string().describe("스크립트 ID"),
+    name: z.string().optional().describe("스크립트 이름 (표시용)"),
+  }),
+  execute: async ({ id, name }) => {
+    const script = getScriptById(id);
+    if (!script) return { error: `스크립트를 찾을 수 없음: ${id}` };
+
+    const displayName = name ?? script.name;
+    const approvalId = `approval_${genId()}`;
+
+    sendToChat("chat:stream-message", {
+      id: approvalId,
+      role: "assistant",
+      content: `"${displayName}" 스크립트를 삭제할까요?`,
+      timestamp: Date.now(),
+      approval: {
+        id: approvalId,
+        status: "pending",
+        toolName: "delete_script",
+        displayName,
+        args: { id },
+      },
+    });
+
+    const approved = await waitForApproval(approvalId);
+    if (!approved) {
+      return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+    }
+
+    cancelSchedule(id);
+    deleteScriptById(id);
+    notifyScriptsChanged();
+    return { success: true };
+  },
+});
+
 toolRegistry.register(
   {
     name: "script-manager",
     label: "스크립트 관리",
     dangerLevel: "dangerous",
-    description: "스크립트 생성/조회/실행/토글",
+    description: "스크립트 생성/조회/실행/토글/삭제",
   },
-  { list_scripts, create_script, run_script, toggle_script },
+  { list_scripts, create_script, run_script, toggle_script, delete_script },
 );
