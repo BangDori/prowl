@@ -281,7 +281,11 @@ export default function ChatConversation({
                 return (
                   <Fragment key={msg.id}>
                     {msg.id === unreadDividerMsgId.current && <UnreadDivider />}
-                    <MessageBubble message={msg} isLastInGroup={isLastInGroup} />
+                    <MessageBubble
+                      message={msg}
+                      isLastInGroup={isLastInGroup}
+                      onExpandForPreview={onToggleExpand}
+                    />
                   </Fragment>
                 );
               })}

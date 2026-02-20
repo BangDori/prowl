@@ -99,6 +99,8 @@ interface MessageBubbleProps {
   message: ChatMessage;
   /** 같은 발신자의 연속 메시지 그룹에서 마지막 메시지인지 여부 */
   isLastInGroup?: boolean;
+  /** HTML 프리뷰 확인을 위한 전체화면 전환 콜백 (비전체화면일 때만 전달) */
+  onExpandForPreview?: () => void;
 }
 
 /** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
@@ -106,7 +108,11 @@ function stripProwlUi(content: string): string {
   return content.replace(/<prowl-ui>[\s\S]*?<\/prowl-ui>/g, "").trim();
 }
 
-export default function MessageBubble({ message, isLastInGroup = true }: MessageBubbleProps) {
+export default function MessageBubble({
+  message,
+  isLastInGroup = true,
+  onExpandForPreview,
+}: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
   const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
@@ -161,11 +167,15 @@ export default function MessageBubble({ message, isLastInGroup = true }: Message
                   {displayContent}
                 </Markdown>
               )}
-              {hasHtmlOutput && (
-                <div className="mt-1.5 flex items-center gap-1 text-[11px] text-white/40">
+              {hasHtmlOutput && onExpandForPreview && (
+                <button
+                  type="button"
+                  onClick={onExpandForPreview}
+                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                  UI 출력됨
-                </div>
+                  전체화면에서 확인하기
+                </button>
               )}
             </>
           )}
