@@ -49,3 +49,7 @@ export function toggleScriptEnabled(id: string): boolean {
   saveScript(script);
   return script.isEnabled;
 }
+
+export function getScriptStorePath(): string {
+  return store.path;
+}

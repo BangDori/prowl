@@ -6,7 +6,7 @@ import {
   useScripts,
   useToggleScript,
 } from "@renderer/hooks/useScripts";
-import { Plus, Terminal } from "lucide-react";
+import { FolderOpen, Plus, Terminal } from "lucide-react";
 import { useState } from "react";
 import ScriptCard from "../scripts/ScriptCard";
 import ScriptCreateDialog from "../scripts/ScriptCreateDialog";
@@ -21,6 +21,11 @@ export default function ScriptsSection() {
   const [showCreate, setShowCreate] = useState(false);
   const [runningId, setRunningId] = useState<string | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const handleOpenStoragePath = async () => {
+    const path = await window.electronAPI.getScriptStoragePath();
+    window.electronAPI.showInFolder(path);
+  };
 
   const handleToggle = async (id: string) => {
     setTogglingId(id);
@@ -65,14 +70,24 @@ export default function ScriptsSection() {
       {/* 툴바 */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-prowl-border">
         <span className="text-xs text-gray-500">{scripts.length}개 스크립트</span>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          추가
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={handleOpenStoragePath}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+            title="파일 위치 열기"
+          >
+            <FolderOpen className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            추가
+          </button>
+        </div>
       </div>
 
       {/* 스크립트 목록 */}

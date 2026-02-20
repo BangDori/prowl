@@ -98,6 +98,7 @@ const electronAPI = {
   deleteMemory: invokeIpc("memory:delete"),
 
   // Scripts
+  getScriptStoragePath: invokeIpc("scripts:storage-path"),
   listScripts: invokeIpc("scripts:list"),
   createScript: invokeIpc("scripts:create"),
   updateScript: invokeIpc("scripts:update"),

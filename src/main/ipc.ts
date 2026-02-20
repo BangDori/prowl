@@ -30,6 +30,7 @@ import {
   deleteScriptById,
   getAllScripts,
   getScriptById,
+  getScriptStorePath,
   saveScript,
   toggleScriptEnabled,
 } from "./services/script-store";
@@ -518,6 +519,10 @@ export function registerIpcHandlers(): void {
   });
 
   // ── Scripts ──────────────────────────────────────────
+
+  handleIpc("scripts:storage-path", async () => {
+    return getScriptStorePath();
+  });
 
   handleIpc("scripts:list", async () => {
     return getAllScripts();

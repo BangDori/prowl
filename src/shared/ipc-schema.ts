@@ -140,7 +140,8 @@ export interface IpcInvokeSchema {
   };
   "tasks:delete-backlog": { params: [taskId: string]; return: IpcResult };
 
-  // Scripts (7 channels)
+  // Scripts (8 channels)
+  "scripts:storage-path": { params: []; return: string };
   "scripts:list": { params: []; return: ProwlScript[] };
   "scripts:create": { params: [prompt: string]; return: IpcResult & { script?: ProwlScript } };
   "scripts:update": {
