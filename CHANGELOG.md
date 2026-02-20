@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.38.1] - 2026-02-21
+- 채팅 모델 목록에서 GPT-4o 시리즈 제거 및 GPT-5 Mini 추가
+- 기본 채팅 모델을 GPT-5 Mini로 변경
+
 ## [1.38.0] - 2026-02-21
 - Prowl Chat 우측 프리뷰 패널을 브라우저 탭 형식으로 전환: HTML 보기 및 외부 링크 클릭 시 탭으로 관리
 - 외부 링크 클릭 시 기본 브라우저 대신 앱 내 탭(Electron webview)으로 열기
