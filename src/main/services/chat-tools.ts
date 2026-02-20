@@ -1,4 +1,4 @@
-/** 채팅 AI 도구 정의 — Task Manager + Memory 연동 */
+/** 채팅 AI 도구 정의 — Task Manager + Memory 연동, 툴 레지스트리 등록 */
 
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
@@ -19,6 +19,7 @@ import {
   updateBacklogTask,
   updateTask,
 } from "./tasks";
+import { toolRegistry } from "./tool-registry";
 
 /** 고유 ID 생성 */
 function generateId(): string {
@@ -274,18 +275,19 @@ const delete_memory = tool({
   },
 });
 
-/** 채팅에서 사용할 도구 맵 반환 */
+// 태스크 관리 툴 등록
+toolRegistry.register(
+  { name: "task-manager", label: "태스크 관리", dangerLevel: "safe" },
+  { get_today_info, list_tasks, add_task, update_task, delete_task, toggle_task_complete },
+);
+
+// 메모리 관리 툴 등록
+toolRegistry.register(
+  { name: "memory-manager", label: "메모리 관리", dangerLevel: "safe" },
+  { save_memory, list_memories, update_memory, delete_memory },
+);
+
+/** 레지스트리에 등록된 전체 도구 반환 (chat.ts에서 사용) */
 export function getChatTools() {
-  return {
-    get_today_info,
-    list_tasks,
-    add_task,
-    update_task,
-    delete_task,
-    toggle_task_complete,
-    save_memory,
-    list_memories,
-    update_memory,
-    delete_memory,
-  };
+  return toolRegistry.getAllTools();
 }
