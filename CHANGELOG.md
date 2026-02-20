@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.30.2] - 2026-02-20
+- 채팅 알림에 AI 응답의 실제 메시지 내용 표시
+
 ## [1.30.1] - 2026-02-20
 - Task Manager 윈도우가 macOS Space 전환 시 사라지는 현상 수정
 
