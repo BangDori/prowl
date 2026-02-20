@@ -48,9 +48,9 @@ export default function ScriptCreateDialog({ onClose, onSubmit }: ScriptCreateDi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-md mx-4 bg-prowl-bg border border-white/10 rounded-xl shadow-2xl">
+      <div className="w-full max-w-md mx-4 bg-prowl-bg border border-prowl-border rounded-xl shadow-2xl">
         {/* 헤더 */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-prowl-border">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-accent" />
             <span className="text-sm font-medium">새 스크립트 만들기</span>
@@ -58,7 +58,7 @@ export default function ScriptCreateDialog({ onClose, onSubmit }: ScriptCreateDi
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded text-gray-500 hover:text-gray-300 hover:bg-white/5"
+            className="p-1 rounded text-gray-500 hover:text-gray-300 hover:bg-app-hover-bg"
           >
             <X className="w-4 h-4" />
           </button>
@@ -73,7 +73,7 @@ export default function ScriptCreateDialog({ onClose, onSubmit }: ScriptCreateDi
             onKeyDown={handleKeyDown}
             placeholder="어떤 스크립트를 만들까요? 자연어로 설명해주세요."
             rows={3}
-            className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-500 outline-none focus:border-accent/40 resize-none"
+            className="w-full bg-app-input-bg border border-app-input-border rounded-lg px-3 py-2 text-sm text-app-text-primary placeholder-app-text-muted outline-none focus:border-accent/40 resize-none"
           />
 
           {/* 예시 */}
@@ -88,7 +88,7 @@ export default function ScriptCreateDialog({ onClose, onSubmit }: ScriptCreateDi
                     setPrompt(ex);
                     textareaRef.current?.focus();
                   }}
-                  className="block w-full text-left text-[11px] text-gray-500 hover:text-gray-300 hover:bg-white/5 px-2 py-1 rounded transition-colors"
+                  className="block w-full text-left text-[11px] text-gray-500 hover:text-gray-300 hover:bg-app-hover-bg px-2 py-1 rounded transition-colors"
                 >
                   {ex}
                 </button>
@@ -104,7 +104,7 @@ export default function ScriptCreateDialog({ onClose, onSubmit }: ScriptCreateDi
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 hover:bg-white/5 rounded-lg transition-colors"
+            className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 hover:bg-app-hover-bg rounded-lg transition-colors"
           >
             취소
           </button>

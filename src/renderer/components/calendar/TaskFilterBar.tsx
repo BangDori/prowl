@@ -24,8 +24,8 @@ export default function TaskFilterBar({
         onClick={() => onFilterPriority(null)}
         className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
           filterPriority === null
-            ? "bg-white/10 text-gray-200"
-            : "text-gray-500 hover:text-gray-300"
+            ? "bg-app-active-bg text-app-text-primary"
+            : "text-app-text-muted hover:text-app-text-secondary"
         }`}
       >
         전체
@@ -36,7 +36,9 @@ export default function TaskFilterBar({
           type="button"
           onClick={() => onFilterPriority(filterPriority === p ? null : p)}
           className={`px-1.5 py-0.5 rounded text-[9px] flex items-center gap-0.5 transition-colors ${
-            filterPriority === p ? "bg-white/10 text-gray-200" : "text-gray-500 hover:text-gray-300"
+            filterPriority === p
+              ? "bg-app-active-bg text-app-text-primary"
+              : "text-app-text-muted hover:text-app-text-secondary"
           }`}
         >
           <div
@@ -51,7 +53,7 @@ export default function TaskFilterBar({
       <button
         type="button"
         onClick={onToggleShowCompleted}
-        className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+        className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
         title={showCompleted ? "완료 숨기기" : "완료 표시"}
       >
         {showCompleted ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}

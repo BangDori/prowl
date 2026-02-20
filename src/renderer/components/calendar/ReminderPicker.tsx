@@ -86,7 +86,7 @@ export default function ReminderPicker({ reminders, onChange }: ReminderPickerPr
         createPortal(
           <div
             data-reminder-dropdown
-            className="fixed z-[9999] p-1 rounded-lg border border-white/[0.08] bg-[#1a1a1a] backdrop-blur-2xl shadow-xl min-w-[120px]"
+            className="fixed z-[9999] p-1 rounded-lg border border-prowl-border bg-prowl-surface backdrop-blur-2xl shadow-xl min-w-[120px]"
             style={{ top: dropdownPos.top, left: dropdownPos.left, transform: "translateY(-100%)" }}
           >
             {REMINDER_PRESETS.map((preset) => {
@@ -99,8 +99,8 @@ export default function ReminderPicker({ reminders, onChange }: ReminderPickerPr
                   onClick={() => addReminder(preset.minutes)}
                   className={`w-full text-left px-2 py-1 rounded text-[10px] transition-colors ${
                     isAdded
-                      ? "text-gray-600 cursor-not-allowed"
-                      : "text-gray-300 hover:bg-white/10 cursor-pointer"
+                      ? "text-app-text-ghost cursor-not-allowed"
+                      : "text-app-text-secondary hover:bg-app-active-bg cursor-pointer"
                   }`}
                 >
                   {preset.label}

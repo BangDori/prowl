@@ -24,21 +24,21 @@ export default function CalendarHeader({
         <button
           type="button"
           onClick={onPrevMonth}
-          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+          className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
         <button
           type="button"
           onClick={onToday}
-          className="text-[11px] font-medium text-gray-300 hover:text-accent transition-colors min-w-[100px] text-center"
+          className="text-[11px] font-medium text-app-text-secondary hover:text-accent transition-colors min-w-[100px] text-center"
         >
           {monthLabel}
         </button>
         <button
           type="button"
           onClick={onNextMonth}
-          className="p-0.5 rounded text-gray-500 hover:text-gray-300 transition-colors"
+          className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
         >
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
@@ -47,7 +47,7 @@ export default function CalendarHeader({
         type="button"
         onClick={onRefresh}
         disabled={refreshing}
-        className="p-1 rounded text-gray-500 hover:text-gray-300 transition-colors disabled:opacity-50"
+        className="p-1 rounded text-app-text-muted hover:text-app-text-secondary transition-colors disabled:opacity-50"
         title="새로고침"
       >
         <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />

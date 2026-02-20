@@ -5,13 +5,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // 다크 테마 기반 색상 (Liquid Glass)
+        // prowl 컴포넌트 색상 — CSS 변수로 라이트/다크 자동 분기
         prowl: {
           bg: 'transparent',
-          surface: 'rgba(255, 255, 255, 0.06)',
-          card: 'rgba(255, 255, 255, 0.04)',
-          border: 'rgba(255, 255, 255, 0.08)',
-          'border-hover': 'rgba(255, 255, 255, 0.15)',
+          surface: 'var(--prowl-surface)',
+          card: 'var(--prowl-card)',
+          border: 'var(--prowl-border)',
+          'border-hover': 'var(--prowl-border-hover)',
+        },
+        // 의미론적 텍스트/배경 토큰 — CSS 변수로 라이트/다크 자동 분기
+        app: {
+          'text-primary':   'var(--app-text-primary)',
+          'text-secondary': 'var(--app-text-secondary)',
+          'text-muted':     'var(--app-text-muted)',
+          'text-faint':     'var(--app-text-faint)',
+          'text-ghost':     'var(--app-text-ghost)',
+          'hover-bg':       'var(--app-hover-bg)',
+          'active-bg':      'var(--app-active-bg)',
+          'input-bg':       'var(--app-input-bg)',
+          'input-border':   'var(--app-input-border)',
         },
         // 골드 액센트 (고양이 눈 색상)
         accent: {

@@ -37,7 +37,9 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
       className={`
         w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
         ${
-          active ? "bg-accent/20 text-accent" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+          active
+            ? "bg-accent/20 text-accent"
+            : "text-app-text-muted hover:text-app-text-primary hover:bg-app-hover-bg"
         }
       `}
     >
@@ -63,9 +65,9 @@ export default function DashboardLayout() {
   const [activeNav, setActiveNav] = useState<NavItem>("scripts");
 
   return (
-    <div className="flex h-screen bg-transparent text-gray-100">
+    <div className="flex h-screen bg-transparent text-app-text-primary">
       {/* Sidebar */}
-      <aside className="w-52 flex-shrink-0 bg-white/[0.02] border-r border-white/[0.06] flex flex-col">
+      <aside className="w-52 flex-shrink-0 bg-prowl-surface border-r border-prowl-border flex flex-col">
         {/* Drag region for window */}
         <div className="h-10 -webkit-app-region-drag" />
 

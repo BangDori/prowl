@@ -41,7 +41,9 @@ function TreeItem({ icon, label, depth = 0, selected, onClick }: TreeItemProps) 
       type="button"
       onClick={onClick}
       className={`w-full flex items-center gap-1.5 px-2 py-1 text-left text-[11px] rounded transition-colors ${
-        selected ? "bg-accent/20 text-accent" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+        selected
+          ? "bg-accent/20 text-accent"
+          : "text-app-text-muted hover:text-app-text-primary hover:bg-app-hover-bg"
       }`}
       style={{ paddingLeft: `${8 + depth * 12}px` }}
     >
@@ -67,7 +69,7 @@ function TreeFolder({ icon, label, count, defaultOpen = true, children }: TreeFo
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-1.5 px-2 py-1 text-left text-[11px] text-gray-300 hover:text-gray-100 transition-colors"
+        className="w-full flex items-center gap-1.5 px-2 py-1 text-left text-[11px] text-app-text-secondary hover:text-app-text-primary transition-colors"
       >
         {open ? (
           <ChevronDown className="w-3 h-3 text-gray-500" />
@@ -126,7 +128,7 @@ function ContentPanel({ selected, content, loading, onOpenInFinder }: ContentPan
   return (
     <div className="h-full flex flex-col">
       {/* 헤더 */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06] bg-white/[0.03] backdrop-blur-xl">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-prowl-border bg-prowl-card backdrop-blur-xl">
         <div className="flex-1 min-w-0">
           <h2 className="text-xs font-medium truncate">{title}</h2>
           <p className="text-[10px] text-gray-500 font-mono">{subtitle}</p>
@@ -135,7 +137,7 @@ function ContentPanel({ selected, content, loading, onOpenInFinder }: ContentPan
           <button
             type="button"
             onClick={() => onOpenInFinder(filePath)}
-            className="p-1 rounded text-gray-500 hover:text-gray-300 hover:bg-prowl-card transition-colors"
+            className="p-1 rounded text-app-text-muted hover:text-app-text-secondary hover:bg-prowl-card transition-colors"
             title="Finder에서 열기"
           >
             <ExternalLink className="w-3 h-3" />
@@ -152,7 +154,7 @@ function ContentPanel({ selected, content, loading, onOpenInFinder }: ContentPan
             <div className="skeleton h-3 w-5/6" />
           </div>
         ) : (
-          <pre className="text-[11px] text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
+          <pre className="text-[11px] text-app-text-secondary whitespace-pre-wrap font-mono leading-relaxed">
             {content}
           </pre>
         )}
@@ -283,7 +285,7 @@ export default function ClaudeConfigSection() {
           <button
             type="button"
             onClick={fetchConfig}
-            className="p-1 rounded text-gray-500 hover:text-gray-300 transition-colors"
+            className="p-1 rounded text-app-text-muted hover:text-app-text-secondary transition-colors"
             title="새로고침"
           >
             <RefreshCw className="w-3 h-3" />

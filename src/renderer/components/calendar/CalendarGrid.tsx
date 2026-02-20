@@ -20,7 +20,7 @@ export default function CalendarGrid({
 }: CalendarGridProps) {
   return (
     <div className="flex-shrink-0 px-3 pt-2 pb-1">
-      <div className="glass-card-3d rounded-lg bg-white/[0.03] border border-white/[0.06] p-2">
+      <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border p-2">
         <div className="grid grid-cols-7 mb-1">
           {WEEKDAYS.map((day) => (
             <div

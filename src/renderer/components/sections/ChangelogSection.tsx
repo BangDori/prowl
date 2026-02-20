@@ -59,7 +59,7 @@ export default function ChangelogSection() {
     <div className="h-full overflow-y-auto">
       <div className="p-4">
         {/* 현재 버전 헤더 */}
-        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-white/[0.06]">
+        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
           <img src={prowlProfile} alt="Prowl" className="w-8 h-8 rounded-full" />
           <div>
             <h4 className="text-sm font-medium">Prowl</h4>
@@ -76,7 +76,7 @@ export default function ChangelogSection() {
             <div
               key={release.version}
               className={`glass-card-3d p-3 rounded-lg border backdrop-blur-xl ${
-                index === 0 ? "bg-accent/5 border-accent/20" : "bg-prowl-card border-white/[0.06]"
+                index === 0 ? "bg-accent/5 border-accent/20" : "bg-prowl-card border-prowl-border"
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -87,7 +87,10 @@ export default function ChangelogSection() {
               </div>
               <ul className="space-y-1">
                 {release.changes.map((change) => (
-                  <li key={change} className="text-xs text-gray-400 flex items-start gap-2">
+                  <li
+                    key={change}
+                    className="text-xs text-app-text-secondary flex items-start gap-2"
+                  >
                     <span className="text-gray-600 mt-0.5">•</span>
                     {change}
                   </li>

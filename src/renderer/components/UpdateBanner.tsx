@@ -46,7 +46,7 @@ export default function UpdateBanner() {
           ) : (
             <Download className="w-3.5 h-3.5 text-accent" />
           )}
-          <span className="text-[11px] font-medium text-gray-300">
+          <span className="text-[11px] font-medium text-app-text-secondary">
             {phase === "idle" && (
               <>
                 <span className="text-accent">v{updateResult.latestVersion}</span>
@@ -72,7 +72,7 @@ export default function UpdateBanner() {
 
       {/* Progress bar during install */}
       {phase === "installing" && (
-        <div className="h-1 rounded-full bg-white/5 overflow-hidden mb-1.5">
+        <div className="h-1 rounded-full bg-app-hover-bg overflow-hidden mb-1.5">
           <div className="h-full bg-accent/60 rounded-full animate-pulse w-2/3" />
         </div>
       )}
