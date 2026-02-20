@@ -13,19 +13,14 @@ import {
 } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
-import HtmlPreviewPanel from "./HtmlPreviewPanel";
 import MessageBubble from "./MessageBubble";
+import PreviewPanel, { type PreviewTab } from "./PreviewPanel";
 import UnreadDivider from "./UnreadDivider";
 
-/** messages에서 가장 마지막 <prowl-ui> 블록의 HTML 콘텐츠를 반환 */
-function extractLatestHtml(messages: ChatMessage[]): string | null {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].role === "assistant") {
-      const match = messages[i].content.match(/<prowl-ui>([\s\S]*?)<\/prowl-ui>/);
-      if (match) return match[1];
-    }
-  }
-  return null;
+/** 탭 레이블 중복 시 숫자 접미사 부여 */
+function dedupeLabel(label: string, existing: PreviewTab[]): string {
+  const same = existing.filter((t) => t.label === label || t.label.startsWith(`${label} `));
+  return same.length === 0 ? label : `${label} ${same.length + 1}`;
 }
 
 /** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
@@ -259,21 +254,51 @@ export default function ChatConversation({
   }, []);
 
   const hasMessages = messages.length > 0 || loading;
-  const htmlContent = extractLatestHtml(messages);
-  const [dismissedHtml, setDismissedHtml] = useState<string | null>(null);
-  const isSplitView = isExpanded && !!htmlContent && htmlContent !== dismissedHtml;
 
-  // 분할 뷰 열림 → 프리뷰 닫기, 전체화면+dismissed → 프리뷰 재표시, 비전체화면 → expand
-  const handleTogglePreview = useCallback(async () => {
-    if (isSplitView) {
-      setDismissedHtml(htmlContent);
-    } else if (isExpanded) {
-      setDismissedHtml(null);
-    } else {
-      setDismissedHtml(null);
-      await onToggleExpand();
-    }
-  }, [isSplitView, isExpanded, htmlContent, onToggleExpand]);
+  // 탭 기반 프리뷰 패널 상태
+  const [previewTabs, setPreviewTabs] = useState<PreviewTab[]>([]);
+  const [activeTabId, setActiveTabId] = useState<string | null>(null);
+  const isSplitView = isExpanded && previewTabs.length > 0;
+
+  /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
+  const addOrActivateTab = useCallback(
+    async (newTab: Omit<PreviewTab, "id">) => {
+      let activated = false;
+      setPreviewTabs((prev) => {
+        const key = newTab.type === "html" ? newTab.content : newTab.url;
+        const existing = prev.find((t) => (t.type === "html" ? t.content : t.url) === key);
+        if (existing) {
+          setActiveTabId(existing.id);
+          activated = true;
+          return prev;
+        }
+        const id = `tab_${Date.now()}`;
+        setActiveTabId(id);
+        const label = dedupeLabel(newTab.label, prev);
+        return [...prev, { ...newTab, id, label } as PreviewTab];
+      });
+      if (!isExpanded && !activated) {
+        await onToggleExpand();
+      }
+    },
+    [isExpanded, onToggleExpand],
+  );
+
+  /** 탭 닫기 — 마지막 탭 닫힐 시 분할 뷰 자동 해제 */
+  const closeTab = useCallback(
+    (id: string) => {
+      setPreviewTabs((prev) => {
+        const next = prev.filter((t) => t.id !== id);
+        if (next.length === 0) {
+          setActiveTabId(null);
+        } else if (activeTabId === id) {
+          setActiveTabId(next.at(-1)?.id ?? null);
+        }
+        return next;
+      });
+    },
+    [activeTabId],
+  );
 
   const handleDividerMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -327,7 +352,10 @@ export default function ChatConversation({
                     <MessageBubble
                       message={msg}
                       isLastInGroup={isLastInGroup}
-                      onExpandForPreview={handleTogglePreview}
+                      onOpenHtml={(html) =>
+                        addOrActivateTab({ type: "html", content: html, label: "HTML" })
+                      }
+                      onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
                     />
                   </Fragment>
                 );
@@ -431,7 +459,13 @@ export default function ChatConversation({
         </div>
         {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
         <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
-        <HtmlPreviewPanel html={htmlContent} onClose={() => setDismissedHtml(htmlContent)} />
+        <PreviewPanel
+          tabs={previewTabs}
+          activeTabId={activeTabId}
+          onActivateTab={setActiveTabId}
+          onCloseTab={closeTab}
+          isDragging={isDragging}
+        />
       </div>
     );
   }

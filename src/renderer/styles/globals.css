@@ -418,15 +418,98 @@ select.input-field {
   cursor: col-resize;
 }
 
-.chat-split-wrapper.is-dragging .chat-html-preview {
+.chat-split-wrapper.is-dragging .chat-preview-panel {
   pointer-events: none;
 }
 
-.chat-html-preview {
-  position: relative;
+/* ============================================
+   프리뷰 패널 (탭 기반)
+   ============================================ */
+
+.chat-preview-panel {
   flex: 1;
-  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  background: rgba(18, 18, 22, 0.9);
   overflow: hidden;
+}
+
+.chat-preview-tabs {
+  display: flex;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  padding: 5px 5px 0;
+  gap: 2px;
+}
+
+.chat-preview-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.chat-preview-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 10px;
+  border-radius: 6px 6px 0 0;
+  font-size: 11px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+  max-width: 160px;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.chat-preview-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.chat-preview-tab.is-active {
+  background: rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.chat-preview-tab-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-preview-tab-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+
+.chat-preview-tab-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chat-preview-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
 }
 
 /* ============================================
