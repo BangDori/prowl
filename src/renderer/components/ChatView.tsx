@@ -66,7 +66,7 @@ export default function ChatView() {
   }, []);
 
   return (
-    <div className={`chat-floating-root${isExpanded ? " expanded" : ""}`}>
+    <div className={`chat-floating-root${isExpanded ? " expanded" : ""}`} data-theme="dark">
       {selectedRoomId ? (
         <ChatConversation
           roomId={selectedRoomId}
