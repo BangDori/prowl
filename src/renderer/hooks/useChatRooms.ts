@@ -4,10 +4,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../queries/keys";
 
 /** 채팅 룸 목록 조회 */
-export function useChatRooms() {
+export function useChatRooms(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.chatRooms.list(),
     queryFn: () => window.electronAPI.listChatRooms(),
+    enabled: options?.enabled ?? true,
   });
 }
 

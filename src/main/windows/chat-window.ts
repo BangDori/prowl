@@ -144,14 +144,16 @@ export function isChatWindowExpanded(): boolean {
 
 /** 채팅 윈도우를 열고 특정 룸으로 네비게이션 이벤트 전송 */
 export function navigateToChatRoom(roomId: string): void {
-  const wasAlreadyOpen = !!(chatWindow && !chatWindow.isDestroyed() && chatWindow.getOpacity() > 0);
+  // showChatWindow() 호출 전 창 존재 여부 확인
+  // 창이 있으면(opacity=0 포함) React가 이미 마운트된 상태이므로 즉시 전송 가능
+  const windowAlreadyExists = !!(chatWindow && !chatWindow.isDestroyed());
   showChatWindow();
 
-  if (wasAlreadyOpen) {
+  if (windowAlreadyExists) {
     chatWindow?.webContents.send("chat:navigate-to-room", roomId);
   } else if (chatWindow && !chatWindow.isDestroyed()) {
-    chatWindow.once("ready-to-show", () => {
-      // React가 마운트될 시간을 확보 후 이벤트 전송
+    // 새로 생성된 창: did-finish-load 후 React 마운트 대기
+    chatWindow.webContents.once("did-finish-load", () => {
       setTimeout(() => {
         chatWindow?.webContents.send("chat:navigate-to-room", roomId);
       }, 500);

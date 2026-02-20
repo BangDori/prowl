@@ -22,7 +22,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
     task.reminders && task.reminders.length > 0 ? task.reminders : DEFAULT_REMINDERS,
   );
   const [roomId, setRoomId] = useState<string>(task.roomId ?? "");
-  const { data: chatRooms } = useChatRooms();
+  const { data: chatRooms } = useChatRooms({ enabled: editing });
 
   const handleSave = () => {
     if (!title.trim()) return;
