@@ -4,9 +4,11 @@ export {
   closeChatWindow,
   getChatWindow,
   isChatWindowActive,
+  isChatWindowExpanded,
   resizeChatWindow,
   showChatWindow,
   toggleChatWindow,
+  toggleExpandChatWindow,
 } from "./chat-window";
 // Compact sticky view
 export {

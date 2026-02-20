@@ -65,6 +65,7 @@ import {
   popUpTrayMenu,
   resizeChatWindow,
   toggleCompactWindow,
+  toggleExpandChatWindow,
 } from "./windows";
 
 /**
@@ -197,6 +198,11 @@ export function registerIpcHandlers(): void {
   // 채팅 윈도우 닫기
   handleIpc("chat:close", async () => {
     closeChatWindow();
+  });
+
+  // 채팅 윈도우 전체화면 토글 (isExpanded 반환)
+  handleIpc("chat:expand-toggle", async () => {
+    return toggleExpandChatWindow();
   });
 
   // 앱 버전 조회
