@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.45.1] - 2026-02-23
+- Dashboard에서 Claude Config 탭 제거
+
 ## [1.45.0] - 2026-02-23
 - Task Manager에 파일 기반 동적 카테고리 시스템 추가 (카테고리 생성/수정/삭제)
 - Prowl Chat에서 카테고리 관리 가능 (추가/이름 변경/삭제, 삭제 시 HITL 승인)

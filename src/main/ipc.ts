@@ -22,7 +22,6 @@ import {
   toggleChatRoomFavorite,
   toggleChatRoomLock,
 } from "./services/chat-rooms";
-import { getClaudeConfig, getFileContent } from "./services/claude-config";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
 import {
@@ -389,16 +388,6 @@ export function registerIpcHandlers(): void {
     } catch (error) {
       return { success: false, error: String(error) };
     }
-  });
-
-  // Claude Config 조회
-  handleIpc("claude-config:list", async () => {
-    return getClaudeConfig();
-  });
-
-  // 파일 내용 조회
-  handleIpc("claude-config:read-file", async (filePath) => {
-    return getFileContent(filePath);
   });
 
   // ── Memory ──────────────────────────────────────────
