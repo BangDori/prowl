@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.39.1] - 2026-02-22
+- 날짜 미정 작업 완료 시 완료됨 섹션으로 이동하지 않던 버그 수정
+
 ## [1.39.0] - 2026-02-21
 - Prowl Chat 박스 헤더를 드래그해 화면 원하는 위치로 이동 가능
 

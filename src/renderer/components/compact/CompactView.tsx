@@ -42,6 +42,11 @@ export default function CompactView() {
   const { tasksByDate: upcomingTasksByDate, toggleComplete: toggleUpcomingComplete } =
     useUpcomingTasks(upcomingRange);
 
+  const incompleteBacklogTasks = useMemo(
+    () => backlogTasks.filter((t) => !t.completed),
+    [backlogTasks],
+  );
+
   const todayTasks = useMemo(
     () => getTasksForDate(tasksByDate, todayStr).filter((t) => !t.completed),
     [tasksByDate, todayStr],
@@ -53,14 +58,36 @@ export default function CompactView() {
   );
 
   const completedGroups = useMemo(() => {
-    return Object.entries(tasksByDate)
+    const grouped: Record<string, typeof backlogTasks> = {};
+
+    // 날짜 있는 완료 작업
+    for (const [date, tasks] of Object.entries(tasksByDate)) {
+      const completed = tasks.filter((t) => t.completed);
+      if (completed.length > 0) grouped[date] = [...(grouped[date] ?? []), ...completed];
+    }
+
+    // 백로그(날짜 미정) 완료 작업 — completedAt 날짜 기준
+    for (const task of backlogTasks) {
+      if (!task.completed) continue;
+      const date = task.completedAt?.slice(0, 10) ?? todayStr;
+      grouped[date] = [...(grouped[date] ?? []), task];
+    }
+
+    return Object.entries(grouped)
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, tasks]) => ({
-        date,
-        tasks: tasks.filter((t) => t.completed),
-      }))
-      .filter(({ tasks }) => tasks.length > 0);
-  }, [tasksByDate]);
+      .map(([date, tasks]) => ({ date, tasks }));
+  }, [tasksByDate, backlogTasks, todayStr]);
+
+  const handleToggleCompleted = useCallback(
+    (date: string, taskId: string) => {
+      if (backlogTasks.some((t) => t.id === taskId)) {
+        toggleBacklogComplete(taskId);
+      } else {
+        toggleComplete(date, taskId);
+      }
+    },
+    [backlogTasks, toggleBacklogComplete, toggleComplete],
+  );
 
   const handleToggleMinimize = useCallback(() => {
     const next = !minimized;
@@ -69,7 +96,7 @@ export default function CompactView() {
   }, [minimized]);
 
   const hasCompleted = completedGroups.length > 0;
-  const hasBacklog = backlogTasks.length > 0;
+  const hasBacklog = incompleteBacklogTasks.length > 0;
   const isEmpty =
     todayTasks.length === 0 && upcomingGroups.length === 0 && !hasBacklog && !hasCompleted;
 
@@ -89,7 +116,10 @@ export default function CompactView() {
         ) : (
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
             {hasBacklog && (
-              <CompactBacklog tasks={backlogTasks} onToggleComplete={toggleBacklogComplete} />
+              <CompactBacklog
+                tasks={incompleteBacklogTasks}
+                onToggleComplete={toggleBacklogComplete}
+              />
             )}
             <CompactTaskList
               tasks={todayTasks}
@@ -107,7 +137,7 @@ export default function CompactView() {
               />
             )}
             {hasCompleted && (
-              <CompactCompleted groups={completedGroups} onToggleComplete={toggleComplete} />
+              <CompactCompleted groups={completedGroups} onToggleComplete={handleToggleCompleted} />
             )}
           </div>
         ))}
