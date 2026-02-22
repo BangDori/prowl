@@ -87,6 +87,12 @@ const electronAPI = {
   markChatRoomRead: invokeIpc("chat-rooms:mark-read"),
   getChatUnreadCounts: invokeIpc("chat-rooms:unread-counts"),
 
+  // Categories
+  listCategories: invokeIpc("categories:list"),
+  addCategory: invokeIpc("categories:add"),
+  renameCategory: invokeIpc("categories:rename"),
+  deleteCategory: invokeIpc("categories:delete"),
+
   // Memory
   listMemories: invokeIpc("memory:list"),
   addMemory: invokeIpc("memory:add"),
@@ -108,6 +114,11 @@ const electronAPI = {
     const handler = () => callback();
     ipcRenderer.on("tasks:changed", handler);
     return () => ipcRenderer.removeListener("tasks:changed", handler);
+  },
+  onCategoriesChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("categories:changed", handler);
+    return () => ipcRenderer.removeListener("categories:changed", handler);
   },
   onMemoryChanged: (callback: () => void): (() => void) => {
     const handler = () => callback();

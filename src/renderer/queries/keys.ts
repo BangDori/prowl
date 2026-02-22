@@ -26,6 +26,10 @@ export const queryKeys = {
     version: () => [...queryKeys.app.all, "version"] as const,
     update: () => [...queryKeys.app.all, "update"] as const,
   },
+  categories: {
+    all: ["categories"] as const,
+    list: () => [...queryKeys.categories.all, "list"] as const,
+  },
   memory: {
     all: ["memory"] as const,
     list: () => [...queryKeys.memory.all, "list"] as const,

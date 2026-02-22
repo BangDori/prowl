@@ -5,6 +5,7 @@ import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { WINDOW } from "./constants";
 import { resolveApproval } from "./services/approval";
 import { runBrewUpgrade } from "./services/brew-updater";
+import { addCategory, deleteCategory, listCategories, renameCategory } from "./services/categories";
 import { getProviderStatuses, setPageContext, streamChatMessage } from "./services/chat";
 import {
   getAllUnreadCounts,
@@ -54,12 +55,27 @@ import {
   closeChatWindow,
   getChatWindow,
   getCompactWindow,
+  getDashboardWindow,
   getSubWindow,
   popUpTrayMenu,
   resizeChatWindow,
   toggleCompactWindow,
   toggleExpandChatWindow,
 } from "./windows";
+
+/** Task Manager + 대시보드에 태스크 변경 알림 */
+function notifyTasksChanged(): void {
+  for (const win of [getCompactWindow(), getDashboardWindow()]) {
+    if (win && !win.isDestroyed()) win.webContents.send("tasks:changed");
+  }
+}
+
+/** 모든 창에 카테고리 변경 알림 */
+function notifyCategoriesChanged(): void {
+  for (const win of [getCompactWindow(), getDashboardWindow(), getChatWindow()]) {
+    if (win && !win.isDestroyed()) win.webContents.send("categories:changed");
+  }
+}
 
 /**
  * 타입 안전한 IPC 핸들러 등록
@@ -406,6 +422,45 @@ export function registerIpcHandlers(): void {
   handleIpc("memory:delete", async (id) => {
     try {
       deleteMemory(id);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // ── Categories ──────────────────────────────────────
+
+  handleIpc("categories:list", async () => {
+    return listCategories();
+  });
+
+  handleIpc("categories:add", async (name) => {
+    try {
+      addCategory(name);
+      notifyCategoriesChanged();
+      notifyTasksChanged();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("categories:rename", async (oldName, newName) => {
+    try {
+      renameCategory(oldName, newName);
+      notifyCategoriesChanged();
+      notifyTasksChanged();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("categories:delete", async (name) => {
+    try {
+      deleteCategory(name);
+      notifyCategoriesChanged();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

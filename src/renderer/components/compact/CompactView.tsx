@@ -4,6 +4,7 @@ import type { UpcomingRange } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useBacklogData } from "../../hooks/useBacklogData";
+import { useCategories } from "../../hooks/useCategories";
 import { useTaskData } from "../../hooks/useTaskData";
 import { useUpcomingTasks } from "../../hooks/useUpcomingTasks";
 import { queryKeys } from "../../queries/keys";
@@ -20,8 +21,10 @@ const HEADER_HEIGHT = 32;
 
 export default function CompactView() {
   const queryClient = useQueryClient();
+  // 카테고리 캐시 초기화 — compact 컴포넌트들이 getCategoryColor()를 동기적으로 사용
+  useCategories();
   const [minimized, setMinimized] = useState(false);
-  const [sortMode, setSortMode] = useState<TaskSortMode>("time");
+  const [sortMode, setSortMode] = useState<TaskSortMode>("category");
   const [upcomingRange, setUpcomingRange] = useState<UpcomingRange>("1m");
 
   // Chat에서 태스크 변경 시 자동 새로고침

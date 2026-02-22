@@ -1,11 +1,12 @@
 /** 채팅 AI 도구 정의 — Task Manager + Memory + Prowl FS 연동, 툴 레지스트리 등록 */
 
 import "./chat-tools-fs";
-import type { Task, TaskPriority } from "@shared/types";
+import type { Task } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { getChatWindow, getCompactWindow, getDashboardWindow } from "../windows";
 import { waitForApproval } from "./approval";
+import { addCategory, deleteCategory, listCategories, renameCategory } from "./categories";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./memory";
 import { refreshReminders } from "./task-reminder";
 import {
@@ -61,6 +62,15 @@ function notifyTasksChanged(): void {
   }
 }
 
+/** 모든 창에 카테고리 변경 알림 */
+function notifyCategoriesChanged(): void {
+  for (const win of [getCompactWindow(), getDashboardWindow(), getChatWindow()]) {
+    if (win && !win.isDestroyed()) {
+      win.webContents.send("categories:changed");
+    }
+  }
+}
+
 const get_today_info = tool({
   description: "Get today's date, current time, and day of week.",
   inputSchema: z.object({}),
@@ -102,17 +112,15 @@ const add_task = tool({
     backlog: z.boolean().optional().describe("If true, add to backlog"),
     description: z.string().optional(),
     dueTime: z.string().optional().describe('Time in "HH:MM" format'),
-    priority: z.enum(["high", "medium", "low"]).optional().describe("Defaults to medium"),
-    category: z.string().optional(),
+    category: z.string().optional().describe("Task category"),
   }),
-  execute: async ({ title, date, backlog, description, dueTime, priority, category }) => {
+  execute: async ({ title, date, backlog, description, dueTime, category }) => {
     try {
       const task: Task = {
         id: generateId(),
         title,
         description,
         dueTime,
-        priority: (priority ?? "medium") as TaskPriority,
         category,
         completed: false,
         createdAt: new Date().toISOString(),
@@ -141,7 +149,6 @@ const update_task = tool({
     title: z.string().optional(),
     description: z.string().optional(),
     dueTime: z.string().optional().describe('"HH:MM" format'),
-    priority: z.enum(["high", "medium", "low"]).optional(),
     category: z.string().optional(),
     newDate: z.string().optional().describe('Move to new date "YYYY-MM-DD" or "backlog"'),
   }),
@@ -161,7 +168,6 @@ const update_task = tool({
       if (updates.title !== undefined) merged.title = updates.title;
       if (updates.description !== undefined) merged.description = updates.description;
       if (updates.dueTime !== undefined) merged.dueTime = updates.dueTime;
-      if (updates.priority !== undefined) merged.priority = updates.priority as TaskPriority;
       if (updates.category !== undefined) merged.category = updates.category;
 
       // 날짜 이동
@@ -357,6 +363,91 @@ const delete_memory = tool({
   },
 });
 
+const list_categories = tool({
+  description: "List all task categories.",
+  inputSchema: z.object({}),
+  execute: async () => {
+    try {
+      return { categories: listCategories() };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
+const add_category = tool({
+  description: "Add a new task category.",
+  inputSchema: z.object({
+    name: z.string().describe("Category name"),
+  }),
+  execute: async ({ name }) => {
+    try {
+      const category = addCategory(name);
+      notifyCategoriesChanged();
+      return { success: true, category };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
+const rename_category = tool({
+  description:
+    "Rename an existing category. All tasks with the old category name will be updated automatically.",
+  inputSchema: z.object({
+    oldName: z.string().describe("Current category name"),
+    newName: z.string().describe("New category name"),
+  }),
+  execute: async ({ oldName, newName }) => {
+    try {
+      renameCategory(oldName, newName);
+      notifyCategoriesChanged();
+      notifyTasksChanged();
+      return { success: true };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
+const delete_category = tool({
+  description:
+    "Delete a category. Tasks assigned to it will be moved to '기타'. Cannot delete '기타'.",
+  inputSchema: z.object({
+    name: z.string().describe("Category name to delete"),
+  }),
+  execute: async ({ name }) => {
+    try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", currentRoomId, {
+        id: approvalId,
+        role: "assistant",
+        content: `"${name}" 카테고리를 삭제할까요? 해당 카테고리의 태스크는 '기타'로 변경됩니다.`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "delete_category",
+          displayName: name,
+          args: { name },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 삭제를 취소했습니다." };
+      }
+
+      deleteCategory(name);
+      notifyCategoriesChanged();
+      notifyTasksChanged();
+      return { success: true };
+    } catch (error) {
+      return { error: String(error) };
+    }
+  },
+});
+
 // 태스크 관리 툴 등록
 toolRegistry.register(
   { name: "task-manager", label: "태스크 관리", dangerLevel: "moderate" },
@@ -367,6 +458,12 @@ toolRegistry.register(
 toolRegistry.register(
   { name: "memory-manager", label: "메모리 관리", dangerLevel: "safe" },
   { save_memory, list_memories, update_memory, delete_memory },
+);
+
+// 카테고리 관리 툴 등록
+toolRegistry.register(
+  { name: "category-manager", label: "카테고리 관리", dangerLevel: "moderate" },
+  { list_categories, add_category, rename_category, delete_category },
 );
 
 /** 레지스트리에 등록된 전체 도구 반환 (chat.ts에서 사용) */
