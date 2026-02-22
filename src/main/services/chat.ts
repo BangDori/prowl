@@ -56,18 +56,10 @@ Always call list_memories first when the user asks to update or delete a memory,
 Match the user's language (Korean if they write in Korean).
 Never use bold (**) formatting in your messages.
 
-Respond in multiple short messages like a messenger chat.
-Put "---" on its own line between messages.
-Keep each message to 1-3 sentences.
-Never put "---" as a separator inside code blocks (\`\`\`).
-Do not split lists, tables, or code blocks across messages.
-
 ## UI Output
 When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), output a complete HTML document directly in your message (starting with <!DOCTYPE html>). It will be automatically detected and rendered live in a preview panel alongside the chat.
 - You may include explanatory text before or after the HTML in the same response.
-- Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.
-- The preview panel has a white background by default.
-- Do not put "---" separators inside the HTML document.`;
+- Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
@@ -80,13 +72,6 @@ When you want to display structured content (cards, tables, charts, dashboards, 
   }
 
   return prompt;
-}
-
-/** 구분자 위치가 코드 블록 내부인지 판별 (``` 개수가 홀수면 내부) */
-function isInsideCodeBlock(text: string, pos: number): boolean {
-  const before = text.slice(0, pos);
-  const count = (before.match(/```/g) || []).length;
-  return count % 2 === 1;
 }
 
 /** 채팅 윈도우에 이벤트 전송 (윈도우 없으면 무시) */
@@ -168,43 +153,19 @@ export async function streamChatMessage(
     });
 
     let buffer = "";
-    let msgIndex = 0;
     const baseTs = Date.now();
-    const delimiterRegex = /\n+\s*---\s*\n+/;
 
     for await (const chunk of result.textStream) {
       buffer += chunk;
-
-      let match = delimiterRegex.exec(buffer);
-      while (match) {
-        if (!isInsideCodeBlock(buffer, match.index)) {
-          const content = buffer.slice(0, match.index).trim();
-          if (content) {
-            const msg: ChatMessage = {
-              id: `msg_${baseTs}_${msgIndex}`,
-              role: "assistant",
-              content,
-              timestamp: baseTs + msgIndex,
-            };
-            sendToChat("chat:stream-message", roomId, msg);
-            aiMessages.push(msg);
-            msgIndex++;
-          }
-          buffer = buffer.slice(match.index + match[0].length);
-          match = delimiterRegex.exec(buffer);
-        } else {
-          break;
-        }
-      }
     }
 
-    const remaining = buffer.trim();
-    if (remaining) {
+    const content = buffer.trim();
+    if (content) {
       const msg: ChatMessage = {
-        id: `msg_${baseTs}_${msgIndex}`,
+        id: `msg_${baseTs}`,
         role: "assistant",
-        content: remaining,
-        timestamp: baseTs + msgIndex,
+        content,
+        timestamp: baseTs,
       };
       sendToChat("chat:stream-message", roomId, msg);
       aiMessages.push(msg);
