@@ -1,7 +1,7 @@
 /** 채팅 입력바 — input 상태를 격리하여 MessageBubble 재렌더 차단 */
 import type { ChatConfig, ProviderStatus } from "@shared/types";
 import { Plus, Send } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ModelSelector from "../ModelSelector";
 import type { PageContext } from "./PreviewPanel";
 
@@ -38,6 +38,12 @@ export default function ChatInputBar({
   const [input, setInput] = useState("");
   const [placeholder] = useState(getRandomPlaceholder);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const onFocus = () => textareaRef.current?.focus();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, []);
 
   const handleSend = useCallback(() => {
     const content = input.trim();
