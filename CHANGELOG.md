@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.42.0] - 2026-02-22
+- 프리뷰 패널 URL 탭에 네비게이션 바 추가: 뒤로/앞으로/새로고침/중지/URL 입력 지원
+- 탭 바에 새 탭(+) 버튼 추가: 빈 URL 탭 생성 및 URL 입력창 자동 포커스
+- about:blank 탭에 Prowl 브랜딩 페이지 표시: 로고, 타이틀, GitHub 링크
+
 ## [1.41.0] - 2026-02-22
 - Prowl Chat 함께 보기(co-browsing): PreviewPanel에서 외부 URL 또는 HTML 탭 열기 시 페이지 텍스트를 AI 컨텍스트에 자동 주입
 - 입력창 위 "👁 Prowl이 함께 보고 있어요 · hostname" 인디케이터 표시
