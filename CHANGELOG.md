@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.44.1] - 2026-02-22
+- AI 응답 멀티 메시지(--- 구분자) 방식 제거, 단일 메시지로 응답 품질 개선
+- 채팅 창 재오픈 시 입력창 자동 포커스
+
 ## [1.44.0] - 2026-02-22
 - AI 채팅에서 ~/.prowl/ 전체 파일 조회 가능 (economic-freedom, scripts 등 모든 하위 경로 탐색 및 읽기)
 
