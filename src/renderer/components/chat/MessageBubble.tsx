@@ -1,7 +1,7 @@
 /** 개별 채팅 메시지 버블 컴포넌트 */
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatMessage, ToolApprovalMeta } from "@shared/types";
-import { ArrowUpRight, Check, Copy, Play, X } from "lucide-react";
+import { ArrowUpRight, Check, Code, Copy, Play, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -203,10 +203,23 @@ export default function MessageBubble({
                 <button
                   type="button"
                   onClick={() => onOpenHtml(htmlContent)}
-                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors select-none"
+                  className="mt-2 w-full text-left rounded-lg overflow-hidden border border-white/10 hover:border-accent/40 transition-colors group/html"
                 >
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                  HTML 보기
+                  <div className="flex items-center justify-between px-2.5 py-1.5 bg-black/30 border-b border-white/10">
+                    <div className="flex items-center gap-1.5">
+                      <Code className="w-3 h-3 text-accent" />
+                      <span className="text-[11px] font-medium text-white/60">HTML</span>
+                    </div>
+                    <span className="text-[10px] text-accent/60 group-hover/html:text-accent transition-colors">
+                      열기 →
+                    </span>
+                  </div>
+                  <div className="relative px-2.5 py-2 max-h-16 overflow-hidden bg-black/20">
+                    <pre className="text-[10px] leading-relaxed text-white/25 whitespace-pre-wrap break-all">
+                      {htmlContent.slice(0, 400)}
+                    </pre>
+                    <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-black/50 to-transparent" />
+                  </div>
                 </button>
               )}
             </>
