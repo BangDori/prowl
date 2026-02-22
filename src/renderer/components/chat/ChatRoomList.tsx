@@ -1,11 +1,12 @@
 /** 채팅 룸 목록 컴포넌트 */
 import type { ChatRoomSummary } from "@shared/types";
-import { Lock, Trash2, Unlock } from "lucide-react";
+import { Lock, Star, Trash2, Unlock } from "lucide-react";
 import { useCallback } from "react";
 import {
   useChatRooms,
   useChatUnreadCounts,
   useDeleteChatRoom,
+  useToggleChatRoomFavorite,
   useToggleChatRoomLock,
 } from "../../hooks/useChatRooms";
 
@@ -31,6 +32,7 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
   const { data: unreadCounts = {} } = useChatUnreadCounts();
   const deleteRoom = useDeleteChatRoom();
   const toggleLock = useToggleChatRoomLock();
+  const toggleFavorite = useToggleChatRoomFavorite();
 
   const handleDeleteRoom = useCallback(
     (roomId: string) => {
@@ -46,6 +48,13 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
     [toggleLock],
   );
 
+  const handleToggleFavorite = useCallback(
+    (roomId: string) => {
+      toggleFavorite.mutate(roomId);
+    },
+    [toggleFavorite],
+  );
+
   if (isLoading || rooms.length === 0) return null;
 
   return (
@@ -58,6 +67,7 @@ export default function ChatRoomList({ onSelectRoom }: ChatRoomListProps) {
           onSelect={() => onSelectRoom(room.id)}
           onDelete={() => handleDeleteRoom(room.id)}
           onToggleLock={() => handleToggleLock(room.id)}
+          onToggleFavorite={() => handleToggleFavorite(room.id)}
         />
       ))}
     </div>
@@ -71,18 +81,23 @@ function RoomItem({
   onSelect,
   onDelete,
   onToggleLock,
+  onToggleFavorite,
 }: {
   room: ChatRoomSummary;
   unreadCount: number;
   onSelect: () => void;
   onDelete: () => void;
   onToggleLock: () => void;
+  onToggleFavorite: () => void;
 }) {
   return (
     <div className="chat-room-item group">
       <button type="button" onClick={onSelect} className="flex-1 min-w-0 text-left">
         <div className="flex items-center gap-1 min-w-0">
           {room.locked && <Lock className="w-2.5 h-2.5 text-white/40 flex-shrink-0" />}
+          {room.favorited && (
+            <Star className="w-2.5 h-2.5 text-yellow-400/70 flex-shrink-0 fill-yellow-400/70" />
+          )}
           <span className="text-[13px] text-white/90 truncate">{room.title}</span>
         </div>
         {room.lastMessage && (
@@ -100,6 +115,21 @@ function RoomItem({
           <span className="text-[10px] text-white/30">{formatRelativeTime(room.updatedAt)}</span>
         </div>
         <div className="hidden group-hover:flex items-center gap-0.5 mt-0.5">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className="p-1 rounded transition-colors"
+            style={{ color: room.favorited ? "rgb(250 204 21 / 0.8)" : "rgb(255 255 255 / 0.3)" }}
+            title={room.favorited ? "즐겨찾기 해제" : "즐겨찾기"}
+          >
+            <Star
+              className="w-3 h-3"
+              style={{ fill: room.favorited ? "rgb(250 204 21 / 0.8)" : "transparent" }}
+            />
+          </button>
           {!room.locked && (
             <button
               type="button"

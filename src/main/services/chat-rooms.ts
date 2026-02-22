@@ -46,7 +46,7 @@ function writeRoomFile(room: ChatRoom): void {
   writeFileSync(roomFilePath(room.id), JSON.stringify(room, null, 2), "utf-8");
 }
 
-/** 룸 목록 조회 (summaries, updatedAt 내림차순) */
+/** 룸 목록 조회 (summaries, 즐겨찾기 우선 → updatedAt 내림차순) */
 export function listChatRooms(): ChatRoomSummary[] {
   const folder = ensureFolder();
   const files = readdirSync(folder).filter((f) => f.endsWith(".json"));
@@ -63,11 +63,16 @@ export function listChatRooms(): ChatRoomSummary[] {
         createdAt: room.createdAt,
         updatedAt: room.updatedAt,
         locked: room.locked,
+        favorited: room.favorited,
       });
     }
   }
 
-  return summaries.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return summaries.sort((a, b) => {
+    if (a.favorited && !b.favorited) return -1;
+    if (!a.favorited && b.favorited) return 1;
+    return b.updatedAt.localeCompare(a.updatedAt);
+  });
 }
 
 /** 룸 상세 조회 (메시지 포함) */
@@ -104,6 +109,14 @@ export function toggleChatRoomLock(roomId: string): void {
   const room = readRoomFile(roomId);
   if (!room) throw new Error(`Chat room not found: ${roomId}`);
   room.locked = !room.locked;
+  writeRoomFile(room);
+}
+
+/** 룸 즐겨찾기 토글 */
+export function toggleChatRoomFavorite(roomId: string): void {
+  const room = readRoomFile(roomId);
+  if (!room) throw new Error(`Chat room not found: ${roomId}`);
+  room.favorited = !room.favorited;
   writeRoomFile(room);
 }
 
