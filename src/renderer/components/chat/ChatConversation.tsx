@@ -64,6 +64,12 @@ export default function ChatConversation({
   const [isDragging, setIsDragging] = useState(false);
   const splitWrapperRef = useRef<HTMLDivElement>(null);
 
+  // isExpanded를 ref로 추적 — addOrActivateTab 클로저의 stale 값 방지
+  const isExpandedRef = useRef(isExpanded);
+  useEffect(() => {
+    isExpandedRef.current = isExpanded;
+  }, [isExpanded]);
+
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
   if (prevRoomId !== roomId) {
@@ -262,11 +268,11 @@ export default function ChatConversation({
         const label = dedupeLabel(newTab.label, prev);
         return [...prev, { ...newTab, id, label } as PreviewTab];
       });
-      if (!isExpanded && !activated) {
+      if (!isExpandedRef.current && !activated) {
         await onToggleExpand();
       }
     },
-    [isExpanded, onToggleExpand],
+    [onToggleExpand],
   );
 
   /** 탭 닫기 — 마지막 탭 닫힐 시 분할 뷰 자동 해제 */

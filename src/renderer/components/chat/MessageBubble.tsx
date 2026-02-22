@@ -179,7 +179,7 @@ export default function MessageBubble({
         ) : (
           <div className="w-7 mr-2 flex-shrink-0" />
         ))}
-      <div className={`max-w-[85%] flex ${isUser ? "items-end" : "items-end"} gap-1`}>
+      <div className={`max-w-[85%] min-w-0 flex ${isUser ? "items-end" : "items-end"} gap-1`}>
         {showMeta && isUser && (
           <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
         )}
