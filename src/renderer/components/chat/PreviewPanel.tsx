@@ -193,7 +193,7 @@ const UrlContent = forwardRef<
 UrlContent.displayName = "UrlContent";
 
 /** about:blank 탭에 표시되는 Prowl 브랜딩 페이지 */
-function BlankPage() {
+function BlankPage({ onOpenLink }: { onOpenLink?: (url: string, label: string) => void }) {
   return (
     <div
       style={{
@@ -221,27 +221,29 @@ function BlankPage() {
       <span style={{ fontSize: 13, color: "rgba(255,255,255,0.28)", marginTop: 4 }}>
         URL을 입력해 탐색하세요
       </span>
-      <a
-        href="https://github.com/BangDori/prowl"
-        target="_blank"
-        rel="noopener noreferrer"
+      <button
+        type="button"
+        onClick={() => onOpenLink?.("https://github.com/BangDori/prowl", "GitHub")}
         style={{
           position: "absolute",
           bottom: 16,
           fontSize: 11,
           color: "rgba(255,255,255,0.2)",
-          textDecoration: "none",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 0,
           transition: "color 0.15s",
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.5)";
+          (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.5)";
         }}
         onMouseLeave={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "rgba(255,255,255,0.2)";
+          (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.2)";
         }}
       >
         GitHub
-      </a>
+      </button>
     </div>
   );
 }
@@ -420,7 +422,7 @@ export default function PreviewPanel({
             onNavStateChange={handleNavStateChange}
           />
         )}
-        {isBlankTab && <BlankPage />}
+        {isBlankTab && <BlankPage onOpenLink={onOpenLink} />}
       </div>
     </div>
   );
