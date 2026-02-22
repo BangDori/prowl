@@ -1,4 +1,6 @@
 /** 탭 기반 프리뷰 패널 — HTML 및 외부 URL을 브라우저 탭처럼 표시 */
+
+import prowlLogo from "@assets/prowl-logo.png";
 import { ChevronLeft, ChevronRight, Plus, RotateCcw, X } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
@@ -190,6 +192,38 @@ const UrlContent = forwardRef<
 });
 UrlContent.displayName = "UrlContent";
 
+/** about:blank 탭에 표시되는 Prowl 브랜딩 페이지 */
+function BlankPage() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100%",
+        gap: 10,
+        background: "rgba(14, 11, 22, 0.96)",
+      }}
+    >
+      <img src={prowlLogo} alt="Prowl" style={{ width: 88, height: 88, opacity: 0.8 }} />
+      <span
+        style={{
+          fontSize: 24,
+          fontWeight: 700,
+          color: "rgba(255,255,255,0.6)",
+          letterSpacing: "0.14em",
+        }}
+      >
+        PROWL
+      </span>
+      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.28)", marginTop: 4 }}>
+        URL을 입력해 탐색하세요
+      </span>
+    </div>
+  );
+}
+
 export default function PreviewPanel({
   tabs,
   activeTabId,
@@ -218,7 +252,8 @@ export default function PreviewPanel({
   tabsRef.current = tabs;
   useEffect(() => {
     const tab = tabsRef.current.find((t) => t.id === activeTabId) ?? tabsRef.current.at(-1);
-    const initUrl = tab?.type === "url" ? tab.url : "";
+    // about:blank 탭은 URL 입력창을 비워 placeholder가 보이게 함
+    const initUrl = tab?.type === "url" && tab.url !== "about:blank" ? tab.url : "";
     setNavState({ canGoBack: false, canGoForward: false, isLoading: false, currentUrl: initUrl });
     if (!isInputFocused.current) setNavInput(initUrl);
     if (tab?.type === "url" && tab.url === "about:blank") {
@@ -234,17 +269,29 @@ export default function PreviewPanel({
     if (!isInputFocused.current) setNavInput(state.currentUrl);
   }, []);
 
+  const isBlankTab = activeTab?.type === "url" && activeTab.url === "about:blank";
+  const isActiveUrl = activeTab?.type === "url";
+
   const handleUrlSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     let target = navInput.trim();
+    if (!target || target === "about:blank") return;
     if (!target.startsWith("http://") && !target.startsWith("https://")) {
       target = `https://${target}`;
     }
-    urlContentRef.current?.loadURL(target);
+    if (isBlankTab && activeTab) {
+      // 빈 탭: 새 URL 탭 열고 이 탭 닫기 (webview가 없으므로 loadURL 불가)
+      try {
+        onOpenLink?.(target, new URL(target).hostname);
+      } catch {
+        onOpenLink?.(target, target);
+      }
+      onCloseTab(activeTab.id);
+    } else {
+      urlContentRef.current?.loadURL(target);
+    }
     isInputFocused.current = false;
   };
-
-  const isActiveUrl = activeTab?.type === "url";
 
   return (
     <div className={`chat-preview-panel${isDragging ? " is-dragging" : ""}`}>
@@ -325,7 +372,8 @@ export default function PreviewPanel({
                 );
               }}
               ref={urlInputRef}
-              className="w-full bg-white/10 rounded px-2 py-0.5 text-[11px] text-white/70 outline-none focus:bg-white/15 focus:text-white/90 transition-colors"
+              placeholder="URL 입력..."
+              className="w-full bg-white/10 rounded px-2 py-0.5 text-[11px] text-white/70 placeholder:text-white/25 outline-none focus:bg-white/15 focus:text-white/90 transition-colors"
               spellCheck={false}
             />
           </form>
@@ -342,7 +390,7 @@ export default function PreviewPanel({
             onPageContextChange={onPageContextChange}
           />
         )}
-        {activeTab?.type === "url" && (
+        {activeTab?.type === "url" && !isBlankTab && (
           <UrlContent
             ref={urlContentRef}
             url={activeTab.url}
@@ -350,6 +398,7 @@ export default function PreviewPanel({
             onNavStateChange={handleNavStateChange}
           />
         )}
+        {isBlankTab && <BlankPage />}
       </div>
     </div>
   );
