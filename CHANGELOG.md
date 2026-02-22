@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.43.1] - 2026-02-22
+- Settings API 키 저장 시 Prowl Chat에 즉시 반영 (재시작 불필요)
+- OpenAI API 키 전역 환경변수 fallback 제거 (Settings에서 명시적으로 저장한 키만 사용)
+- API Keys 설정에 Remove 버튼 추가로 저장된 키 즉시 삭제 가능
+- API 키 Change 후 Save 시 UI가 갱신되지 않던 버그 수정 (queryKeys.jobs 참조 오류)
+
 ## [1.43.0] - 2026-02-22
 - 프리뷰 패널 인탭 브라우저 히스토리 스택 추가: HTML 링크 클릭 및 새 창 이벤트가 새 탭 대신 현재 탭 히스토리에 쌓임
 - 뒤로/앞으로 버튼이 webview 내부 히스토리와 커스텀 히스토리를 계층적으로 통합 탐색
