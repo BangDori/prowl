@@ -17,6 +17,11 @@ import MessageBubble from "./MessageBubble";
 import PreviewPanel, { type PageContext, type PreviewTab } from "./PreviewPanel";
 import UnreadDivider from "./UnreadDivider";
 
+/** Omit<PreviewTab, "id"> — TypeScript의 union 분배 미지원으로 명시적 정의 */
+type NewPreviewTab =
+  | { type: "html"; content: string; label: string }
+  | { type: "url"; url: string; label: string };
+
 /** 탭 레이블 중복 시 숫자 접미사 부여 */
 function dedupeLabel(label: string, existing: PreviewTab[]): string {
   const same = existing.filter((t) => t.label === label || t.label.startsWith(`${label} `));
@@ -65,6 +70,10 @@ export default function ChatConversation({
   const splitWrapperRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const prevIsSplitViewRef = useRef(false);
+
+  // isExpanded를 ref로도 추적 — addOrActivateTab 클로저에서 최신 값을 읽기 위함
+  const isExpandedRef = useRef(isExpanded);
+  isExpandedRef.current = isExpanded;
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
@@ -267,26 +276,32 @@ export default function ChatConversation({
 
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
-    async (newTab: Omit<PreviewTab, "id">) => {
-      let activated = false;
+    async (newTab: NewPreviewTab) => {
+      const key = newTab.type === "html" ? newTab.content : newTab.url;
+      const existing = previewTabs.find((t) => (t.type === "html" ? t.content : t.url) === key);
+
+      if (existing) {
+        // 이미 열린 탭 활성화 — 창 크기 변경 없음
+        setActiveTabId(existing.id);
+        return;
+      }
+
+      // 새 탭 추가 (updater에서도 중복 체크하여 rapid-click 방어)
+      const id = `tab_${Date.now()}`;
       setPreviewTabs((prev) => {
-        const key = newTab.type === "html" ? newTab.content : newTab.url;
-        const existing = prev.find((t) => (t.type === "html" ? t.content : t.url) === key);
-        if (existing) {
-          setActiveTabId(existing.id);
-          activated = true;
-          return prev;
-        }
-        const id = `tab_${Date.now()}`;
-        setActiveTabId(id);
+        const alreadyExists = prev.find((t) => (t.type === "html" ? t.content : t.url) === key);
+        if (alreadyExists) return prev;
         const label = dedupeLabel(newTab.label, prev);
         return [...prev, { ...newTab, id, label } as PreviewTab];
       });
-      if (!isExpanded && !activated) {
+      setActiveTabId(id);
+
+      // isExpandedRef.current으로 최신 상태를 읽어 stale closure 방지
+      if (!isExpandedRef.current) {
         await onToggleExpand();
       }
     },
-    [isExpanded, onToggleExpand],
+    [onToggleExpand, previewTabs],
   );
 
   /** 탭 닫기 — 마지막 탭 닫힐 시 분할 뷰 자동 해제 */
