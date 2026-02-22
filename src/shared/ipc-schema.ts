@@ -5,7 +5,6 @@ import type {
   ChatMessage,
   ChatRoom,
   ChatRoomSummary,
-  ClaudeConfig,
   FocusMode,
   IpcResult,
   Memory,
@@ -136,10 +135,6 @@ export interface IpcInvokeSchema {
   "categories:add": { params: [name: string]; return: IpcResult };
   "categories:rename": { params: [oldName: string, newName: string]; return: IpcResult };
   "categories:delete": { params: [name: string]; return: IpcResult };
-
-  // Claude Config (2 channels)
-  "claude-config:list": { params: []; return: ClaudeConfig };
-  "claude-config:read-file": { params: [filePath: string]; return: string };
 
   // Memory (4 channels)
   "memory:list": { params: []; return: Memory[] };

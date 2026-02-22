@@ -73,10 +73,6 @@ const electronAPI = {
   toggleBacklogComplete: invokeIpc("tasks:toggle-backlog-complete"),
   deleteBacklogTask: invokeIpc("tasks:delete-backlog"),
 
-  // Claude Config
-  getClaudeConfig: invokeIpc("claude-config:list"),
-  readConfigFile: invokeIpc("claude-config:read-file"),
-
   // Chat Rooms
   listChatRooms: invokeIpc("chat-rooms:list"),
   getChatRoom: invokeIpc("chat-rooms:get"),

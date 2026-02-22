@@ -16,11 +16,6 @@ export const queryKeys = {
       [...queryKeys.tasks.all, "dateRange", start, end] as const,
     backlog: () => [...queryKeys.tasks.all, "backlog"] as const,
   },
-  claude: {
-    all: ["claude"] as const,
-    config: () => [...queryKeys.claude.all, "config"] as const,
-    file: (path: string) => [...queryKeys.claude.all, "file", path] as const,
-  },
   app: {
     all: ["app"] as const,
     version: () => [...queryKeys.app.all, "version"] as const,
