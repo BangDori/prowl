@@ -10,8 +10,6 @@ import type {
   IpcResult,
   Memory,
   ProviderStatus,
-  ProwlScript,
-  ScriptRunInfo,
   Task,
   TasksByDate,
   UpdateCheckResult,
@@ -125,24 +123,6 @@ export interface IpcInvokeSchema {
     return: IpcResult;
   };
   "tasks:delete-backlog": { params: [taskId: string]; return: IpcResult };
-
-  // Scripts (8 channels)
-  "scripts:storage-path": { params: []; return: string };
-  "scripts:list": { params: []; return: ProwlScript[] };
-  "scripts:create": { params: [prompt: string]; return: IpcResult & { script?: ProwlScript } };
-  "scripts:update": {
-    params: [
-      id: string,
-      updates: Partial<
-        Pick<ProwlScript, "name" | "script" | "schedule" | "scheduleText" | "isEnabled">
-      >,
-    ];
-    return: IpcResult;
-  };
-  "scripts:delete": { params: [id: string]; return: IpcResult };
-  "scripts:toggle": { params: [id: string]; return: IpcResult };
-  "scripts:run": { params: [id: string]; return: IpcResult };
-  "scripts:logs": { params: [id: string]; return: ScriptRunInfo[] };
 
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };
