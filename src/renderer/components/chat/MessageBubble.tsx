@@ -80,9 +80,11 @@ interface MessageBubbleProps {
   onOpenLink?: (url: string, label: string) => void;
 }
 
-/** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
-function stripProwlUi(content: string): string {
-  return content.replace(/<prowl-ui>[\s\S]*?<\/prowl-ui>/g, "").trim();
+/** HTML 문서 블록을 제거한 표시용 텍스트 반환 */
+const HTML_DOC_REGEX = /<!DOCTYPE\s+html>[\s\S]*<\/html>/i;
+
+function stripHtmlDoc(content: string): string {
+  return content.replace(HTML_DOC_REGEX, "").trim();
 }
 
 export default function MessageBubble({
@@ -93,11 +95,11 @@ export default function MessageBubble({
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
-  const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
-  const displayContent = hasHtmlOutput ? stripProwlUi(message.content) : message.content;
+  const hasHtmlOutput = !isUser && HTML_DOC_REGEX.test(message.content);
+  const displayContent = hasHtmlOutput ? stripHtmlDoc(message.content) : message.content;
   const htmlContent = useMemo(() => {
     if (!hasHtmlOutput) return null;
-    return message.content.match(/<prowl-ui>([\s\S]*?)<\/prowl-ui>/)?.[1] ?? null;
+    return message.content.match(HTML_DOC_REGEX)?.[0] ?? null;
   }, [hasHtmlOutput, message.content]);
   const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
     message.approval?.status ?? "pending",

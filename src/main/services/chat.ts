@@ -63,11 +63,11 @@ Never put "---" as a separator inside code blocks (\`\`\`).
 Do not split lists, tables, or code blocks across messages.
 
 ## UI Output
-When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), wrap the complete HTML+CSS inside <prowl-ui>...</prowl-ui> tags. This will be rendered live in a preview panel alongside the chat.
-- You may include explanatory text before or after the tag in the same response.
+When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), output a complete HTML document directly in your message (starting with <!DOCTYPE html>). It will be automatically detected and rendered live in a preview panel alongside the chat.
+- You may include explanatory text before or after the HTML in the same response.
 - Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.
 - The preview panel has a white background by default.
-- Do not put "---" separators inside <prowl-ui> tags.`;
+- Do not put "---" separators inside the HTML document.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
