@@ -1,18 +1,17 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Bot, Brain, Cog, History, ListTodo, Terminal } from "lucide-react";
+import { Bot, Brain, Cog, History, ListTodo } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import ClaudeConfigSection from "./sections/ClaudeConfigSection";
 import MemorySection from "./sections/MemorySection";
-import ScriptsSection from "./sections/ScriptsSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "scripts" | "calendar" | "memory" | "changelog" | "settings" | "claude-config";
+type NavItem = "calendar" | "memory" | "changelog" | "settings" | "claude-config";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -62,7 +61,7 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
  * - SettingsSection: 앱 설정 (Night Watch 포함)
  */
 export default function DashboardLayout() {
-  const [activeNav, setActiveNav] = useState<NavItem>("scripts");
+  const [activeNav, setActiveNav] = useState<NavItem>("calendar");
 
   return (
     <div className="flex h-screen bg-transparent text-app-text-primary">
@@ -81,12 +80,6 @@ export default function DashboardLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 px-2 space-y-1">
-          <SidebarItem
-            icon={<Terminal className="w-4 h-4" />}
-            label="Script Library"
-            active={activeNav === "scripts"}
-            onClick={() => setActiveNav("scripts")}
-          />
           <SidebarItem
             icon={<ListTodo className="w-4 h-4" />}
             label="Task Manager"
@@ -126,11 +119,6 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 min-w-0">
         <div className="h-full overflow-hidden relative">
-          <div className={`h-full ${activeNav === "scripts" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Script Library">
-              <ScriptsSection />
-            </ErrorBoundary>
-          </div>
           <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
             <ErrorBoundary section="Task Manager">
               <CalendarSection />
