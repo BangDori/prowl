@@ -18,6 +18,7 @@ import {
   getChatRoom,
   listChatRooms,
   saveChatMessages,
+  toggleChatRoomFavorite,
   toggleChatRoomLock,
 } from "./services/chat-rooms";
 import { getClaudeConfig, getFileContent } from "./services/claude-config";
@@ -440,6 +441,15 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:toggle-lock", async (roomId) => {
     try {
       toggleChatRoomLock(roomId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("chat-rooms:toggle-favorite", async (roomId) => {
+    try {
+      toggleChatRoomFavorite(roomId);
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.40.0] - 2026-02-22
+- 채팅방 즐겨찾기(별) 기능 추가 — 별 클릭 시 목록 최상단으로 고정
+
 ## [1.39.3] - 2026-02-22
 - 채팅방 진입 시 스크롤 애니메이션 없이 즉시 최하단에서 시작
 

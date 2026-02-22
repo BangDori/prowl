@@ -54,6 +54,17 @@ export function useToggleChatRoomLock() {
   });
 }
 
+/** 채팅 룸 즐겨찾기 토글 */
+export function useToggleChatRoomFavorite() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (roomId: string) => window.electronAPI.toggleChatRoomFavorite(roomId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
+    },
+  });
+}
+
 /** 모든 룸의 안 읽은 메시지 수 조회 */
 export function useChatUnreadCounts() {
   return useQuery({
