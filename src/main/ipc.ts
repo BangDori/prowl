@@ -27,6 +27,7 @@ import { updateFocusModeMonitor } from "./services/focus-mode";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
 import {
   getChatConfig,
+  getCompactExpandedHeight,
   getFocusMode,
   getSettings,
   setChatConfig,
@@ -277,6 +278,11 @@ export function registerIpcHandlers(): void {
     if (!win || win.isDestroyed()) return;
     const [width] = win.getSize();
     win.setSize(width, Math.round(height));
+  });
+
+  // Task Manager 저장된 확장 높이 조회
+  handleIpc("compact:get-expanded-height", async () => {
+    return getCompactExpandedHeight();
   });
 
   // 월 단위 태스크 조회

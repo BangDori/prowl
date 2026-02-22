@@ -12,6 +12,7 @@ import Store from "electron-store";
 interface StoreSchema {
   settings: AppSettings;
   chatConfig: ChatConfig;
+  compactExpandedHeight?: number;
 }
 
 const store = new Store<StoreSchema>({
@@ -50,4 +51,13 @@ export function getChatConfig(): ChatConfig {
 
 export function setChatConfig(config: ChatConfig): void {
   store.set("chatConfig", config);
+}
+
+// Task Manager 창 높이
+export function getCompactExpandedHeight(): number {
+  return store.get("compactExpandedHeight") ?? 400;
+}
+
+export function saveCompactExpandedHeight(height: number): void {
+  store.set("compactExpandedHeight", height);
 }

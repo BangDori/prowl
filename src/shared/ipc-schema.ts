@@ -95,6 +95,7 @@ export interface IpcInvokeSchema {
   // Compact (2 channels)
   "compact:toggle": { params: []; return: IpcResult };
   "compact:resize": { params: [height: number]; return: void };
+  "compact:get-expanded-height": { params: []; return: number };
 
   // Tasks (11 channels)
   "tasks:list-month": {

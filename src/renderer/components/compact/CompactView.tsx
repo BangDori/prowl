@@ -18,7 +18,6 @@ import CompactHeader from "./CompactHeader";
 import CompactTaskList from "./CompactTaskList";
 import CompactUpcoming from "./CompactUpcoming";
 
-const FULL_HEIGHT = 400;
 const HEADER_HEIGHT = 32;
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -142,10 +141,15 @@ export default function CompactView() {
     [backlogTasks, toggleBacklogComplete, toggleComplete],
   );
 
-  const handleToggleMinimize = useCallback(() => {
+  const handleToggleMinimize = useCallback(async () => {
     const next = !minimized;
     setMinimized(next);
-    window.electronAPI.resizeCompactView(next ? HEADER_HEIGHT : FULL_HEIGHT);
+    if (next) {
+      window.electronAPI.resizeCompactView(HEADER_HEIGHT);
+    } else {
+      const savedHeight = await window.electronAPI.getCompactExpandedHeight();
+      window.electronAPI.resizeCompactView(savedHeight);
+    }
   }, [minimized]);
 
   const hasCompleted = completedGroups.length > 0;

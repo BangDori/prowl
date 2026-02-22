@@ -2,6 +2,7 @@
 import * as path from "node:path";
 import { BrowserWindow, screen } from "electron";
 import { COMPACT, DEV_SERVER_PORT } from "../constants";
+import { getCompactExpandedHeight, saveCompactExpandedHeight } from "../services/settings";
 
 let compactWindow: BrowserWindow | null = null;
 
@@ -31,7 +32,7 @@ export function showCompactWindow(): void {
 
   compactWindow = new BrowserWindow({
     width: COMPACT.WIDTH,
-    height: COMPACT.HEIGHT,
+    height: getCompactExpandedHeight(),
     x,
     y,
     resizable: true,
@@ -67,6 +68,14 @@ export function showCompactWindow(): void {
   compactWindow.once("ready-to-show", () => compactWindow?.show());
   compactWindow.on("closed", () => {
     compactWindow = null;
+  });
+
+  // 사용자가 창 높이를 드래그로 변경할 때 저장 (최소화 높이 제외)
+  compactWindow.on("resize", () => {
+    const win = compactWindow;
+    if (!win || win.isDestroyed()) return;
+    const [, h] = win.getSize();
+    if (h > 50) saveCompactExpandedHeight(h);
   });
 }
 
