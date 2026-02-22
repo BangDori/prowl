@@ -5,7 +5,7 @@ import {
   type FocusMode,
   type ShortcutConfig,
 } from "@shared/types";
-import { Bell, ExternalLink, KeyRound, Pencil, RefreshCw } from "lucide-react";
+import { Bell, ExternalLink, KeyRound, Pencil, RefreshCw, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
@@ -54,6 +54,12 @@ export default function SettingsSection() {
       { ...settings, openaiApiKey: apiKeyInput.trim() },
       { onSuccess: () => setApiKeyEditing(false) },
     );
+  };
+
+  const removeApiKey = () => {
+    if (!settings) return;
+    updateSettings.mutate({ ...settings, openaiApiKey: "" });
+    setApiKeyInput("");
   };
 
   const hasSavedApiKey = !!settings?.openaiApiKey;
@@ -147,14 +153,25 @@ export default function SettingsSection() {
                 <p className="text-[10px] text-gray-500">Used for Prowl Chat (GPT models)</p>
               </div>
               {hasSavedApiKey && !apiKeyEditing ? (
-                <button
-                  type="button"
-                  onClick={() => setApiKeyEditing(true)}
-                  className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors shrink-0"
-                >
-                  <Pencil className="w-2.5 h-2.5" />
-                  Change
-                </button>
+                <div className="flex gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setApiKeyEditing(true)}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors"
+                  >
+                    <Pencil className="w-2.5 h-2.5" />
+                    Change
+                  </button>
+                  <button
+                    type="button"
+                    onClick={removeApiKey}
+                    disabled={updateSettings.isPending}
+                    className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="w-2.5 h-2.5" />
+                    Remove
+                  </button>
+                </div>
               ) : (
                 <div className="flex gap-2 shrink-0">
                   <input
