@@ -145,6 +145,7 @@ export interface IpcInvokeSchema {
  */
 export interface IpcEventSchema {
   "window:show": { params: [] };
+  "settings:changed": { params: [] };
   "tasks:changed": { params: [] };
   "chat:stream-message": { params: [message: ChatMessage] };
   "chat:stream-done": { params: [] };
