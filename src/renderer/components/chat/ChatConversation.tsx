@@ -3,7 +3,7 @@ import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Maximize2, Minimize2, Plus, Send, X } from "lucide-react";
+import { ChevronLeft, Maximize2, Minimize2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   useChatRoom,
@@ -12,27 +12,15 @@ import {
   useSaveChatMessages,
 } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";
-import ModelSelector from "../ModelSelector";
+import ChatInputBar from "./ChatInputBar";
 import MessageBubble from "./MessageBubble";
-import PreviewPanel, { type PreviewTab } from "./PreviewPanel";
+import PreviewPanel, { type PageContext, type PreviewTab } from "./PreviewPanel";
 import UnreadDivider from "./UnreadDivider";
 
 /** 탭 레이블 중복 시 숫자 접미사 부여 */
 function dedupeLabel(label: string, existing: PreviewTab[]): string {
   const same = existing.filter((t) => t.label === label || t.label.startsWith(`${label} `));
   return same.length === 0 ? label : `${label} ${same.length + 1}`;
-}
-
-/** 채팅 입력창에 표시될 플레이스홀더 메시지 목록 */
-const PLACEHOLDERS = [
-  "무엇이든 물어봐라냥~",
-  "오늘은 뭘 도와줄까냥?",
-  "궁금한 게 있으면 말해라냥~",
-  "나한테 맡겨라냥! 🐾",
-];
-
-function getRandomPlaceholder(): string {
-  return PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
 }
 
 interface ChatConversationProps {
@@ -59,15 +47,12 @@ export default function ChatConversation({
   const markRead = useMarkChatRoomRead();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [placeholder] = useState(getRandomPlaceholder);
   const [chatConfig, setChatConfig] = useState<ChatConfig | null>(null);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [initialized, setInitialized] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
   const initialMessageProcessed = useRef(false);
@@ -236,37 +221,20 @@ export default function ChatConversation({
     }
   }, [initialMessage, initialized, sendMessage]);
 
-  const handleSend = useCallback(() => {
-    const content = input.trim();
-    if (!content || loading) return;
-    setInput("");
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
-    sendMessage(content);
-  }, [input, loading, sendMessage]);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-        e.preventDefault();
-        handleSend();
-      }
-    },
-    [handleSend],
-  );
-
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInput(e.target.value);
-    const el = e.target;
-    el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-  }, []);
-
   const hasMessages = messages.length > 0 || loading;
 
   // 탭 기반 프리뷰 패널 상태
   const [previewTabs, setPreviewTabs] = useState<PreviewTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
+
+  // 페이지 컨텍스트 (webview 로드 시 자동 추출)
+  const [pageContext, setPageContextState] = useState<PageContext | null>(null);
+
+  const handlePageContextChange = useCallback((ctx: PageContext | null) => {
+    setPageContextState(ctx);
+    window.electronAPI.setPageContext(ctx);
+  }, []);
 
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
@@ -420,39 +388,15 @@ export default function ChatConversation({
         </>
       )}
 
-      {/* 하단 입력바 */}
-      <div className="chat-input-bar">
-        {chatConfig && providers.length > 0 && (
-          <ModelSelector config={chatConfig} providers={providers} onSelect={handleConfigChange} />
-        )}
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          rows={1}
-          // biome-ignore lint/a11y/noAutofocus: 대화 진입 시 즉시 입력 가능해야 함
-          autoFocus
-          className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/30 resize-none outline-none leading-relaxed max-h-[120px]"
-        />
-        <button
-          type="button"
-          onClick={onNewChat}
-          title="새 대화"
-          className="flex-shrink-0 p-1.5 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={!input.trim() || loading}
-          className="chat-send-btn"
-        >
-          <Send className="w-3.5 h-3.5" />
-        </button>
-      </div>
+      <ChatInputBar
+        loading={loading}
+        chatConfig={chatConfig}
+        providers={providers}
+        pageContext={pageContext}
+        onSend={sendMessage}
+        onNewChat={onNewChat}
+        onConfigChange={handleConfigChange}
+      />
     </>
   );
 
@@ -473,6 +417,7 @@ export default function ChatConversation({
           onActivateTab={setActiveTabId}
           onCloseTab={closeTab}
           onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
+          onPageContextChange={handlePageContextChange}
           isDragging={isDragging}
         />
       </div>

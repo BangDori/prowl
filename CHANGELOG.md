@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.41.0] - 2026-02-22
+- Prowl Chat 함께 보기(co-browsing): PreviewPanel에서 외부 URL 또는 HTML 탭 열기 시 페이지 텍스트를 AI 컨텍스트에 자동 주입
+- 입력창 위 "👁 Prowl이 함께 보고 있어요 · hostname" 인디케이터 표시
+- 채팅 입력 딜레이 제거: input 상태를 ChatInputBar로 격리하여 타이핑 시 메시지 목록 재렌더 방지
+
 ## [1.40.0] - 2026-02-22
 - 채팅방 즐겨찾기(별) 기능 추가 — 별 클릭 시 목록 최상단으로 고정
 

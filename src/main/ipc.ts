@@ -5,7 +5,7 @@ import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { WINDOW } from "./constants";
 import { resolveApproval } from "./services/approval";
 import { runBrewUpgrade } from "./services/brew-updater";
-import { getProviderStatuses, streamChatMessage } from "./services/chat";
+import { getProviderStatuses, setPageContext, streamChatMessage } from "./services/chat";
 import {
   getAllUnreadCounts,
   markRoomAsRead,
@@ -206,6 +206,16 @@ export function registerIpcHandlers(): void {
   handleIpc("chat:reject-tool", async (approvalId) => {
     const ok = resolveApproval(approvalId, false);
     return { success: ok };
+  });
+
+  // 페이지 컨텍스트 설정 (PreviewPanel webview 로드/언마운트 시)
+  handleIpc("chat:set-page-context", async (context) => {
+    try {
+      setPageContext(context);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 앱 버전 조회

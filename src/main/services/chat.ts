@@ -1,4 +1,4 @@
-/** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling) */
+/** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling + 페이지 컨텍스트 주입) */
 import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
@@ -7,6 +7,14 @@ import { getChatTools } from "./chat-tools";
 import { listMemories } from "./memory";
 import { sendChatNotification } from "./notification";
 import { getSettings } from "./settings";
+
+/** 현재 사용자가 보고 있는 페이지 컨텍스트 (메모리만 보관, DB 저장 안 함) */
+let currentPageContext: { url: string; title: string; text: string } | null = null;
+
+/** 페이지 컨텍스트 설정 (PreviewPanel에서 webview 로드 시 호출) */
+export function setPageContext(context: { url: string; title: string; text: string } | null): void {
+  currentPageContext = context;
+}
 
 /** 오늘 날짜와 시간을 포함한 시스템 프롬프트 생성 */
 function buildSystemPrompt(): string {
@@ -65,6 +73,10 @@ When you want to display structured content (cards, tables, charts, dashboards, 
   if (memories.length > 0) {
     const items = memories.map((m) => `- ${m.content}`).join("\n");
     prompt += `\n\n# User Preferences (ALWAYS respect these)\n${items}`;
+  }
+
+  if (currentPageContext) {
+    prompt += `\n\n## 현재 사용자가 보고 있는 페이지\nURL: ${currentPageContext.url}\n제목: ${currentPageContext.title}\n내용:\n${currentPageContext.text}`;
   }
 
   return prompt;
