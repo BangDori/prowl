@@ -4,7 +4,7 @@ import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Maximize2, Minimize2, X } from "lucide-react";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   useChatRoom,
   useChatUnreadCounts,
@@ -63,6 +63,9 @@ export default function ChatConversation({
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
   const splitWrapperRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const savedScrollRef = useRef<number | null>(null);
+  const prevIsSplitViewRef = useRef(false);
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
@@ -237,6 +240,17 @@ export default function ChatConversation({
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
 
+  // 분할 뷰 전환 시 스크롤 위치 복원 (DOM 재마운트로 인한 scrollTop 초기화 방지)
+  useLayoutEffect(() => {
+    if (isSplitView && !prevIsSplitViewRef.current && savedScrollRef.current !== null) {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = savedScrollRef.current;
+      }
+      savedScrollRef.current = null;
+    }
+    prevIsSplitViewRef.current = isSplitView;
+  }, [isSplitView]);
+
   // 페이지 컨텍스트 (webview 로드 시 자동 추출)
   const [pageContext, setPageContextState] = useState<PageContext | null>(null);
 
@@ -248,6 +262,8 @@ export default function ChatConversation({
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
     async (newTab: Omit<PreviewTab, "id">) => {
+      // 분할 뷰 첫 진입 전 스크롤 위치 저장 (DOM 재마운트 후 복원용)
+      savedScrollRef.current = messagesContainerRef.current?.scrollTop ?? null;
       let activated = false;
       setPreviewTabs((prev) => {
         const key = newTab.type === "html" ? newTab.content : newTab.url;
@@ -323,7 +339,7 @@ export default function ChatConversation({
             isExpanded={isExpanded}
             onToggleExpand={onToggleExpand}
           />
-          <div className="flex-1 overflow-y-auto px-4 pb-3">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
               {messages.map((msg, idx) => {
                 const next = messages[idx + 1];
