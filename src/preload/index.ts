@@ -91,16 +91,6 @@ const electronAPI = {
   updateMemory: invokeIpc("memory:update"),
   deleteMemory: invokeIpc("memory:delete"),
 
-  // Scripts
-  getScriptStoragePath: invokeIpc("scripts:storage-path"),
-  listScripts: invokeIpc("scripts:list"),
-  createScript: invokeIpc("scripts:create"),
-  updateScript: invokeIpc("scripts:update"),
-  deleteScript: invokeIpc("scripts:delete"),
-  toggleScript: invokeIpc("scripts:toggle"),
-  runScript: invokeIpc("scripts:run"),
-  getScriptLogs: invokeIpc("scripts:logs"),
-
   // Event listener (non-invoke)
   onWindowShow: (callback: () => void): (() => void) => {
     const handler = () => callback();
@@ -111,11 +101,6 @@ const electronAPI = {
     const handler = () => callback();
     ipcRenderer.on("tasks:changed", handler);
     return () => ipcRenderer.removeListener("tasks:changed", handler);
-  },
-  onScriptsChanged: (callback: () => void): (() => void) => {
-    const handler = () => callback();
-    ipcRenderer.on("scripts:changed", handler);
-    return () => ipcRenderer.removeListener("scripts:changed", handler);
   },
   onMemoryChanged: (callback: () => void): (() => void) => {
     const handler = () => callback();
