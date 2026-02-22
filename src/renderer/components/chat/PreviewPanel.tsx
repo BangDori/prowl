@@ -23,13 +23,17 @@ interface PreviewPanelProps {
   isDragging?: boolean;
 }
 
-/** HTML 콘텐츠를 iframe으로 렌더링 — 링크 클릭 시 탭 열기 콜백 호출 */
+/** HTML 콘텐츠를 iframe으로 렌더링 — 렌더 후 텍스트 추출, 링크 클릭 시 탭 열기 */
 function HtmlContent({
   content,
+  label,
   onOpenLink,
+  onPageContextChange,
 }: {
   content: string;
+  label: string;
   onOpenLink?: (url: string, label: string) => void;
+  onPageContextChange?: (ctx: PageContext | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -43,18 +47,25 @@ function HtmlContent({
     doc.write(content);
     doc.close();
 
+    // doc.write 후 동기적으로 텍스트 추출 가능
+    const text = (doc.body?.innerText ?? "").slice(0, 3000);
+    onPageContextChange?.({ url: "prowl-ui://html", title: label, text });
+
     const handleClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
       if (!anchor?.href) return;
       if (!anchor.href.startsWith("http://") && !anchor.href.startsWith("https://")) return;
       e.preventDefault();
-      const label = anchor.textContent?.trim() || new URL(anchor.href).hostname;
-      onOpenLink?.(anchor.href, label);
+      const anchorLabel = anchor.textContent?.trim() || new URL(anchor.href).hostname;
+      onOpenLink?.(anchor.href, anchorLabel);
     };
 
     doc.addEventListener("click", handleClick);
-    return () => doc.removeEventListener("click", handleClick);
-  }, [content, onOpenLink]);
+    return () => {
+      doc.removeEventListener("click", handleClick);
+      onPageContextChange?.(null);
+    };
+  }, [content, label, onOpenLink, onPageContextChange]);
 
   return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
 }
@@ -143,7 +154,12 @@ export default function PreviewPanel({
       {/* 콘텐츠 영역 */}
       <div className="chat-preview-content">
         {activeTab?.type === "html" && (
-          <HtmlContent content={activeTab.content} onOpenLink={onOpenLink} />
+          <HtmlContent
+            content={activeTab.content}
+            label={activeTab.label}
+            onOpenLink={onOpenLink}
+            onPageContextChange={onPageContextChange}
+          />
         )}
         {activeTab?.type === "url" && (
           <UrlContent url={activeTab.url} onPageContextChange={onPageContextChange} />

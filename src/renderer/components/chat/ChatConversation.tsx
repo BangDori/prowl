@@ -435,13 +435,15 @@ export default function ChatConversation({
           <span className="text-amber-400/70">Prowl이 함께 보고 있어요</span>
           <span>·</span>
           <span className="truncate max-w-[140px]">
-            {(() => {
-              try {
-                return new URL(pageContext.url).hostname;
-              } catch {
-                return pageContext.url;
-              }
-            })()}
+            {pageContext.url.startsWith("prowl-ui://")
+              ? pageContext.title
+              : (() => {
+                  try {
+                    return new URL(pageContext.url).hostname;
+                  } catch {
+                    return pageContext.url;
+                  }
+                })()}
           </span>
         </div>
       )}
