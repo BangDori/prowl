@@ -73,6 +73,7 @@ export default function ChatConversation({
   const initialMessageProcessed = useRef(false);
   const unreadDividerMsgId = useRef<string | null>(null);
   const hasMarkedRead = useRef(false);
+  const hasInitialScrolled = useRef(false);
 
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
@@ -86,6 +87,7 @@ export default function ChatConversation({
     initialMessageProcessed.current = false;
     unreadDividerMsgId.current = null;
     hasMarkedRead.current = false;
+    hasInitialScrolled.current = false;
   }
 
   // 룸 데이터 로드 시 메시지 초기화 + 백그라운드 refetch 반영
@@ -143,12 +145,18 @@ export default function ChatConversation({
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, []);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    messagesEndRef.current?.scrollIntoView({ behavior });
   }, []);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new messages
-  useEffect(scrollToBottom, [messages, scrollToBottom]);
+  useEffect(() => {
+    if (messages.length === 0) return;
+    // 초기 진입 시 즉시 이동, 이후 새 메시지는 smooth
+    const behavior = hasInitialScrolled.current ? "smooth" : "instant";
+    hasInitialScrolled.current = true;
+    scrollToBottom(behavior);
+  }, [messages, scrollToBottom]);
 
   // 스트림 이벤트 리스너 (저장은 main, 읽음 처리는 대화방에 있을 때만 renderer)
   useEffect(() => {

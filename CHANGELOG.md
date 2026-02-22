@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.39.3] - 2026-02-22
+- 채팅방 진입 시 스크롤 애니메이션 없이 즉시 최하단에서 시작
+
 ## [1.39.2] - 2026-02-22
 - Script Library 기능 및 관련 툴 전체 제거
 
