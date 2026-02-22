@@ -138,7 +138,7 @@ export default function MessageBubble({
         <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
       ),
       pre: ({ children }: { children?: React.ReactNode }) => (
-        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px]">
+        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px] max-w-full">
           {children}
         </pre>
       ),
@@ -184,7 +184,7 @@ export default function MessageBubble({
           <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
         )}
         <div
-          className={`relative px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
+          className={`relative min-w-0 px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
             isUser
               ? "bg-accent text-black rounded-br-sm whitespace-pre-wrap"
               : "bg-white/10 text-white/90 rounded-bl-sm"
