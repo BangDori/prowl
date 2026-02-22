@@ -68,11 +68,11 @@ export default function ChatInputBar({
     <>
       {/* 페이지 컨텍스트 인디케이터 */}
       {pageContext && (
-        <div className="flex items-center gap-1.5 px-4 py-1 text-[11px] text-white/40 overflow-hidden">
-          <span className="flex-shrink-0">👁</span>
-          <span className="text-amber-400/70 flex-shrink-0">Prowl이 함께 보고 있어요</span>
-          <span className="flex-shrink-0">·</span>
-          <span className="truncate min-w-0">
+        <div className="flex items-center gap-1.5 px-4 py-1 text-[11px] text-white/40">
+          <span>👁</span>
+          <span className="text-amber-400/70">Prowl이 함께 보고 있어요</span>
+          <span>·</span>
+          <span className="truncate max-w-[140px]">
             {pageContext.url.startsWith("prowl-ui://")
               ? pageContext.title
               : (() => {

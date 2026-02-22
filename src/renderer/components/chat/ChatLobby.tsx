@@ -42,7 +42,7 @@ export default function ChatLobby({
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const loadMeta = useCallback(() => {
+  useEffect(() => {
     Promise.all([window.electronAPI.getChatConfig(), window.electronAPI.getChatProviders()]).then(
       ([config, providerList]) => {
         setChatConfig(config);
@@ -50,15 +50,6 @@ export default function ChatLobby({
       },
     );
   }, []);
-
-  useEffect(() => {
-    loadMeta();
-  }, [loadMeta]);
-
-  // settings 변경 시 (API 키 저장 등) providers 즉시 갱신
-  useEffect(() => {
-    return window.electronAPI.onSettingsChanged(loadMeta);
-  }, [loadMeta]);
 
   const handleConfigChange = useCallback((config: ChatConfig) => {
     setChatConfig(config);
