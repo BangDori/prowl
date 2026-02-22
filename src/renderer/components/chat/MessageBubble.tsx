@@ -80,6 +80,55 @@ interface MessageBubbleProps {
   onOpenLink?: (url: string, label: string) => void;
 }
 
+/** HTML 카드 (복사 + 열기 버튼 포함) */
+function HtmlCard({ html, onOpen }: { html: string; onOpen: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(html);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    },
+    [html],
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="mt-2 w-full text-left rounded-lg overflow-hidden border border-white/10 hover:border-accent/40 transition-colors group/html"
+    >
+      <div className="flex items-center justify-between px-2.5 py-1.5 bg-black/30 border-b border-white/10">
+        <div className="flex items-center gap-1.5">
+          <Code className="w-3 h-3 text-accent" />
+          <span className="text-[11px] font-medium text-white/60">HTML</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/70 transition-colors"
+          >
+            {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+            <span>{copied ? "복사됨" : "복사"}</span>
+          </button>
+          <span className="text-[10px] text-accent/60 group-hover/html:text-accent transition-colors">
+            열기 →
+          </span>
+        </div>
+      </div>
+      <div className="relative px-2.5 py-2 max-h-16 overflow-hidden bg-black/20">
+        <pre className="text-[10px] leading-relaxed text-white/25 whitespace-pre-wrap break-all">
+          {html.slice(0, 400)}
+        </pre>
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+    </button>
+  );
+}
+
 /** HTML 문서 블록을 제거한 표시용 텍스트 반환 */
 const HTML_DOC_REGEX = /<!DOCTYPE\s+html>[\s\S]*<\/html>/i;
 
@@ -205,27 +254,7 @@ export default function MessageBubble({
                 </Markdown>
               )}
               {hasHtmlOutput && onOpenHtml && htmlContent && (
-                <button
-                  type="button"
-                  onClick={() => onOpenHtml(htmlContent)}
-                  className="mt-2 w-full text-left rounded-lg overflow-hidden border border-white/10 hover:border-accent/40 transition-colors group/html"
-                >
-                  <div className="flex items-center justify-between px-2.5 py-1.5 bg-black/30 border-b border-white/10">
-                    <div className="flex items-center gap-1.5">
-                      <Code className="w-3 h-3 text-accent" />
-                      <span className="text-[11px] font-medium text-white/60">HTML</span>
-                    </div>
-                    <span className="text-[10px] text-accent/60 group-hover/html:text-accent transition-colors">
-                      열기 →
-                    </span>
-                  </div>
-                  <div className="relative px-2.5 py-2 max-h-16 overflow-hidden bg-black/20">
-                    <pre className="text-[10px] leading-relaxed text-white/25 whitespace-pre-wrap break-all">
-                      {htmlContent.slice(0, 400)}
-                    </pre>
-                    <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-black/50 to-transparent" />
-                  </div>
-                </button>
+                <HtmlCard html={htmlContent} onOpen={() => onOpenHtml(htmlContent)} />
               )}
             </>
           )}
