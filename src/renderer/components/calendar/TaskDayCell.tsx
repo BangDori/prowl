@@ -24,6 +24,7 @@ export default function TaskDayCell({
   const today = isToday(date);
   const incomplete = tasks.filter((t) => !t.completed);
   const allDone = tasks.length > 0 && incomplete.length === 0;
+  const uniqueColors = [...new Set(incomplete.map((t) => getCategoryColor(t.category ?? "기타")))];
 
   return (
     <button
@@ -50,13 +51,13 @@ export default function TaskDayCell({
           {allDone ? (
             <Check className="w-2.5 h-2.5 text-emerald-400" />
           ) : (
-            incomplete
+            uniqueColors
               .slice(0, MAX_DOTS)
-              .map((task) => (
+              .map((color) => (
                 <div
-                  key={task.id}
+                  key={color}
                   className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+                  style={{ backgroundColor: color }}
                 />
               ))
           )}
