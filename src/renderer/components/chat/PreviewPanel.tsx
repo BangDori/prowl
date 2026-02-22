@@ -1,6 +1,6 @@
 /** 탭 기반 프리뷰 패널 — HTML 및 외부 URL을 브라우저 탭처럼 표시 */
-import { X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight, RotateCcw, X } from "lucide-react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 export type PreviewTab =
   | { id: string; type: "html"; content: string; label: string }
@@ -8,9 +8,31 @@ export type PreviewTab =
 
 export type PageContext = { url: string; title: string; text: string };
 
-/** 최소 webview 타입 (executeJavaScript + Electron 이벤트 지원) */
+/** webview 타입 — executeJavaScript + 탐색 메서드 + Electron 이벤트 지원 */
 type WebviewEl = HTMLElement & {
   executeJavaScript(code: string): Promise<unknown>;
+  goBack(): void;
+  goForward(): void;
+  reload(): void;
+  stop(): void;
+  loadURL(url: string): void;
+  canGoBack(): boolean;
+  canGoForward(): boolean;
+};
+
+/** PreviewPanel이 UrlContent를 명령형으로 제어하기 위한 핸들 */
+type UrlHandle = {
+  goBack(): void;
+  goForward(): void;
+  reloadOrStop(): void;
+  loadURL(url: string): void;
+};
+
+type NavState = {
+  canGoBack: boolean;
+  canGoForward: boolean;
+  isLoading: boolean;
+  currentUrl: string;
 };
 
 interface PreviewPanelProps {
@@ -26,8 +48,7 @@ interface PreviewPanelProps {
 /**
  * HTML 콘텐츠를 iframe으로 렌더링 — 렌더 후 텍스트 추출, 링크 클릭 시 탭 열기
  *
- * 콜백(onOpenLink, onPageContextChange)은 ref로 저장해 effect deps에서 제외한다.
- * 이로써 부모 컴포넌트 렌더 시 콜백 레퍼런스가 바뀌어도 iframe이 재렌더되지 않는다.
+ * 콜백은 ref로 저장해 effect deps에서 제외한다.
  */
 function HtmlContent({
   content,
@@ -46,7 +67,6 @@ function HtmlContent({
   const onPageContextChangeRef = useRef(onPageContextChange);
   onPageContextChangeRef.current = onPageContextChange;
 
-  // content/label이 바뀔 때만 iframe을 재렌더한다 (콜백 변경은 무시)
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -74,52 +94,90 @@ function HtmlContent({
       doc.removeEventListener("click", handleClick);
       onPageContextChangeRef.current?.(null);
     };
-  }, [content, label]); // 콜백은 ref로 처리하므로 deps 제외
+  }, [content, label]);
 
   return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
 }
 
 /**
- * 외부 URL을 webview로 렌더링 — 로드 완료 시 페이지 컨텍스트 추출
+ * 외부 URL을 webview로 렌더링 — 네비게이션 이벤트 추적 및 페이지 컨텍스트 추출
  *
- * onPageContextChange는 ref로 저장해 url 변경 시에만 effect가 재실행된다.
+ * forwardRef + useImperativeHandle로 부모(PreviewPanel)가 goBack/goForward 등을 호출한다.
+ * webview는 .chat-preview-content의 직접 자식으로 height: 100% 유지 (레이아웃 안정성).
  */
-function UrlContent({
-  url,
-  onPageContextChange,
-}: {
-  url: string;
-  onPageContextChange?: (ctx: PageContext | null) => void;
-}) {
+const UrlContent = forwardRef<
+  UrlHandle,
+  {
+    url: string;
+    onPageContextChange?: (ctx: PageContext | null) => void;
+    onNavStateChange?: (s: NavState) => void;
+  }
+>(({ url, onPageContextChange, onNavStateChange }, ref) => {
   const webviewRef = useRef<HTMLElement>(null);
   const onPageContextChangeRef = useRef(onPageContextChange);
   onPageContextChangeRef.current = onPageContextChange;
+  const onNavStateChangeRef = useRef(onNavStateChange);
+  onNavStateChangeRef.current = onNavStateChange;
+  const isLoadingRef = useRef(false);
 
-  // url이 바뀔 때만 이벤트 리스너를 재등록한다
+  useImperativeHandle(ref, () => ({
+    goBack: () => (webviewRef.current as WebviewEl | null)?.goBack(),
+    goForward: () => (webviewRef.current as WebviewEl | null)?.goForward(),
+    reloadOrStop: () => {
+      const wv = webviewRef.current as WebviewEl | null;
+      isLoadingRef.current ? wv?.stop() : wv?.reload();
+    },
+    loadURL: (u: string) => (webviewRef.current as WebviewEl | null)?.loadURL(u),
+  }));
+
   useEffect(() => {
     const webview = webviewRef.current as WebviewEl | null;
     if (!webview) return;
 
-    const handleLoad = async () => {
-      try {
-        const title = await webview.executeJavaScript("document.title");
-        const text = await webview.executeJavaScript("document.body.innerText");
-        onPageContextChangeRef.current?.({
-          url,
-          title: String(title),
-          text: String(text).slice(0, 3000),
-        });
-      } catch {
-        // webview 내부 오류 무시 (CSP 등)
-      }
+    const pushNav = (loading: boolean, currentUrl?: string) => {
+      isLoadingRef.current = loading;
+      onNavStateChangeRef.current?.({
+        canGoBack: webview.canGoBack(),
+        canGoForward: webview.canGoForward(),
+        isLoading: loading,
+        currentUrl: currentUrl ?? url,
+      });
     };
 
-    webview.addEventListener("did-finish-load", handleLoad);
+    const handleFinishLoad = async () => {
+      let currentUrl = url;
+      let title = "";
+      let text = "";
+      try {
+        currentUrl = String(await webview.executeJavaScript("location.href"));
+        title = String(await webview.executeJavaScript("document.title"));
+        text = String(await webview.executeJavaScript("document.body.innerText")).slice(0, 3000);
+      } catch {
+        /* CSP 등 무시 */
+      }
+      pushNav(false, currentUrl);
+      onPageContextChangeRef.current?.({ url: currentUrl, title, text });
+    };
+
+    const handleStartLoading = () => pushNav(true);
+    const handleNavigate = (e: Event) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const navUrl = (e as any).url as string | undefined;
+      if (navUrl) pushNav(false, navUrl);
+    };
+
+    webview.addEventListener("did-finish-load", handleFinishLoad);
+    webview.addEventListener("did-start-loading", handleStartLoading);
+    webview.addEventListener("did-navigate", handleNavigate);
+    webview.addEventListener("did-navigate-in-page", handleNavigate);
     return () => {
-      webview.removeEventListener("did-finish-load", handleLoad);
+      webview.removeEventListener("did-finish-load", handleFinishLoad);
+      webview.removeEventListener("did-start-loading", handleStartLoading);
+      webview.removeEventListener("did-navigate", handleNavigate);
+      webview.removeEventListener("did-navigate-in-page", handleNavigate);
       onPageContextChangeRef.current?.(null);
     };
-  }, [url]); // 콜백은 ref로 처리하므로 deps 제외
+  }, [url]);
 
   return (
     <webview
@@ -128,7 +186,8 @@ function UrlContent({
       style={{ width: "100%", height: "100%", display: "flex" }}
     />
   );
-}
+});
+UrlContent.displayName = "UrlContent";
 
 export default function PreviewPanel({
   tabs,
@@ -140,6 +199,43 @@ export default function PreviewPanel({
   isDragging,
 }: PreviewPanelProps) {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs.at(-1);
+  const urlContentRef = useRef<UrlHandle>(null);
+
+  const [navState, setNavState] = useState<NavState>({
+    canGoBack: false,
+    canGoForward: false,
+    isLoading: false,
+    currentUrl: "",
+  });
+  const [navInput, setNavInput] = useState("");
+  const isInputFocused = useRef(false);
+
+  // 활성 탭 변경 시 nav 상태 초기화
+  const tabsRef = useRef(tabs);
+  tabsRef.current = tabs;
+  useEffect(() => {
+    const tab = tabsRef.current.find((t) => t.id === activeTabId) ?? tabsRef.current.at(-1);
+    const initUrl = tab?.type === "url" ? tab.url : "";
+    setNavState({ canGoBack: false, canGoForward: false, isLoading: false, currentUrl: initUrl });
+    if (!isInputFocused.current) setNavInput(initUrl);
+  }, [activeTabId]);
+
+  const handleNavStateChange = useCallback((state: NavState) => {
+    setNavState(state);
+    if (!isInputFocused.current) setNavInput(state.currentUrl);
+  }, []);
+
+  const handleUrlSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    let target = navInput.trim();
+    if (!target.startsWith("http://") && !target.startsWith("https://")) {
+      target = `https://${target}`;
+    }
+    urlContentRef.current?.loadURL(target);
+    isInputFocused.current = false;
+  };
+
+  const isActiveUrl = activeTab?.type === "url";
 
   return (
     <div className={`chat-preview-panel${isDragging ? " is-dragging" : ""}`}>
@@ -167,7 +263,61 @@ export default function PreviewPanel({
         ))}
       </div>
 
-      {/* 콘텐츠 영역 */}
+      {/* URL 탭 전용 네비게이션 바 — .chat-preview-content 위의 flex 형제 */}
+      {isActiveUrl && (
+        <div className="chat-preview-nav">
+          <button
+            type="button"
+            onClick={() => urlContentRef.current?.goBack()}
+            disabled={!navState.canGoBack}
+            title="뒤로"
+            className="p-1 rounded text-white/50 hover:text-white/80 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => urlContentRef.current?.goForward()}
+            disabled={!navState.canGoForward}
+            title="앞으로"
+            className="p-1 rounded text-white/50 hover:text-white/80 disabled:opacity-25 disabled:cursor-not-allowed transition-colors"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => urlContentRef.current?.reloadOrStop()}
+            title={navState.isLoading ? "중지" : "새로고침"}
+            className="p-1 rounded text-white/50 hover:text-white/80 transition-colors"
+          >
+            {navState.isLoading ? (
+              <X className="w-3.5 h-3.5" />
+            ) : (
+              <RotateCcw className="w-3.5 h-3.5" />
+            )}
+          </button>
+          <form onSubmit={handleUrlSubmit} style={{ flex: 1, minWidth: 0 }}>
+            <input
+              type="text"
+              value={navInput}
+              onChange={(e) => setNavInput(e.target.value)}
+              onFocus={() => {
+                isInputFocused.current = true;
+              }}
+              onBlur={() => {
+                isInputFocused.current = false;
+                setNavInput(
+                  navState.currentUrl || (activeTab?.type === "url" ? activeTab.url : ""),
+                );
+              }}
+              className="w-full bg-white/10 rounded px-2 py-0.5 text-[11px] text-white/70 outline-none focus:bg-white/15 focus:text-white/90 transition-colors"
+              spellCheck={false}
+            />
+          </form>
+        </div>
+      )}
+
+      {/* 콘텐츠 영역 — webview/iframe이 직접 자식으로 height: 100% 유지 */}
       <div className="chat-preview-content">
         {activeTab?.type === "html" && (
           <HtmlContent
@@ -178,7 +328,12 @@ export default function PreviewPanel({
           />
         )}
         {activeTab?.type === "url" && (
-          <UrlContent url={activeTab.url} onPageContextChange={onPageContextChange} />
+          <UrlContent
+            ref={urlContentRef}
+            url={activeTab.url}
+            onPageContextChange={onPageContextChange}
+            onNavStateChange={handleNavStateChange}
+          />
         )}
       </div>
     </div>
