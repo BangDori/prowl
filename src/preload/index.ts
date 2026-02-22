@@ -99,6 +99,11 @@ const electronAPI = {
     ipcRenderer.on("window:show", handler);
     return () => ipcRenderer.removeListener("window:show", handler);
   },
+  onSettingsChanged: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("settings:changed", handler);
+    return () => ipcRenderer.removeListener("settings:changed", handler);
+  },
   onTasksChanged: (callback: () => void): (() => void) => {
     const handler = () => callback();
     ipcRenderer.on("tasks:changed", handler);

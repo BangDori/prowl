@@ -52,6 +52,7 @@ import {
 import { checkForUpdates } from "./services/update-checker";
 import {
   closeChatWindow,
+  getChatWindow,
   getCompactWindow,
   getSubWindow,
   popUpTrayMenu,
@@ -97,6 +98,11 @@ export function registerIpcHandlers(): void {
       const shortcutResult = registerGlobalShortcuts(settings.shortcuts ?? DEFAULT_SHORTCUTS);
       if (!shortcutResult.success) {
         return { success: false, error: shortcutResult.error };
+      }
+      // 설정 변경 사항을 chat window에 즉시 알림
+      const chatWin = getChatWindow();
+      if (chatWin && !chatWin.isDestroyed()) {
+        chatWin.webContents.send("settings:changed");
       }
       return { success: true };
     } catch (error) {

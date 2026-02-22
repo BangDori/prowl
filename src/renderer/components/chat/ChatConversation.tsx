@@ -107,7 +107,7 @@ export default function ChatConversation({
   }, [initialized, roomData, unreadCounts, roomId, markRead]);
 
   // 채팅 설정 및 프로바이더 목록 로드
-  useEffect(() => {
+  const loadChatMeta = useCallback(() => {
     Promise.all([window.electronAPI.getChatConfig(), window.electronAPI.getChatProviders()]).then(
       ([config, providerList]) => {
         setChatConfig(config);
@@ -115,6 +115,15 @@ export default function ChatConversation({
       },
     );
   }, []);
+
+  useEffect(() => {
+    loadChatMeta();
+  }, [loadChatMeta]);
+
+  // settings 변경 시 (API 키 저장 등) providers 즉시 갱신
+  useEffect(() => {
+    return window.electronAPI.onSettingsChanged(loadChatMeta);
+  }, [loadChatMeta]);
 
   const handleConfigChange = useCallback((config: ChatConfig) => {
     setChatConfig(config);
