@@ -115,21 +115,6 @@ function RoomItem({
           <span className="text-[10px] text-white/30">{formatRelativeTime(room.updatedAt)}</span>
         </div>
         <div className="hidden group-hover:flex items-center gap-0.5 mt-0.5">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite();
-            }}
-            className="p-1 rounded transition-colors"
-            style={{ color: room.favorited ? "rgb(250 204 21 / 0.8)" : "rgb(255 255 255 / 0.3)" }}
-            title={room.favorited ? "즐겨찾기 해제" : "즐겨찾기"}
-          >
-            <Star
-              className="w-3 h-3"
-              style={{ fill: room.favorited ? "rgb(250 204 21 / 0.8)" : "transparent" }}
-            />
-          </button>
           {!room.locked && (
             <button
               type="button"
@@ -153,6 +138,21 @@ function RoomItem({
             title={room.locked ? "잠금 해제" : "삭제 잠금"}
           >
             {room.locked ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            className="p-1 rounded transition-colors"
+            style={{ color: room.favorited ? "rgb(250 204 21 / 0.8)" : "rgb(255 255 255 / 0.3)" }}
+            title={room.favorited ? "즐겨찾기 해제" : "즐겨찾기"}
+          >
+            <Star
+              className="w-3 h-3"
+              style={{ fill: room.favorited ? "rgb(250 204 21 / 0.8)" : "transparent" }}
+            />
           </button>
         </div>
       </div>
