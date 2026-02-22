@@ -26,6 +26,7 @@ vi.mock("./services/focus-mode", () => ({
 vi.mock("./services/chat", () => ({
   streamChatMessage: vi.fn().mockResolvedValue(undefined),
   getProviderStatuses: vi.fn().mockReturnValue([]),
+  setPageContext: vi.fn(),
 }));
 
 vi.mock("./windows", () => ({
@@ -37,7 +38,7 @@ vi.mock("./windows", () => ({
 
 import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
-import { streamChatMessage } from "./services/chat";
+import { setPageContext, streamChatMessage } from "./services/chat";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { getSettings, setFocusMode, setSettings } from "./services/settings";
 import { closeChatWindow, getSubWindow, resizeChatWindow } from "./windows";
@@ -165,6 +166,26 @@ describe("registerIpcHandlers", () => {
     expect(channels).toContain("chat:providers");
     expect(channels).toContain("chat:resize");
     expect(channels).toContain("chat:close");
+    expect(channels).toContain("chat:set-page-context");
+  });
+
+  describe("chat:set-page-context", () => {
+    it("페이지 컨텍스트를 설정하고 success를 반환한다", async () => {
+      const handler = getHandler("chat:set-page-context");
+      const ctx = { url: "https://example.com", title: "Example", text: "본문 내용" };
+      const result = await handler({}, ctx);
+
+      expect(setPageContext).toHaveBeenCalledWith(ctx);
+      expect(result).toEqual({ success: true });
+    });
+
+    it("null을 전달하면 컨텍스트를 초기화한다", async () => {
+      const handler = getHandler("chat:set-page-context");
+      const result = await handler({}, null);
+
+      expect(setPageContext).toHaveBeenCalledWith(null);
+      expect(result).toEqual({ success: true });
+    });
   });
 
   describe("chat:send", () => {
