@@ -3,7 +3,7 @@ import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@sh
 import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
-import { getChatTools } from "./chat-tools";
+import { getChatTools, setCurrentRoomId } from "./chat-tools";
 import { listMemories } from "./memory";
 import { sendChatNotification } from "./notification";
 import { getSettings } from "./settings";
@@ -100,6 +100,7 @@ export async function streamChatMessage(
   history: ChatMessage[],
   config?: ChatConfig,
 ): Promise<void> {
+  setCurrentRoomId(roomId);
   const modelId = config?.model ?? "gpt-5-mini";
   const aiMessages: ChatMessage[] = [];
 
