@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.44.0] - 2026-02-22
+- AI 채팅에서 ~/.prowl/ 전체 파일 조회 가능 (economic-freedom, scripts 등 모든 하위 경로 탐색 및 읽기)
+
 ## [1.43.3] - 2026-02-22
 - 전체화면에서 HTML 보기 클릭 시 창이 작은 크기로 변경되는 버그 수정
 - "Prowl이 함께 보고 있어요" 영역 배경 불투명 처리 (뒷 텍스트 비침 현상 수정)
