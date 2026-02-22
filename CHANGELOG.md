@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.43.3] - 2026-02-22
+- 전체화면에서 HTML 보기 클릭 시 창이 작은 크기로 변경되는 버그 수정
+- "Prowl이 함께 보고 있어요" 영역 배경 불투명 처리 (뒷 텍스트 비침 현상 수정)
+
 ## [1.43.2] - 2026-02-22
 - 메시지 버블 코드 블록 포함 시 UI 깨짐 수정
 - Prowl Chat 커맨드로 껐다 켤 때 전체화면 상태 복원
