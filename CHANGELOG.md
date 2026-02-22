@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.44.3] - 2026-02-23
+- Task Manager가 멀티 모니터 환경에서 주 모니터가 아닌 커서가 위치한 모니터에 표시되도록 수정
+
 ## [1.44.2] - 2026-02-22
 - AI 채팅 삭제 HITL 승인 메시지가 표시되지 않던 버그 수정 (roomId 누락으로 30초 타임아웃 후 자동 거부)
 

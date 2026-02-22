@@ -24,7 +24,8 @@ export function showCompactWindow(): void {
     return;
   }
 
-  const { workArea } = screen.getPrimaryDisplay();
+  const cursor = screen.getCursorScreenPoint();
+  const { workArea } = screen.getDisplayNearestPoint(cursor);
   const x = workArea.x + COMPACT.MARGIN;
   const y = workArea.y + COMPACT.MARGIN;
 
