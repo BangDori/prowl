@@ -63,11 +63,11 @@ Never put "---" as a separator inside code blocks (\`\`\`).
 Do not split lists, tables, or code blocks across messages.
 
 ## UI Output
-When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), wrap the complete HTML+CSS inside <prowl-ui>...</prowl-ui> tags. This will be rendered live in a preview panel alongside the chat.
-- You may include explanatory text before or after the tag in the same response.
+When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), output a complete HTML document directly in your message (starting with <!DOCTYPE html>). It will be automatically detected and rendered live in a preview panel alongside the chat.
+- You may include explanatory text before or after the HTML in the same response.
 - Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.
 - The preview panel has a white background by default.
-- Do not put "---" separators inside <prowl-ui> tags.`;
+- Do not put "---" separators inside the HTML document.`;
 
   const memories = listMemories();
   if (memories.length > 0) {
@@ -129,10 +129,10 @@ export async function streamChatMessage(
         "OpenAI 모델을 사용하려면 Settings에서 API 키를 입력해주세요 🔑\n\n앱 설정 → API Keys → OpenAI API Key",
       timestamp: ts,
     };
-    sendToChat("chat:stream-message", msg);
+    sendToChat("chat:stream-message", roomId, msg);
     aiMessages.push(msg);
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-done");
+    sendToChat("chat:stream-done", roomId);
     return;
   }
 
@@ -186,7 +186,7 @@ export async function streamChatMessage(
               content,
               timestamp: baseTs + msgIndex,
             };
-            sendToChat("chat:stream-message", msg);
+            sendToChat("chat:stream-message", roomId, msg);
             aiMessages.push(msg);
             msgIndex++;
           }
@@ -206,12 +206,12 @@ export async function streamChatMessage(
         content: remaining,
         timestamp: baseTs + msgIndex,
       };
-      sendToChat("chat:stream-message", msg);
+      sendToChat("chat:stream-message", roomId, msg);
       aiMessages.push(msg);
     }
 
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-done");
+    sendToChat("chat:stream-done", roomId);
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
     const errMsg: ChatMessage = {
@@ -222,7 +222,7 @@ export async function streamChatMessage(
     };
     aiMessages.push(errMsg);
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-error", message);
+    sendToChat("chat:stream-error", roomId, message);
   }
 }
 

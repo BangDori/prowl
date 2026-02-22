@@ -78,9 +78,10 @@ describe("chat 서비스", () => {
 
     expect(mockSend).toHaveBeenCalledWith(
       "chat:stream-message",
+      "room1",
       expect.objectContaining({ content: expect.stringContaining("Settings") }),
     );
-    expect(mockSend).toHaveBeenCalledWith("chat:stream-done");
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-done", "room1");
     expect(mockStreamText).not.toHaveBeenCalled();
   });
 
@@ -102,9 +103,10 @@ describe("chat 서비스", () => {
     );
     expect(mockSend).toHaveBeenCalledWith(
       "chat:stream-message",
+      "room1",
       expect.objectContaining({ role: "assistant", content: "안녕하세요!" }),
     );
-    expect(mockSend).toHaveBeenCalledWith("chat:stream-done");
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-done", "room1");
   });
 
   it("config 없으면 OpenAI 기본값을 사용한다", async () => {
@@ -156,7 +158,7 @@ describe("chat 서비스", () => {
       { provider: "openai", model: "gpt-5-mini" },
     );
 
-    expect(mockSend).toHaveBeenCalledWith("chat:stream-error", "Rate limit exceeded");
+    expect(mockSend).toHaveBeenCalledWith("chat:stream-error", "room1", "Rate limit exceeded");
   });
 });
 

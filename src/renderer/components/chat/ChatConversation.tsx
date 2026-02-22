@@ -4,7 +4,7 @@ import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, Maximize2, Minimize2, X } from "lucide-react";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   useChatRoom,
   useChatUnreadCounts,
@@ -63,6 +63,8 @@ export default function ChatConversation({
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
   const splitWrapperRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const prevIsSplitViewRef = useRef(false);
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
   const [prevRoomId, setPrevRoomId] = useState(roomId);
@@ -154,17 +156,20 @@ export default function ChatConversation({
 
   // 스트림 이벤트 리스너 (저장은 main, 읽음 처리는 대화방에 있을 때만 renderer)
   useEffect(() => {
-    const offMessage = window.electronAPI.onChatStreamMessage((msg) => {
+    const offMessage = window.electronAPI.onChatStreamMessage((streamRoomId, msg) => {
+      if (streamRoomId !== roomId) return;
       setMessages((prev) => [...prev, msg]);
     });
-    const offDone = window.electronAPI.onChatStreamDone(() => {
+    const offDone = window.electronAPI.onChatStreamDone((streamRoomId) => {
+      if (streamRoomId !== roomId) return;
       setLoading(false);
       // 대화방에 있으므로 즉시 읽음 처리
       const lastMsg = messagesRef.current.at(-1);
       if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
-    const offError = window.electronAPI.onChatStreamError((error) => {
+    const offError = window.electronAPI.onChatStreamError((streamRoomId, error) => {
+      if (streamRoomId !== roomId) return;
       setLoading(false);
       const errMsg: ChatMessage = {
         id: `err_${Date.now()}`,
@@ -236,6 +241,21 @@ export default function ChatConversation({
   const [previewTabs, setPreviewTabs] = useState<PreviewTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
+
+  // 분할 뷰 전환 시 최신 메시지로 스크롤
+  // scrollIntoView는 reflow 전에 호출되어 효과 없음 → rAF로 reflow 완료 후 스크롤
+  useLayoutEffect(() => {
+    if (!isSplitView || prevIsSplitViewRef.current) {
+      prevIsSplitViewRef.current = isSplitView;
+      return;
+    }
+    prevIsSplitViewRef.current = true;
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
+  }, [isSplitView]);
 
   // 페이지 컨텍스트 (webview 로드 시 자동 추출)
   const [pageContext, setPageContextState] = useState<PageContext | null>(null);
@@ -323,7 +343,7 @@ export default function ChatConversation({
             isExpanded={isExpanded}
             onToggleExpand={onToggleExpand}
           />
-          <div className="flex-1 overflow-y-auto px-4 pb-3">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 pb-3">
             <div className="flex flex-col justify-end min-h-full">
               {messages.map((msg, idx) => {
                 const next = messages[idx + 1];
@@ -409,31 +429,32 @@ export default function ChatConversation({
     </>
   );
 
-  if (isSplitView) {
-    return (
+  // 항상 동일한 wrapper 구조 유지 — isSplitView 전환 시 chatArea가 remount되지 않도록
+  return (
+    <div ref={splitWrapperRef} className={`chat-split-wrapper${isDragging ? " is-dragging" : ""}`}>
       <div
-        ref={splitWrapperRef}
-        className={`chat-split-wrapper${isDragging ? " is-dragging" : ""}`}
+        className="chat-split-left"
+        style={isSplitView ? { width: `${splitRatio * 100}%` } : { flex: 1 }}
       >
-        <div className="chat-split-left" style={{ width: `${splitRatio * 100}%` }}>
-          {chatArea}
-        </div>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
-        <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
-        <PreviewPanel
-          tabs={previewTabs}
-          activeTabId={activeTabId}
-          onActivateTab={setActiveTabId}
-          onCloseTab={closeTab}
-          onNewTab={() => addOrActivateTab({ type: "url", url: "about:blank", label: "새 탭" })}
-          onPageContextChange={handlePageContextChange}
-          isDragging={isDragging}
-        />
+        {chatArea}
       </div>
-    );
-  }
-
-  return chatArea;
+      {isSplitView && (
+        <>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
+          <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
+          <PreviewPanel
+            tabs={previewTabs}
+            activeTabId={activeTabId}
+            onActivateTab={setActiveTabId}
+            onCloseTab={closeTab}
+            onNewTab={() => addOrActivateTab({ type: "url", url: "about:blank", label: "새 탭" })}
+            onPageContextChange={handlePageContextChange}
+            isDragging={isDragging}
+          />
+        </>
+      )}
+    </div>
+  );
 }
 
 /** 대화 헤더 (뒤로가기 + 제목 + 전체화면 + 닫기) */

@@ -147,9 +147,9 @@ export interface IpcEventSchema {
   "window:show": { params: [] };
   "settings:changed": { params: [] };
   "tasks:changed": { params: [] };
-  "chat:stream-message": { params: [message: ChatMessage] };
-  "chat:stream-done": { params: [] };
-  "chat:stream-error": { params: [error: string] };
+  "chat:stream-message": { params: [roomId: string, message: ChatMessage] };
+  "chat:stream-done": { params: [roomId: string] };
+  "chat:stream-error": { params: [roomId: string, error: string] };
   "chat-rooms:unread-changed": { params: [totalUnread: number] };
   "chat:navigate-to-room": { params: [roomId: string] };
   "chat:expand-reset": { params: [] };

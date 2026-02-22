@@ -2,6 +2,13 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.43.2] - 2026-02-22
+- 메시지 버블 코드 블록 포함 시 UI 깨짐 수정
+- Prowl Chat 커맨드로 껐다 켤 때 전체화면 상태 복원
+- HTML 카드에 복사 버튼 추가 (열기 버튼 좌측)
+- 분할 뷰 진입 시 메시지 버블 텍스트 오버플로우 수정 (flex min-width: 0)
+- 분할 뷰 진입 시 메시지 스크롤이 최상단으로 초기화되는 버그 수정
+
 ## [1.43.1] - 2026-02-22
 - Settings API 키 저장 시 Prowl Chat에 즉시 반영 (재시작 불필요)
 - OpenAI API 키 전역 환경변수 fallback 제거 (Settings에서 명시적으로 저장한 키만 사용)

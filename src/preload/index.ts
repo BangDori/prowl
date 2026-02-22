@@ -117,20 +117,20 @@ const electronAPI = {
 
   // Chat stream events
   onChatStreamMessage: (
-    callback: (message: import("@shared/types").ChatMessage) => void,
+    callback: (roomId: string, message: import("@shared/types").ChatMessage) => void,
   ): (() => void) => {
-    const handler = (_e: unknown, message: import("@shared/types").ChatMessage) =>
-      callback(message);
+    const handler = (_e: unknown, roomId: string, message: import("@shared/types").ChatMessage) =>
+      callback(roomId, message);
     ipcRenderer.on("chat:stream-message", handler as never);
     return () => ipcRenderer.removeListener("chat:stream-message", handler as never);
   },
-  onChatStreamDone: (callback: () => void): (() => void) => {
-    const handler = () => callback();
-    ipcRenderer.on("chat:stream-done", handler);
-    return () => ipcRenderer.removeListener("chat:stream-done", handler);
+  onChatStreamDone: (callback: (roomId: string) => void): (() => void) => {
+    const handler = (_e: unknown, roomId: string) => callback(roomId);
+    ipcRenderer.on("chat:stream-done", handler as never);
+    return () => ipcRenderer.removeListener("chat:stream-done", handler as never);
   },
-  onChatStreamError: (callback: (error: string) => void): (() => void) => {
-    const handler = (_e: unknown, error: string) => callback(error);
+  onChatStreamError: (callback: (roomId: string, error: string) => void): (() => void) => {
+    const handler = (_e: unknown, roomId: string, error: string) => callback(roomId, error);
     ipcRenderer.on("chat:stream-error", handler as never);
     return () => ipcRenderer.removeListener("chat:stream-error", handler as never);
   },

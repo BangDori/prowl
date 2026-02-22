@@ -1,7 +1,7 @@
 /** 개별 채팅 메시지 버블 컴포넌트 */
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatMessage, ToolApprovalMeta } from "@shared/types";
-import { ArrowUpRight, Check, Copy, Play, X } from "lucide-react";
+import { ArrowUpRight, Check, Code, Copy, Play, X } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -80,9 +80,63 @@ interface MessageBubbleProps {
   onOpenLink?: (url: string, label: string) => void;
 }
 
-/** <prowl-ui> 태그를 제거한 표시용 텍스트 반환 */
-function stripProwlUi(content: string): string {
-  return content.replace(/<prowl-ui>[\s\S]*?<\/prowl-ui>/g, "").trim();
+/** HTML 카드 (복사 + 열기 버튼 포함) */
+function HtmlCard({ html, onOpen }: { html: string; onOpen: () => void }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(html);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    },
+    [html],
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="mt-2 w-full text-left rounded-lg overflow-hidden border border-white/10 hover:border-accent/40 transition-colors group/html"
+    >
+      <div className="flex items-center justify-between px-2.5 py-1.5 bg-black/30 border-b border-white/10">
+        <div className="flex items-center gap-1.5">
+          <Code className="w-3 h-3 text-accent" />
+          <span className="text-[11px] font-medium text-white/60">HTML</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="flex items-center gap-1 text-[10px] text-white/30 hover:text-white/70 transition-colors"
+          >
+            {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+            <span>{copied ? "복사됨" : "복사"}</span>
+          </button>
+          <span className="text-[10px] text-accent/60 group-hover/html:text-accent transition-colors">
+            열기 →
+          </span>
+        </div>
+      </div>
+      <div className="relative px-2.5 py-2 max-h-16 overflow-hidden bg-black/20">
+        <pre className="text-[10px] leading-relaxed text-white/25 whitespace-pre-wrap break-all">
+          {html.slice(0, 400)}
+        </pre>
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-black/50 to-transparent" />
+      </div>
+    </button>
+  );
+}
+
+/** HTML 문서 블록을 제거한 표시용 텍스트 반환 */
+const HTML_DOC_REGEX = /<!DOCTYPE\s+html>[\s\S]*<\/html>/i;
+
+function stripHtmlDoc(content: string): string {
+  // 코드 펜스(```...```)로 감싸진 경우 펜스까지 함께 제거 (빈 코드 블록 방지)
+  const result = content.replace(/```[a-z]*\r?\n[\s\S]*?<\/html>\r?\n```/i, "");
+  if (result !== content) return result.trim();
+  return content.replace(HTML_DOC_REGEX, "").trim();
 }
 
 export default function MessageBubble({
@@ -93,11 +147,11 @@ export default function MessageBubble({
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
-  const hasHtmlOutput = !isUser && /<prowl-ui>/.test(message.content);
-  const displayContent = hasHtmlOutput ? stripProwlUi(message.content) : message.content;
+  const hasHtmlOutput = !isUser && HTML_DOC_REGEX.test(message.content);
+  const displayContent = hasHtmlOutput ? stripHtmlDoc(message.content) : message.content;
   const htmlContent = useMemo(() => {
     if (!hasHtmlOutput) return null;
-    return message.content.match(/<prowl-ui>([\s\S]*?)<\/prowl-ui>/)?.[1] ?? null;
+    return message.content.match(HTML_DOC_REGEX)?.[0] ?? null;
   }, [hasHtmlOutput, message.content]);
   const [approvalState, setApprovalState] = useState<"pending" | "approved" | "rejected">(
     message.approval?.status ?? "pending",
@@ -138,7 +192,7 @@ export default function MessageBubble({
         <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
       ),
       pre: ({ children }: { children?: React.ReactNode }) => (
-        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px]">
+        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px] max-w-full">
           {children}
         </pre>
       ),
@@ -179,12 +233,12 @@ export default function MessageBubble({
         ) : (
           <div className="w-7 mr-2 flex-shrink-0" />
         ))}
-      <div className={`max-w-[85%] flex ${isUser ? "items-end" : "items-end"} gap-1`}>
+      <div className={`max-w-[85%] min-w-0 flex ${isUser ? "items-end" : "items-end"} gap-1`}>
         {showMeta && isUser && (
           <span className="text-[10px] text-white/30 mb-0.5 flex-shrink-0">{time}</span>
         )}
         <div
-          className={`relative px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
+          className={`relative min-w-0 px-3 py-2 rounded-2xl text-[13px] leading-relaxed break-words ${
             isUser
               ? "bg-accent text-black rounded-br-sm whitespace-pre-wrap"
               : "bg-white/10 text-white/90 rounded-bl-sm"
@@ -200,14 +254,7 @@ export default function MessageBubble({
                 </Markdown>
               )}
               {hasHtmlOutput && onOpenHtml && htmlContent && (
-                <button
-                  type="button"
-                  onClick={() => onOpenHtml(htmlContent)}
-                  className="mt-1.5 flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-hover transition-colors select-none"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                  HTML 보기
-                </button>
+                <HtmlCard html={htmlContent} onOpen={() => onOpenHtml(htmlContent)} />
               )}
             </>
           )}
