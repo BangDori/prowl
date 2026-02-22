@@ -84,6 +84,9 @@ interface MessageBubbleProps {
 const HTML_DOC_REGEX = /<!DOCTYPE\s+html>[\s\S]*<\/html>/i;
 
 function stripHtmlDoc(content: string): string {
+  // 코드 펜스(```...```)로 감싸진 경우 펜스까지 함께 제거 (빈 코드 블록 방지)
+  const result = content.replace(/```[a-z]*\r?\n[\s\S]*?<\/html>\r?\n```/i, "");
+  if (result !== content) return result.trim();
   return content.replace(HTML_DOC_REGEX, "").trim();
 }
 
