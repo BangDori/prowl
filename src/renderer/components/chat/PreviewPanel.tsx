@@ -23,7 +23,12 @@ interface PreviewPanelProps {
   isDragging?: boolean;
 }
 
-/** HTML 콘텐츠를 iframe으로 렌더링 — 렌더 후 텍스트 추출, 링크 클릭 시 탭 열기 */
+/**
+ * HTML 콘텐츠를 iframe으로 렌더링 — 렌더 후 텍스트 추출, 링크 클릭 시 탭 열기
+ *
+ * 콜백(onOpenLink, onPageContextChange)은 ref로 저장해 effect deps에서 제외한다.
+ * 이로써 부모 컴포넌트 렌더 시 콜백 레퍼런스가 바뀌어도 iframe이 재렌더되지 않는다.
+ */
 function HtmlContent({
   content,
   label,
@@ -36,7 +41,12 @@ function HtmlContent({
   onPageContextChange?: (ctx: PageContext | null) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const onOpenLinkRef = useRef(onOpenLink);
+  onOpenLinkRef.current = onOpenLink;
+  const onPageContextChangeRef = useRef(onPageContextChange);
+  onPageContextChangeRef.current = onPageContextChange;
 
+  // content/label이 바뀔 때만 iframe을 재렌더한다 (콜백 변경은 무시)
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -47,9 +57,8 @@ function HtmlContent({
     doc.write(content);
     doc.close();
 
-    // doc.write 후 동기적으로 텍스트 추출 가능
     const text = (doc.body?.innerText ?? "").slice(0, 3000);
-    onPageContextChange?.({ url: "prowl-ui://html", title: label, text });
+    onPageContextChangeRef.current?.({ url: "prowl-ui://html", title: label, text });
 
     const handleClick = (e: MouseEvent) => {
       const anchor = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
@@ -57,20 +66,24 @@ function HtmlContent({
       if (!anchor.href.startsWith("http://") && !anchor.href.startsWith("https://")) return;
       e.preventDefault();
       const anchorLabel = anchor.textContent?.trim() || new URL(anchor.href).hostname;
-      onOpenLink?.(anchor.href, anchorLabel);
+      onOpenLinkRef.current?.(anchor.href, anchorLabel);
     };
 
     doc.addEventListener("click", handleClick);
     return () => {
       doc.removeEventListener("click", handleClick);
-      onPageContextChange?.(null);
+      onPageContextChangeRef.current?.(null);
     };
-  }, [content, label, onOpenLink, onPageContextChange]);
+  }, [content, label]); // 콜백은 ref로 처리하므로 deps 제외
 
   return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
 }
 
-/** 외부 URL을 webview로 렌더링 — 로드 완료 시 페이지 컨텍스트 추출 */
+/**
+ * 외부 URL을 webview로 렌더링 — 로드 완료 시 페이지 컨텍스트 추출
+ *
+ * onPageContextChange는 ref로 저장해 url 변경 시에만 effect가 재실행된다.
+ */
 function UrlContent({
   url,
   onPageContextChange,
@@ -79,7 +92,10 @@ function UrlContent({
   onPageContextChange?: (ctx: PageContext | null) => void;
 }) {
   const webviewRef = useRef<HTMLElement>(null);
+  const onPageContextChangeRef = useRef(onPageContextChange);
+  onPageContextChangeRef.current = onPageContextChange;
 
+  // url이 바뀔 때만 이벤트 리스너를 재등록한다
   useEffect(() => {
     const webview = webviewRef.current as WebviewEl | null;
     if (!webview) return;
@@ -88,7 +104,7 @@ function UrlContent({
       try {
         const title = await webview.executeJavaScript("document.title");
         const text = await webview.executeJavaScript("document.body.innerText");
-        onPageContextChange?.({
+        onPageContextChangeRef.current?.({
           url,
           title: String(title),
           text: String(text).slice(0, 3000),
@@ -101,9 +117,9 @@ function UrlContent({
     webview.addEventListener("did-finish-load", handleLoad);
     return () => {
       webview.removeEventListener("did-finish-load", handleLoad);
-      onPageContextChange?.(null);
+      onPageContextChangeRef.current?.(null);
     };
-  }, [url, onPageContextChange]);
+  }, [url]); // 콜백은 ref로 처리하므로 deps 제외
 
   return (
     <webview
