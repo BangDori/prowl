@@ -1,6 +1,5 @@
 /** 태스크 펼침 상세 패널 */
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
 import { Check, Copy } from "lucide-react";
 import { useCallback, useState } from "react";
 
@@ -23,22 +22,13 @@ export default function CompactTaskDetail({ task }: CompactTaskDetailProps) {
     <div className="px-2.5 pb-2 pt-0.5 pl-8">
       {hasMeta && (
         <div className="flex items-center gap-1.5 flex-wrap">
-          <span
-            className="text-[9px] font-medium"
-            style={{ color: PRIORITY_COLORS[task.priority] }}
-          >
-            {PRIORITY_LABELS[task.priority]}
-          </span>
+          {task.category && (
+            <span className="text-[9px] text-app-text-faint">#{task.category}</span>
+          )}
           {task.dueTime && (
             <>
-              <span className="text-[9px] text-app-text-ghost">·</span>
+              {task.category && <span className="text-[9px] text-app-text-ghost">·</span>}
               <span className="text-[9px] text-app-text-faint tabular-nums">{task.dueTime}</span>
-            </>
-          )}
-          {task.category && (
-            <>
-              <span className="text-[9px] text-app-text-ghost">·</span>
-              <span className="text-[9px] text-app-text-faint">#{task.category}</span>
             </>
           )}
         </div>

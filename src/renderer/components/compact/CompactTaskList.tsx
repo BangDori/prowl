@@ -1,50 +1,25 @@
-/** 오늘의 태스크 목록 (체크박스 토글 가능) */
+/** 오늘의 태스크 목록 (시간순 정렬, 체크박스 토글 가능) */
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
-import { CalendarClock, ChevronDown, ChevronRight, Flag } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { sortTasks, type TaskSortMode } from "../../utils/task-helpers";
+import { getCategoryColor } from "../../utils/category-utils";
+import { sortTasks } from "../../utils/task-helpers";
 import CompactTaskDetail from "./CompactTaskDetail";
 
 interface CompactTaskListProps {
   tasks: Task[];
   date: string;
-  sortMode: TaskSortMode;
-  onSortModeChange: (mode: TaskSortMode) => void;
   onToggleComplete: (date: string, taskId: string) => void;
 }
 
-export default function CompactTaskList({
-  tasks,
-  date,
-  sortMode,
-  onSortModeChange,
-  onToggleComplete,
-}: CompactTaskListProps) {
-  const sorted = sortTasks(tasks, sortMode);
+export default function CompactTaskList({ tasks, date, onToggleComplete }: CompactTaskListProps) {
+  const sorted = sortTasks(tasks, "time");
   const incompleteCount = tasks.filter((t) => !t.completed).length;
-
-  const toggleSort = () => onSortModeChange(sortMode === "priority" ? "time" : "priority");
-  const SortIcon = sortMode === "time" ? CalendarClock : Flag;
-  const sortLabel = sortMode === "time" ? "마감기한" : "우선순위";
 
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5 px-0.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-accent">
-            오늘
-          </span>
-          <button
-            type="button"
-            onClick={toggleSort}
-            className="flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] text-app-text-ghost hover:text-app-text-muted hover:bg-app-hover-bg transition-colors"
-            title={sortLabel}
-          >
-            <SortIcon className="w-2.5 h-2.5" />
-            <span>{sortLabel}</span>
-          </button>
-        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-accent">오늘</span>
         <span className="text-[9px] text-app-text-ghost">
           {incompleteCount > 0 ? `${incompleteCount}건 남음` : "모두 완료"}
         </span>
@@ -126,10 +101,12 @@ function CompactTaskRow({
           >
             {task.title}
           </span>
-          <span
-            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? "opacity-30" : ""}`}
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-          />
+          {task.category && (
+            <span
+              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? "opacity-30" : ""}`}
+              style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+            />
+          )}
           {task.dueTime && (
             <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}

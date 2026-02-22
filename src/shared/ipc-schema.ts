@@ -11,6 +11,7 @@ import type {
   Memory,
   ProviderStatus,
   Task,
+  TaskCategoryItem,
   TasksByDate,
   UpdateCheckResult,
 } from "./types";
@@ -94,6 +95,7 @@ export interface IpcInvokeSchema {
   // Compact (2 channels)
   "compact:toggle": { params: []; return: IpcResult };
   "compact:resize": { params: [height: number]; return: void };
+  "compact:get-expanded-height": { params: []; return: number };
 
   // Tasks (11 channels)
   "tasks:list-month": {
@@ -129,6 +131,12 @@ export interface IpcInvokeSchema {
   };
   "tasks:delete-backlog": { params: [taskId: string]; return: IpcResult };
 
+  // Categories (4 channels)
+  "categories:list": { params: []; return: TaskCategoryItem[] };
+  "categories:add": { params: [name: string]; return: IpcResult };
+  "categories:rename": { params: [oldName: string, newName: string]; return: IpcResult };
+  "categories:delete": { params: [name: string]; return: IpcResult };
+
   // Claude Config (2 channels)
   "claude-config:list": { params: []; return: ClaudeConfig };
   "claude-config:read-file": { params: [filePath: string]; return: string };
@@ -147,6 +155,7 @@ export interface IpcEventSchema {
   "window:show": { params: [] };
   "settings:changed": { params: [] };
   "tasks:changed": { params: [] };
+  "categories:changed": { params: [] };
   "chat:stream-message": { params: [roomId: string, message: ChatMessage] };
   "chat:stream-done": { params: [roomId: string] };
   "chat:stream-error": { params: [roomId: string, error: string] };
