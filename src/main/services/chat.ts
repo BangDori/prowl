@@ -129,10 +129,10 @@ export async function streamChatMessage(
         "OpenAI 모델을 사용하려면 Settings에서 API 키를 입력해주세요 🔑\n\n앱 설정 → API Keys → OpenAI API Key",
       timestamp: ts,
     };
-    sendToChat("chat:stream-message", msg);
+    sendToChat("chat:stream-message", roomId, msg);
     aiMessages.push(msg);
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-done");
+    sendToChat("chat:stream-done", roomId);
     return;
   }
 
@@ -186,7 +186,7 @@ export async function streamChatMessage(
               content,
               timestamp: baseTs + msgIndex,
             };
-            sendToChat("chat:stream-message", msg);
+            sendToChat("chat:stream-message", roomId, msg);
             aiMessages.push(msg);
             msgIndex++;
           }
@@ -206,12 +206,12 @@ export async function streamChatMessage(
         content: remaining,
         timestamp: baseTs + msgIndex,
       };
-      sendToChat("chat:stream-message", msg);
+      sendToChat("chat:stream-message", roomId, msg);
       aiMessages.push(msg);
     }
 
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-done");
+    sendToChat("chat:stream-done", roomId);
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
     const errMsg: ChatMessage = {
@@ -222,7 +222,7 @@ export async function streamChatMessage(
     };
     aiMessages.push(errMsg);
     persistAfterStream(roomId, history, aiMessages);
-    sendToChat("chat:stream-error", message);
+    sendToChat("chat:stream-error", roomId, message);
   }
 }
 

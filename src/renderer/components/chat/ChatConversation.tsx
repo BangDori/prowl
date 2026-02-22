@@ -157,17 +157,20 @@ export default function ChatConversation({
 
   // 스트림 이벤트 리스너 (저장은 main, 읽음 처리는 대화방에 있을 때만 renderer)
   useEffect(() => {
-    const offMessage = window.electronAPI.onChatStreamMessage((msg) => {
+    const offMessage = window.electronAPI.onChatStreamMessage((streamRoomId, msg) => {
+      if (streamRoomId !== roomId) return;
       setMessages((prev) => [...prev, msg]);
     });
-    const offDone = window.electronAPI.onChatStreamDone(() => {
+    const offDone = window.electronAPI.onChatStreamDone((streamRoomId) => {
+      if (streamRoomId !== roomId) return;
       setLoading(false);
       // 대화방에 있으므로 즉시 읽음 처리
       const lastMsg = messagesRef.current.at(-1);
       if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
-    const offError = window.electronAPI.onChatStreamError((error) => {
+    const offError = window.electronAPI.onChatStreamError((streamRoomId, error) => {
+      if (streamRoomId !== roomId) return;
       setLoading(false);
       const errMsg: ChatMessage = {
         id: `err_${Date.now()}`,
