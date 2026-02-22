@@ -64,7 +64,6 @@ export default function ChatConversation({
   const [isDragging, setIsDragging] = useState(false);
   const splitWrapperRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const savedScrollRef = useRef<number | null>(null);
   const prevIsSplitViewRef = useRef(false);
 
   // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
@@ -243,15 +242,19 @@ export default function ChatConversation({
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
 
-  // 분할 뷰 전환 시 스크롤 위치 복원 (DOM 재마운트로 인한 scrollTop 초기화 방지)
+  // 분할 뷰 전환 시 최신 메시지로 스크롤
+  // scrollIntoView는 reflow 전에 호출되어 효과 없음 → rAF로 reflow 완료 후 스크롤
   useLayoutEffect(() => {
-    if (isSplitView && !prevIsSplitViewRef.current && savedScrollRef.current !== null) {
-      if (messagesContainerRef.current) {
-        messagesContainerRef.current.scrollTop = savedScrollRef.current;
-      }
-      savedScrollRef.current = null;
+    if (!isSplitView || prevIsSplitViewRef.current) {
+      prevIsSplitViewRef.current = isSplitView;
+      return;
     }
-    prevIsSplitViewRef.current = isSplitView;
+    prevIsSplitViewRef.current = true;
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
   }, [isSplitView]);
 
   // 페이지 컨텍스트 (webview 로드 시 자동 추출)
@@ -265,8 +268,6 @@ export default function ChatConversation({
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
     async (newTab: Omit<PreviewTab, "id">) => {
-      // 분할 뷰 첫 진입 전 스크롤 위치 저장 (DOM 재마운트 후 복원용)
-      savedScrollRef.current = messagesContainerRef.current?.scrollTop ?? null;
       let activated = false;
       setPreviewTabs((prev) => {
         const key = newTab.type === "html" ? newTab.content : newTab.url;
@@ -428,31 +429,32 @@ export default function ChatConversation({
     </>
   );
 
-  if (isSplitView) {
-    return (
+  // 항상 동일한 wrapper 구조 유지 — isSplitView 전환 시 chatArea가 remount되지 않도록
+  return (
+    <div ref={splitWrapperRef} className={`chat-split-wrapper${isDragging ? " is-dragging" : ""}`}>
       <div
-        ref={splitWrapperRef}
-        className={`chat-split-wrapper${isDragging ? " is-dragging" : ""}`}
+        className="chat-split-left"
+        style={isSplitView ? { width: `${splitRatio * 100}%` } : { flex: 1 }}
       >
-        <div className="chat-split-left" style={{ width: `${splitRatio * 100}%` }}>
-          {chatArea}
-        </div>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
-        <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
-        <PreviewPanel
-          tabs={previewTabs}
-          activeTabId={activeTabId}
-          onActivateTab={setActiveTabId}
-          onCloseTab={closeTab}
-          onNewTab={() => addOrActivateTab({ type: "url", url: "about:blank", label: "새 탭" })}
-          onPageContextChange={handlePageContextChange}
-          isDragging={isDragging}
-        />
+        {chatArea}
       </div>
-    );
-  }
-
-  return chatArea;
+      {isSplitView && (
+        <>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: 드래그 가능한 분할 구분선 */}
+          <div className="chat-split-divider" onMouseDown={handleDividerMouseDown} />
+          <PreviewPanel
+            tabs={previewTabs}
+            activeTabId={activeTabId}
+            onActivateTab={setActiveTabId}
+            onCloseTab={closeTab}
+            onNewTab={() => addOrActivateTab({ type: "url", url: "about:blank", label: "새 탭" })}
+            onPageContextChange={handlePageContextChange}
+            isDragging={isDragging}
+          />
+        </>
+      )}
+    </div>
+  );
 }
 
 /** 대화 헤더 (뒤로가기 + 제목 + 전체화면 + 닫기) */
