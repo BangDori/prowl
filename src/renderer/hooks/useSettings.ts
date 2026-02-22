@@ -17,7 +17,6 @@ export function useUpdateSettings() {
     mutationFn: (settings: AppSettings) => window.electronAPI.setSettings(settings),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.settings.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.jobs.all });
     },
   });
 }
