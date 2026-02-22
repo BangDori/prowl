@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.39.2] - 2026-02-22
+- Script Library 기능 및 관련 툴 전체 제거
+
 ## [1.39.1] - 2026-02-22
 - 날짜 미정 작업 완료 시 완료됨 섹션으로 이동하지 않던 버그 수정
 
