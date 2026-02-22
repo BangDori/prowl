@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.44.2] - 2026-02-22
+- AI 채팅 삭제 HITL 승인 메시지가 표시되지 않던 버그 수정 (roomId 누락으로 30초 타임아웃 후 자동 거부)
+
 ## [1.44.1] - 2026-02-22
 - AI 응답 멀티 메시지(--- 구분자) 방식 제거, 단일 메시지로 응답 품질 개선
 - 채팅 창 재오픈 시 입력창 자동 포커스
