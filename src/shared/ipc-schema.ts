@@ -66,6 +66,10 @@ export interface IpcInvokeSchema {
   "chat:expand-toggle": { params: []; return: boolean };
   "chat:approve-tool": { params: [approvalId: string]; return: IpcResult };
   "chat:reject-tool": { params: [approvalId: string]; return: IpcResult };
+  "chat:set-page-context": {
+    params: [context: { url: string; title: string; text: string } | null];
+    return: IpcResult;
+  };
 
   // Chat Rooms (7 channels)
   "chat-rooms:list": { params: []; return: ChatRoomSummary[] };

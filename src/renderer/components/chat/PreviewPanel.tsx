@@ -6,12 +6,20 @@ export type PreviewTab =
   | { id: string; type: "html"; content: string; label: string }
   | { id: string; type: "url"; url: string; label: string };
 
+export type PageContext = { url: string; title: string; text: string };
+
+/** 최소 webview 타입 (executeJavaScript + Electron 이벤트 지원) */
+type WebviewEl = HTMLElement & {
+  executeJavaScript(code: string): Promise<unknown>;
+};
+
 interface PreviewPanelProps {
   tabs: PreviewTab[];
   activeTabId: string | null;
   onActivateTab: (id: string) => void;
   onCloseTab: (id: string) => void;
   onOpenLink?: (url: string, label: string) => void;
+  onPageContextChange?: (ctx: PageContext | null) => void;
   isDragging?: boolean;
 }
 
@@ -51,9 +59,48 @@ function HtmlContent({
   return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
 }
 
-/** 외부 URL을 webview로 렌더링 (X-Frame-Options 우회) */
-function UrlContent({ url }: { url: string }) {
-  return <webview src={url} style={{ width: "100%", height: "100%", display: "flex" }} />;
+/** 외부 URL을 webview로 렌더링 — 로드 완료 시 페이지 컨텍스트 추출 */
+function UrlContent({
+  url,
+  onPageContextChange,
+}: {
+  url: string;
+  onPageContextChange?: (ctx: PageContext | null) => void;
+}) {
+  const webviewRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const webview = webviewRef.current as WebviewEl | null;
+    if (!webview) return;
+
+    const handleLoad = async () => {
+      try {
+        const title = await webview.executeJavaScript("document.title");
+        const text = await webview.executeJavaScript("document.body.innerText");
+        onPageContextChange?.({
+          url,
+          title: String(title),
+          text: String(text).slice(0, 3000),
+        });
+      } catch {
+        // webview 내부 오류 무시 (CSP 등)
+      }
+    };
+
+    webview.addEventListener("did-finish-load", handleLoad);
+    return () => {
+      webview.removeEventListener("did-finish-load", handleLoad);
+      onPageContextChange?.(null);
+    };
+  }, [url, onPageContextChange]);
+
+  return (
+    <webview
+      ref={webviewRef as React.RefObject<HTMLElement>}
+      src={url}
+      style={{ width: "100%", height: "100%", display: "flex" }}
+    />
+  );
 }
 
 export default function PreviewPanel({
@@ -62,6 +109,7 @@ export default function PreviewPanel({
   onActivateTab,
   onCloseTab,
   onOpenLink,
+  onPageContextChange,
   isDragging,
 }: PreviewPanelProps) {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs.at(-1);
@@ -97,7 +145,9 @@ export default function PreviewPanel({
         {activeTab?.type === "html" && (
           <HtmlContent content={activeTab.content} onOpenLink={onOpenLink} />
         )}
-        {activeTab?.type === "url" && <UrlContent url={activeTab.url} />}
+        {activeTab?.type === "url" && (
+          <UrlContent url={activeTab.url} onPageContextChange={onPageContextChange} />
+        )}
       </div>
     </div>
   );

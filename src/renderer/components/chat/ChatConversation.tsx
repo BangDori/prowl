@@ -14,7 +14,7 @@ import {
 import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
 import MessageBubble from "./MessageBubble";
-import PreviewPanel, { type PreviewTab } from "./PreviewPanel";
+import PreviewPanel, { type PageContext, type PreviewTab } from "./PreviewPanel";
 import UnreadDivider from "./UnreadDivider";
 
 /** 탭 레이블 중복 시 숫자 접미사 부여 */
@@ -268,6 +268,14 @@ export default function ChatConversation({
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
 
+  // 페이지 컨텍스트 (webview 로드 시 자동 추출)
+  const [pageContext, setPageContextState] = useState<PageContext | null>(null);
+
+  const handlePageContextChange = useCallback((ctx: PageContext | null) => {
+    setPageContextState(ctx);
+    window.electronAPI.setPageContext(ctx);
+  }, []);
+
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
     async (newTab: Omit<PreviewTab, "id">) => {
@@ -420,6 +428,24 @@ export default function ChatConversation({
         </>
       )}
 
+      {/* 페이지 컨텍스트 인디케이터 */}
+      {pageContext && (
+        <div className="flex items-center gap-1.5 px-4 py-1 text-[11px] text-white/40">
+          <span>👁</span>
+          <span className="text-amber-400/70">Prowl이 함께 보고 있어요</span>
+          <span>·</span>
+          <span className="truncate max-w-[140px]">
+            {(() => {
+              try {
+                return new URL(pageContext.url).hostname;
+              } catch {
+                return pageContext.url;
+              }
+            })()}
+          </span>
+        </div>
+      )}
+
       {/* 하단 입력바 */}
       <div className="chat-input-bar">
         {chatConfig && providers.length > 0 && (
@@ -473,6 +499,7 @@ export default function ChatConversation({
           onActivateTab={setActiveTabId}
           onCloseTab={closeTab}
           onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
+          onPageContextChange={handlePageContextChange}
           isDragging={isDragging}
         />
       </div>
