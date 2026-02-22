@@ -28,6 +28,14 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
 }
 
+/** 현재 스트리밍 중인 채팅 룸 ID — HITL 메시지 전송 시 사용 */
+let currentRoomId = "";
+
+/** 도구 실행 전 roomId 설정 (chat.ts에서 streamChatMessage 시작 시 호출) */
+export function setCurrentRoomId(roomId: string): void {
+  currentRoomId = roomId;
+}
+
 /** 채팅 윈도우에 이벤트 전송 */
 function sendToChat(channel: string, ...args: unknown[]): void {
   const win = getChatWindow();
@@ -202,7 +210,7 @@ const delete_task = tool({
       }
 
       const approvalId = `approval_${generateId()}`;
-      sendToChat("chat:stream-message", {
+      sendToChat("chat:stream-message", currentRoomId, {
         id: approvalId,
         role: "assistant",
         content: `"${taskTitle}" 태스크를 삭제할까요?`,
@@ -321,7 +329,7 @@ const delete_memory = tool({
       const displayName = memory ? memory.content.slice(0, 40) : id;
 
       const approvalId = `approval_${generateId()}`;
-      sendToChat("chat:stream-message", {
+      sendToChat("chat:stream-message", currentRoomId, {
         id: approvalId,
         role: "assistant",
         content: `"${displayName}" 메모리를 삭제할까요?`,
