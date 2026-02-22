@@ -1,5 +1,6 @@
-/** 채팅 AI 도구 정의 — Task Manager + Memory 연동, 툴 레지스트리 등록 */
+/** 채팅 AI 도구 정의 — Task Manager + Memory + Prowl FS 연동, 툴 레지스트리 등록 */
 
+import "./chat-tools-fs";
 import type { Task, TaskPriority } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
