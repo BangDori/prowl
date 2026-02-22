@@ -2,6 +2,13 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.43.2] - 2026-02-22
+- 메시지 버블 코드 블록 포함 시 UI 깨짐 수정
+- 전체화면 상태에서 HTML 보기 클릭 시 간혹 소형으로 리셋되는 race condition 수정
+- Prowl Chat 커맨드로 껐다 켤 때 전체화면 상태 복원
+- "Prowl이 함께 보고 있어요" 영역 UI 깨짐 수정
+- API 키 저장 후 ChatLobby에서 즉시 적용되지 않던 문제 수정
+
 ## [1.43.1] - 2026-02-22
 - Settings API 키 저장 시 Prowl Chat에 즉시 반영 (재시작 불필요)
 - OpenAI API 키 전역 환경변수 fallback 제거 (Settings에서 명시적으로 저장한 키만 사용)
