@@ -97,12 +97,9 @@ function sendToChat(channel: string, ...args: unknown[]): void {
   }
 }
 
-/** 환경변수 키 (fallback용) */
-const ENV_KEY = "OPENAI_API_KEY";
-
-/** 앱 설정 또는 환경변수에서 API 키 조회 */
+/** 앱 설정에서 API 키 조회 */
 function getOpenAiApiKey(): string | undefined {
-  return getSettings().openaiApiKey || process.env[ENV_KEY] || undefined;
+  return getSettings().openaiApiKey || undefined;
 }
 
 /** 사용 가능 모델 목록 */
