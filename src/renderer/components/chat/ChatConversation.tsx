@@ -417,6 +417,7 @@ export default function ChatConversation({
           onActivateTab={setActiveTabId}
           onCloseTab={closeTab}
           onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
+          onNewTab={() => addOrActivateTab({ type: "url", url: "about:blank", label: "새 탭" })}
           onPageContextChange={handlePageContextChange}
           isDragging={isDragging}
         />

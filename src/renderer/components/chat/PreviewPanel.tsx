@@ -1,5 +1,5 @@
 /** 탭 기반 프리뷰 패널 — HTML 및 외부 URL을 브라우저 탭처럼 표시 */
-import { ChevronLeft, ChevronRight, RotateCcw, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, RotateCcw, X } from "lucide-react";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 export type PreviewTab =
@@ -42,6 +42,7 @@ interface PreviewPanelProps {
   onCloseTab: (id: string) => void;
   onOpenLink?: (url: string, label: string) => void;
   onPageContextChange?: (ctx: PageContext | null) => void;
+  onNewTab?: () => void;
   isDragging?: boolean;
 }
 
@@ -196,10 +197,12 @@ export default function PreviewPanel({
   onCloseTab,
   onOpenLink,
   onPageContextChange,
+  onNewTab,
   isDragging,
 }: PreviewPanelProps) {
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs.at(-1);
   const urlContentRef = useRef<UrlHandle>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
 
   const [navState, setNavState] = useState<NavState>({
     canGoBack: false,
@@ -210,7 +213,7 @@ export default function PreviewPanel({
   const [navInput, setNavInput] = useState("");
   const isInputFocused = useRef(false);
 
-  // 활성 탭 변경 시 nav 상태 초기화
+  // 활성 탭 변경 시 nav 상태 초기화, 새 빈 탭이면 URL 입력창 자동 포커스
   const tabsRef = useRef(tabs);
   tabsRef.current = tabs;
   useEffect(() => {
@@ -218,6 +221,12 @@ export default function PreviewPanel({
     const initUrl = tab?.type === "url" ? tab.url : "";
     setNavState({ canGoBack: false, canGoForward: false, isLoading: false, currentUrl: initUrl });
     if (!isInputFocused.current) setNavInput(initUrl);
+    if (tab?.type === "url" && tab.url === "about:blank") {
+      setTimeout(() => {
+        urlInputRef.current?.focus();
+        urlInputRef.current?.select();
+      }, 50);
+    }
   }, [activeTabId]);
 
   const handleNavStateChange = useCallback((state: NavState) => {
@@ -261,6 +270,11 @@ export default function PreviewPanel({
             </button>
           </button>
         ))}
+        {onNewTab && (
+          <button type="button" onClick={onNewTab} className="chat-preview-tab-new" title="새 탭">
+            <Plus className="w-3 h-3" />
+          </button>
+        )}
       </div>
 
       {/* URL 탭 전용 네비게이션 바 — .chat-preview-content 위의 flex 형제 */}
@@ -310,6 +324,7 @@ export default function PreviewPanel({
                   navState.currentUrl || (activeTab?.type === "url" ? activeTab.url : ""),
                 );
               }}
+              ref={urlInputRef}
               className="w-full bg-white/10 rounded px-2 py-0.5 text-[11px] text-white/70 outline-none focus:bg-white/15 focus:text-white/90 transition-colors"
               spellCheck={false}
             />
