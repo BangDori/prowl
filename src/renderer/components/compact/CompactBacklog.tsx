@@ -1,17 +1,22 @@
 /** 백로그 태스크 섹션 (날짜 미정) */
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
+import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import CompactTaskDetail from "./CompactTaskDetail";
 
-const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+function getCategoryOrder(name: string | undefined): number {
+  const names = getCategoryNames();
+  const idx = names.indexOf(name ?? "기타");
+  return idx === -1 ? 99 : idx;
+}
 
 function sortBacklogTasks(tasks: Task[]): Task[] {
   return [...tasks].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
-    const pDiff = (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1);
-    if (pDiff !== 0) return pDiff;
+    const aCat = getCategoryOrder(a.category);
+    const bCat = getCategoryOrder(b.category);
+    if (aCat !== bCat) return aCat - bCat;
     return b.createdAt.localeCompare(a.createdAt);
   });
 }
@@ -118,10 +123,12 @@ function BacklogTaskRow({
           >
             {task.title}
           </span>
-          <span
-            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isCompleted ? "opacity-25" : ""}`}
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-          />
+          {task.category && (
+            <span
+              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isCompleted ? "opacity-25" : ""}`}
+              style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+            />
+          )}
         </button>
       </div>
 

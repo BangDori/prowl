@@ -1,9 +1,11 @@
-/** 단일 태스크 행: 체크박스, 제목, 우선순위, 리마인더, 인라인 편집 */
-import type { Task, TaskPriority, TaskReminder } from "@shared/types";
-import { DEFAULT_REMINDERS, PRIORITY_COLORS, PRIORITY_LABELS } from "@shared/types";
-import { Bell, MessageSquare, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+/** 단일 태스크 행: 체크박스, 제목, 카테고리, 리마인더, 인라인 편집 */
+import type { Task, TaskReminder } from "@shared/types";
+import { DEFAULT_REMINDERS } from "@shared/types";
+import { Bell, MessageSquare, Pencil, Plus, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { useCategories } from "../../hooks/useCategories";
 import { useChatRooms } from "../../hooks/useChatRooms";
+import { getCategoryColor } from "../../utils/category-utils";
 import ReminderPicker from "./ReminderPicker";
 
 interface TaskItemProps {
@@ -17,11 +19,16 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
-  const [priority, setPriority] = useState<TaskPriority>(task.priority);
+  const [category, setCategory] = useState<string>(task.category ?? "기타");
   const [reminders, setReminders] = useState<TaskReminder[]>(
     task.reminders && task.reminders.length > 0 ? task.reminders : DEFAULT_REMINDERS,
   );
   const [roomId, setRoomId] = useState<string>(task.roomId ?? "");
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const newCategoryInputRef = useRef<HTMLInputElement>(null);
+
+  const { categories, addCategory } = useCategories();
   const { data: chatRooms } = useChatRooms({ enabled: editing });
 
   const handleSave = () => {
@@ -30,7 +37,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
       ...task,
       title: title.trim(),
       description: description.trim() || undefined,
-      priority,
+      category,
       reminders: reminders.length > 0 ? reminders : undefined,
       roomId: roomId || undefined,
     });
@@ -40,11 +47,34 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   const handleCancel = () => {
     setTitle(task.title);
     setDescription(task.description ?? "");
-    setPriority(task.priority);
+    setCategory(task.category ?? "기타");
     setReminders(task.reminders ?? []);
     setRoomId(task.roomId ?? "");
+    setAddingCategory(false);
+    setNewCategoryName("");
     setEditing(false);
   };
+
+  const handleConfirmNewCategory = () => {
+    const trimmed = newCategoryName.trim();
+    if (trimmed) {
+      addCategory(trimmed);
+      setCategory(trimmed);
+    }
+    setAddingCategory(false);
+    setNewCategoryName("");
+  };
+
+  const handleNewCategoryKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleConfirmNewCategory();
+    else if (e.key === "Escape") {
+      setAddingCategory(false);
+      setNewCategoryName("");
+    }
+  };
+
+  const displayCategory = task.category ?? "기타";
+  const categoryColor = getCategoryColor(displayCategory);
 
   if (editing) {
     return (
@@ -65,23 +95,56 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           rows={2}
           className="w-full bg-transparent text-[10px] text-app-text-secondary placeholder-app-text-ghost outline-none resize-none"
         />
+
+        {/* 카테고리 선택 */}
         <div className="flex items-center gap-1 flex-wrap">
-          {(["high", "medium", "low"] as const).map((p) => (
+          {categories.map((cat) => (
             <button
-              key={p}
+              key={cat.name}
               type="button"
-              onClick={() => setPriority(p)}
-              className={`px-1.5 py-0.5 rounded text-[9px] transition-colors ${
-                priority === p
+              onClick={() => setCategory(cat.name)}
+              className={`px-1.5 py-0.5 rounded text-[9px] transition-colors flex items-center gap-0.5 ${
+                category === cat.name
                   ? "ring-1 ring-prowl-border-hover text-app-text-primary"
                   : "text-app-text-muted hover:text-app-text-secondary"
               }`}
-              style={priority === p ? { backgroundColor: `${PRIORITY_COLORS[p]}30` } : undefined}
+              style={category === cat.name ? { backgroundColor: `${cat.color}25` } : undefined}
             >
-              {PRIORITY_LABELS[p]}
+              <div
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: cat.color }}
+              />
+              {cat.name}
             </button>
           ))}
+          {addingCategory ? (
+            <input
+              ref={newCategoryInputRef}
+              type="text"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={handleNewCategoryKeyDown}
+              onBlur={handleConfirmNewCategory}
+              placeholder="새 카테고리"
+              className="w-20 px-1.5 py-0.5 rounded text-[9px] bg-app-input-bg border border-app-input-border text-app-text-primary placeholder-app-text-ghost outline-none"
+              // biome-ignore lint/a11y/noAutofocus: 카테고리 추가 입력 시 즉시 포커스
+              autoFocus
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setAddingCategory(true);
+                setNewCategoryName("");
+              }}
+              className="p-0.5 rounded text-app-text-ghost hover:text-app-text-muted hover:bg-app-hover-bg transition-colors"
+              title="카테고리 추가"
+            >
+              <Plus className="w-2.5 h-2.5" />
+            </button>
+          )}
         </div>
+
         <ReminderPicker reminders={reminders} onChange={setReminders} />
         {chatRooms && chatRooms.length > 0 && (
           <div className="flex items-center gap-1.5">
@@ -162,17 +225,16 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           </span>
           <div
             className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-            title={PRIORITY_LABELS[task.priority]}
+            style={{ backgroundColor: categoryColor }}
+            title={displayCategory}
           />
           {task.reminders && task.reminders.length > 0 && (
             <Bell className="w-2.5 h-2.5 text-amber-500/70 flex-shrink-0" />
           )}
           {task.roomId && (
-            <MessageSquare
-              className="w-2.5 h-2.5 text-blue-400/70 flex-shrink-0"
-              title="채팅방 연결됨"
-            />
+            <span title="채팅방 연결됨" className="flex-shrink-0">
+              <MessageSquare className="w-2.5 h-2.5 text-blue-400/70" />
+            </span>
           )}
           {task.dueTime && (
             <span className="text-[9px] text-gray-500 flex-shrink-0">{task.dueTime}</span>

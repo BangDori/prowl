@@ -1,5 +1,5 @@
 /** 태스크 목록 패널: 선택 날짜 또는 어젠다 뷰 */
-import type { Task, TaskPriority, TasksByDate } from "@shared/types";
+import type { Task, TasksByDate } from "@shared/types";
 import { useMemo } from "react";
 import { formatDateKr, isToday, toDateStr } from "../../utils/calendar";
 import { getTasksForDate, getUpcomingTasks, sortTasks } from "../../utils/task-helpers";
@@ -10,7 +10,7 @@ interface TaskListPanelProps {
   tasksByDate: TasksByDate;
   backlogTasks: Task[];
   showCompleted: boolean;
-  filterPriority: TaskPriority | null;
+  filterCategory: string | null;
   onToggleComplete: (date: string, taskId: string) => void;
   onToggleBacklogComplete: (taskId: string) => void;
   onUpdateTask: (date: string, task: Task) => void;
@@ -22,7 +22,7 @@ export default function TaskListPanel({
   tasksByDate,
   backlogTasks,
   showCompleted,
-  filterPriority,
+  filterCategory,
   onToggleComplete,
   onToggleBacklogComplete,
   onUpdateTask,
@@ -31,7 +31,8 @@ export default function TaskListPanel({
   const applyFilters = (tasks: Task[]): Task[] => {
     let filtered = tasks;
     if (!showCompleted) filtered = filtered.filter((t) => !t.completed);
-    if (filterPriority) filtered = filtered.filter((t) => t.priority === filterPriority);
+    if (filterCategory)
+      filtered = filtered.filter((t) => (t.category ?? "기타") === filterCategory);
     return sortTasks(filtered);
   };
 
@@ -79,7 +80,7 @@ export default function TaskListPanel({
       tasksByDate={tasksByDate}
       backlogTasks={backlogTasks}
       showCompleted={showCompleted}
-      filterPriority={filterPriority}
+      filterCategory={filterCategory}
       onToggleComplete={onToggleComplete}
       onToggleBacklogComplete={onToggleBacklogComplete}
       onUpdateTask={onUpdateTask}
@@ -93,7 +94,7 @@ function AgendaView({
   tasksByDate,
   backlogTasks,
   showCompleted,
-  filterPriority,
+  filterCategory,
   onToggleComplete,
   onToggleBacklogComplete,
   onUpdateTask,
@@ -101,18 +102,22 @@ function AgendaView({
 }: Omit<TaskListPanelProps, "selectedDate">) {
   const groups = useMemo(() => {
     const upcoming = getUpcomingTasks(tasksByDate, showCompleted);
-    if (!filterPriority) return upcoming;
+    if (!filterCategory) return upcoming;
     return upcoming
-      .map((g) => ({ ...g, tasks: g.tasks.filter((t) => t.priority === filterPriority) }))
+      .map((g) => ({
+        ...g,
+        tasks: g.tasks.filter((t) => (t.category ?? "기타") === filterCategory),
+      }))
       .filter((g) => g.tasks.length > 0);
-  }, [tasksByDate, showCompleted, filterPriority]);
+  }, [tasksByDate, showCompleted, filterCategory]);
 
   const filteredBacklog = useMemo(() => {
     let filtered = backlogTasks;
     if (!showCompleted) filtered = filtered.filter((t) => !t.completed);
-    if (filterPriority) filtered = filtered.filter((t) => t.priority === filterPriority);
+    if (filterCategory)
+      filtered = filtered.filter((t) => (t.category ?? "기타") === filterCategory);
     return sortTasks(filtered);
-  }, [backlogTasks, showCompleted, filterPriority]);
+  }, [backlogTasks, showCompleted, filterCategory]);
 
   const isEmpty = groups.length === 0 && filteredBacklog.length === 0;
 

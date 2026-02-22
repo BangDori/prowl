@@ -1,22 +1,5 @@
 /** Task 캘린더 타입 (파일 기반 태스크 관리) */
 
-/** 태스크 우선순위 */
-export type TaskPriority = "high" | "medium" | "low";
-
-/** 우선순위별 색상 */
-export const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  high: "#ef4444",
-  medium: "#f59e0b",
-  low: "#3b82f6",
-} as const;
-
-/** 우선순위별 라벨 */
-export const PRIORITY_LABELS: Record<TaskPriority, string> = {
-  high: "높음",
-  medium: "보통",
-  low: "낮음",
-} as const;
-
 /** 알림 프리셋 */
 export const REMINDER_PRESETS: { label: string; minutes: number }[] = [
   { label: "정각", minutes: 0 },
@@ -45,8 +28,7 @@ export interface Task {
   title: string;
   description?: string;
   dueTime?: string; // "HH:MM" (없으면 종일)
-  priority: TaskPriority;
-  category?: string;
+  category?: string; // 사전 정의 카테고리 또는 커스텀 문자열
   completed: boolean;
   completedAt?: string; // ISO 8601
   createdAt: string; // ISO 8601
@@ -75,6 +57,12 @@ export const UPCOMING_RANGE_LABELS: Record<UpcomingRange, string> = {
   "1m": "1개월",
   "1y": "1년",
 } as const;
+
+/** 태스크 카테고리 항목 (파일 기반, 이름이 식별자) */
+export interface TaskCategoryItem {
+  name: string;
+  color: string;
+}
 
 /** Prowl 데이터 루트 디렉터리 (~/.prowl) */
 export const PROWL_DATA_DIR = ".prowl";

@@ -1,5 +1,4 @@
 /** 캘린더 탭 섹션: 파일 기반 태스크 캘린더 */
-import type { TaskPriority } from "@shared/types";
 import { useMemo, useState } from "react";
 import { useBacklogData } from "../../hooks/useBacklogData";
 import { useTaskData } from "../../hooks/useTaskData";
@@ -14,7 +13,7 @@ export default function CalendarSection() {
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [filterPriority, setFilterPriority] = useState<TaskPriority | null>(null);
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [showCompleted, setShowCompleted] = useState(true);
 
   const {
@@ -100,9 +99,9 @@ export default function CalendarSection() {
           }
         />
         <TaskFilterBar
-          filterPriority={filterPriority}
+          filterCategory={filterCategory}
           showCompleted={showCompleted}
-          onFilterPriority={setFilterPriority}
+          onFilterCategory={setFilterCategory}
           onToggleShowCompleted={() => setShowCompleted(!showCompleted)}
         />
         <TaskListPanel
@@ -110,7 +109,7 @@ export default function CalendarSection() {
           tasksByDate={tasksByDate}
           backlogTasks={backlogTasks}
           showCompleted={showCompleted}
-          filterPriority={filterPriority}
+          filterCategory={filterCategory}
           onToggleComplete={toggleComplete}
           onToggleBacklogComplete={toggleBacklogComplete}
           onUpdateTask={updateTask}

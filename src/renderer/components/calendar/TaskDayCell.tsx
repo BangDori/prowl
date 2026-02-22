@@ -1,9 +1,7 @@
-/** 캘린더 날짜 셀 — 태스크 수와 우선순위 표시 */
+/** 캘린더 날짜 셀 — 태스크 수와 미완료 표시 */
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
 import { Check } from "lucide-react";
 import { isToday } from "../../utils/calendar";
-import { highestPriority } from "../../utils/task-helpers";
 
 interface TaskDayCellProps {
   date: Date;
@@ -23,8 +21,6 @@ export default function TaskDayCell({
   const today = isToday(date);
   const incomplete = tasks.filter((t) => !t.completed);
   const allDone = tasks.length > 0 && incomplete.length === 0;
-  const topPriority = highestPriority(tasks);
-  const dotColor = topPriority ? PRIORITY_COLORS[topPriority] : undefined;
 
   return (
     <button
@@ -52,7 +48,7 @@ export default function TaskDayCell({
             <Check className="w-2.5 h-2.5 text-emerald-400" />
           ) : (
             <>
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dotColor }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-accent/60" />
               {incomplete.length > 1 && (
                 <span className="text-[8px] text-gray-500">{incomplete.length}</span>
               )}

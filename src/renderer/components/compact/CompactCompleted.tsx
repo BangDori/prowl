@@ -1,10 +1,10 @@
 /** 완료된 태스크 토글 섹션 */
 
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
+import { getCategoryColor } from "../../utils/category-utils";
 import CompactTaskDetail from "./CompactTaskDetail";
 
 interface CompletedGroup {
@@ -115,10 +115,12 @@ function CompletedTaskRow({
           <span className="flex-1 text-[11px] leading-tight truncate text-left line-through text-app-text-ghost">
             {task.title}
           </span>
-          <span
-            className="w-1.5 h-1.5 rounded-full flex-shrink-0 opacity-25"
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-          />
+          {task.category && (
+            <span
+              className="w-1.5 h-1.5 rounded-full flex-shrink-0 opacity-25"
+              style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+            />
+          )}
           {task.dueTime && (
             <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}

@@ -1,8 +1,8 @@
 /** 오늘의 태스크 목록 (체크박스 토글 가능) */
 import type { Task } from "@shared/types";
-import { PRIORITY_COLORS } from "@shared/types";
-import { CalendarClock, ChevronDown, ChevronRight, Flag } from "lucide-react";
+import { CalendarClock, ChevronDown, ChevronRight, Tag } from "lucide-react";
 import { useState } from "react";
+import { getCategoryColor } from "../../utils/category-utils";
 import { sortTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactTaskDetail from "./CompactTaskDetail";
 
@@ -24,9 +24,9 @@ export default function CompactTaskList({
   const sorted = sortTasks(tasks, sortMode);
   const incompleteCount = tasks.filter((t) => !t.completed).length;
 
-  const toggleSort = () => onSortModeChange(sortMode === "priority" ? "time" : "priority");
-  const SortIcon = sortMode === "time" ? CalendarClock : Flag;
-  const sortLabel = sortMode === "time" ? "마감기한" : "우선순위";
+  const toggleSort = () => onSortModeChange(sortMode === "category" ? "time" : "category");
+  const SortIcon = sortMode === "time" ? CalendarClock : Tag;
+  const sortLabel = sortMode === "time" ? "마감기한" : "카테고리";
 
   return (
     <div>
@@ -126,10 +126,12 @@ function CompactTaskRow({
           >
             {task.title}
           </span>
-          <span
-            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? "opacity-30" : ""}`}
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-          />
+          {task.category && (
+            <span
+              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? "opacity-30" : ""}`}
+              style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+            />
+          )}
           {task.dueTime && (
             <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}

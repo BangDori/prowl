@@ -1,9 +1,10 @@
 /** 다가오는 일정: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
 import type { Task, UpcomingRange } from "@shared/types";
-import { PRIORITY_COLORS, UPCOMING_RANGE_LABELS } from "@shared/types";
+import { UPCOMING_RANGE_LABELS } from "@shared/types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
+import { getCategoryColor } from "../../utils/category-utils";
 import CompactTaskDetail from "./CompactTaskDetail";
 
 interface UpcomingGroup {
@@ -109,10 +110,12 @@ function UpcomingTaskRow({
           <span className="flex-1 text-[11px] leading-tight truncate text-left text-app-text-secondary">
             {task.title}
           </span>
-          <span
-            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: PRIORITY_COLORS[task.priority] }}
-          />
+          {task.category && (
+            <span
+              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
+            />
+          )}
           {task.dueTime && (
             <span className="text-[9px] text-app-text-ghost flex-shrink-0 tabular-nums">
               {task.dueTime}
