@@ -1,8 +1,8 @@
 /** 오늘의 태스크 목록 (체크박스 토글 가능) */
 import type { Task } from "@shared/types";
 import { CalendarClock, ChevronDown, ChevronRight, Tag } from "lucide-react";
-import { useState } from "react";
-import { getCategoryColor } from "../../utils/category-utils";
+import { useMemo, useState } from "react";
+import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import { sortTasks, type TaskSortMode } from "../../utils/task-helpers";
 import CompactTaskDetail from "./CompactTaskDetail";
 
@@ -14,6 +14,24 @@ interface CompactTaskListProps {
   onToggleComplete: (date: string, taskId: string) => void;
 }
 
+/** sortTasks("category") 결과를 카테고리별 그룹으로 변환 */
+function buildCategoryGroups(sorted: Task[]): { category: string; color: string; tasks: Task[] }[] {
+  const order = getCategoryNames();
+  const map = new Map<string, Task[]>();
+  for (const task of sorted) {
+    const cat = task.category ?? "기타";
+    if (!map.has(cat)) map.set(cat, []);
+    map.get(cat)!.push(task);
+  }
+  return [...map.entries()]
+    .sort(([a], [b]) => {
+      const ai = order.indexOf(a);
+      const bi = order.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    })
+    .map(([category, tasks]) => ({ category, color: getCategoryColor(category), tasks }));
+}
+
 export default function CompactTaskList({
   tasks,
   date,
@@ -23,6 +41,10 @@ export default function CompactTaskList({
 }: CompactTaskListProps) {
   const sorted = sortTasks(tasks, sortMode);
   const incompleteCount = tasks.filter((t) => !t.completed).length;
+  const categoryGroups = useMemo(
+    () => (sortMode === "category" ? buildCategoryGroups(sorted) : []),
+    [sorted, sortMode],
+  );
 
   const toggleSort = () => onSortModeChange(sortMode === "category" ? "time" : "category");
   const SortIcon = sortMode === "time" ? CalendarClock : Tag;
@@ -54,6 +76,35 @@ export default function CompactTaskList({
         <div className="flex items-center justify-center py-4">
           <p className="text-[10px] text-app-text-ghost">오늘 태스크 없음</p>
         </div>
+      ) : sortMode === "category" ? (
+        <div className="space-y-1.5">
+          {categoryGroups.map((group) => (
+            <div
+              key={group.category}
+              className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
+            >
+              <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-1">
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: group.color }}
+                />
+                <span className="text-[10px] font-medium text-app-text-muted flex-1">
+                  {group.category}
+                </span>
+                <span className="text-[9px] text-app-text-ghost">{group.tasks.length}건</span>
+              </div>
+              {group.tasks.map((task, idx) => (
+                <CompactTaskRow
+                  key={task.id}
+                  task={task}
+                  showBorder={idx < group.tasks.length - 1}
+                  showCategoryDot={false}
+                  onToggle={() => onToggleComplete(date, task.id)}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden">
           {sorted.map((task, idx) => (
@@ -61,6 +112,7 @@ export default function CompactTaskList({
               key={task.id}
               task={task}
               showBorder={idx < sorted.length - 1}
+              showCategoryDot
               onToggle={() => onToggleComplete(date, task.id)}
             />
           ))}
@@ -73,10 +125,12 @@ export default function CompactTaskList({
 function CompactTaskRow({
   task,
   showBorder,
+  showCategoryDot,
   onToggle,
 }: {
   task: Task;
   showBorder: boolean;
+  showCategoryDot: boolean;
   onToggle: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -126,7 +180,7 @@ function CompactTaskRow({
           >
             {task.title}
           </span>
-          {task.category && (
+          {showCategoryDot && task.category && (
             <span
               className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${task.completed ? "opacity-30" : ""}`}
               style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
