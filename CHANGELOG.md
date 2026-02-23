@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.0] - 2026-02-24
+- Dashboard에 Files 탭 추가 — `~/.prowl/` 내부 파일 탐색, 조회, 편집 기능
+- 파일 트리: 폴더 클릭으로 하위 항목 펼치기/접기, 폴더 우선 알파벳 정렬
+- 파일 편집기: 인라인 편집 및 ⌘S 저장, 전체 새로고침 버튼
+- 파일/빈 폴더 삭제 기능 (hover 시 휴지통 버튼, 삭제 확인 모달 포함)
+
 ## [1.45.1] - 2026-02-23
 - Dashboard에서 Claude Config 탭 제거
 
