@@ -93,6 +93,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("memory")}
           />
           <SidebarItem
+            icon={<FolderOpen className="w-4 h-4" />}
+            label="Files"
+            active={activeNav === "files"}
+            onClick={() => setActiveNav("files")}
+          />
+          <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
             active={activeNav === "changelog"}
@@ -103,12 +109,6 @@ export default function DashboardLayout() {
             label="Settings"
             active={activeNav === "settings"}
             onClick={() => setActiveNav("settings")}
-          />
-          <SidebarItem
-            icon={<FolderOpen className="w-4 h-4" />}
-            label="Files"
-            active={activeNav === "files"}
-            onClick={() => setActiveNav("files")}
           />
         </nav>
 
