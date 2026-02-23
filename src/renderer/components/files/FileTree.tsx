@@ -3,6 +3,7 @@ import type { ProwlEntry } from "@shared/types";
 import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useDeleteProwlEntry, useProwlDir } from "../../hooks/useProwlFiles";
+import ConfirmDialog from "../ConfirmDialog";
 
 /** 파일 크기를 읽기 쉬운 형식으로 변환 */
 function formatSize(bytes: number): string {
@@ -15,7 +16,7 @@ interface FileTreeNodeProps {
   entry: ProwlEntry;
   selectedPath: string | null;
   onSelectFile: (path: string) => void;
-  onDeleted: (path: string) => void;
+  onRequestDelete: (entry: ProwlEntry) => void;
   depth?: number;
 }
 
@@ -24,23 +25,18 @@ function FileTreeNode({
   entry,
   selectedPath,
   onSelectFile,
-  onDeleted,
+  onRequestDelete,
   depth = 0,
 }: FileTreeNodeProps) {
   const [expanded, setExpanded] = useState(false);
   const { data: children } = useProwlDir(expanded ? entry.path : undefined);
-  const deleteMutation = useDeleteProwlEntry();
 
   const isSelected = selectedPath === entry.path;
   const indent = depth * 12;
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    deleteMutation.mutate(entry.path, {
-      onSuccess: (result) => {
-        if (result.success) onDeleted(entry.path);
-      },
-    });
+    onRequestDelete(entry);
   };
 
   if (entry.type === "directory") {
@@ -71,9 +67,8 @@ function FileTreeNode({
           </button>
           <button
             type="button"
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-            className="absolute right-1 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-app-text-ghost hover:text-red-400 transition-colors disabled:opacity-40"
+            onClick={handleDeleteClick}
+            className="absolute right-1 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-app-text-ghost hover:text-red-400 transition-colors"
             title="삭제"
           >
             <Trash2 className="w-3 h-3" />
@@ -87,7 +82,7 @@ function FileTreeNode({
                 entry={child}
                 selectedPath={selectedPath}
                 onSelectFile={onSelectFile}
-                onDeleted={onDeleted}
+                onRequestDelete={onRequestDelete}
                 depth={depth + 1}
               />
             ))}
@@ -126,9 +121,8 @@ function FileTreeNode({
       </button>
       <button
         type="button"
-        onClick={handleDelete}
-        disabled={deleteMutation.isPending}
-        className="absolute right-1 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-app-text-ghost hover:text-red-400 transition-colors disabled:opacity-40"
+        onClick={handleDeleteClick}
+        className="absolute right-1 opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 text-app-text-ghost hover:text-red-400 transition-colors"
         title="삭제"
       >
         <Trash2 className="w-3 h-3" />
@@ -146,6 +140,20 @@ interface FileTreeProps {
 /** ~/.prowl/ 디렉터리 전체 트리 */
 export default function FileTree({ selectedPath, onSelectFile, onDeleted }: FileTreeProps) {
   const { data: entries, isLoading } = useProwlDir();
+  const [pendingDelete, setPendingDelete] = useState<ProwlEntry | null>(null);
+  const deleteMutation = useDeleteProwlEntry();
+
+  const handleConfirmDelete = () => {
+    if (!pendingDelete) return;
+    deleteMutation.mutate(pendingDelete.path, {
+      onSuccess: (result) => {
+        if (result.success) {
+          onDeleted(pendingDelete.path);
+          setPendingDelete(null);
+        }
+      },
+    });
+  };
 
   if (isLoading) {
     return (
@@ -162,17 +170,30 @@ export default function FileTree({ selectedPath, onSelectFile, onDeleted }: File
   }
 
   return (
-    <div className="p-1 space-y-0.5">
-      {entries.map((entry) => (
-        <FileTreeNode
-          key={entry.path}
-          entry={entry}
-          selectedPath={selectedPath}
-          onSelectFile={onSelectFile}
-          onDeleted={onDeleted}
-          depth={0}
+    <>
+      <div className="p-1 space-y-0.5">
+        {entries.map((entry) => (
+          <FileTreeNode
+            key={entry.path}
+            entry={entry}
+            selectedPath={selectedPath}
+            onSelectFile={onSelectFile}
+            onRequestDelete={setPendingDelete}
+            depth={0}
+          />
+        ))}
+      </div>
+
+      {pendingDelete && (
+        <ConfirmDialog
+          title="삭제 확인"
+          message={`"${pendingDelete.name}"을 삭제할까요? 이 작업은 되돌릴 수 없습니다.`}
+          confirmLabel="삭제"
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={handleConfirmDelete}
+          loading={deleteMutation.isPending}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 }
