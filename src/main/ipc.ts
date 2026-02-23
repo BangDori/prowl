@@ -24,6 +24,7 @@ import {
 } from "./services/chat-rooms";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
+import { listProwlDir, readProwlFile, writeProwlFile } from "./services/prowl-fs";
 import {
   getChatConfig,
   getCompactExpandedHeight,
@@ -516,6 +517,25 @@ export function registerIpcHandlers(): void {
   handleIpc("chat-rooms:toggle-favorite", async (roomId) => {
     try {
       toggleChatRoomFavorite(roomId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  // ── Prowl Files ──────────────────────────────────────
+
+  handleIpc("prowl-files:list", async (relPath) => {
+    return listProwlDir(relPath);
+  });
+
+  handleIpc("prowl-files:read", async (relPath) => {
+    return readProwlFile(relPath);
+  });
+
+  handleIpc("prowl-files:write", async (relPath, content) => {
+    try {
+      writeProwlFile(relPath, content);
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

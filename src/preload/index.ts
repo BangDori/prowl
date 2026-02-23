@@ -96,6 +96,11 @@ const electronAPI = {
   updateMemory: invokeIpc("memory:update"),
   deleteMemory: invokeIpc("memory:delete"),
 
+  // Prowl Files
+  listProwlFiles: invokeIpc("prowl-files:list"),
+  readProwlFile: invokeIpc("prowl-files:read"),
+  writeProwlFile: invokeIpc("prowl-files:write"),
+
   // Event listener (non-invoke)
   onWindowShow: (callback: () => void): (() => void) => {
     const handler = () => callback();

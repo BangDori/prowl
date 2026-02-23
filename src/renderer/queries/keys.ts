@@ -35,4 +35,9 @@ export const queryKeys = {
     detail: (id: string) => [...queryKeys.chatRooms.all, "detail", id] as const,
     unreadCounts: () => [...queryKeys.chatRooms.all, "unread"] as const,
   },
+  prowlFiles: {
+    all: ["prowlFiles"] as const,
+    list: (relPath?: string) => [...queryKeys.prowlFiles.all, "list", relPath ?? ""] as const,
+    read: (relPath: string) => [...queryKeys.prowlFiles.all, "read", relPath] as const,
+  },
 };
