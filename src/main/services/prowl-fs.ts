@@ -1,7 +1,16 @@
-/** ~/.prowl/ 디렉터리 파일 시스템 읽기 서비스 (경로 이탈 방지 포함) */
+/** ~/.prowl/ 디렉터리 파일 시스템 읽기/쓰기 서비스 (경로 이탈 방지 포함) */
 
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmdirSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
 import { PROWL_DATA_DIR } from "@shared/types";
 import { app } from "electron";
 
@@ -22,14 +31,8 @@ function resolveSafe(relPath: string): string {
   return full;
 }
 
-export interface ProwlEntry {
-  name: string;
-  /** ~/.prowl/ 기준 상대 경로 */
-  path: string;
-  type: "file" | "directory";
-  /** 파일인 경우 바이트 크기 */
-  size?: number;
-}
+import type { ProwlEntry } from "@shared/types";
+export type { ProwlEntry };
 
 /** ~/.prowl/ 내부 디렉터리 항목 목록 조회 (1단계, 비재귀) */
 export function listProwlDir(relPath = ""): ProwlEntry[] {
@@ -39,16 +42,21 @@ export function listProwlDir(relPath = ""): ProwlEntry[] {
   if (!existsSync(targetDir)) return [];
 
   try {
-    return readdirSync(targetDir).map((name) => {
-      const fullPath = join(targetDir, name);
-      const stat = statSync(fullPath);
-      return {
-        name,
-        path: relative(base, fullPath),
-        type: stat.isDirectory() ? "directory" : "file",
-        size: stat.isFile() ? stat.size : undefined,
-      } satisfies ProwlEntry;
-    });
+    return readdirSync(targetDir)
+      .map((name) => {
+        const fullPath = join(targetDir, name);
+        const stat = statSync(fullPath);
+        return {
+          name,
+          path: relative(base, fullPath),
+          type: stat.isDirectory() ? "directory" : "file",
+          size: stat.isFile() ? stat.size : undefined,
+        } satisfies ProwlEntry;
+      })
+      .sort((a, b) => {
+        if (a.type !== b.type) return a.type === "directory" ? -1 : 1;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      });
   } catch {
     return [];
   }
@@ -71,4 +79,28 @@ export function readProwlFile(relPath: string): string {
   }
 
   return readFileSync(fullPath, "utf-8");
+}
+
+/** ~/.prowl/ 내부 파일 또는 빈 디렉터리 삭제 */
+export function deleteProwlEntry(relPath: string): void {
+  const fullPath = resolveSafe(relPath);
+  if (!existsSync(fullPath)) {
+    throw new Error(`경로를 찾을 수 없습니다: ${relPath}`);
+  }
+  const stat = statSync(fullPath);
+  if (stat.isDirectory()) {
+    rmdirSync(fullPath); // 비어 있지 않으면 예외 발생
+  } else {
+    unlinkSync(fullPath);
+  }
+}
+
+/** ~/.prowl/ 내부 파일 내용 쓰기 (UTF-8, 부모 디렉터리 자동 생성) */
+export function writeProwlFile(relPath: string, content: string): void {
+  const fullPath = resolveSafe(relPath);
+  const parentDir = dirname(fullPath);
+  if (!existsSync(parentDir)) {
+    mkdirSync(parentDir, { recursive: true });
+  }
+  writeFileSync(fullPath, content, "utf-8");
 }

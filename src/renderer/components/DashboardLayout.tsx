@@ -1,16 +1,17 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Brain, Cog, History, ListTodo } from "lucide-react";
+import { Brain, Cog, FolderOpen, History, ListTodo } from "lucide-react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
+import FilesSection from "./sections/FilesSection";
 import MemorySection from "./sections/MemorySection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "calendar" | "memory" | "changelog" | "settings";
+type NavItem = "calendar" | "memory" | "changelog" | "settings" | "files";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -92,6 +93,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("memory")}
           />
           <SidebarItem
+            icon={<FolderOpen className="w-4 h-4" />}
+            label="Files"
+            active={activeNav === "files"}
+            onClick={() => setActiveNav("files")}
+          />
+          <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
             active={activeNav === "changelog"}
@@ -130,6 +137,11 @@ export default function DashboardLayout() {
           <div className={`h-full ${activeNav === "settings" ? "" : "hidden"}`}>
             <ErrorBoundary section="Settings">
               <SettingsSection />
+            </ErrorBoundary>
+          </div>
+          <div className={`h-full ${activeNav === "files" ? "" : "hidden"}`}>
+            <ErrorBoundary section="Files">
+              <FilesSection />
             </ErrorBoundary>
           </div>
         </div>

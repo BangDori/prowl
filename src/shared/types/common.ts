@@ -109,6 +109,16 @@ export interface UpdateCheckResult {
   brewStatus?: BrewInstallStatus;
 }
 
+// ~/.prowl/ 디렉터리 항목
+export interface ProwlEntry {
+  name: string;
+  /** ~/.prowl/ 기준 상대 경로 */
+  path: string;
+  type: "file" | "directory";
+  /** 파일인 경우 바이트 크기 */
+  size?: number;
+}
+
 // 사용자 메모리 (AI 채팅에서 기억할 선호/지시)
 export interface Memory {
   id: string;

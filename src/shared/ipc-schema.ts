@@ -9,6 +9,7 @@ import type {
   IpcResult,
   Memory,
   ProviderStatus,
+  ProwlEntry,
   Task,
   TaskCategoryItem,
   TasksByDate,
@@ -141,6 +142,12 @@ export interface IpcInvokeSchema {
   "memory:add": { params: [content: string]; return: IpcResult };
   "memory:update": { params: [id: string, content: string]; return: IpcResult };
   "memory:delete": { params: [id: string]; return: IpcResult };
+
+  // Prowl Files (4 channels)
+  "prowl-files:list": { params: [relPath?: string]; return: ProwlEntry[] };
+  "prowl-files:read": { params: [relPath: string]; return: string };
+  "prowl-files:write": { params: [relPath: string, content: string]; return: IpcResult };
+  "prowl-files:delete": { params: [relPath: string]; return: IpcResult };
 }
 
 /**
