@@ -33,16 +33,21 @@ export function listProwlDir(relPath = ""): ProwlEntry[] {
   if (!existsSync(targetDir)) return [];
 
   try {
-    return readdirSync(targetDir).map((name) => {
-      const fullPath = join(targetDir, name);
-      const stat = statSync(fullPath);
-      return {
-        name,
-        path: relative(base, fullPath),
-        type: stat.isDirectory() ? "directory" : "file",
-        size: stat.isFile() ? stat.size : undefined,
-      } satisfies ProwlEntry;
-    });
+    return readdirSync(targetDir)
+      .map((name) => {
+        const fullPath = join(targetDir, name);
+        const stat = statSync(fullPath);
+        return {
+          name,
+          path: relative(base, fullPath),
+          type: stat.isDirectory() ? "directory" : "file",
+          size: stat.isFile() ? stat.size : undefined,
+        } satisfies ProwlEntry;
+      })
+      .sort((a, b) => {
+        if (a.type !== b.type) return a.type === "directory" ? -1 : 1;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+      });
   } catch {
     return [];
   }
