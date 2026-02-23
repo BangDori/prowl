@@ -39,7 +39,13 @@ export default function FilesSection() {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto">
-          <FileTree selectedPath={selectedFile} onSelectFile={setSelectedFile} />
+          <FileTree
+            selectedPath={selectedFile}
+            onSelectFile={setSelectedFile}
+            onDeleted={(path) => {
+              if (selectedFile === path) setSelectedFile(null);
+            }}
+          />
         </div>
       </aside>
 

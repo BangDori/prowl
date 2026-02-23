@@ -1,6 +1,15 @@
 /** ~/.prowl/ 디렉터리 파일 시스템 읽기/쓰기 서비스 (경로 이탈 방지 포함) */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmdirSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { PROWL_DATA_DIR } from "@shared/types";
 import { app } from "electron";
@@ -70,6 +79,20 @@ export function readProwlFile(relPath: string): string {
   }
 
   return readFileSync(fullPath, "utf-8");
+}
+
+/** ~/.prowl/ 내부 파일 또는 빈 디렉터리 삭제 */
+export function deleteProwlEntry(relPath: string): void {
+  const fullPath = resolveSafe(relPath);
+  if (!existsSync(fullPath)) {
+    throw new Error(`경로를 찾을 수 없습니다: ${relPath}`);
+  }
+  const stat = statSync(fullPath);
+  if (stat.isDirectory()) {
+    rmdirSync(fullPath); // 비어 있지 않으면 예외 발생
+  } else {
+    unlinkSync(fullPath);
+  }
 }
 
 /** ~/.prowl/ 내부 파일 내용 쓰기 (UTF-8, 부모 디렉터리 자동 생성) */

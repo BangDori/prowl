@@ -24,7 +24,7 @@ import {
 } from "./services/chat-rooms";
 import { updateFocusModeMonitor } from "./services/focus-mode";
 import { addMemory, deleteMemory, listMemories, updateMemory } from "./services/memory";
-import { listProwlDir, readProwlFile, writeProwlFile } from "./services/prowl-fs";
+import { deleteProwlEntry, listProwlDir, readProwlFile, writeProwlFile } from "./services/prowl-fs";
 import {
   getChatConfig,
   getCompactExpandedHeight,
@@ -536,6 +536,15 @@ export function registerIpcHandlers(): void {
   handleIpc("prowl-files:write", async (relPath, content) => {
     try {
       writeProwlFile(relPath, content);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
+  });
+
+  handleIpc("prowl-files:delete", async (relPath) => {
+    try {
+      deleteProwlEntry(relPath);
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

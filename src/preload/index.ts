@@ -100,6 +100,7 @@ const electronAPI = {
   listProwlFiles: invokeIpc("prowl-files:list"),
   readProwlFile: invokeIpc("prowl-files:read"),
   writeProwlFile: invokeIpc("prowl-files:write"),
+  deleteProwlFile: invokeIpc("prowl-files:delete"),
 
   // Event listener (non-invoke)
   onWindowShow: (callback: () => void): (() => void) => {

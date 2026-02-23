@@ -29,7 +29,20 @@ export function useWriteProwlFile() {
       window.electronAPI.writeProwlFile(relPath, content),
     onSuccess: (_result, { relPath }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.prowlFiles.read(relPath) });
-      // 부모 디렉터리 목록도 갱신
+      const parentPath = relPath.includes("/") ? relPath.split("/").slice(0, -1).join("/") : "";
+      queryClient.invalidateQueries({ queryKey: queryKeys.prowlFiles.list(parentPath) });
+    },
+  });
+}
+
+/** 파일 또는 빈 디렉터리 삭제 */
+export function useDeleteProwlEntry() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (relPath: string) => window.electronAPI.deleteProwlFile(relPath),
+    onSuccess: (_result, relPath) => {
+      queryClient.removeQueries({ queryKey: queryKeys.prowlFiles.read(relPath) });
       const parentPath = relPath.includes("/") ? relPath.split("/").slice(0, -1).join("/") : "";
       queryClient.invalidateQueries({ queryKey: queryKeys.prowlFiles.list(parentPath) });
     },
