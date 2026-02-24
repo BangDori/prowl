@@ -21,6 +21,12 @@ interface CategoryGroup {
 function buildGroups(entries: CategoryTaskEntry[]): CategoryGroup[] {
   const order = getCategoryNames();
   const map = new Map<string, CategoryTaskEntry[]>();
+
+  // 알려진 카테고리를 빈 배열로 먼저 초기화 (태스크 없는 카테고리도 노출)
+  for (const name of order) {
+    map.set(name, []);
+  }
+
   for (const entry of entries) {
     const cat = entry.task.category ?? "기타";
     if (!map.has(cat)) map.set(cat, []);
@@ -71,13 +77,19 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
             </span>
             <span className="text-[9px] text-app-text-ghost">{group.entries.length}건</span>
           </div>
-          {group.entries.map((entry, idx) => (
-            <CategoryTaskRow
-              key={entry.task.id}
-              entry={entry}
-              showBorder={idx < group.entries.length - 1}
-            />
-          ))}
+          {group.entries.length === 0 ? (
+            <div className="px-2.5 py-2 text-center">
+              <p className="text-[10px] text-app-text-ghost">태스크 없음</p>
+            </div>
+          ) : (
+            group.entries.map((entry, idx) => (
+              <CategoryTaskRow
+                key={entry.task.id}
+                entry={entry}
+                showBorder={idx < group.entries.length - 1}
+              />
+            ))
+          )}
         </div>
       ))}
     </div>
