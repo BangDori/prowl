@@ -5,7 +5,7 @@ import { join } from "node:path";
 import type { Task } from "@shared/types";
 import { DEFAULT_REMINDERS, PROWL_DATA_DIR, TASK_SUBFOLDER } from "@shared/types";
 import { app, Notification } from "electron";
-import { navigateToChatRoom, showChatWindow } from "../windows/chat-window";
+import { showChatWindow } from "../windows/chat-window";
 import { scanDates } from "./tasks";
 
 function loadTasksForDate(date: string): Task[] {
@@ -56,11 +56,7 @@ function sendTaskReminder(task: Task, minutesBefore: number): void {
     : formatTimeLabel(minutesBefore);
   const notification = new Notification({ title, body, silent: false });
   notification.on("click", () => {
-    if (task.roomId) {
-      navigateToChatRoom(task.roomId);
-    } else {
-      showChatWindow();
-    }
+    showChatWindow();
   });
   notification.show();
 }

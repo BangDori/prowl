@@ -1,6 +1,6 @@
 # Prowl
 
-macOS 메뉴바에서 launchd 작업을 관리하는 Electron 앱 (Main/Renderer IPC 구조)
+macOS 생산성 유틸리티 앱 — 태스크 관리 + AI 채팅 + 메모리 (Electron Main/Renderer IPC 구조)
 
 ## Commands
 
@@ -19,25 +19,12 @@ bun run lint       # biome 린트
 | `@renderer/*` | `src/renderer/*` |
 | `@shared/*` | `src/shared/*` |
 
-## Build
-
-- Main: TypeScript → `dist/main/`
-- Renderer: Vite + React → `dist/renderer/`
-- Preload: TypeScript → `dist/preload/`
-
-## 주의사항
-
-- `isDev`: `process.argv.includes('--dev')` 또는 `ELECTRON_DEV=true`
-- menubar 패키지로 트레이 팝업 (Dock 숨김, 단일 인스턴스)
-- 스플래시: 앱 실행 → 4.5초 애니메이션 → 트레이 표시
-
 ## IPC Safety
 
 - IPC 스키마 Single Source of Truth: `src/shared/ipc-schema.ts`
 - Mutation 채널은 `IpcResult { success, error? }` 반환 필수
 - Fire-and-forget(quit, resize, navigate)만 void 허용
 - **Date 객체는 IPC 통과 불가** — ISO 8601 문자열 사용
-- plist 파싱은 Zod `safeParse` 사용 (`as` 캐스팅 금지)
 
 ## Data Fetching
 
@@ -63,9 +50,10 @@ bun run lint       # biome 린트
 
 ## Conventions
 
-- 커밋: `.claude/commands/commit.md` 규칙 우선
-- UI: `.claude/skills/design-system/SKILL.md`
-- IPC 추가/수정: `.claude/skills/ipc-development/SKILL.md`
-- 데이터 페칭 패턴: `.claude/skills/data-fetching/SKILL.md`
+- 커밋: commit 스킬 사용
+- UI: design-system 스킬 참고
+- IPC 추가/수정: ipc-development 스킬 참고
+- 데이터 페칭 패턴: data-fetching 스킬 참고
+- React 패턴: `docs/react-patterns.md`
+- 도메인 모델: `docs/domain-model.md`
 - 네이밍: `docs/naming-convention.md`
-- 컴포넌트 패턴: `docs/component-patterns.md`

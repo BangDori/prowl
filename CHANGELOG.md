@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.5] - 2026-02-25
+- Task.roomId 제거 — 도메인 경계 위반 수정
+- ChatRoom.favorited → AppSettings.favoritedRoomIds로 이동
+- chat.ts의 Memory 직접 참조 제거 — Tool 인터페이스로 추상화
+
 ## [1.46.4] - 2026-02-25
 - Files 섹션: 파일 확장자별 아이콘 구분 (.json, .plist, .sh, .txt 등)
 - Files 섹션: Python·JS·TS·JSON·Bash·XML·Markdown·YAML 등 코드 파일 syntax highlighting 지원

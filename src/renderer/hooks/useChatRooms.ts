@@ -54,13 +54,14 @@ export function useToggleChatRoomLock() {
   });
 }
 
-/** 채팅 룸 즐겨찾기 토글 */
+/** 채팅 룸 즐겨찾기 토글 (AppSettings.favoritedRoomIds 변경) */
 export function useToggleChatRoomFavorite() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (roomId: string) => window.electronAPI.toggleChatRoomFavorite(roomId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.settings.all });
     },
   });
 }

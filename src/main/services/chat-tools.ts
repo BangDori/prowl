@@ -470,3 +470,11 @@ toolRegistry.register(
 export function getChatTools() {
   return toolRegistry.getAllTools();
 }
+
+/** 시스템 프롬프트에 주입할 메모리 섹션 반환 (chat.ts가 memory.ts를 직접 참조하지 않도록) */
+export function getMemorySystemPromptSection(): string {
+  const memories = listMemories();
+  if (memories.length === 0) return "";
+  const items = memories.map((m) => `- ${m.content}`).join("\n");
+  return `\n\n# User Preferences (ALWAYS respect these)\n${items}`;
+}
