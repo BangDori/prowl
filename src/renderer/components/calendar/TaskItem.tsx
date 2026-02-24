@@ -1,10 +1,9 @@
 /** 단일 태스크 행: 체크박스, 제목, 카테고리, 리마인더, 인라인 편집 */
 import type { Task, TaskReminder } from "@shared/types";
 import { DEFAULT_REMINDERS } from "@shared/types";
-import { Bell, MessageSquare, Pencil, Plus, Trash2 } from "lucide-react";
+import { Bell, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
-import { useChatRooms } from "../../hooks/useChatRooms";
 import { getCategoryColor } from "../../utils/category-utils";
 import ReminderPicker from "./ReminderPicker";
 
@@ -23,13 +22,11 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   const [reminders, setReminders] = useState<TaskReminder[]>(
     task.reminders && task.reminders.length > 0 ? task.reminders : DEFAULT_REMINDERS,
   );
-  const [roomId, setRoomId] = useState<string>(task.roomId ?? "");
   const [addingCategory, setAddingCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const newCategoryInputRef = useRef<HTMLInputElement>(null);
 
   const { categories, addCategory } = useCategories();
-  const { data: chatRooms } = useChatRooms({ enabled: editing });
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -39,7 +36,6 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
       description: description.trim() || undefined,
       category,
       reminders: reminders.length > 0 ? reminders : undefined,
-      roomId: roomId || undefined,
     });
     setEditing(false);
   };
@@ -49,7 +45,6 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
     setDescription(task.description ?? "");
     setCategory(task.category ?? "기타");
     setReminders(task.reminders ?? []);
-    setRoomId(task.roomId ?? "");
     setAddingCategory(false);
     setNewCategoryName("");
     setEditing(false);
@@ -146,23 +141,6 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
         </div>
 
         <ReminderPicker reminders={reminders} onChange={setReminders} />
-        {chatRooms && chatRooms.length > 0 && (
-          <div className="flex items-center gap-1.5">
-            <MessageSquare className="w-2.5 h-2.5 text-gray-500 flex-shrink-0" />
-            <select
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              className="flex-1 bg-app-input-bg border border-app-input-border rounded text-[10px] text-app-text-secondary px-1 py-0.5 outline-none appearance-none cursor-pointer hover:border-prowl-border-hover transition-colors"
-            >
-              <option value="">채팅방 연결 안 함</option>
-              {chatRooms.map((room) => (
-                <option key={room.id} value={room.id}>
-                  {room.title || `채팅방 ${room.id.slice(0, 6)}`}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
         <div className="flex items-center gap-1">
           <div className="flex-1" />
           <button
@@ -230,11 +208,6 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           />
           {task.reminders && task.reminders.length > 0 && (
             <Bell className="w-2.5 h-2.5 text-amber-500/70 flex-shrink-0" />
-          )}
-          {task.roomId && (
-            <span title="채팅방 연결됨" className="flex-shrink-0">
-              <MessageSquare className="w-2.5 h-2.5 text-blue-400/70" />
-            </span>
           )}
           {task.dueTime && (
             <span className="text-[9px] text-gray-500 flex-shrink-0">{task.dueTime}</span>
