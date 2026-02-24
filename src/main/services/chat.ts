@@ -3,8 +3,7 @@ import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@sh
 import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
-import { getChatTools, setCurrentRoomId } from "./chat-tools";
-import { listMemories } from "./memory";
+import { getChatTools, getMemorySystemPromptSection, setCurrentRoomId } from "./chat-tools";
 import { sendChatNotification } from "./notification";
 import { getSettings } from "./settings";
 
@@ -61,11 +60,7 @@ When you want to display structured content (cards, tables, charts, dashboards, 
 - You may include explanatory text before or after the HTML in the same response.
 - Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.`;
 
-  const memories = listMemories();
-  if (memories.length > 0) {
-    const items = memories.map((m) => `- ${m.content}`).join("\n");
-    prompt += `\n\n# User Preferences (ALWAYS respect these)\n${items}`;
-  }
+  prompt += getMemorySystemPromptSection();
 
   if (currentPageContext) {
     prompt += `\n\n## 현재 사용자가 보고 있는 페이지\nURL: ${currentPageContext.url}\n제목: ${currentPageContext.title}\n내용:\n${currentPageContext.text}`;
