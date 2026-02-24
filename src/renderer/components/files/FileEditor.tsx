@@ -1,7 +1,69 @@
 /** ~/.prowl/ 파일 내용 뷰어/편집기 컴포넌트 */
-import { Check, Pencil, RotateCcw, Save, X } from "lucide-react";
+import { AlertTriangle, Check, Pencil, RotateCcw, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useProwlFile, useWriteProwlFile } from "../../hooks/useProwlFiles";
+
+/** JSON 파싱 결과 */
+interface JsonResult {
+  valid: boolean;
+  formatted?: string;
+  error?: string;
+}
+
+/** 파일 확장자 기반 콘텐츠 타입 */
+function getContentType(filePath: string): "json" | "text" {
+  const ext = filePath.split(".").pop()?.toLowerCase();
+  return ext === "json" ? "json" : "text";
+}
+
+/** JSON 파싱 및 pretty-print 시도 */
+function tryParseJson(content: string): JsonResult {
+  try {
+    const parsed = JSON.parse(content);
+    return { valid: true, formatted: JSON.stringify(parsed, null, 2) };
+  } catch (e) {
+    return { valid: false, error: (e as Error).message };
+  }
+}
+
+/** 파일 타입에 따른 내용 렌더러 */
+function FileContentView({ filePath, content }: { filePath: string; content: string }) {
+  if (!content) {
+    return (
+      <pre className="w-full h-full overflow-auto p-4 font-mono text-xs leading-relaxed">
+        <span className="text-app-text-ghost italic">파일이 비어 있습니다</span>
+      </pre>
+    );
+  }
+
+  if (getContentType(filePath) === "json") {
+    const result = tryParseJson(content);
+    if (!result.valid) {
+      return (
+        <div className="h-full flex flex-col">
+          <div className="px-4 py-2 bg-red-500/10 border-b border-red-500/20 shrink-0 flex items-center gap-1.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+            <p className="text-xs text-red-400 truncate">유효하지 않은 JSON: {result.error}</p>
+          </div>
+          <pre className="flex-1 overflow-auto p-4 font-mono text-xs text-app-text-secondary leading-relaxed whitespace-pre-wrap break-words">
+            {content}
+          </pre>
+        </div>
+      );
+    }
+    return (
+      <pre className="w-full h-full overflow-auto p-4 font-mono text-xs text-app-text-secondary leading-relaxed whitespace-pre-wrap break-words">
+        {result.formatted}
+      </pre>
+    );
+  }
+
+  return (
+    <pre className="w-full h-full overflow-auto p-4 font-mono text-xs text-app-text-secondary leading-relaxed whitespace-pre-wrap break-words">
+      {content}
+    </pre>
+  );
+}
 
 interface FileEditorProps {
   filePath: string;
@@ -147,9 +209,7 @@ export default function FileEditor({ filePath }: FileEditorProps) {
             autoFocus
           />
         ) : (
-          <pre className="w-full h-full overflow-auto p-4 font-mono text-xs text-app-text-secondary leading-relaxed whitespace-pre-wrap break-words">
-            {content || <span className="text-app-text-ghost italic">파일이 비어 있습니다</span>}
-          </pre>
+          <FileContentView filePath={filePath} content={content ?? ""} />
         )}
       </div>
 

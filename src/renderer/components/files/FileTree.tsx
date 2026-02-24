@@ -1,9 +1,41 @@
 /** ~/.prowl/ 디렉터리 트리 탐색 컴포넌트 */
 import type { ProwlEntry } from "@shared/types";
-import { ChevronDown, ChevronRight, File, Folder, FolderOpen, Trash2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  File,
+  FileBraces,
+  FileCode,
+  FileTerminal,
+  FileText,
+  Folder,
+  FolderOpen,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { useDeleteProwlEntry, useProwlDir } from "../../hooks/useProwlFiles";
 import ConfirmDialog from "../ConfirmDialog";
+
+/** 파일 확장자에 맞는 아이콘 컴포넌트 반환 */
+function getFileIcon(name: string) {
+  const ext = name.split(".").pop()?.toLowerCase();
+  switch (ext) {
+    case "json":
+      return FileBraces;
+    case "plist":
+    case "xml":
+      return FileCode;
+    case "sh":
+    case "bash":
+    case "zsh":
+      return FileTerminal;
+    case "txt":
+    case "log":
+      return FileText;
+    default:
+      return File;
+  }
+}
 
 /** 파일 크기를 읽기 쉬운 형식으로 변환 */
 function formatSize(bytes: number): string {
@@ -33,6 +65,7 @@ function FileTreeNode({
 
   const isSelected = selectedPath === entry.path;
   const indent = depth * 12;
+  const FileIcon = getFileIcon(entry.name);
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,7 +144,7 @@ function FileTreeNode({
         `}
         style={{ paddingLeft: `${20 + indent}px`, paddingRight: "24px" }}
       >
-        <File className="w-3.5 h-3.5 shrink-0 opacity-60" />
+        <FileIcon className="w-3.5 h-3.5 shrink-0 opacity-60" />
         <span className="truncate flex-1">{entry.name}</span>
         {entry.size !== undefined && (
           <span className="text-app-text-ghost text-[10px] shrink-0 group-hover:opacity-0 transition-opacity">
