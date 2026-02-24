@@ -53,6 +53,18 @@ export function setChatConfig(config: ChatConfig): void {
   store.set("chatConfig", config);
 }
 
+// 즐겨찾기 ChatRoom ID 목록
+export function getFavoritedRoomIds(): string[] {
+  return getSettings().favoritedRoomIds ?? [];
+}
+
+export function toggleFavoritedRoom(roomId: string): void {
+  const settings = getSettings();
+  const ids = settings.favoritedRoomIds ?? [];
+  const next = ids.includes(roomId) ? ids.filter((id) => id !== roomId) : [...ids, roomId];
+  setSettings({ ...settings, favoritedRoomIds: next });
+}
+
 // Task Manager 창 높이
 export function getCompactExpandedHeight(): number {
   return store.get("compactExpandedHeight") ?? 400;

@@ -19,7 +19,6 @@ import {
   getChatRoom,
   listChatRooms,
   saveChatMessages,
-  toggleChatRoomFavorite,
   toggleChatRoomLock,
 } from "./services/chat-rooms";
 import { updateFocusModeMonitor } from "./services/focus-mode";
@@ -28,11 +27,13 @@ import { deleteProwlEntry, listProwlDir, readProwlFile, writeProwlFile } from ".
 import {
   getChatConfig,
   getCompactExpandedHeight,
+  getFavoritedRoomIds,
   getFocusMode,
   getSettings,
   setChatConfig,
   setFocusMode,
   setSettings,
+  toggleFavoritedRoom,
 } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { refreshReminders } from "./services/task-reminder";
@@ -465,7 +466,7 @@ export function registerIpcHandlers(): void {
 
   // ── Chat Rooms ──────────────────────────────────────
 
-  handleIpc("chat-rooms:list", async () => listChatRooms());
+  handleIpc("chat-rooms:list", async () => listChatRooms(getFavoritedRoomIds()));
 
   handleIpc("chat-rooms:get", async (roomId) => getChatRoom(roomId));
 
@@ -516,7 +517,7 @@ export function registerIpcHandlers(): void {
 
   handleIpc("chat-rooms:toggle-favorite", async (roomId) => {
     try {
-      toggleChatRoomFavorite(roomId);
+      toggleFavoritedRoom(roomId);
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

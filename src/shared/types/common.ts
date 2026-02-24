@@ -37,6 +37,7 @@ export interface AppSettings {
   notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
+  favoritedRoomIds: string[]; // 즐겨찾기 ChatRoom ID 목록 (ChatRoom 도메인과 분리)
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -44,6 +45,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
   openaiApiKey: "",
+  favoritedRoomIds: [],
 };
 
 // AI 프로바이더
@@ -138,13 +140,13 @@ export interface ChatRoomSummary {
   favorited?: boolean; // 즐겨찾기 여부
 }
 
-// 채팅 룸 전체 데이터 (메시지 포함)
+// 채팅 룸 전체 데이터 (메시지 포함, 파일에 저장되는 엔티티)
 export interface ChatRoom {
   id: string;
   title: string;
   messages: ChatMessage[];
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
-  locked?: boolean; // 삭제 잠금 여부
-  favorited?: boolean; // 즐겨찾기 여부
+  locked?: boolean; // 삭제 잠금 여부 (도메인 규칙: 잠금 시 삭제 불가)
+  // favorited 없음 — 즐겨찾기는 AppSettings.favoritedRoomIds로 관리
 }
