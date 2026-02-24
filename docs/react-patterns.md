@@ -1,8 +1,3 @@
----
-name: react-patterns
-description: Prowl React 컴포넌트/훅 작성 패턴. 리렌더 최적화, 상태 관리, effect 패턴을 다룬다.
----
-
 # React Patterns
 
 Prowl에서 검증된 React 패턴. Vercel Engineering 가이드에서 Electron 환경에 맞게 추려낸 핵심 규칙.
