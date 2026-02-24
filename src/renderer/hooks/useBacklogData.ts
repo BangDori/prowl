@@ -42,12 +42,29 @@ export function useBacklogData() {
     onSettled: invalidate,
   });
 
+  const deleteBacklogMutation = useMutation({
+    mutationFn: (taskId: string) => window.electronAPI.deleteBacklogTask(taskId),
+    onMutate: async (taskId) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.tasks.backlog() });
+      const prev = queryClient.getQueryData<Task[]>(queryKeys.tasks.backlog());
+      queryClient.setQueryData<Task[]>(queryKeys.tasks.backlog(), (old = []) =>
+        old.filter((t) => t.id !== taskId),
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.prev) queryClient.setQueryData(queryKeys.tasks.backlog(), ctx.prev);
+    },
+    onSettled: invalidate,
+  });
+
   return {
     backlogTasks,
     isLoading,
     error: error ? "백로그 태스크를 불러올 수 없습니다." : null,
     refreshing,
     toggleComplete: (taskId: string) => toggleCompleteMutation.mutate(taskId),
+    deleteBacklog: (taskId: string) => deleteBacklogMutation.mutate(taskId),
     refetch: invalidate,
   };
 }
