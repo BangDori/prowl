@@ -254,7 +254,7 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
         )}
       </div>
       {!task.completed && (
-        <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="hidden group-hover:flex flex-shrink-0 items-center gap-0.5">
           <button
             type="button"
             onClick={() => setEditing(true)}
