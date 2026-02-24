@@ -19,18 +19,6 @@ bun run lint       # biome 린트
 | `@renderer/*` | `src/renderer/*` |
 | `@shared/*` | `src/shared/*` |
 
-## Build
-
-- Main: TypeScript → `dist/main/`
-- Renderer: Vite + React → `dist/renderer/`
-- Preload: TypeScript → `dist/preload/`
-
-## 주의사항
-
-- `isDev`: `process.argv.includes('--dev')` 또는 `ELECTRON_DEV=true`
-- menubar 패키지로 트레이 팝업 (Dock 숨김, 단일 인스턴스)
-- 스플래시: 앱 실행 → 4.5초 애니메이션 → 트레이 표시
-
 ## IPC Safety
 
 - IPC 스키마 Single Source of Truth: `src/shared/ipc-schema.ts`
