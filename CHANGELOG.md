@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.1] - 2026-02-24
+- Compact View(메뉴바 팝업)에서 태스크 삭제 기능 추가 — 태스크 hover 시 휴지통 버튼 표시
+- 오늘 태스크, 다가오는 일정, 날짜 미정(백로그) 전 영역 및 카테고리 뷰에서 삭제 가능
+
 ## [1.46.0] - 2026-02-24
 - Dashboard에 Files 탭 추가 — `~/.prowl/` 내부 파일 탐색, 조회, 편집 기능
 - 파일 트리: 폴더 클릭으로 하위 항목 펼치기/접기, 폴더 우선 알파벳 정렬
