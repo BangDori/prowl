@@ -1,6 +1,7 @@
 /** 범용 확인 다이얼로그 모달 */
 import { AlertTriangle } from "lucide-react";
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ConfirmDialogProps {
   /** 다이얼로그 제목 */
@@ -34,7 +35,7 @@ export default function ConfirmDialog({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onCancel]);
 
-  return (
+  return createPortal(
     /* 오버레이 */
     // biome-ignore lint/a11y/useKeyWithClickEvents: 오버레이 클릭은 보조 닫기 수단
     // biome-ignore lint/a11y/noStaticElementInteractions: 오버레이 클릭은 보조 닫기 수단
@@ -74,6 +75,7 @@ export default function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
