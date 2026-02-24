@@ -46,10 +46,13 @@ export default function CompactView() {
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  const { tasksByDate, toggleComplete, refreshing, refetch } = useTaskData(year, month);
-  const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
-  const { tasksByDate: upcomingTasksByDate, toggleComplete: toggleUpcomingComplete } =
-    useUpcomingTasks(upcomingRange);
+  const { tasksByDate, toggleComplete, deleteTask, refreshing, refetch } = useTaskData(year, month);
+  const { backlogTasks, toggleComplete: toggleBacklogComplete, deleteBacklog } = useBacklogData();
+  const {
+    tasksByDate: upcomingTasksByDate,
+    toggleComplete: toggleUpcomingComplete,
+    deleteTask: deleteUpcomingTask,
+  } = useUpcomingTasks(upcomingRange);
 
   const incompleteBacklogTasks = useMemo(
     () => backlogTasks.filter((t) => !t.completed),
@@ -76,7 +79,12 @@ export default function CompactView() {
     const entries: CategoryTaskEntry[] = [];
 
     for (const task of todayTasks) {
-      entries.push({ task, dateLabel: "오늘", onToggle: () => toggleComplete(todayStr, task.id) });
+      entries.push({
+        task,
+        dateLabel: "오늘",
+        onToggle: () => toggleComplete(todayStr, task.id),
+        onDelete: () => deleteTask(todayStr, task.id),
+      });
     }
 
     for (const [date, tasks] of Object.entries(upcomingTasksByDate).sort(([a], [b]) =>
@@ -87,6 +95,7 @@ export default function CompactView() {
           task,
           dateLabel: getLabel(date),
           onToggle: () => toggleUpcomingComplete(date, task.id),
+          onDelete: () => deleteUpcomingTask(date, task.id),
         });
       }
     }
@@ -96,6 +105,7 @@ export default function CompactView() {
         task,
         dateLabel: "날짜 미정",
         onToggle: () => toggleBacklogComplete(task.id),
+        onDelete: () => deleteBacklog(task.id),
       });
     }
 
@@ -107,6 +117,9 @@ export default function CompactView() {
     toggleComplete,
     toggleUpcomingComplete,
     toggleBacklogComplete,
+    deleteTask,
+    deleteUpcomingTask,
+    deleteBacklog,
     todayStr,
     tomorrowStr,
   ]);
@@ -187,15 +200,22 @@ export default function CompactView() {
               <CompactBacklog
                 tasks={incompleteBacklogTasks}
                 onToggleComplete={toggleBacklogComplete}
+                onDelete={deleteBacklog}
               />
             )}
-            <CompactTaskList tasks={todayTasks} date={todayStr} onToggleComplete={toggleComplete} />
+            <CompactTaskList
+              tasks={todayTasks}
+              date={todayStr}
+              onToggleComplete={toggleComplete}
+              onDelete={deleteTask}
+            />
             {upcomingGroups.length > 0 && (
               <CompactUpcoming
                 groups={upcomingGroups}
                 range={upcomingRange}
                 onRangeChange={setUpcomingRange}
                 onToggleComplete={toggleUpcomingComplete}
+                onDelete={deleteUpcomingTask}
               />
             )}
             {hasCompleted && (

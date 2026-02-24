@@ -1,6 +1,6 @@
 /** 카테고리별 전체 태스크 그룹 뷰 (날짜 구분 없이 카테고리로 묶음) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import CompactTaskDetail from "./CompactTaskDetail";
@@ -9,6 +9,7 @@ export interface CategoryTaskEntry {
   task: Task;
   dateLabel: string; // "오늘" | "내일" | "M/D(요일)" | "날짜 미정"
   onToggle: () => void;
+  onDelete: () => void;
 }
 
 interface CategoryGroup {
@@ -86,11 +87,11 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
 function CategoryTaskRow({ entry, showBorder }: { entry: CategoryTaskEntry; showBorder: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
-  const { task, dateLabel, onToggle } = entry;
+  const { task, dateLabel, onToggle, onDelete } = entry;
 
   return (
     <div className={showBorder ? "border-b border-prowl-border" : ""}>
-      <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
+      <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors" />
         </button>
@@ -115,6 +116,13 @@ function CategoryTaskRow({ entry, showBorder }: { entry: CategoryTaskEntry; show
               {task.dueTime}
             </span>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-all"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
         </button>
       </div>
       {expanded && <CompactTaskDetail task={task} />}

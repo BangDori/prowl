@@ -1,7 +1,7 @@
 /** 다가오는 일정: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
 import type { Task, UpcomingRange } from "@shared/types";
 import { UPCOMING_RANGE_LABELS } from "@shared/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";
@@ -17,6 +17,7 @@ interface CompactUpcomingProps {
   range: UpcomingRange;
   onRangeChange: (range: UpcomingRange) => void;
   onToggleComplete: (date: string, taskId: string) => void;
+  onDelete: (date: string, taskId: string) => void;
 }
 
 export default function CompactUpcoming({
@@ -24,6 +25,7 @@ export default function CompactUpcoming({
   range,
   onRangeChange,
   onToggleComplete,
+  onDelete,
 }: CompactUpcomingProps) {
   if (groups.length === 0) return null;
 
@@ -55,6 +57,7 @@ export default function CompactUpcoming({
                 task={task}
                 showBorder={idx < group.tasks.length - 1}
                 onToggle={() => onToggleComplete(group.date, task.id)}
+                onDelete={() => onDelete(group.date, task.id)}
               />
             ))}
           </div>
@@ -68,17 +71,19 @@ function UpcomingTaskRow({
   task,
   showBorder,
   onToggle,
+  onDelete,
 }: {
   task: Task;
   showBorder: boolean;
   onToggle: () => void;
+  onDelete: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
   return (
     <div className={showBorder ? "border-b border-prowl-border" : ""}>
-      <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
+      <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors">
             {task.completed && (
@@ -121,6 +126,13 @@ function UpcomingTaskRow({
               {task.dueTime}
             </span>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-all"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
         </button>
       </div>
 

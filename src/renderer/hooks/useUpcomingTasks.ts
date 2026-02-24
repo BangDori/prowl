@@ -30,10 +30,17 @@ export function useUpcomingTasks(range: UpcomingRange) {
     onSettled: invalidateAll,
   });
 
+  const deleteTaskMutation = useMutation({
+    mutationFn: ({ date, taskId }: { date: string; taskId: string }) =>
+      window.electronAPI.deleteTask(date, taskId),
+    onSettled: invalidateAll,
+  });
+
   return {
     tasksByDate,
     refreshing,
     toggleComplete: (date: string, taskId: string) =>
       toggleCompleteMutation.mutate({ date, taskId }),
+    deleteTask: (date: string, taskId: string) => deleteTaskMutation.mutate({ date, taskId }),
   };
 }
