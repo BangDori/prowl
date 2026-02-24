@@ -1,7 +1,9 @@
 /** 다가오는 일정: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
 import type { Task, UpcomingRange } from "@shared/types";
 import { UPCOMING_RANGE_LABELS } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";

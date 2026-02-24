@@ -1,5 +1,10 @@
 /** Task Manager 헤더: 드래그 영역 + 정렬 토글/새로고침/최소화/닫기 버튼 */
-import { CalendarClock, Minus, Plus, RefreshCw, Tag, X } from "lucide-react";
+import CalendarClock from "lucide-react/dist/esm/icons/calendar-clock";
+import Minus from "lucide-react/dist/esm/icons/minus";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
+import Tag from "lucide-react/dist/esm/icons/tag";
+import X from "lucide-react/dist/esm/icons/x";
 import type { TaskSortMode } from "../../utils/task-helpers";
 
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;

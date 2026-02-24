@@ -1,6 +1,6 @@
 /** 캘린더 날짜 셀 — 태스크 카테고리 색상 표시 */
 import type { Task } from "@shared/types";
-import { Check } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
 import { isToday } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";
 

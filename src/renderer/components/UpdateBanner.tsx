@@ -1,5 +1,7 @@
 /** 사이드바 하단 업데이트 인디케이터 */
-import { Download, RefreshCw, X } from "lucide-react";
+import Download from "lucide-react/dist/esm/icons/download";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
+import X from "lucide-react/dist/esm/icons/x";
 import { useState } from "react";
 import { useInstallUpdate, useRelaunchApp, useUpdateCheck } from "../hooks/useUpdate";
 

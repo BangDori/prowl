@@ -1,6 +1,8 @@
 /** 카테고리별 전체 태스크 그룹 뷰 (날짜 구분 없이 카테고리로 묶음) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import ConfirmDialog from "../ConfirmDialog";

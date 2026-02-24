@@ -1,6 +1,8 @@
 /** 백로그 태스크 섹션 (날짜 미정) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useMemo, useState } from "react";
 import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import ConfirmDialog from "../ConfirmDialog";

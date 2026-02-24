@@ -1,6 +1,10 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import { Brain, Cog, FolderOpen, History, ListTodo } from "lucide-react";
+import Brain from "lucide-react/dist/esm/icons/brain";
+import Cog from "lucide-react/dist/esm/icons/cog";
+import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
+import History from "lucide-react/dist/esm/icons/history";
+import ListTodo from "lucide-react/dist/esm/icons/list-todo";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";

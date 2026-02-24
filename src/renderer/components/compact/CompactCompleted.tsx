@@ -1,7 +1,8 @@
 /** 완료된 태스크 토글 섹션 */
 
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";

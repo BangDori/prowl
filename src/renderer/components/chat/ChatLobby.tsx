@@ -2,7 +2,10 @@
 import prowlLying from "@assets/prowl-lying.png";
 import type { ChatConfig, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { Maximize2, Minimize2, Send, X } from "lucide-react";
+import Maximize2 from "lucide-react/dist/esm/icons/maximize-2";
+import Minimize2 from "lucide-react/dist/esm/icons/minimize-2";
+import Send from "lucide-react/dist/esm/icons/send";
+import X from "lucide-react/dist/esm/icons/x";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useChatRooms } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";

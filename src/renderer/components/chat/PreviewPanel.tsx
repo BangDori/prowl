@@ -1,7 +1,11 @@
 /** 탭 기반 프리뷰 패널 — HTML 및 외부 URL을 브라우저 탭처럼 표시 */
 
 import prowlLogo from "@assets/prowl-logo.png";
-import { ChevronLeft, ChevronRight, Plus, RotateCcw, X } from "lucide-react";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
+import X from "lucide-react/dist/esm/icons/x";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { type NavEntry, useTabHistory } from "./useTabHistory";
 

@@ -1,6 +1,8 @@
 /** 오늘의 태스크 목록 (시간순 정렬, 체크박스 토글 가능) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { getCategoryColor } from "../../utils/category-utils";
 import { sortTasks } from "../../utils/task-helpers";

@@ -1,6 +1,7 @@
 /** 채팅 입력바 — input 상태를 격리하여 MessageBubble 재렌더 차단 */
 import type { ChatConfig, ProviderStatus } from "@shared/types";
-import { Plus, Send } from "lucide-react";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import Send from "lucide-react/dist/esm/icons/send";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ModelSelector from "../ModelSelector";
 import type { PageContext } from "./PreviewPanel";

@@ -1,5 +1,8 @@
 /** 태스크 필터 바: 동적 카테고리 탭, 완료 상태 */
-import { Eye, EyeOff, Plus, X } from "lucide-react";
+import Eye from "lucide-react/dist/esm/icons/eye";
+import EyeOff from "lucide-react/dist/esm/icons/eye-off";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import X from "lucide-react/dist/esm/icons/x";
 import { useRef, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
 

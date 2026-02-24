@@ -3,7 +3,10 @@ import prowlLying from "@assets/prowl-lying.png";
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft, Maximize2, Minimize2, X } from "lucide-react";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import Maximize2 from "lucide-react/dist/esm/icons/maximize-2";
+import Minimize2 from "lucide-react/dist/esm/icons/minimize-2";
+import X from "lucide-react/dist/esm/icons/x";
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   useChatRoom,

@@ -1,5 +1,7 @@
 /** 캘린더 헤더: 월 네비게이션 및 새로고침 */
-import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 
 interface CalendarHeaderProps {
   monthLabel: string;

@@ -1,7 +1,12 @@
 /** 개별 채팅 메시지 버블 컴포넌트 */
 import prowlProfile from "@assets/prowl-profile.png";
 import type { ChatMessage, ToolApprovalMeta } from "@shared/types";
-import { ArrowUpRight, Check, Code, Copy, Play, X } from "lucide-react";
+import ArrowUpRight from "lucide-react/dist/esm/icons/arrow-up-right";
+import Check from "lucide-react/dist/esm/icons/check";
+import Code from "lucide-react/dist/esm/icons/code";
+import Copy from "lucide-react/dist/esm/icons/copy";
+import Play from "lucide-react/dist/esm/icons/play";
+import X from "lucide-react/dist/esm/icons/x";
 import { useCallback, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";

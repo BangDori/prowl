@@ -5,7 +5,12 @@ import {
   type FocusMode,
   type ShortcutConfig,
 } from "@shared/types";
-import { Bell, ExternalLink, KeyRound, Pencil, RefreshCw, Trash2 } from "lucide-react";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
+import KeyRound from "lucide-react/dist/esm/icons/key-round";
+import Pencil from "lucide-react/dist/esm/icons/pencil";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useEffect, useState } from "react";
 import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";

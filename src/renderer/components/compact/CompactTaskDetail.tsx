@@ -1,6 +1,7 @@
 /** 태스크 펼침 상세 패널 */
 import type { Task } from "@shared/types";
-import { Check, Copy } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
+import Copy from "lucide-react/dist/esm/icons/copy";
 import { useCallback, useState } from "react";
 
 interface CompactTaskDetailProps {
