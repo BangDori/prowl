@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.6] - 2026-02-25
+- 태스크 삭제 버튼에 확인 모달 추가 — 실수로 삭제되는 경우 방지
+- ConfirmDialog Portal 렌더링으로 전환 — 부모 레이어 스타일 영향 없이 앱 전체 기준으로 표시
+
 ## [1.46.5] - 2026-02-25
 - Task.roomId 제거 — 도메인 경계 위반 수정
 - ChatRoom.favorited → AppSettings.favoritedRoomIds로 이동

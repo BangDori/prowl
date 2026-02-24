@@ -1,6 +1,6 @@
 {
   "name": "prowl",
-  "version": "1.46.5",
+  "version": "1.46.6",
   "description": "A cat that watches your background jobs from the macOS menubar",
   "main": "dist/main/index.js",
   "type": "commonjs",
