@@ -253,22 +253,24 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
           </span>
         )}
       </div>
-      <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
-        >
-          <Pencil className="w-2.5 h-2.5" />
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
-        >
-          <Trash2 className="w-2.5 h-2.5" />
-        </button>
-      </div>
+      {!task.completed && (
+        <div className="flex-shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
+          >
+            <Pencil className="w-2.5 h-2.5" />
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
+          >
+            <Trash2 className="w-2.5 h-2.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

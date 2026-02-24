@@ -141,6 +141,7 @@ export function updateTask(date: string, task: Task): void {
   const tasks = readDateFile(date);
   const idx = tasks.findIndex((t) => t.id === task.id);
   if (idx === -1) throw new Error(`Task not found: ${task.id}`);
+  if (tasks[idx].completed) throw new Error("완료된 태스크는 수정할 수 없습니다.");
   tasks[idx] = task;
   writeDateFile(date, tasks);
 }
@@ -157,8 +158,13 @@ export function toggleTaskComplete(date: string, taskId: string): void {
 
 /** 태스크 삭제 */
 export function deleteTask(date: string, taskId: string): void {
-  const tasks = readDateFile(date).filter((t) => t.id !== taskId);
-  writeDateFile(date, tasks);
+  const tasks = readDateFile(date);
+  const task = tasks.find((t) => t.id === taskId);
+  if (task?.completed) throw new Error("완료된 태스크는 삭제할 수 없습니다.");
+  writeDateFile(
+    date,
+    tasks.filter((t) => t.id !== taskId),
+  );
 }
 
 // ── Backlog ──────────────────────────────────────────
@@ -205,6 +211,7 @@ export function updateBacklogTask(task: Task): void {
   const tasks = readBacklogFile();
   const idx = tasks.findIndex((t) => t.id === task.id);
   if (idx === -1) throw new Error(`Backlog task not found: ${task.id}`);
+  if (tasks[idx].completed) throw new Error("완료된 태스크는 수정할 수 없습니다.");
   tasks[idx] = task;
   writeBacklogFile(tasks);
 }
@@ -221,8 +228,10 @@ export function toggleBacklogComplete(taskId: string): void {
 
 /** 백로그 태스크 삭제 */
 export function deleteBacklogTask(taskId: string): void {
-  const tasks = readBacklogFile().filter((t) => t.id !== taskId);
-  writeBacklogFile(tasks);
+  const tasks = readBacklogFile();
+  const task = tasks.find((t) => t.id === taskId);
+  if (task?.completed) throw new Error("완료된 태스크는 삭제할 수 없습니다.");
+  writeBacklogFile(tasks.filter((t) => t.id !== taskId));
 }
 
 // ── Overdue Migration ──────────────────────────────────────────
