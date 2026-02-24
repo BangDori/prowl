@@ -5,6 +5,7 @@ import { Bell, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
 import { getCategoryColor } from "../../utils/category-utils";
+import ConfirmDialog from "../ConfirmDialog";
 import ReminderPicker from "./ReminderPicker";
 
 interface TaskItemProps {
@@ -16,6 +17,7 @@ interface TaskItemProps {
 
 export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [category, setCategory] = useState<string>(task.category ?? "기타");
@@ -164,86 +166,99 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
   }
 
   return (
-    <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-prowl-card border border-prowl-border hover:bg-app-hover-bg transition-colors">
-      <button
-        type="button"
-        onClick={onToggleComplete}
-        className={`w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
-          task.completed
-            ? "bg-emerald-500/30 border-emerald-500/50"
-            : "border-gray-600 hover:border-gray-400"
-        }`}
-      >
-        {task.completed && (
-          <svg
-            className="w-2 h-2 text-emerald-400"
-            viewBox="0 0 12 12"
-            fill="none"
-            role="img"
-            aria-label="완료"
-          >
-            <path
-              d="M2 6l3 3 5-5"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        )}
-      </button>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span
-            className={`text-[11px] leading-tight ${
-              task.completed ? "line-through text-app-text-ghost" : "text-app-text-primary"
-            }`}
-          >
-            {task.title}
-          </span>
-          <div
-            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ backgroundColor: categoryColor }}
-            title={displayCategory}
-          />
-          {task.reminders && task.reminders.length > 0 && (
-            <Bell className="w-2.5 h-2.5 text-amber-500/70 flex-shrink-0" />
+    <>
+      <div className="group flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-prowl-card border border-prowl-border hover:bg-app-hover-bg transition-colors">
+        <button
+          type="button"
+          onClick={onToggleComplete}
+          className={`w-3.5 h-3.5 rounded border flex-shrink-0 flex items-center justify-center transition-colors ${
+            task.completed
+              ? "bg-emerald-500/30 border-emerald-500/50"
+              : "border-gray-600 hover:border-gray-400"
+          }`}
+        >
+          {task.completed && (
+            <svg
+              className="w-2 h-2 text-emerald-400"
+              viewBox="0 0 12 12"
+              fill="none"
+              role="img"
+              aria-label="완료"
+            >
+              <path
+                d="M2 6l3 3 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           )}
-          {task.dueTime && (
-            <span className="text-[9px] text-gray-500 flex-shrink-0">{task.dueTime}</span>
+        </button>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`text-[11px] leading-tight ${
+                task.completed ? "line-through text-app-text-ghost" : "text-app-text-primary"
+              }`}
+            >
+              {task.title}
+            </span>
+            <div
+              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+              style={{ backgroundColor: categoryColor }}
+              title={displayCategory}
+            />
+            {task.reminders && task.reminders.length > 0 && (
+              <Bell className="w-2.5 h-2.5 text-amber-500/70 flex-shrink-0" />
+            )}
+            {task.dueTime && (
+              <span className="text-[9px] text-gray-500 flex-shrink-0">{task.dueTime}</span>
+            )}
+          </div>
+          {task.description && (
+            <p
+              className={`text-[10px] mt-0.5 truncate ${task.completed ? "text-app-text-ghost" : "text-app-text-muted"}`}
+            >
+              {task.description}
+            </p>
+          )}
+          {task.category && (
+            <span className="inline-block mt-0.5 px-1 py-px rounded text-[8px] bg-app-hover-bg text-app-text-muted">
+              {task.category}
+            </span>
           )}
         </div>
-        {task.description && (
-          <p
-            className={`text-[10px] mt-0.5 truncate ${task.completed ? "text-app-text-ghost" : "text-app-text-muted"}`}
-          >
-            {task.description}
-          </p>
-        )}
-        {task.category && (
-          <span className="inline-block mt-0.5 px-1 py-px rounded text-[8px] bg-app-hover-bg text-app-text-muted">
-            {task.category}
-          </span>
+        {!task.completed && (
+          <div className="hidden group-hover:flex flex-shrink-0 items-center gap-0.5">
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
+            >
+              <Pencil className="w-2.5 h-2.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmPending(true)}
+              className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
+            >
+              <Trash2 className="w-2.5 h-2.5" />
+            </button>
+          </div>
         )}
       </div>
-      {!task.completed && (
-        <div className="hidden group-hover:flex flex-shrink-0 items-center gap-0.5">
-          <button
-            type="button"
-            onClick={() => setEditing(true)}
-            className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
-          >
-            <Pencil className="w-2.5 h-2.5" />
-          </button>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
-          >
-            <Trash2 className="w-2.5 h-2.5" />
-          </button>
-        </div>
+      {confirmPending && (
+        <ConfirmDialog
+          title="태스크 삭제"
+          message={`"${task.title}" 태스크를 삭제할까요?`}
+          onCancel={() => setConfirmPending(false)}
+          onConfirm={() => {
+            onDelete();
+            setConfirmPending(false);
+          }}
+        />
       )}
-    </div>
+    </>
   );
 }

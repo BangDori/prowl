@@ -4,6 +4,7 @@ import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { getCategoryColor } from "../../utils/category-utils";
 import { sortTasks } from "../../utils/task-helpers";
+import ConfirmDialog from "../ConfirmDialog";
 import CompactTaskDetail from "./CompactTaskDetail";
 
 interface CompactTaskListProps {
@@ -64,6 +65,7 @@ function CompactTaskRow({
   onDelete: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
   return (
@@ -125,7 +127,7 @@ function CompactTaskRow({
         {!task.completed && (
           <button
             type="button"
-            onClick={onDelete}
+            onClick={() => setConfirmPending(true)}
             className="hidden group-hover:flex flex-shrink-0 items-center p-0.5 rounded text-app-text-ghost hover:text-red-400"
           >
             <Trash2 className="w-2.5 h-2.5" />
@@ -134,6 +136,17 @@ function CompactTaskRow({
       </div>
 
       {expanded && <CompactTaskDetail task={task} />}
+      {confirmPending && (
+        <ConfirmDialog
+          title="태스크 삭제"
+          message={`"${task.title}" 태스크를 삭제할까요?`}
+          onCancel={() => setConfirmPending(false)}
+          onConfirm={() => {
+            onDelete();
+            setConfirmPending(false);
+          }}
+        />
+      )}
     </div>
   );
 }
