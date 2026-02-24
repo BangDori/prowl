@@ -1,6 +1,6 @@
 /** 백로그 태스크 섹션 (날짜 미정) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import CompactTaskDetail from "./CompactTaskDetail";
@@ -24,9 +24,10 @@ function sortBacklogTasks(tasks: Task[]): Task[] {
 interface CompactBacklogProps {
   tasks: Task[];
   onToggleComplete: (taskId: string) => void;
+  onDelete: (taskId: string) => void;
 }
 
-export default function CompactBacklog({ tasks, onToggleComplete }: CompactBacklogProps) {
+export default function CompactBacklog({ tasks, onToggleComplete, onDelete }: CompactBacklogProps) {
   const [expanded, setExpanded] = useState(false);
 
   const sorted = useMemo(() => sortBacklogTasks(tasks), [tasks]);
@@ -62,6 +63,7 @@ export default function CompactBacklog({ tasks, onToggleComplete }: CompactBackl
               task={task}
               showBorder={idx < sorted.length - 1}
               onToggle={() => onToggleComplete(task.id)}
+              onDelete={() => onDelete(task.id)}
             />
           ))}
         </div>
@@ -74,10 +76,12 @@ function BacklogTaskRow({
   task,
   showBorder,
   onToggle,
+  onDelete,
 }: {
   task: Task;
   showBorder: boolean;
   onToggle: () => void;
+  onDelete: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
@@ -85,7 +89,7 @@ function BacklogTaskRow({
 
   return (
     <div className={showBorder ? "border-b border-prowl-border" : ""}>
-      <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
+      <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           {isCompleted ? (
             <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center bg-emerald-500/20 border-emerald-500/30 transition-colors">
@@ -129,6 +133,13 @@ function BacklogTaskRow({
               style={{ backgroundColor: getCategoryColor(task.category ?? "기타") }}
             />
           )}
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex-shrink-0 opacity-0 group-hover:opacity-100 p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-all"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
         </button>
       </div>
 
