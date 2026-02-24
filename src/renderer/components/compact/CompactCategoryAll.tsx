@@ -21,17 +21,19 @@ interface CategoryGroup {
 function buildGroups(entries: CategoryTaskEntry[]): CategoryGroup[] {
   const order = getCategoryNames();
   const map = new Map<string, CategoryTaskEntry[]>();
+
+  // 알려진 카테고리를 빈 배열로 먼저 초기화 (태스크 없는 카테고리도 노출)
+  for (const name of order) {
+    map.set(name, []);
+  }
+
   for (const entry of entries) {
     const cat = entry.task.category ?? "기타";
     if (!map.has(cat)) map.set(cat, []);
     map.get(cat)!.push(entry);
   }
   return [...map.entries()]
-    .sort(([a], [b]) => {
-      const ai = order.indexOf(a);
-      const bi = order.indexOf(b);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-    })
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .map(([category, catEntries]) => ({
       category,
       color: getCategoryColor(category),

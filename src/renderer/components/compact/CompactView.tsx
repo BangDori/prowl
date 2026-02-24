@@ -24,7 +24,7 @@ const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 export default function CompactView() {
   const queryClient = useQueryClient();
   // 카테고리 캐시 초기화 — compact 컴포넌트들이 getCategoryColor()를 동기적으로 사용
-  useCategories();
+  const { categories } = useCategories();
   const [minimized, setMinimized] = useState(false);
   const [sortMode, setSortMode] = useState<TaskSortMode>("category");
   const [upcomingRange, setUpcomingRange] = useState<UpcomingRange>("1m");
@@ -169,7 +169,7 @@ export default function CompactView() {
   const hasBacklog = incompleteBacklogTasks.length > 0;
   const isEmpty =
     sortMode === "category"
-      ? categoryEntries.length === 0 && !hasCompleted
+      ? categories.length === 0 && categoryEntries.length === 0 && !hasCompleted
       : todayTasks.length === 0 && upcomingGroups.length === 0 && !hasBacklog && !hasCompleted;
 
   return (
