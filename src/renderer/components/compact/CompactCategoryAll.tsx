@@ -33,11 +33,7 @@ function buildGroups(entries: CategoryTaskEntry[]): CategoryGroup[] {
     map.get(cat)!.push(entry);
   }
   return [...map.entries()]
-    .sort(([a], [b]) => {
-      const ai = order.indexOf(a);
-      const bi = order.indexOf(b);
-      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
-    })
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .map(([category, catEntries]) => ({
       category,
       color: getCategoryColor(category),
@@ -77,19 +73,13 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
             </span>
             <span className="text-[9px] text-app-text-ghost">{group.entries.length}건</span>
           </div>
-          {group.entries.length === 0 ? (
-            <div className="px-2.5 py-2 text-center">
-              <p className="text-[10px] text-app-text-ghost">태스크 없음</p>
-            </div>
-          ) : (
-            group.entries.map((entry, idx) => (
-              <CategoryTaskRow
-                key={entry.task.id}
-                entry={entry}
-                showBorder={idx < group.entries.length - 1}
-              />
-            ))
-          )}
+          {group.entries.map((entry, idx) => (
+            <CategoryTaskRow
+              key={entry.task.id}
+              entry={entry}
+              showBorder={idx < group.entries.length - 1}
+            />
+          ))}
         </div>
       ))}
     </div>
