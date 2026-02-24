@@ -2,6 +2,7 @@
 import { Check, Pencil, RotateCcw, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useProwlFile, useWriteProwlFile } from "../../hooks/useProwlFiles";
+import FileContentView from "./FileContentView";
 
 interface FileEditorProps {
   filePath: string;
@@ -147,9 +148,7 @@ export default function FileEditor({ filePath }: FileEditorProps) {
             autoFocus
           />
         ) : (
-          <pre className="w-full h-full overflow-auto p-4 font-mono text-xs text-app-text-secondary leading-relaxed whitespace-pre-wrap break-words">
-            {content || <span className="text-app-text-ghost italic">파일이 비어 있습니다</span>}
-          </pre>
+          <FileContentView filePath={filePath} content={content ?? ""} />
         )}
       </div>
 
