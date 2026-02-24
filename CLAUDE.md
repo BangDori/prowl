@@ -56,4 +56,3 @@ bun run lint       # biome 린트
 - 데이터 페칭 패턴: data-fetching 스킬 참고
 - 도메인 모델: `docs/domain-model.md`
 - 네이밍: `docs/naming-convention.md`
-- 컴포넌트 패턴: `docs/component-patterns.md`
