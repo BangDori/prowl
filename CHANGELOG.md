@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.4] - 2026-02-25
+- Files 섹션: 파일 확장자별 아이콘 구분 (.json, .plist, .sh, .txt 등)
+- Files 섹션: Python·JS·TS·JSON·Bash·XML·Markdown·YAML 등 코드 파일 syntax highlighting 지원
+- JSON 파일 자동 pretty-print 및 파싱 오류 시 에러 배너 표시
+
 ## [1.46.3] - 2026-02-24
 - 카테고리 뷰에서 태스크 없는 카테고리도 항상 표시
 - 카테고리 목록 정렬을 유니코드(가나다) 순으로 변경
