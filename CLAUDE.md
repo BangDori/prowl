@@ -1,6 +1,6 @@
 # Prowl
 
-macOS 메뉴바 AI 생산성 앱 — 태스크 관리 + AI 채팅 + 메모리 (Electron Main/Renderer IPC 구조)
+macOS AI 생산성 앱 — 태스크 관리 + AI 채팅 + 메모리 (Electron Main/Renderer IPC 구조)
 
 ## Commands
 
