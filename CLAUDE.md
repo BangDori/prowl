@@ -1,6 +1,6 @@
 # Prowl
 
-macOS 메뉴바에서 launchd 작업을 관리하는 Electron 앱 (Main/Renderer IPC 구조)
+macOS 메뉴바 AI 생산성 앱 — 태스크 관리 + AI 채팅 + 메모리 (Electron Main/Renderer IPC 구조)
 
 ## Commands
 
@@ -25,7 +25,6 @@ bun run lint       # biome 린트
 - Mutation 채널은 `IpcResult { success, error? }` 반환 필수
 - Fire-and-forget(quit, resize, navigate)만 void 허용
 - **Date 객체는 IPC 통과 불가** — ISO 8601 문자열 사용
-- plist 파싱은 Zod `safeParse` 사용 (`as` 캐스팅 금지)
 
 ## Data Fetching
 
