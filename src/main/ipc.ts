@@ -112,7 +112,10 @@ export function registerIpcHandlers(): void {
   // 설정 저장
   handleIpc("settings:set", async (settings) => {
     try {
-      setSettings(settings);
+      // favoritedRoomIds는 chat-rooms:toggle-favorite 전용 — Dashboard(별도 renderer)의
+      // stale 캐시가 덮어쓰지 않도록 항상 현재 저장된 값을 유지한다.
+      const current = getSettings();
+      setSettings({ ...settings, favoritedRoomIds: current.favoritedRoomIds });
       const shortcutResult = registerGlobalShortcuts(settings.shortcuts ?? DEFAULT_SHORTCUTS);
       if (!shortcutResult.success) {
         return { success: false, error: shortcutResult.error };
