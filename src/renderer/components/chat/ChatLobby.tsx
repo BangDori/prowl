@@ -67,6 +67,13 @@ export default function ChatLobby({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  // 채팅 창이 다시 열릴 때 룸 목록 새로고침
+  useEffect(() => {
+    return window.electronAPI.onChatShown(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
+    });
+  }, [queryClient]);
+
   // 미열람 변경 이벤트 수신 → 룸 목록 + unread 쿼리 갱신
   useEffect(() => {
     return window.electronAPI.onChatUnreadChanged(() => {
