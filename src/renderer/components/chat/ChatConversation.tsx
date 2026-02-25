@@ -1,24 +1,17 @@
 /** 채팅 대화 뷰 (개별 룸의 메시지 표시 및 전송) */
 import prowlLying from "@assets/prowl-lying.png";
-import prowlProfile from "@assets/prowl-profile.png";
-import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
-import { useQueryClient } from "@tanstack/react-query";
 import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
 import Maximize2 from "lucide-react/dist/esm/icons/maximize-2";
 import Minimize2 from "lucide-react/dist/esm/icons/minimize-2";
 import X from "lucide-react/dist/esm/icons/x";
-import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import {
-  useChatRoom,
-  useChatUnreadCounts,
-  useMarkChatRoomRead,
-  useSaveChatMessages,
-} from "../../hooks/useChatRooms";
-import { queryKeys } from "../../queries/keys";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import ChatInputBar from "./ChatInputBar";
+import ConversationHeader from "./ConversationHeader";
+import LoadingIndicator from "./LoadingIndicator";
 import MessageBubble from "./MessageBubble";
 import PreviewPanel, { type PageContext, type PreviewTab } from "./PreviewPanel";
 import UnreadDivider from "./UnreadDivider";
+import { useChatMessages } from "./useChatMessages";
 
 /** Omit<PreviewTab, "id"> — TypeScript의 union 분배 미지원으로 명시적 정의 */
 type NewPreviewTab =
@@ -48,25 +41,17 @@ export default function ChatConversation({
   isExpanded,
   onToggleExpand,
 }: ChatConversationProps) {
-  const queryClient = useQueryClient();
-  const { data: roomData } = useChatRoom(roomId);
-  const { data: unreadCounts } = useChatUnreadCounts();
-  const saveMessages = useSaveChatMessages();
-  const markRead = useMarkChatRoomRead();
-
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [chatConfig, setChatConfig] = useState<ChatConfig | null>(null);
-  const [providers, setProviders] = useState<ProviderStatus[]>([]);
-  const [initialized, setInitialized] = useState(false);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesRef = useRef<ChatMessage[]>(messages);
-  messagesRef.current = messages;
-  const initialMessageProcessed = useRef(false);
-  const unreadDividerMsgId = useRef<string | null>(null);
-  const hasMarkedRead = useRef(false);
-  const hasInitialScrolled = useRef(false);
+  const {
+    messages,
+    loading,
+    sendMessage,
+    messagesEndRef,
+    unreadDividerMsgId,
+    chatConfig,
+    providers,
+    handleConfigChange,
+    roomTitle,
+  } = useChatMessages(roomId, initialMessage);
 
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
@@ -78,184 +63,20 @@ export default function ChatConversation({
   const isExpandedRef = useRef(isExpanded);
   isExpandedRef.current = isExpanded;
 
-  // roomId 변경 시 상태 리셋 (렌더 중 동기 처리로 race condition 방지)
-  const [prevRoomId, setPrevRoomId] = useState(roomId);
-  if (prevRoomId !== roomId) {
-    setPrevRoomId(roomId);
-    setInitialized(false);
-    initialMessageProcessed.current = false;
-    unreadDividerMsgId.current = null;
-    hasMarkedRead.current = false;
-    hasInitialScrolled.current = false;
-  }
-
-  // 룸 데이터 로드 시 메시지 초기화 + 백그라운드 refetch 반영
-  useEffect(() => {
-    if (!roomData) return;
-    if (!initialized) {
-      setMessages(roomData.messages);
-      setInitialized(true);
-    } else if (!loading && roomData.messages.length > messagesRef.current.length) {
-      // main에서 저장한 AI 응답이 디스크에 반영된 경우 (뒤로가기 후 복귀)
-      setMessages(roomData.messages);
-    }
-  }, [roomData, initialized, loading]);
-
-  // 읽음 구분선 위치 계산 + mark-read (roomData·unreadCounts 둘 다 로드 후 한번만)
-  useEffect(() => {
-    if (!initialized || hasMarkedRead.current || !roomData) return;
-    if (unreadCounts === undefined) return;
-
-    const unreadCount = unreadCounts[roomId] ?? 0;
-    if (unreadCount > 0 && roomData.messages.length > 0) {
-      const firstUnreadIdx = roomData.messages.length - unreadCount;
-      if (firstUnreadIdx > 0 && firstUnreadIdx < roomData.messages.length) {
-        unreadDividerMsgId.current = roomData.messages[firstUnreadIdx].id;
-      }
-    }
-    const lastMsg = roomData.messages.at(-1);
-    if (lastMsg) {
-      markRead.mutate({ roomId, lastMessageId: lastMsg.id });
-    }
-    hasMarkedRead.current = true;
-  }, [initialized, roomData, unreadCounts, roomId, markRead]);
-
-  // 채팅 설정 및 프로바이더 목록 로드
-  const loadChatMeta = useCallback(() => {
-    Promise.all([window.electronAPI.getChatConfig(), window.electronAPI.getChatProviders()]).then(
-      ([config, providerList]) => {
-        setChatConfig(config);
-        setProviders(providerList);
-      },
-    );
-  }, []);
-
-  useEffect(() => {
-    loadChatMeta();
-  }, [loadChatMeta]);
-
-  // settings 변경 시 (API 키 저장 등) providers 즉시 갱신
-  useEffect(() => {
-    return window.electronAPI.onSettingsChanged(loadChatMeta);
-  }, [loadChatMeta]);
-
-  const handleConfigChange = useCallback((config: ChatConfig) => {
-    setChatConfig(config);
-    window.electronAPI.setChatConfig(config);
-  }, []);
-
-  // ESC 키로 창 닫기
-  useEffect(() => {
-    const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") window.electronAPI.closeChatWindow();
-    };
-    window.addEventListener("keydown", handleGlobalKeyDown);
-    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
-  }, []);
-
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
-  }, []);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new messages
-  useEffect(() => {
-    if (messages.length === 0) return;
-    // 초기 진입 시 즉시 이동, 이후 새 메시지는 smooth
-    const behavior = hasInitialScrolled.current ? "smooth" : "instant";
-    hasInitialScrolled.current = true;
-    scrollToBottom(behavior);
-  }, [messages, scrollToBottom]);
-
-  // 스트림 이벤트 리스너 (저장은 main, 읽음 처리는 대화방에 있을 때만 renderer)
-  useEffect(() => {
-    const offMessage = window.electronAPI.onChatStreamMessage((streamRoomId, msg) => {
-      if (streamRoomId !== roomId) return;
-      setMessages((prev) => [...prev, msg]);
-    });
-    const offDone = window.electronAPI.onChatStreamDone((streamRoomId) => {
-      if (streamRoomId !== roomId) return;
-      setLoading(false);
-      // 대화방에 있으므로 즉시 읽음 처리
-      const lastMsg = messagesRef.current.at(-1);
-      if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
-      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
-    });
-    const offError = window.electronAPI.onChatStreamError((streamRoomId, error) => {
-      if (streamRoomId !== roomId) return;
-      setLoading(false);
-      const errMsg: ChatMessage = {
-        id: `err_${Date.now()}`,
-        role: "assistant",
-        content: error || "오류가 발생했습니다.",
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => [...prev, errMsg]);
-      // 대화방에 있으므로 즉시 읽음 처리
-      const lastMsg = messagesRef.current.at(-1);
-      if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
-      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
-    });
-    return () => {
-      offMessage();
-      offDone();
-      offError();
-    };
-  }, [roomId, queryClient, markRead]);
-
-  /** 메시지 전송 핵심 로직 (입력 및 초기 메시지 양쪽에서 사용) */
-  const sendMessage = useCallback(
-    async (content: string) => {
-      const userMsg: ChatMessage = {
-        id: `user_${Date.now()}`,
-        role: "user",
-        content,
-        timestamp: Date.now(),
-      };
-      const updated = [...messagesRef.current, userMsg];
-      messagesRef.current = updated;
-      setMessages(updated);
-      setLoading(true);
-
-      // 유저 메시지를 즉시 저장 + 읽음 처리 (뒤로가기 시 유실·미열람 방지)
-      saveMessages.mutate({ roomId, messages: updated });
-      markRead.mutate({ roomId, lastMessageId: userMsg.id });
-
-      // main에 roomId + history(유저 메시지 포함) 전달 → main이 AI 응답 저장까지 책임
-      const result = await window.electronAPI.sendChatMessage(roomId, content, updated);
-      if (!result.success) {
-        setLoading(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `err_${Date.now()}`,
-            role: "assistant" as const,
-            content: "오류가 발생했습니다.",
-            timestamp: Date.now(),
-          },
-        ]);
-      }
-      // success → 메시지는 stream 이벤트로 도착, 저장은 main이 처리
-    },
-    [roomId, saveMessages, markRead],
-  );
-
-  // 초기 메시지 자동 전송 (로비에서 메시지 입력 후 진입 시)
-  useEffect(() => {
-    if (initialMessage && initialized && !initialMessageProcessed.current) {
-      initialMessageProcessed.current = true;
-      sendMessage(initialMessage);
-    }
-  }, [initialMessage, initialized, sendMessage]);
-
-  const hasMessages = messages.length > 0 || loading;
-
   // 탭 기반 프리뷰 패널 상태
   const [previewTabs, setPreviewTabs] = useState<PreviewTab[]>([]);
   const [activeTabId, setActiveTabId] = useState<string | null>(null);
   const isSplitView = isExpanded && previewTabs.length > 0;
 
+  // 페이지 컨텍스트 (webview 로드 시 자동 추출)
+  const [pageContext, setPageContextState] = useState<PageContext | null>(null);
+
+  const handlePageContextChange = useCallback((ctx: PageContext | null) => {
+    setPageContextState(ctx);
+    window.electronAPI.setPageContext(ctx);
+  }, []);
+
   // 분할 뷰 전환 시 최신 메시지로 스크롤
-  // scrollIntoView는 reflow 전에 호출되어 효과 없음 → rAF로 reflow 완료 후 스크롤
   useLayoutEffect(() => {
     if (!isSplitView || prevIsSplitViewRef.current) {
       prevIsSplitViewRef.current = isSplitView;
@@ -269,14 +90,6 @@ export default function ChatConversation({
     });
   }, [isSplitView]);
 
-  // 페이지 컨텍스트 (webview 로드 시 자동 추출)
-  const [pageContext, setPageContextState] = useState<PageContext | null>(null);
-
-  const handlePageContextChange = useCallback((ctx: PageContext | null) => {
-    setPageContextState(ctx);
-    window.electronAPI.setPageContext(ctx);
-  }, []);
-
   /** 탭 추가 또는 동일 콘텐츠 탭 활성화 */
   const addOrActivateTab = useCallback(
     async (newTab: NewPreviewTab) => {
@@ -284,12 +97,10 @@ export default function ChatConversation({
       const existing = previewTabs.find((t) => (t.type === "html" ? t.content : t.url) === key);
 
       if (existing) {
-        // 이미 열린 탭 활성화 — 창 크기 변경 없음
         setActiveTabId(existing.id);
         return;
       }
 
-      // 새 탭 추가 (updater에서도 중복 체크하여 rapid-click 방어)
       const id = `tab_${Date.now()}`;
       setPreviewTabs((prev) => {
         const alreadyExists = prev.find((t) => (t.type === "html" ? t.content : t.url) === key);
@@ -299,7 +110,6 @@ export default function ChatConversation({
       });
       setActiveTabId(id);
 
-      // isExpandedRef.current으로 최신 상태를 읽어 stale closure 방지
       if (!isExpandedRef.current) {
         await onToggleExpand();
       }
@@ -349,13 +159,14 @@ export default function ChatConversation({
     document.addEventListener("mouseup", handleMouseUp);
   }, []);
 
+  const hasMessages = messages.length > 0 || loading;
+
   const chatArea = (
     <>
-      {/* 대화 영역 */}
       {hasMessages && (
         <div className="chat-messages-area">
           <ConversationHeader
-            title={roomData?.title}
+            title={roomTitle}
             onBack={onBack}
             onClose={() => window.electronAPI.closeChatWindow()}
             isExpanded={isExpanded}
@@ -390,7 +201,6 @@ export default function ChatConversation({
         </div>
       )}
 
-      {/* 고양이 로고: 메시지가 없을 때 */}
       {!hasMessages && (
         <>
           <div className="chat-conv-header px-4 py-2">
@@ -471,75 +281,6 @@ export default function ChatConversation({
           />
         </>
       )}
-    </div>
-  );
-}
-
-/** 대화 헤더 (뒤로가기 + 제목 + 전체화면 + 닫기) */
-function ConversationHeader({
-  title,
-  onBack,
-  onClose,
-  isExpanded,
-  onToggleExpand,
-}: {
-  title?: string;
-  onBack: () => void;
-  onClose: () => void;
-  isExpanded: boolean;
-  onToggleExpand: () => void;
-}) {
-  return (
-    <div className="chat-conv-header px-3 py-2">
-      <button
-        type="button"
-        onClick={onBack}
-        className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-      >
-        <ChevronLeft className="w-4 h-4" />
-      </button>
-      <span className="text-[12px] text-white/50 truncate max-w-[60%]">{title || "새 대화"}</span>
-      <div className="flex items-center gap-0.5">
-        <button
-          type="button"
-          onClick={onToggleExpand}
-          title={isExpanded ? "기본 크기로" : "전체화면"}
-          className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-        >
-          {isExpanded ? (
-            <Minimize2 className="w-3.5 h-3.5" />
-          ) : (
-            <Maximize2 className="w-3.5 h-3.5" />
-          )}
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="p-1 rounded-md text-white/30 hover:text-white/60 transition-colors"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/** 로딩 인디케이터 (3개 바운싱 dot) */
-function LoadingIndicator() {
-  return (
-    <div className="flex justify-start mb-3 chat-bubble-enter">
-      <img
-        src={prowlProfile}
-        alt="Prowl"
-        className="flex-shrink-0 w-7 h-7 rounded-full mr-2 mt-1 object-cover"
-      />
-      <div className="px-3 py-2 rounded-2xl rounded-bl-sm bg-white/10">
-        <div className="flex gap-1">
-          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" />
-          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.15s]" />
-          <span className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.3s]" />
-        </div>
-      </div>
     </div>
   );
 }

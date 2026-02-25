@@ -9,37 +9,21 @@ import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import Pencil from "lucide-react/dist/esm/icons/pencil";
-import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useEffect, useState } from "react";
 import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
-import { useInstallUpdate, useRelaunchApp, useUpdateCheck } from "../../hooks/useUpdate";
 import FocusModePanel from "../FocusModePanel";
 import ShortcutsPanel from "../ShortcutsPanel";
 import ToggleSwitch from "../ToggleSwitch";
+import SettingsUpdateCard from "./SettingsUpdateCard";
 
-type InstallPhase = "idle" | "installing" | "done" | "error";
-
-/**
- * 설정 섹션 컴포넌트
- */
 export default function SettingsSection() {
   const { data: settings, isLoading: settingsLoading } = useSettings();
   const { data: focusMode = DEFAULT_FOCUS_MODE, isLoading: focusLoading } = useFocusMode();
   const updateSettings = useUpdateSettings();
   const updateFocusMode = useUpdateFocusMode();
 
-  const {
-    data: updateResult,
-    isFetching: updateChecking,
-    refetch: recheckUpdate,
-  } = useUpdateCheck();
-  const installUpdate = useInstallUpdate();
-  const { relaunch } = useRelaunchApp();
-
-  const [cooldown, setCooldown] = useState(0);
-  const [installPhase, setInstallPhase] = useState<InstallPhase>("idle");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [apiKeyEditing, setApiKeyEditing] = useState(false);
 
@@ -83,26 +67,6 @@ export default function SettingsSection() {
     updateSettings.mutate({ ...settings, shortcuts: updated });
   };
 
-  const handleCheckForUpdates = async () => {
-    const { data } = await recheckUpdate();
-    if (data && !data.error && !data.hasUpdate) {
-      setCooldown(600);
-    }
-  };
-
-  const handleInstall = async () => {
-    setInstallPhase("installing");
-    const result = await installUpdate.mutateAsync();
-    setInstallPhase(result.success ? "done" : "error");
-  };
-
-  // 쿨다운 타이머
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [cooldown]);
-
   if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -110,8 +74,6 @@ export default function SettingsSection() {
       </div>
     );
   }
-
-  const canBrewUpdate = updateResult?.brewStatus === "brew-ready";
 
   return (
     <div className="h-full overflow-y-auto">
@@ -231,89 +193,7 @@ export default function SettingsSection() {
                 <p className="text-[10px] text-gray-500">View source code and contribute</p>
               </div>
             </button>
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <RefreshCw
-                    className={`w-4 h-4 text-gray-400 ${updateChecking ? "animate-spin" : ""}`}
-                  />
-                  <div>
-                    <p className="text-sm">Check for Updates</p>
-                    {!updateResult && !updateChecking && (
-                      <p className="text-[10px] text-gray-500">
-                        Check if a new version is available
-                      </p>
-                    )}
-                    {updateChecking && <p className="text-[10px] text-gray-500">Checking...</p>}
-                    {updateResult && !updateChecking && (
-                      <div className="text-[10px]">
-                        {updateResult.error ? (
-                          <p className="text-red-400">{updateResult.error}</p>
-                        ) : updateResult.hasUpdate ? (
-                          <p className="text-accent">
-                            v{updateResult.latestVersion} available (current: v
-                            {updateResult.currentVersion})
-                          </p>
-                        ) : (
-                          <p className="text-green-400">
-                            You're on the latest version (v{updateResult.currentVersion})
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {installPhase === "done" && (
-                      <p className="text-[10px] text-green-400">
-                        Update installed. Restart to apply.
-                      </p>
-                    )}
-                    {installPhase === "error" && (
-                      <p className="text-[10px] text-red-400">Update failed.</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {updateResult?.hasUpdate &&
-                    installPhase === "idle" &&
-                    (canBrewUpdate ? (
-                      <button
-                        type="button"
-                        onClick={handleInstall}
-                        className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-                      >
-                        Update
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
-                        className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-                      >
-                        Download
-                      </button>
-                    ))}
-                  {installPhase === "installing" && (
-                    <span className="text-[10px] text-app-text-muted">Installing...</span>
-                  )}
-                  {installPhase === "done" && (
-                    <button
-                      type="button"
-                      onClick={relaunch}
-                      className="px-2 py-1 text-[10px] rounded bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
-                    >
-                      Restart
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleCheckForUpdates}
-                    disabled={updateChecking || cooldown > 0}
-                    className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors disabled:opacity-50"
-                  >
-                    {updateChecking ? "Checking" : cooldown > 0 ? "Checked" : "Check"}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <SettingsUpdateCard />
           </div>
         </div>
       </div>
