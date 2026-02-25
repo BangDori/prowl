@@ -163,6 +163,11 @@ const electronAPI = {
     ipcRenderer.on("chat:expand-reset", handler);
     return () => ipcRenderer.removeListener("chat:expand-reset", handler);
   },
+  onChatShown: (callback: () => void): (() => void) => {
+    const handler = () => callback();
+    ipcRenderer.on("chat:shown", handler);
+    return () => ipcRenderer.removeListener("chat:shown", handler);
+  },
 };
 
 // contextBridge로 API 노출

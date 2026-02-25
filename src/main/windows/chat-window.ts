@@ -36,6 +36,7 @@ export function showChatWindow(): void {
     chatWindow.setOpacity(1);
     chatWindow.setIgnoreMouseEvents(false);
     chatWindow.focus();
+    chatWindow.webContents.send("chat:shown");
     return;
   }
 
