@@ -2,6 +2,11 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.8] - 2026-02-25
+- docs 컨벤션 기반 전면 리팩토링 — IPC 채널 네이밍, JSDoc 헤더, boolean prop 접두사(is/has/can) 통일
+- lucide-react 배럴 임포트를 직접 경로 임포트로 전환 (번들 크기 최적화)
+- 300줄 초과 파일 도메인별 분리 — ipc, chat-tools, PreviewPanel, ChatConversation, SettingsSection
+
 ## [1.46.7] - 2026-02-25
 - 즐겨찾기 상단 정렬 버그 수정 — Dashboard 설정 저장 시 favoritedRoomIds가 덮어쓰여지던 문제 해결
 - settings.ts / chat-rooms.ts 유닛 테스트 보강 (60개)
