@@ -2,6 +2,10 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.46.7] - 2026-02-25
+- 즐겨찾기 상단 정렬 버그 수정 — Dashboard 설정 저장 시 favoritedRoomIds가 덮어쓰여지던 문제 해결
+- settings.ts / chat-rooms.ts 유닛 테스트 보강 (60개)
+
 ## [1.46.6] - 2026-02-25
 - 태스크 삭제 버튼에 확인 모달 추가 — 실수로 삭제되는 경우 방지
 - ConfirmDialog Portal 렌더링으로 전환 — 부모 레이어 스타일 영향 없이 앱 전체 기준으로 표시

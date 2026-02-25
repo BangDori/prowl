@@ -15,7 +15,14 @@ vi.mock("electron-store", () => ({
 }));
 
 import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "@shared/types";
-import { getFocusMode, getSettings, setFocusMode, setSettings } from "./settings";
+import {
+  getFavoritedRoomIds,
+  getFocusMode,
+  getSettings,
+  setFocusMode,
+  setSettings,
+  toggleFavoritedRoom,
+} from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {
@@ -73,6 +80,57 @@ describe("settings 서비스", () => {
       expect(mockSet).toHaveBeenCalledWith("settings", {
         patterns: ["com.test.*"],
         focusMode: newFm,
+      });
+    });
+  });
+
+  describe("getFavoritedRoomIds", () => {
+    it("favoritedRoomIds가 있으면 반환한다", () => {
+      mockGet.mockReturnValue({ ...DEFAULT_SETTINGS, favoritedRoomIds: ["roomA", "roomB"] });
+
+      expect(getFavoritedRoomIds()).toEqual(["roomA", "roomB"]);
+    });
+
+    it("favoritedRoomIds가 없으면 빈 배열을 반환한다", () => {
+      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE }); // 필드 없음
+
+      expect(getFavoritedRoomIds()).toEqual([]);
+    });
+  });
+
+  describe("toggleFavoritedRoom", () => {
+    it("없는 방을 추가한다", () => {
+      mockGet.mockReturnValue({ ...DEFAULT_SETTINGS, favoritedRoomIds: [] });
+
+      toggleFavoritedRoom("roomA");
+
+      expect(mockSet).toHaveBeenCalledWith("settings", {
+        ...DEFAULT_SETTINGS,
+        favoritedRoomIds: ["roomA"],
+      });
+    });
+
+    it("이미 있는 방은 제거한다", () => {
+      mockGet.mockReturnValue({ ...DEFAULT_SETTINGS, favoritedRoomIds: ["roomA", "roomB"] });
+
+      toggleFavoritedRoom("roomA");
+
+      expect(mockSet).toHaveBeenCalledWith("settings", {
+        ...DEFAULT_SETTINGS,
+        favoritedRoomIds: ["roomB"],
+      });
+    });
+
+    it("favoritedRoomIds 필드가 없는 기존 설정에서도 동작한다 (마이그레이션 시나리오)", () => {
+      // 리팩터링 전 저장된 설정 (favoritedRoomIds 없음)
+      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE, notificationsEnabled: true });
+
+      toggleFavoritedRoom("roomX");
+
+      expect(mockSet).toHaveBeenCalledWith("settings", {
+        focusMode: DEFAULT_FOCUS_MODE,
+        notificationsEnabled: true,
+        favoritedRoomIds: ["roomX"],
       });
     });
   });

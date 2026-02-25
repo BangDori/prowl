@@ -17,6 +17,17 @@ vi.mock("./services/settings", () => ({
   setFocusMode: vi.fn(),
   getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-5-mini" }),
   setChatConfig: vi.fn(),
+  getFavoritedRoomIds: vi.fn().mockReturnValue([]),
+  toggleFavoritedRoom: vi.fn(),
+}));
+
+vi.mock("./services/chat-rooms", () => ({
+  listChatRooms: vi.fn().mockReturnValue([]),
+  createChatRoom: vi.fn(),
+  getChatRoom: vi.fn(),
+  deleteChatRoom: vi.fn(),
+  saveChatMessages: vi.fn(),
+  toggleChatRoomLock: vi.fn(),
 }));
 
 vi.mock("./services/focus-mode", () => ({
@@ -39,8 +50,15 @@ vi.mock("./windows", () => ({
 import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
 import { setPageContext, streamChatMessage } from "./services/chat";
+import { listChatRooms } from "./services/chat-rooms";
 import { updateFocusModeMonitor } from "./services/focus-mode";
-import { getSettings, setFocusMode, setSettings } from "./services/settings";
+import {
+  getFavoritedRoomIds,
+  getSettings,
+  setFocusMode,
+  setSettings,
+  toggleFavoritedRoom,
+} from "./services/settings";
 import { closeChatWindow, getSubWindow, resizeChatWindow } from "./windows";
 
 const mockIpcHandle = vi.mocked(ipcMain.handle);
@@ -68,6 +86,8 @@ describe("registerIpcHandlers", () => {
     expect(channels).toContain("focusMode:set");
     expect(channels).toContain("window:resize");
     expect(channels).toContain("app:quit");
+    expect(channels).toContain("chat-rooms:list");
+    expect(channels).toContain("chat-rooms:toggle-favorite");
   });
 
   describe("settings:get / settings:set", () => {
@@ -78,13 +98,33 @@ describe("registerIpcHandlers", () => {
     });
 
     it("setSettings를 호출한다", async () => {
-      const settings = {
+      const incoming = {
         patterns: ["test"],
         focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" },
+        favoritedRoomIds: [],
+      };
+      vi.mocked(getSettings).mockReturnValue({ ...incoming } as never);
+
+      const handler = getHandler("settings:set");
+      await handler({}, incoming);
+      expect(setSettings).toHaveBeenCalledWith(incoming);
+    });
+
+    it("favoritedRoomIds는 현재 저장된 값을 유지한다 (Dashboard stale 캐시 덮어쓰기 방지)", async () => {
+      const stored = { favoritedRoomIds: ["roomA", "roomB"] };
+      vi.mocked(getSettings).mockReturnValue(stored as never);
+
+      const incomingWithStale = {
+        focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" },
+        favoritedRoomIds: [], // Dashboard stale 캐시 (빈 배열)
       };
       const handler = getHandler("settings:set");
-      await handler({}, settings);
-      expect(setSettings).toHaveBeenCalledWith(settings);
+      await handler({}, incomingWithStale);
+
+      expect(setSettings).toHaveBeenCalledWith({
+        ...incomingWithStale,
+        favoritedRoomIds: ["roomA", "roomB"], // 현재 저장된 값 유지
+      });
     });
   });
 
@@ -216,6 +256,41 @@ describe("registerIpcHandlers", () => {
       await handler({});
 
       expect(closeChatWindow).toHaveBeenCalled();
+    });
+  });
+
+  describe("chat-rooms:list", () => {
+    it("getFavoritedRoomIds 결과를 listChatRooms에 전달한다", async () => {
+      const favIds = ["room1", "room2"];
+      vi.mocked(getFavoritedRoomIds).mockReturnValue(favIds);
+      vi.mocked(listChatRooms).mockReturnValue([]);
+
+      const handler = getHandler("chat-rooms:list");
+      await handler({});
+
+      expect(getFavoritedRoomIds).toHaveBeenCalled();
+      expect(listChatRooms).toHaveBeenCalledWith(favIds);
+    });
+  });
+
+  describe("chat-rooms:toggle-favorite", () => {
+    it("toggleFavoritedRoom을 호출하고 success를 반환한다", async () => {
+      const handler = getHandler("chat-rooms:toggle-favorite");
+      const result = await handler({}, "roomA");
+
+      expect(toggleFavoritedRoom).toHaveBeenCalledWith("roomA");
+      expect(result).toEqual({ success: true });
+    });
+
+    it("예외 발생 시 success: false를 반환한다", async () => {
+      vi.mocked(toggleFavoritedRoom).mockImplementationOnce(() => {
+        throw new Error("store error");
+      });
+
+      const handler = getHandler("chat-rooms:toggle-favorite");
+      const result = await handler({}, "roomA");
+
+      expect(result).toEqual({ success: false, error: "Error: store error" });
     });
   });
 });
