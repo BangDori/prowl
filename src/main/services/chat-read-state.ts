@@ -49,12 +49,12 @@ function readRoomMessages(roomId: string): ChatRoom["messages"] {
 
 /** 특정 룸의 안 읽은 메시지 수 계산 */
 function getUnreadCountForRoom(roomId: string, state: ChatReadState): number {
-  const lastReadId = state[roomId];
-  // 읽음 상태 엔트리 없으면 기존 룸 → 전부 읽은 것으로 처리
-  if (lastReadId === undefined) return 0;
-
   const messages = readRoomMessages(roomId);
   if (messages.length === 0) return 0;
+
+  const lastReadId = state[roomId];
+  // 읽음 상태 엔트리 없으면 → 모든 메시지를 안 읽은 것으로 처리
+  if (lastReadId === undefined) return messages.length;
 
   const lastReadIndex = messages.findIndex((m) => m.id === lastReadId);
   // lastReadId를 못 찾으면 (삭제됐을 수 있음) 전부 읽은 것으로 처리
