@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.47.2] - 2026-02-26
+- 채팅 메시지 내 bare URL이 포함될 때 버블 레이아웃이 깨지던 현상 수정 — URL은 hostname만 표시되도록 개선
+
 ## [1.47.1] - 2026-02-25
 - chat-read-state.json에 없는 채팅방의 안 읽은 메시지 수가 표시되지 않던 버그 수정
 
