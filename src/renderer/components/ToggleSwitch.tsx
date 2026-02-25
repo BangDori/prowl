@@ -1,11 +1,9 @@
-/**
- * ToggleSwitch 컴포넌트의 Props
- */
+/** iOS 스타일 토글 스위치 컴포넌트 */
 interface ToggleSwitchProps {
   /** 스위치 활성화 상태 */
-  enabled: boolean;
+  isEnabled: boolean;
   /** 로딩 중 여부 (비활성화 및 펄스 애니메이션 적용) */
-  loading?: boolean;
+  isLoading?: boolean;
   /** 상태 변경 핸들러 */
   onChange: () => void;
 }
@@ -23,27 +21,27 @@ interface ToggleSwitchProps {
  * @example
  * ```tsx
  * <ToggleSwitch
- *   enabled={job.isLoaded}
- *   loading={isToggling}
+ *   isEnabled={job.isLoaded}
+ *   isLoading={isToggling}
  *   onChange={() => toggleJob(job.id)}
  * />
  * ```
  */
-export default function ToggleSwitch({ enabled, loading, onChange }: ToggleSwitchProps) {
+export default function ToggleSwitch({ isEnabled, isLoading, onChange }: ToggleSwitchProps) {
   return (
     <button
       onClick={onChange}
-      disabled={loading}
-      className={`toggle-switch ${enabled ? "toggle-switch-on" : "toggle-switch-off"} ${
-        loading ? "opacity-50" : ""
+      disabled={isLoading}
+      className={`toggle-switch ${isEnabled ? "toggle-switch-on" : "toggle-switch-off"} ${
+        isLoading ? "opacity-50" : ""
       }`}
       role="switch"
-      aria-checked={enabled}
+      aria-checked={isEnabled}
     >
       <span
         className={`toggle-switch-knob ${
-          enabled ? "toggle-switch-knob-on" : "toggle-switch-knob-off"
-        } ${loading ? "animate-pulse" : ""}`}
+          isEnabled ? "toggle-switch-knob-on" : "toggle-switch-knob-off"
+        } ${isLoading ? "animate-pulse" : ""}`}
       />
     </button>
   );

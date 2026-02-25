@@ -47,7 +47,7 @@ export default function CalendarGrid({
                 date={day}
                 isCurrentMonth={day.getMonth() === viewMonth}
                 tasks={tasks}
-                selected={selectedDate !== null && isSameDay(day, selectedDate)}
+                isSelected={selectedDate !== null && isSameDay(day, selectedDate)}
                 onClick={() => onDayClick(day)}
               />
             );

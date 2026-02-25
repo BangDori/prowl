@@ -1,6 +1,9 @@
 /** 대시보드 Memory 관리 섹션 */
 import type { Memory } from "@shared/types";
-import { Brain, Pencil, Plus, Trash2 } from "lucide-react";
+import Brain from "lucide-react/dist/esm/icons/brain";
+import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { useAddMemory, useDeleteMemory, useMemories, useUpdateMemory } from "../../hooks/useMemory";
 

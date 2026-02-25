@@ -1,6 +1,9 @@
 /** 채팅 룸 목록 컴포넌트 */
 import type { ChatRoomSummary } from "@shared/types";
-import { Lock, Star, Trash2, Unlock } from "lucide-react";
+import Lock from "lucide-react/dist/esm/icons/lock";
+import Star from "lucide-react/dist/esm/icons/star";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
+import Unlock from "lucide-react/dist/esm/icons/unlock";
 import { useCallback } from "react";
 import {
   useChatRooms,

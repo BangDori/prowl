@@ -80,10 +80,10 @@ describe("registerIpcHandlers", () => {
     const channels = mockIpcHandle.mock.calls.map((c) => c[0]);
     expect(channels).toContain("settings:get");
     expect(channels).toContain("settings:set");
-    expect(channels).toContain("shell:showInFolder");
-    expect(channels).toContain("shell:openExternal");
-    expect(channels).toContain("focusMode:get");
-    expect(channels).toContain("focusMode:set");
+    expect(channels).toContain("shell:show-in-folder");
+    expect(channels).toContain("shell:open-external");
+    expect(channels).toContain("focus-mode:get");
+    expect(channels).toContain("focus-mode:set");
     expect(channels).toContain("window:resize");
     expect(channels).toContain("app:quit");
     expect(channels).toContain("chat-rooms:list");
@@ -128,24 +128,24 @@ describe("registerIpcHandlers", () => {
     });
   });
 
-  describe("shell:showInFolder / shell:openExternal", () => {
+  describe("shell:show-in-folder / shell:open-external", () => {
     it("showItemInFolder를 호출한다", async () => {
-      const handler = getHandler("shell:showInFolder");
+      const handler = getHandler("shell:show-in-folder");
       await handler({}, "/some/path");
       expect(shell.showItemInFolder).toHaveBeenCalledWith("/some/path");
     });
 
     it("openExternal를 호출한다", async () => {
-      const handler = getHandler("shell:openExternal");
+      const handler = getHandler("shell:open-external");
       await handler({}, "https://example.com");
       expect(shell.openExternal).toHaveBeenCalledWith("https://example.com");
     });
   });
 
-  describe("focusMode:set", () => {
+  describe("focus-mode:set", () => {
     it("setFocusMode와 updateFocusModeMonitor를 모두 호출한다", async () => {
       const fm = { enabled: true, startTime: "22:00", endTime: "07:00" };
-      const handler = getHandler("focusMode:set");
+      const handler = getHandler("focus-mode:set");
       await handler({}, fm);
 
       expect(setFocusMode).toHaveBeenCalledWith(fm);

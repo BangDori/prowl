@@ -1,5 +1,5 @@
 /** 키보드 단축키 캡처 입력 컴포넌트 */
-import { X } from "lucide-react";
+import X from "lucide-react/dist/esm/icons/x";
 import { useCallback, useEffect, useState } from "react";
 
 interface ShortcutRecorderProps {

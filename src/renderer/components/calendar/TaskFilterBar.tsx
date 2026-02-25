@@ -1,18 +1,21 @@
 /** 태스크 필터 바: 동적 카테고리 탭, 완료 상태 */
-import { Eye, EyeOff, Plus, X } from "lucide-react";
+import Eye from "lucide-react/dist/esm/icons/eye";
+import EyeOff from "lucide-react/dist/esm/icons/eye-off";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import X from "lucide-react/dist/esm/icons/x";
 import { useRef, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
 
 interface TaskFilterBarProps {
   filterCategory: string | null;
-  showCompleted: boolean;
+  isShowingCompleted: boolean;
   onFilterCategory: (category: string | null) => void;
   onToggleShowCompleted: () => void;
 }
 
 export default function TaskFilterBar({
   filterCategory,
-  showCompleted,
+  isShowingCompleted,
   onFilterCategory,
   onToggleShowCompleted,
 }: TaskFilterBarProps) {
@@ -122,9 +125,9 @@ export default function TaskFilterBar({
         type="button"
         onClick={onToggleShowCompleted}
         className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors flex-shrink-0"
-        title={showCompleted ? "완료 숨기기" : "완료 표시"}
+        title={isShowingCompleted ? "완료 숨기기" : "완료 표시"}
       >
-        {showCompleted ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+        {isShowingCompleted ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
       </button>
     </div>
   );

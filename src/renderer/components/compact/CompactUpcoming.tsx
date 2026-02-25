@@ -1,7 +1,9 @@
 /** 다가오는 일정: 오늘 이후 태스크를 날짜별 그룹으로 표시 */
 import type { Task, UpcomingRange } from "@shared/types";
 import { UPCOMING_RANGE_LABELS } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";
@@ -56,7 +58,7 @@ export default function CompactUpcoming({
               <UpcomingTaskRow
                 key={task.id}
                 task={task}
-                showBorder={idx < group.tasks.length - 1}
+                hasBorder={idx < group.tasks.length - 1}
                 onToggle={() => onToggleComplete(group.date, task.id)}
                 onDelete={() => onDelete(group.date, task.id)}
               />
@@ -70,12 +72,12 @@ export default function CompactUpcoming({
 
 function UpcomingTaskRow({
   task,
-  showBorder,
+  hasBorder,
   onToggle,
   onDelete,
 }: {
   task: Task;
-  showBorder: boolean;
+  hasBorder: boolean;
   onToggle: () => void;
   onDelete: () => void;
 }) {
@@ -84,7 +86,7 @@ function UpcomingTaskRow({
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
   return (
-    <div className={showBorder ? "border-b border-prowl-border" : ""}>
+    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
       <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors">

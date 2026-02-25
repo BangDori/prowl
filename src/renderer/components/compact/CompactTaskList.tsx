@@ -1,6 +1,8 @@
 /** 오늘의 태스크 목록 (시간순 정렬, 체크박스 토글 가능) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { getCategoryColor } from "../../utils/category-utils";
 import { sortTasks } from "../../utils/task-helpers";
@@ -42,7 +44,7 @@ export default function CompactTaskList({
             <CompactTaskRow
               key={task.id}
               task={task}
-              showBorder={idx < sorted.length - 1}
+              hasBorder={idx < sorted.length - 1}
               onToggle={() => onToggleComplete(date, task.id)}
               onDelete={() => onDelete(date, task.id)}
             />
@@ -55,12 +57,12 @@ export default function CompactTaskList({
 
 function CompactTaskRow({
   task,
-  showBorder,
+  hasBorder,
   onToggle,
   onDelete,
 }: {
   task: Task;
-  showBorder: boolean;
+  hasBorder: boolean;
   onToggle: () => void;
   onDelete: () => void;
 }) {
@@ -69,7 +71,7 @@ function CompactTaskRow({
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
   return (
-    <div className={showBorder ? "border-b border-prowl-border" : ""}>
+    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
       <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span

@@ -14,7 +14,7 @@ export default function CalendarSection() {
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [showCompleted, setShowCompleted] = useState(true);
+  const [isShowingCompleted, setShowCompleted] = useState(true);
 
   const {
     tasksByDate,
@@ -82,7 +82,7 @@ export default function CalendarSection() {
     <div className="h-full flex flex-col">
       <CalendarHeader
         monthLabel={monthLabel}
-        refreshing={refreshing}
+        isRefreshing={refreshing}
         onPrevMonth={goToPrevMonth}
         onNextMonth={goToNextMonth}
         onToday={goToToday}
@@ -100,15 +100,15 @@ export default function CalendarSection() {
         />
         <TaskFilterBar
           filterCategory={filterCategory}
-          showCompleted={showCompleted}
+          isShowingCompleted={isShowingCompleted}
           onFilterCategory={setFilterCategory}
-          onToggleShowCompleted={() => setShowCompleted(!showCompleted)}
+          onToggleShowCompleted={() => setShowCompleted(!isShowingCompleted)}
         />
         <TaskListPanel
           selectedDate={selectedDate}
           tasksByDate={tasksByDate}
           backlogTasks={backlogTasks}
-          showCompleted={showCompleted}
+          isShowingCompleted={isShowingCompleted}
           filterCategory={filterCategory}
           onToggleComplete={toggleComplete}
           onToggleBacklogComplete={toggleBacklogComplete}

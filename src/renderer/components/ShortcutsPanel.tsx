@@ -1,6 +1,8 @@
 /** 글로벌 단축키 설정 패널 */
 import type { ShortcutConfig } from "@shared/types";
-import { Command, LayoutGrid, Monitor } from "lucide-react";
+import Command from "lucide-react/dist/esm/icons/command";
+import LayoutGrid from "lucide-react/dist/esm/icons/layout-grid";
+import Monitor from "lucide-react/dist/esm/icons/monitor";
 import { useMemo } from "react";
 import ShortcutRecorder from "./ShortcutRecorder";
 

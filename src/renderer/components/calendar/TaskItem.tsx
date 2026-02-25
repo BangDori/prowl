@@ -1,7 +1,10 @@
 /** 단일 태스크 행: 체크박스, 제목, 카테고리, 리마인더, 인라인 편집 */
 import type { Task, TaskReminder } from "@shared/types";
 import { DEFAULT_REMINDERS } from "@shared/types";
-import { Bell, Pencil, Plus, Trash2 } from "lucide-react";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useRef, useState } from "react";
 import { useCategories } from "../../hooks/useCategories";
 import { getCategoryColor } from "../../utils/category-utils";

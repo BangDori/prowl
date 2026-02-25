@@ -9,7 +9,7 @@ interface TaskListPanelProps {
   selectedDate: Date | null;
   tasksByDate: TasksByDate;
   backlogTasks: Task[];
-  showCompleted: boolean;
+  isShowingCompleted: boolean;
   filterCategory: string | null;
   onToggleComplete: (date: string, taskId: string) => void;
   onToggleBacklogComplete: (taskId: string) => void;
@@ -21,7 +21,7 @@ export default function TaskListPanel({
   selectedDate,
   tasksByDate,
   backlogTasks,
-  showCompleted,
+  isShowingCompleted,
   filterCategory,
   onToggleComplete,
   onToggleBacklogComplete,
@@ -30,7 +30,7 @@ export default function TaskListPanel({
 }: TaskListPanelProps) {
   const applyFilters = (tasks: Task[]): Task[] => {
     let filtered = tasks;
-    if (!showCompleted) filtered = filtered.filter((t) => !t.completed);
+    if (!isShowingCompleted) filtered = filtered.filter((t) => !t.completed);
     if (filterCategory)
       filtered = filtered.filter((t) => (t.category ?? "기타") === filterCategory);
     return sortTasks(filtered);
@@ -79,7 +79,7 @@ export default function TaskListPanel({
     <AgendaView
       tasksByDate={tasksByDate}
       backlogTasks={backlogTasks}
-      showCompleted={showCompleted}
+      isShowingCompleted={isShowingCompleted}
       filterCategory={filterCategory}
       onToggleComplete={onToggleComplete}
       onToggleBacklogComplete={onToggleBacklogComplete}
@@ -93,7 +93,7 @@ export default function TaskListPanel({
 function AgendaView({
   tasksByDate,
   backlogTasks,
-  showCompleted,
+  isShowingCompleted,
   filterCategory,
   onToggleComplete,
   onToggleBacklogComplete,
@@ -101,7 +101,7 @@ function AgendaView({
   onDeleteTask,
 }: Omit<TaskListPanelProps, "selectedDate">) {
   const groups = useMemo(() => {
-    const upcoming = getUpcomingTasks(tasksByDate, showCompleted);
+    const upcoming = getUpcomingTasks(tasksByDate, isShowingCompleted);
     if (!filterCategory) return upcoming;
     return upcoming
       .map((g) => ({
@@ -109,15 +109,15 @@ function AgendaView({
         tasks: g.tasks.filter((t) => (t.category ?? "기타") === filterCategory),
       }))
       .filter((g) => g.tasks.length > 0);
-  }, [tasksByDate, showCompleted, filterCategory]);
+  }, [tasksByDate, isShowingCompleted, filterCategory]);
 
   const filteredBacklog = useMemo(() => {
     let filtered = backlogTasks;
-    if (!showCompleted) filtered = filtered.filter((t) => !t.completed);
+    if (!isShowingCompleted) filtered = filtered.filter((t) => !t.completed);
     if (filterCategory)
       filtered = filtered.filter((t) => (t.category ?? "기타") === filterCategory);
     return sortTasks(filtered);
-  }, [backlogTasks, showCompleted, filterCategory]);
+  }, [backlogTasks, isShowingCompleted, filterCategory]);
 
   const isEmpty = groups.length === 0 && filteredBacklog.length === 0;
 

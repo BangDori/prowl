@@ -22,12 +22,12 @@ const electronAPI = {
   setSettings: invokeIpc("settings:set"),
 
   // Shell
-  showInFolder: invokeIpc("shell:showInFolder"),
-  openExternal: invokeIpc("shell:openExternal"),
+  showInFolder: invokeIpc("shell:show-in-folder"),
+  openExternal: invokeIpc("shell:open-external"),
 
   // Focus Mode
-  getFocusMode: invokeIpc("focusMode:get"),
-  setFocusMode: invokeIpc("focusMode:set"),
+  getFocusMode: invokeIpc("focus-mode:get"),
+  setFocusMode: invokeIpc("focus-mode:set"),
 
   // Window
   resizeWindow: invokeIpc("window:resize"),

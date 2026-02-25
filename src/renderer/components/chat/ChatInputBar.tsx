@@ -1,6 +1,7 @@
 /** 채팅 입력바 — input 상태를 격리하여 MessageBubble 재렌더 차단 */
 import type { ChatConfig, ProviderStatus } from "@shared/types";
-import { Plus, Send } from "lucide-react";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import Send from "lucide-react/dist/esm/icons/send";
 import { useCallback, useEffect, useRef, useState } from "react";
 import ModelSelector from "../ModelSelector";
 import type { PageContext } from "./PreviewPanel";
@@ -17,7 +18,7 @@ function getRandomPlaceholder(): string {
 }
 
 interface ChatInputBarProps {
-  loading: boolean;
+  isLoading: boolean;
   chatConfig: ChatConfig | null;
   providers: ProviderStatus[];
   pageContext: PageContext | null;
@@ -27,7 +28,7 @@ interface ChatInputBarProps {
 }
 
 export default function ChatInputBar({
-  loading,
+  isLoading,
   chatConfig,
   providers,
   pageContext,
@@ -47,11 +48,11 @@ export default function ChatInputBar({
 
   const handleSend = useCallback(() => {
     const content = input.trim();
-    if (!content || loading) return;
+    if (!content || isLoading) return;
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     onSend(content);
-  }, [input, loading, onSend]);
+  }, [input, isLoading, onSend]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -119,7 +120,7 @@ export default function ChatInputBar({
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim() || loading}
+          disabled={!input.trim() || isLoading}
           className="chat-send-btn"
         >
           <Send className="w-3.5 h-3.5" />

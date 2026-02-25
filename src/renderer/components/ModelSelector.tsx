@@ -1,6 +1,7 @@
 /** 채팅 프로바이더/모델 선택 드롭다운 */
 import type { ChatConfig, ProviderStatus } from "@shared/types";
-import { ChevronDown, Key } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import Key from "lucide-react/dist/esm/icons/key";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 interface ModelSelectorProps {

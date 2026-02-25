@@ -1,8 +1,14 @@
 /** 탭 기반 프리뷰 패널 — HTML 및 외부 URL을 브라우저 탭처럼 표시 */
 
-import prowlLogo from "@assets/prowl-logo.png";
-import { ChevronLeft, ChevronRight, Plus, RotateCcw, X } from "lucide-react";
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Plus from "lucide-react/dist/esm/icons/plus";
+import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
+import X from "lucide-react/dist/esm/icons/x";
+import { useCallback, useEffect, useRef, useState } from "react";
+import PreviewBlankPage from "./PreviewBlankPage";
+import PreviewHtmlContent from "./PreviewHtmlContent";
+import PreviewUrlContent, { type NavState, type UrlHandle } from "./PreviewUrlContent";
 import { type NavEntry, useTabHistory } from "./useTabHistory";
 
 export type PreviewTab =
@@ -10,33 +16,6 @@ export type PreviewTab =
   | { id: string; type: "url"; url: string; label: string };
 
 export type PageContext = { url: string; title: string; text: string };
-
-/** webview 타입 — executeJavaScript + 탐색 메서드 + Electron 이벤트 지원 */
-type WebviewEl = HTMLElement & {
-  executeJavaScript(code: string): Promise<unknown>;
-  goBack(): void;
-  goForward(): void;
-  reload(): void;
-  stop(): void;
-  loadURL(url: string): void;
-  canGoBack(): boolean;
-  canGoForward(): boolean;
-};
-
-/** PreviewPanel이 UrlContent를 명령형으로 제어하기 위한 핸들 */
-type UrlHandle = {
-  goBack(): void;
-  goForward(): void;
-  reloadOrStop(): void;
-  loadURL(url: string): void;
-};
-
-type NavState = {
-  canGoBack: boolean;
-  canGoForward: boolean;
-  isLoading: boolean;
-  currentUrl: string;
-};
 
 interface PreviewPanelProps {
   tabs: PreviewTab[];
@@ -46,218 +25,6 @@ interface PreviewPanelProps {
   onPageContextChange?: (ctx: PageContext | null) => void;
   onNewTab?: () => void;
   isDragging?: boolean;
-}
-
-/**
- * HTML 콘텐츠를 iframe으로 렌더링 — 렌더 후 텍스트 추출, 링크 클릭 시 인탭 탐색
- *
- * 콜백은 ref로 저장해 effect deps에서 제외한다.
- */
-function HtmlContent({
-  content,
-  label,
-  onNavigate,
-  onPageContextChange,
-}: {
-  content: string;
-  label: string;
-  onNavigate?: (url: string) => void;
-  onPageContextChange?: (ctx: PageContext | null) => void;
-}) {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const onNavigateRef = useRef(onNavigate);
-  onNavigateRef.current = onNavigate;
-  const onPageContextChangeRef = useRef(onPageContextChange);
-  onPageContextChangeRef.current = onPageContextChange;
-
-  useEffect(() => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    const doc = iframe.contentDocument ?? iframe.contentWindow?.document;
-    if (!doc) return;
-
-    doc.open();
-    doc.write(content);
-    doc.close();
-
-    const text = (doc.body?.innerText ?? "").slice(0, 3000);
-    onPageContextChangeRef.current?.({ url: "prowl-ui://html", title: label, text });
-
-    const handleClick = (e: MouseEvent) => {
-      const anchor = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
-      if (!anchor?.href) return;
-      if (!anchor.href.startsWith("http://") && !anchor.href.startsWith("https://")) return;
-      e.preventDefault();
-      onNavigateRef.current?.(anchor.href);
-    };
-
-    doc.addEventListener("click", handleClick);
-    return () => {
-      doc.removeEventListener("click", handleClick);
-      onPageContextChangeRef.current?.(null);
-    };
-  }, [content, label]);
-
-  return <iframe ref={iframeRef} title="HTML Preview" className="w-full h-full border-none" />;
-}
-
-/**
- * 외부 URL을 webview로 렌더링 — 네비게이션 이벤트 추적 및 페이지 컨텍스트 추출
- *
- * forwardRef + useImperativeHandle로 부모(PreviewPanel)가 goBack/goForward 등을 호출한다.
- * new-window 이벤트를 가로채 인탭 탐색으로 전환한다.
- */
-const UrlContent = forwardRef<
-  UrlHandle,
-  {
-    url: string;
-    onPageContextChange?: (ctx: PageContext | null) => void;
-    onNavStateChange?: (s: NavState) => void;
-    onNewWindow?: (url: string) => void;
-  }
->(({ url, onPageContextChange, onNavStateChange, onNewWindow }, ref) => {
-  const webviewRef = useRef<HTMLElement>(null);
-  const onPageContextChangeRef = useRef(onPageContextChange);
-  onPageContextChangeRef.current = onPageContextChange;
-  const onNavStateChangeRef = useRef(onNavStateChange);
-  onNavStateChangeRef.current = onNavStateChange;
-  const onNewWindowRef = useRef(onNewWindow);
-  onNewWindowRef.current = onNewWindow;
-  const isLoadingRef = useRef(false);
-
-  useImperativeHandle(ref, () => ({
-    goBack: () => (webviewRef.current as WebviewEl | null)?.goBack(),
-    goForward: () => (webviewRef.current as WebviewEl | null)?.goForward(),
-    reloadOrStop: () => {
-      const wv = webviewRef.current as WebviewEl | null;
-      isLoadingRef.current ? wv?.stop() : wv?.reload();
-    },
-    loadURL: (u: string) => (webviewRef.current as WebviewEl | null)?.loadURL(u),
-  }));
-
-  useEffect(() => {
-    const webview = webviewRef.current as WebviewEl | null;
-    if (!webview) return;
-
-    const pushNav = (loading: boolean, currentUrl?: string) => {
-      isLoadingRef.current = loading;
-      onNavStateChangeRef.current?.({
-        canGoBack: webview.canGoBack(),
-        canGoForward: webview.canGoForward(),
-        isLoading: loading,
-        currentUrl: currentUrl ?? url,
-      });
-    };
-
-    const handleFinishLoad = async () => {
-      let currentUrl = url;
-      let title = "";
-      let text = "";
-      try {
-        currentUrl = String(await webview.executeJavaScript("location.href"));
-        title = String(await webview.executeJavaScript("document.title"));
-        text = String(await webview.executeJavaScript("document.body.innerText")).slice(0, 3000);
-      } catch {
-        /* CSP 등 무시 */
-      }
-      pushNav(false, currentUrl);
-      onPageContextChangeRef.current?.({ url: currentUrl, title, text });
-    };
-
-    const handleStartLoading = () => pushNav(true);
-    const handleNavigate = (e: Event) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const navUrl = (e as any).url as string | undefined;
-      if (navUrl) pushNav(false, navUrl);
-    };
-
-    const handleNewWindow = (e: Event) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newUrl = (e as any).url as string | undefined;
-      if (newUrl?.startsWith("http://") || newUrl?.startsWith("https://")) {
-        onNewWindowRef.current?.(newUrl);
-      }
-    };
-
-    webview.addEventListener("did-finish-load", handleFinishLoad);
-    webview.addEventListener("did-start-loading", handleStartLoading);
-    webview.addEventListener("did-navigate", handleNavigate);
-    webview.addEventListener("did-navigate-in-page", handleNavigate);
-    webview.addEventListener("new-window", handleNewWindow);
-    return () => {
-      webview.removeEventListener("did-finish-load", handleFinishLoad);
-      webview.removeEventListener("did-start-loading", handleStartLoading);
-      webview.removeEventListener("did-navigate", handleNavigate);
-      webview.removeEventListener("did-navigate-in-page", handleNavigate);
-      webview.removeEventListener("new-window", handleNewWindow);
-      onPageContextChangeRef.current?.(null);
-    };
-  }, [url]);
-
-  return (
-    <webview
-      ref={webviewRef as React.RefObject<HTMLElement>}
-      src={url}
-      style={{ width: "100%", height: "100%", display: "flex" }}
-    />
-  );
-});
-UrlContent.displayName = "UrlContent";
-
-/** about:blank 탭에 표시되는 Prowl 브랜딩 페이지 */
-function BlankPage({ onNavigate }: { onNavigate?: (url: string) => void }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
-        gap: 10,
-        background: "rgba(14, 11, 22, 0.96)",
-        position: "relative",
-      }}
-    >
-      <img src={prowlLogo} alt="Prowl" style={{ width: 120, height: 120, opacity: 0.8 }} />
-      <span
-        style={{
-          fontSize: 24,
-          fontWeight: 700,
-          color: "rgba(255,255,255,0.6)",
-          letterSpacing: "0.14em",
-        }}
-      >
-        PROWL
-      </span>
-      <span style={{ fontSize: 13, color: "rgba(255,255,255,0.28)", marginTop: 4 }}>
-        URL을 입력해 탐색하세요
-      </span>
-      <button
-        type="button"
-        onClick={() => onNavigate?.("https://github.com/BangDori/prowl")}
-        style={{
-          position: "absolute",
-          bottom: 16,
-          fontSize: 11,
-          color: "rgba(255,255,255,0.2)",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-          transition: "color 0.15s",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.5)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.color = "rgba(255,255,255,0.2)";
-        }}
-      >
-        GitHub
-      </button>
-    </div>
-  );
 }
 
 export default function PreviewPanel({
@@ -398,7 +165,7 @@ export default function PreviewPanel({
         )}
       </div>
 
-      {/* URL 탭 전용 네비게이션 바 — .chat-preview-content 위의 flex 형제 */}
+      {/* URL 탭 전용 네비게이션 바 */}
       {isCurrentUrl && (
         <div className="chat-preview-nav">
           <button
@@ -455,7 +222,7 @@ export default function PreviewPanel({
       {/* 콘텐츠 영역 — webview/iframe이 직접 자식으로 height: 100% 유지 */}
       <div className="chat-preview-content">
         {currentEntry?.kind === "html" && (
-          <HtmlContent
+          <PreviewHtmlContent
             content={currentEntry.content}
             label={activeTab?.label ?? ""}
             onNavigate={handleNavigateInTab}
@@ -463,7 +230,7 @@ export default function PreviewPanel({
           />
         )}
         {currentEntry?.kind === "url" && !isBlankEntry && (
-          <UrlContent
+          <PreviewUrlContent
             ref={urlContentRef}
             url={currentUrl}
             onPageContextChange={onPageContextChange}
@@ -471,7 +238,7 @@ export default function PreviewPanel({
             onNewWindow={handleNavigateInTab}
           />
         )}
-        {isBlankEntry && <BlankPage onNavigate={handleNavigateInTab} />}
+        {isBlankEntry && <PreviewBlankPage onNavigate={handleNavigateInTab} />}
       </div>
     </div>
   );

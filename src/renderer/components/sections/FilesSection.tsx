@@ -1,6 +1,7 @@
 /** ~/.prowl/ 파일 탐색기 섹션 */
 import { useQueryClient } from "@tanstack/react-query";
-import { FolderOpen, RefreshCw } from "lucide-react";
+import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 import { useState } from "react";
 import { queryKeys } from "../../queries/keys";
 import FileEditor from "../files/FileEditor";

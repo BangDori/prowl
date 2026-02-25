@@ -1,6 +1,8 @@
 /** 카테고리별 전체 태스크 그룹 뷰 (날짜 구분 없이 카테고리로 묶음) */
 import type { Task } from "@shared/types";
-import { ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
 import ConfirmDialog from "../ConfirmDialog";
@@ -78,7 +80,7 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
             <CategoryTaskRow
               key={entry.task.id}
               entry={entry}
-              showBorder={idx < group.entries.length - 1}
+              hasBorder={idx < group.entries.length - 1}
             />
           ))}
         </div>
@@ -87,14 +89,14 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
   );
 }
 
-function CategoryTaskRow({ entry, showBorder }: { entry: CategoryTaskEntry; showBorder: boolean }) {
+function CategoryTaskRow({ entry, hasBorder }: { entry: CategoryTaskEntry; hasBorder: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmPending, setConfirmPending] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
   const { task, dateLabel, onToggle, onDelete } = entry;
 
   return (
-    <div className={showBorder ? "border-b border-prowl-border" : ""}>
+    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
       <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors" />

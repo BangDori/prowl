@@ -1,7 +1,8 @@
 /** 일정 알림 시간 선택 컴포넌트 */
 import type { TaskReminder } from "@shared/types";
 import { REMINDER_PRESETS } from "@shared/types";
-import { Bell, X } from "lucide-react";
+import Bell from "lucide-react/dist/esm/icons/bell";
+import X from "lucide-react/dist/esm/icons/x";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 

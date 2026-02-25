@@ -1,5 +1,6 @@
 /** 미니 달력 날짜 선택 컴포넌트 */
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getCalendarDays, isSameDay, isToday, toDateStr, WEEKDAYS } from "../../utils/calendar";
 

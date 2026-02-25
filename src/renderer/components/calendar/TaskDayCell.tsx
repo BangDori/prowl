@@ -1,6 +1,6 @@
 /** 캘린더 날짜 셀 — 태스크 카테고리 색상 표시 */
 import type { Task } from "@shared/types";
-import { Check } from "lucide-react";
+import Check from "lucide-react/dist/esm/icons/check";
 import { isToday } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";
 
@@ -10,7 +10,7 @@ interface TaskDayCellProps {
   date: Date;
   isCurrentMonth: boolean;
   tasks: Task[];
-  selected: boolean;
+  isSelected: boolean;
   onClick: () => void;
 }
 
@@ -18,7 +18,7 @@ export default function TaskDayCell({
   date,
   isCurrentMonth,
   tasks,
-  selected,
+  isSelected,
   onClick,
 }: TaskDayCellProps) {
   const today = isToday(date);
@@ -32,7 +32,7 @@ export default function TaskDayCell({
       onClick={onClick}
       className={`
         relative flex flex-col items-center py-1 transition-colors min-h-[36px]
-        ${selected ? "bg-accent/20 ring-1 ring-accent/40 rounded-md" : "hover:bg-app-hover-bg rounded-md"}
+        ${isSelected ? "bg-accent/20 ring-1 ring-accent/40 rounded-md" : "hover:bg-app-hover-bg rounded-md"}
         ${!isCurrentMonth ? "opacity-30" : ""}
       `}
     >
@@ -40,8 +40,8 @@ export default function TaskDayCell({
         className={`
           text-[11px] leading-none w-5 h-5 flex items-center justify-center rounded-full
           ${today ? "bg-accent text-white font-bold" : ""}
-          ${selected && !today ? "text-accent font-medium" : ""}
-          ${!selected && !today && isCurrentMonth ? "text-app-text-secondary" : ""}
+          ${isSelected && !today ? "text-accent font-medium" : ""}
+          ${!isSelected && !today && isCurrentMonth ? "text-app-text-secondary" : ""}
         `}
       >
         {date.getDate()}

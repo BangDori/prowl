@@ -34,12 +34,12 @@ export interface IpcInvokeSchema {
   "settings:set": { params: [settings: AppSettings]; return: IpcResult };
 
   // Shell (2 channels)
-  "shell:showInFolder": { params: [filePath: string]; return: void };
-  "shell:openExternal": { params: [url: string]; return: void };
+  "shell:show-in-folder": { params: [filePath: string]; return: void };
+  "shell:open-external": { params: [url: string]; return: void };
 
   // Focus Mode (2 channels)
-  "focusMode:get": { params: []; return: FocusMode };
-  "focusMode:set": { params: [focusMode: FocusMode]; return: IpcResult };
+  "focus-mode:get": { params: []; return: FocusMode };
+  "focus-mode:set": { params: [focusMode: FocusMode]; return: IpcResult };
 
   // Window (1 channel)
   "window:resize": { params: [height: number]; return: void };

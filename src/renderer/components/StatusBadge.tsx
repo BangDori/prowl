@@ -1,12 +1,13 @@
 /** 작업 성공/실패 상태 배지 */
-import { CheckCircle, XCircle } from "lucide-react";
+import CheckCircle from "lucide-react/dist/esm/icons/check-circle";
+import XCircle from "lucide-react/dist/esm/icons/x-circle";
 
 /**
  * StatusBadge 컴포넌트의 Props
  */
 interface StatusBadgeProps {
   /** 성공 여부 (true: 성공, false: 실패) */
-  success: boolean;
+  isSuccess: boolean;
 }
 
 /**
@@ -21,16 +22,16 @@ interface StatusBadgeProps {
  * @example
  * ```tsx
  * // 성공 상태
- * <StatusBadge success={true} />
+ * <StatusBadge isSuccess={true} />
  *
  * // 실패 상태
- * <StatusBadge success={false} />
+ * <StatusBadge isSuccess={false} />
  * ```
  */
-export default function StatusBadge({ success }: StatusBadgeProps) {
-  if (success) {
+export default function StatusBadge({ isSuccess }: StatusBadgeProps) {
+  if (isSuccess) {
     return (
-      <span className="status-success" title="성공">
+      <span className="status-isSuccess" title="성공">
         <CheckCircle className="w-3.5 h-3.5" />
       </span>
     );
