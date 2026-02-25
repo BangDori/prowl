@@ -201,23 +201,26 @@ export default function MessageBubble({
           {children}
         </pre>
       ),
-      a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-        <button
-          type="button"
-          onClick={() => {
-            if (!href) return;
-            if (onOpenLink) {
-              onOpenLink(href, getLinkLabel(href, children));
-            } else {
-              window.electronAPI.openExternal(href);
-            }
-          }}
-          className="inline-flex items-baseline gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
-        >
-          <span>{children}</span>
-          <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 inline-block translate-y-[1px]" />
-        </button>
-      ),
+      a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
+        const label = href ? getLinkLabel(href, children) : String(children ?? "");
+        return (
+          <button
+            type="button"
+            onClick={() => {
+              if (!href) return;
+              if (onOpenLink) {
+                onOpenLink(href, label);
+              } else {
+                window.electronAPI.openExternal(href);
+              }
+            }}
+            className="inline-flex items-baseline gap-0.5 text-accent hover:text-accent-hover underline underline-offset-2 cursor-pointer"
+          >
+            <span>{label}</span>
+            <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0 inline-block translate-y-[1px]" />
+          </button>
+        );
+      },
     }),
     [onOpenLink],
   );
