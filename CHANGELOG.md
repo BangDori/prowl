@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.47.0] - 2026-02-25
+- Prowl Chat을 열 때 채팅방 목록 자동 새로고침 — 다른 기기나 세션에서 변경된 대화방이 즉시 반영됨
+
 ## [1.46.8] - 2026-02-25
 - docs 컨벤션 기반 전면 리팩토링 — IPC 채널 네이밍, JSDoc 헤더, boolean prop 접두사(is/has/can) 통일
 - lucide-react 배럴 임포트를 직접 경로 임포트로 전환 (번들 크기 최적화)
