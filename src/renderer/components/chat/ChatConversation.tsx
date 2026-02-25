@@ -436,7 +436,7 @@ export default function ChatConversation({
       )}
 
       <ChatInputBar
-        loading={loading}
+        isLoading={loading}
         chatConfig={chatConfig}
         providers={providers}
         pageContext={pageContext}

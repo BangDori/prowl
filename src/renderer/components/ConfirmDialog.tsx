@@ -15,7 +15,7 @@ interface ConfirmDialogProps {
   /** 확인 콜백 */
   onConfirm: () => void;
   /** 확인 버튼 비활성화 (pending 상태) */
-  loading?: boolean;
+  isLoading?: boolean;
 }
 
 export default function ConfirmDialog({
@@ -24,7 +24,7 @@ export default function ConfirmDialog({
   confirmLabel = "삭제",
   onCancel,
   onConfirm,
-  loading = false,
+  isLoading = false,
 }: ConfirmDialogProps) {
   // Esc 키로 닫기
   useEffect(() => {
@@ -68,10 +68,10 @@ export default function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            disabled={loading}
+            disabled={isLoading}
             className="px-3 py-1.5 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
           >
-            {loading ? "삭제 중…" : confirmLabel}
+            {isLoading ? "삭제 중…" : confirmLabel}
           </button>
         </div>
       </div>

@@ -5,7 +5,7 @@ import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 
 interface CalendarHeaderProps {
   monthLabel: string;
-  refreshing: boolean;
+  isRefreshing: boolean;
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onToday: () => void;
@@ -14,7 +14,7 @@ interface CalendarHeaderProps {
 
 export default function CalendarHeader({
   monthLabel,
-  refreshing,
+  isRefreshing,
   onPrevMonth,
   onNextMonth,
   onToday,
@@ -48,11 +48,11 @@ export default function CalendarHeader({
       <button
         type="button"
         onClick={onRefresh}
-        disabled={refreshing}
+        disabled={isRefreshing}
         className="p-1 rounded text-app-text-muted hover:text-app-text-secondary transition-colors disabled:opacity-50"
         title="새로고침"
       >
-        <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+        <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin" : ""}`} />
       </button>
     </div>
   );

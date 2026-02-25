@@ -62,7 +62,7 @@ export default function FocusModePanel({ focusMode, onUpdate, onBack }: FocusMod
             </div>
           </div>
           <ToggleSwitch
-            enabled={focusMode.enabled}
+            isEnabled={focusMode.enabled}
             onChange={() => onUpdate({ ...focusMode, enabled: !focusMode.enabled })}
           />
         </div>

@@ -8,14 +8,14 @@ import { useCategories } from "../../hooks/useCategories";
 
 interface TaskFilterBarProps {
   filterCategory: string | null;
-  showCompleted: boolean;
+  isShowingCompleted: boolean;
   onFilterCategory: (category: string | null) => void;
   onToggleShowCompleted: () => void;
 }
 
 export default function TaskFilterBar({
   filterCategory,
-  showCompleted,
+  isShowingCompleted,
   onFilterCategory,
   onToggleShowCompleted,
 }: TaskFilterBarProps) {
@@ -125,9 +125,9 @@ export default function TaskFilterBar({
         type="button"
         onClick={onToggleShowCompleted}
         className="p-0.5 rounded text-app-text-muted hover:text-app-text-secondary transition-colors flex-shrink-0"
-        title={showCompleted ? "완료 숨기기" : "완료 표시"}
+        title={isShowingCompleted ? "완료 숨기기" : "완료 표시"}
       >
-        {showCompleted ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+        {isShowingCompleted ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
       </button>
     </div>
   );

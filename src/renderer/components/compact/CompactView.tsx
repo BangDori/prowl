@@ -175,8 +175,8 @@ export default function CompactView() {
   return (
     <div className="flex flex-col h-screen bg-transparent text-app-text-primary">
       <CompactHeader
-        minimized={minimized}
-        refreshing={refreshing}
+        isMinimized={minimized}
+        isRefreshing={refreshing}
         sortMode={sortMode}
         onToggleMinimize={handleToggleMinimize}
         onRefresh={refetch}

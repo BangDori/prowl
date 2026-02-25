@@ -44,7 +44,7 @@ export default function CompactTaskList({
             <CompactTaskRow
               key={task.id}
               task={task}
-              showBorder={idx < sorted.length - 1}
+              hasBorder={idx < sorted.length - 1}
               onToggle={() => onToggleComplete(date, task.id)}
               onDelete={() => onDelete(date, task.id)}
             />
@@ -57,12 +57,12 @@ export default function CompactTaskList({
 
 function CompactTaskRow({
   task,
-  showBorder,
+  hasBorder,
   onToggle,
   onDelete,
 }: {
   task: Task;
-  showBorder: boolean;
+  hasBorder: boolean;
   onToggle: () => void;
   onDelete: () => void;
 }) {
@@ -71,7 +71,7 @@ function CompactTaskRow({
   const Chevron = expanded ? ChevronDown : ChevronRight;
 
   return (
-    <div className={showBorder ? "border-b border-prowl-border" : ""}>
+    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
       <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span

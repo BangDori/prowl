@@ -60,7 +60,7 @@ export default function CompactCompleted({ groups, onToggleComplete }: CompactCo
                 <CompletedTaskRow
                   key={task.id}
                   task={task}
-                  showBorder={idx < group.tasks.length - 1}
+                  hasBorder={idx < group.tasks.length - 1}
                   onToggle={() => onToggleComplete(group.date, task.id)}
                 />
               ))}
@@ -74,18 +74,18 @@ export default function CompactCompleted({ groups, onToggleComplete }: CompactCo
 
 function CompletedTaskRow({
   task,
-  showBorder,
+  hasBorder,
   onToggle,
 }: {
   task: Task;
-  showBorder: boolean;
+  hasBorder: boolean;
   onToggle: () => void;
 }) {
   const [rowExpanded, setRowExpanded] = useState(false);
   const Chevron = rowExpanded ? ChevronDown : ChevronRight;
 
   return (
-    <div className={showBorder ? "border-b border-prowl-border" : ""}>
+    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
       <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center bg-emerald-500/20 border-emerald-500/30 transition-colors">

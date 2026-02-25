@@ -140,7 +140,7 @@ export default function SettingsSection() {
                   <p className="text-[10px] text-gray-500">Show alerts when jobs complete</p>
                 </div>
               </div>
-              <ToggleSwitch enabled={notificationsEnabled} onChange={toggleNotifications} />
+              <ToggleSwitch isEnabled={notificationsEnabled} onChange={toggleNotifications} />
             </div>
           </div>
         </div>

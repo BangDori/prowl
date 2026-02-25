@@ -132,22 +132,22 @@ export function registerIpcHandlers(): void {
   });
 
   // Finder에서 파일 위치 보기
-  handleIpc("shell:showInFolder", async (filePath) => {
+  handleIpc("shell:show-in-folder", async (filePath) => {
     shell.showItemInFolder(filePath);
   });
 
   // 외부 URL 열기
-  handleIpc("shell:openExternal", async (url) => {
+  handleIpc("shell:open-external", async (url) => {
     shell.openExternal(url);
   });
 
   // 집중 모드 조회
-  handleIpc("focusMode:get", async () => {
+  handleIpc("focus-mode:get", async () => {
     return getFocusMode();
   });
 
   // 집중 모드 설정 저장 + 모니터 업데이트
-  handleIpc("focusMode:set", async (focusMode) => {
+  handleIpc("focus-mode:set", async (focusMode) => {
     try {
       setFocusMode(focusMode);
       updateFocusModeMonitor(focusMode);

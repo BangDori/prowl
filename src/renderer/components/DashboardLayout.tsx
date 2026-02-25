@@ -24,7 +24,7 @@ interface SidebarItemProps {
   /** 표시할 레이블 */
   label: string;
   /** 활성화 상태 */
-  active: boolean;
+  isActive: boolean;
   /** 클릭 핸들러 */
   onClick: () => void;
 }
@@ -32,7 +32,7 @@ interface SidebarItemProps {
 /**
  * 사이드바 네비게이션 아이템 컴포넌트
  */
-function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
+function SidebarItem({ icon, label, isActive, onClick }: SidebarItemProps) {
   return (
     <button
       type="button"
@@ -40,7 +40,7 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
       className={`
         w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors
         ${
-          active
+          isActive
             ? "bg-accent/20 text-accent"
             : "text-app-text-muted hover:text-app-text-primary hover:bg-app-hover-bg"
         }
@@ -65,7 +65,7 @@ function SidebarItem({ icon, label, active, onClick }: SidebarItemProps) {
  * - SettingsSection: 앱 설정 (Night Watch 포함)
  */
 export default function DashboardLayout() {
-  const [activeNav, setActiveNav] = useState<NavItem>("calendar");
+  const [isActiveNav, setActiveNav] = useState<NavItem>("calendar");
 
   return (
     <div className="flex h-screen bg-transparent text-app-text-primary">
@@ -87,31 +87,31 @@ export default function DashboardLayout() {
           <SidebarItem
             icon={<ListTodo className="w-4 h-4" />}
             label="Task Manager"
-            active={activeNav === "calendar"}
+            isActive={isActiveNav === "calendar"}
             onClick={() => setActiveNav("calendar")}
           />
           <SidebarItem
             icon={<Brain className="w-4 h-4" />}
             label="Memory"
-            active={activeNav === "memory"}
+            isActive={isActiveNav === "memory"}
             onClick={() => setActiveNav("memory")}
           />
           <SidebarItem
             icon={<FolderOpen className="w-4 h-4" />}
             label="Files"
-            active={activeNav === "files"}
+            isActive={isActiveNav === "files"}
             onClick={() => setActiveNav("files")}
           />
           <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
-            active={activeNav === "changelog"}
+            isActive={isActiveNav === "changelog"}
             onClick={() => setActiveNav("changelog")}
           />
           <SidebarItem
             icon={<Cog className="w-4 h-4" />}
             label="Settings"
-            active={activeNav === "settings"}
+            isActive={isActiveNav === "settings"}
             onClick={() => setActiveNav("settings")}
           />
         </nav>
@@ -123,27 +123,27 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 min-w-0">
         <div className="h-full overflow-hidden relative">
-          <div className={`h-full ${activeNav === "calendar" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`}>
             <ErrorBoundary section="Task Manager">
               <CalendarSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${activeNav === "memory" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "memory" ? "" : "hidden"}`}>
             <ErrorBoundary section="Memory">
               <MemorySection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${activeNav === "changelog" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`}>
             <ErrorBoundary section="Version History">
               <ChangelogSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${activeNav === "settings" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "settings" ? "" : "hidden"}`}>
             <ErrorBoundary section="Settings">
               <SettingsSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${activeNav === "files" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`}>
             <ErrorBoundary section="Files">
               <FilesSection />
             </ErrorBoundary>

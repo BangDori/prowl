@@ -18,7 +18,7 @@ function getRandomPlaceholder(): string {
 }
 
 interface ChatInputBarProps {
-  loading: boolean;
+  isLoading: boolean;
   chatConfig: ChatConfig | null;
   providers: ProviderStatus[];
   pageContext: PageContext | null;
@@ -28,7 +28,7 @@ interface ChatInputBarProps {
 }
 
 export default function ChatInputBar({
-  loading,
+  isLoading,
   chatConfig,
   providers,
   pageContext,
@@ -48,11 +48,11 @@ export default function ChatInputBar({
 
   const handleSend = useCallback(() => {
     const content = input.trim();
-    if (!content || loading) return;
+    if (!content || isLoading) return;
     setInput("");
     if (textareaRef.current) textareaRef.current.style.height = "auto";
     onSend(content);
-  }, [input, loading, onSend]);
+  }, [input, isLoading, onSend]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -120,7 +120,7 @@ export default function ChatInputBar({
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim() || loading}
+          disabled={!input.trim() || isLoading}
           className="chat-send-btn"
         >
           <Send className="w-3.5 h-3.5" />

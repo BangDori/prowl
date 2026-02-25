@@ -224,7 +224,7 @@ export default function FileTree({ selectedPath, onSelectFile, onDeleted }: File
           confirmLabel="삭제"
           onCancel={() => setPendingDelete(null)}
           onConfirm={handleConfirmDelete}
-          loading={deleteMutation.isPending}
+          isLoading={deleteMutation.isPending}
         />
       )}
     </>

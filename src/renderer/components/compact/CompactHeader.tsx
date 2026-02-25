@@ -10,8 +10,8 @@ import type { TaskSortMode } from "../../utils/task-helpers";
 const noDrag = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
 
 interface CompactHeaderProps {
-  minimized: boolean;
-  refreshing: boolean;
+  isMinimized: boolean;
+  isRefreshing: boolean;
   sortMode: TaskSortMode;
   onToggleMinimize: () => void;
   onRefresh: () => void;
@@ -19,8 +19,8 @@ interface CompactHeaderProps {
 }
 
 export default function CompactHeader({
-  minimized,
-  refreshing,
+  isMinimized,
+  isRefreshing,
   sortMode,
   onToggleMinimize,
   onRefresh,
@@ -38,7 +38,7 @@ export default function CompactHeader({
       </span>
 
       <div className="flex items-center gap-1" style={noDrag}>
-        {!minimized && (
+        {!isMinimized && (
           <>
             <button
               type="button"
@@ -53,7 +53,7 @@ export default function CompactHeader({
               onClick={onRefresh}
               className="p-1 rounded-md text-app-text-ghost hover:text-app-text-secondary hover:bg-app-hover-bg transition-colors"
             >
-              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3 h-3 ${isRefreshing ? "animate-spin" : ""}`} />
             </button>
           </>
         )}
@@ -62,7 +62,7 @@ export default function CompactHeader({
           onClick={onToggleMinimize}
           className="p-1 rounded-md text-app-text-ghost hover:text-app-text-secondary hover:bg-app-hover-bg transition-colors"
         >
-          {minimized ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+          {isMinimized ? <Plus className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
         </button>
         <button
           type="button"
