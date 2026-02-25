@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.47.1] - 2026-02-25
+- chat-read-state.json에 없는 채팅방의 안 읽은 메시지 수가 표시되지 않던 버그 수정
+
 ## [1.47.0] - 2026-02-25
 - Prowl Chat을 열 때 채팅방 목록 자동 새로고침 — 다른 기기나 세션에서 변경된 대화방이 즉시 반영됨
 
