@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.47.3] - 2026-02-26
+- AI 태스크 도구(update_task)에서 날짜 이동 시 빈 문자열 필드가 기존 제목/카테고리/설명을 덮어쓰던 버그 수정
+
 ## [1.47.2] - 2026-02-26
 - 채팅 메시지 내 bare URL이 포함될 때 버블 레이아웃이 깨지던 현상 수정 — URL은 hostname만 표시되도록 개선
 

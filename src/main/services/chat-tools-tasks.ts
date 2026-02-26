@@ -112,12 +112,12 @@ const update_task = tool({
       }
       if (!currentTask) return { error: `Task not found: ${taskId}` };
 
-      // 필드 업데이트 (undefined가 아닌 값만 반영)
+      // 필드 업데이트 (truthy 값만 반영 — 빈 문자열은 "제공되지 않음"으로 처리)
       const merged: Task = { ...currentTask };
-      if (updates.title !== undefined) merged.title = updates.title;
-      if (updates.description !== undefined) merged.description = updates.description;
-      if (updates.dueTime !== undefined) merged.dueTime = updates.dueTime;
-      if (updates.category !== undefined) merged.category = updates.category;
+      if (updates.title) merged.title = updates.title;
+      if (updates.description) merged.description = updates.description;
+      if (updates.dueTime) merged.dueTime = updates.dueTime;
+      if (updates.category) merged.category = updates.category;
 
       // 날짜 이동
       if (newDate) {
