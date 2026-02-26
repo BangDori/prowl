@@ -50,6 +50,7 @@ interface CompactCategoryAllProps {
 
 export default function CompactCategoryAll({ entries }: CompactCategoryAllProps) {
   const groups = buildGroups(entries);
+  const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   if (groups.length === 0) {
     return (
@@ -59,32 +60,54 @@ export default function CompactCategoryAll({ entries }: CompactCategoryAllProps)
     );
   }
 
+  function toggleCategory(category: string) {
+    setCollapsedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  }
+
   return (
     <div className="space-y-1.5">
-      {groups.map((group) => (
-        <div
-          key={group.category}
-          className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
-        >
-          <div className="flex items-center gap-1.5 px-2.5 pt-2 pb-1">
-            <span
-              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-              style={{ backgroundColor: group.color }}
-            />
-            <span className="text-[10px] font-medium text-app-text-muted flex-1">
-              {group.category}
-            </span>
-            <span className="text-[9px] text-app-text-ghost">{group.entries.length}건</span>
+      {groups.map((group) => {
+        const isCollapsed = collapsedCategories.has(group.category);
+        const Chevron = isCollapsed ? ChevronRight : ChevronDown;
+        return (
+          <div
+            key={group.category}
+            className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
+          >
+            <button
+              type="button"
+              className="w-full flex items-center gap-1.5 px-2.5 pt-2 pb-1 hover:bg-prowl-surface transition-colors"
+              onClick={() => toggleCategory(group.category)}
+            >
+              <span
+                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: group.color }}
+              />
+              <span className="text-[10px] font-medium text-app-text-muted flex-1 text-left">
+                {group.category}
+              </span>
+              <span className="text-[9px] text-app-text-ghost">{group.entries.length}건</span>
+              <Chevron className="w-2.5 h-2.5 text-app-text-ghost flex-shrink-0 ml-0.5" />
+            </button>
+            {!isCollapsed &&
+              group.entries.map((entry, idx) => (
+                <CategoryTaskRow
+                  key={entry.task.id}
+                  entry={entry}
+                  hasBorder={idx < group.entries.length - 1}
+                />
+              ))}
           </div>
-          {group.entries.map((entry, idx) => (
-            <CategoryTaskRow
-              key={entry.task.id}
-              entry={entry}
-              hasBorder={idx < group.entries.length - 1}
-            />
-          ))}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
