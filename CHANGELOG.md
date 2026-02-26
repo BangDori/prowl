@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.48.0] - 2026-02-26
+- Compact View 카테고리 헤더 클릭으로 태스크 목록 접기/펼치기 기능 추가
+
 ## [1.47.3] - 2026-02-26
 - AI 태스크 도구(update_task)에서 날짜 이동 시 빈 문자열 필드가 기존 제목/카테고리/설명을 덮어쓰던 버그 수정
 
