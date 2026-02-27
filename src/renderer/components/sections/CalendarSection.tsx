@@ -1,5 +1,6 @@
 /** 캘린더 탭 섹션: 파일 기반 태스크 캘린더 */
 import { useMemo, useState } from "react";
+import { useAgendaTasks } from "../../hooks/useAgendaTasks";
 import { useBacklogData } from "../../hooks/useBacklogData";
 import { useTaskData } from "../../hooks/useTaskData";
 import { getCalendarDays, isSameDay } from "../../utils/calendar";
@@ -28,6 +29,7 @@ export default function CalendarSection() {
   } = useTaskData(viewYear, viewMonth);
 
   const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
+  const agendaTasksByDate = useAgendaTasks();
 
   // 월 이동
   const goToPrevMonth = () => {
@@ -112,6 +114,7 @@ export default function CalendarSection() {
         <TaskListPanel
           selectedDate={selectedDate}
           tasksByDate={tasksByDate}
+          agendaTasksByDate={agendaTasksByDate}
           backlogTasks={backlogTasks}
           isShowingCompleted={isShowingCompleted}
           filterCategory={filterCategory}

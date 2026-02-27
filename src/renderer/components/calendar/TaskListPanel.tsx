@@ -55,6 +55,7 @@ function TaskGroupedList({
 interface TaskListPanelProps {
   selectedDate: Date | null;
   tasksByDate: TasksByDate;
+  agendaTasksByDate: TasksByDate;
   backlogTasks: Task[];
   isShowingCompleted: boolean;
   filterCategory: string | null;
@@ -67,6 +68,7 @@ interface TaskListPanelProps {
 export default function TaskListPanel({
   selectedDate,
   tasksByDate,
+  agendaTasksByDate,
   backlogTasks,
   isShowingCompleted,
   filterCategory,
@@ -117,10 +119,10 @@ export default function TaskListPanel({
     );
   }
 
-  // 어젠다 뷰
+  // 어젠다 뷰: 달 기준이 아닌 전체 미래 데이터 사용
   return (
     <AgendaView
-      tasksByDate={tasksByDate}
+      tasksByDate={agendaTasksByDate}
       backlogTasks={backlogTasks}
       isShowingCompleted={isShowingCompleted}
       filterCategory={filterCategory}

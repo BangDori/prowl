@@ -30,8 +30,7 @@ export function useTaskData(year: number, month: number) {
     queryFn: () => window.electronAPI.listTasksByMonth(year, month),
   });
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: queryKeys.tasks.month(year, month) });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
 
   const toggleCompleteMutation = useMutation({
     mutationFn: ({ date, taskId }: { date: string; taskId: string }) =>
