@@ -5,6 +5,53 @@ import { formatDateKr, isToday, toDateStr } from "../../utils/calendar";
 import { getTasksForDate, getUpcomingTasks, sortTasks } from "../../utils/task-helpers";
 import TaskItem from "./TaskItem";
 
+/** 미완료·완료 태스크를 구분선과 함께 렌더링 */
+function TaskGroupedList({
+  tasks,
+  dateStr,
+  onToggleComplete,
+  onUpdateTask,
+  onDeleteTask,
+}: {
+  tasks: Task[];
+  dateStr: string;
+  onToggleComplete: (date: string, taskId: string) => void;
+  onUpdateTask: (date: string, task: Task) => void;
+  onDeleteTask: (date: string, taskId: string) => void;
+}) {
+  const incomplete = tasks.filter((t) => !t.completed);
+  const completed = tasks.filter((t) => t.completed);
+  return (
+    <div className="space-y-1.5">
+      {incomplete.map((task) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          onToggleComplete={() => onToggleComplete(dateStr, task.id)}
+          onUpdate={(updated) => onUpdateTask(dateStr, updated)}
+          onDelete={() => onDeleteTask(dateStr, task.id)}
+        />
+      ))}
+      {incomplete.length > 0 && completed.length > 0 && (
+        <div className="flex items-center gap-1.5 py-0.5">
+          <div className="flex-1 h-px bg-prowl-border opacity-50" />
+          <span className="text-[9px] text-gray-600">{completed.length}개 완료</span>
+          <div className="flex-1 h-px bg-prowl-border opacity-50" />
+        </div>
+      )}
+      {completed.map((task) => (
+        <TaskItem
+          key={task.id}
+          task={task}
+          onToggleComplete={() => onToggleComplete(dateStr, task.id)}
+          onUpdate={(updated) => onUpdateTask(dateStr, updated)}
+          onDelete={() => onDeleteTask(dateStr, task.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
 interface TaskListPanelProps {
   selectedDate: Date | null;
   tasksByDate: TasksByDate;
@@ -57,17 +104,13 @@ export default function TaskListPanel({
               <p className="text-[11px] text-gray-600">태스크 없음</p>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              {tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleComplete={() => onToggleComplete(dateStr, task.id)}
-                  onUpdate={(updated) => onUpdateTask(dateStr, updated)}
-                  onDelete={() => onDeleteTask(dateStr, task.id)}
-                />
-              ))}
-            </div>
+            <TaskGroupedList
+              tasks={tasks}
+              dateStr={dateStr}
+              onToggleComplete={onToggleComplete}
+              onUpdateTask={onUpdateTask}
+              onDeleteTask={onDeleteTask}
+            />
           )}
         </div>
       </div>
@@ -167,17 +210,13 @@ function AgendaView({
               </span>
               <span className="text-[10px] text-gray-600">{group.tasks.length}건</span>
             </div>
-            <div className="space-y-1.5">
-              {group.tasks.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleComplete={() => onToggleComplete(group.date, task.id)}
-                  onUpdate={(updated) => onUpdateTask(group.date, updated)}
-                  onDelete={() => onDeleteTask(group.date, task.id)}
-                />
-              ))}
-            </div>
+            <TaskGroupedList
+              tasks={group.tasks}
+              dateStr={group.date}
+              onToggleComplete={onToggleComplete}
+              onUpdateTask={onUpdateTask}
+              onDeleteTask={onDeleteTask}
+            />
           </div>
         );
       })}
