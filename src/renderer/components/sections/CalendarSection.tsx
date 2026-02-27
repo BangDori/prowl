@@ -1,5 +1,6 @@
 /** 캘린더 탭 섹션: 파일 기반 태스크 캘린더 */
 import { useMemo, useState } from "react";
+import { useAgendaTasks } from "../../hooks/useAgendaTasks";
 import { useBacklogData } from "../../hooks/useBacklogData";
 import { useTaskData } from "../../hooks/useTaskData";
 import { getCalendarDays, isSameDay } from "../../utils/calendar";
@@ -14,7 +15,7 @@ export default function CalendarSection() {
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [isShowingCompleted, setShowCompleted] = useState(true);
+  const [isShowingCompleted, setShowCompleted] = useState(false);
 
   const {
     tasksByDate,
@@ -28,6 +29,7 @@ export default function CalendarSection() {
   } = useTaskData(viewYear, viewMonth);
 
   const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
+  const agendaTasksByDate = useAgendaTasks();
 
   // 월 이동
   const goToPrevMonth = () => {
@@ -94,9 +96,14 @@ export default function CalendarSection() {
           viewMonth={viewMonth}
           selectedDate={selectedDate}
           tasksByDate={tasksByDate}
-          onDayClick={(day) =>
-            setSelectedDate(selectedDate && isSameDay(day, selectedDate) ? null : day)
-          }
+          onDayClick={(day) => {
+            // 다른 달 날짜 클릭 시 해당 달로 이동 (그리드 인접 달 날짜 조회 가능)
+            if (day.getFullYear() !== viewYear || day.getMonth() !== viewMonth) {
+              setViewYear(day.getFullYear());
+              setViewMonth(day.getMonth());
+            }
+            setSelectedDate(selectedDate && isSameDay(day, selectedDate) ? null : day);
+          }}
         />
         <TaskFilterBar
           filterCategory={filterCategory}
@@ -107,6 +114,7 @@ export default function CalendarSection() {
         <TaskListPanel
           selectedDate={selectedDate}
           tasksByDate={tasksByDate}
+          agendaTasksByDate={agendaTasksByDate}
           backlogTasks={backlogTasks}
           isShowingCompleted={isShowingCompleted}
           filterCategory={filterCategory}
