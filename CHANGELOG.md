@@ -2,6 +2,9 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.48.1] - 2026-02-27
+- GitHub Actions CI에서 Electron 바이너리 다운로드 실패(socket hang up) 수정 — 불필요한 바이너리 다운로드를 건너뜀
+
 ## [1.48.0] - 2026-02-26
 - Compact View 카테고리 헤더 클릭으로 태스크 목록 접기/펼치기 기능 추가
 
