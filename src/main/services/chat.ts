@@ -1,10 +1,17 @@
 /** 채팅 메시지 스트리밍 서비스 (AI SDK + OpenAI + Tool Calling + 페이지 컨텍스트 주입) */
-import type { AiModelOption, ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
+import type {
+  AiModelOption,
+  ChatConfig,
+  ChatMessage,
+  OpenAICredential,
+  ProviderStatus,
+} from "@shared/types";
 import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
 import { getChatTools, getMemorySystemPromptSection, setCurrentRoomId } from "./chat-tools";
 import { sendChatNotification } from "./notification";
+import { isOAuthCredentialExpired, refreshAccessToken } from "./oauth";
 import { getSettings } from "./settings";
 
 /** 현재 사용자가 보고 있는 페이지 컨텍스트 (메모리만 보관, DB 저장 안 함) */
@@ -36,29 +43,29 @@ function buildSystemPrompt(): string {
 
 Today is ${today} (${weekday}요일), current time is ${time}.
 
-You can manage the user's tasks using the provided tools.
+You can manage user's tasks using provided tools.
 Use "YYYY-MM-DD" format for dates. Use backlog for tasks without a specific date.
 When listing tasks, format them clearly with status, title, priority, and time.
-After creating, updating, or deleting a task, tell the user to check the Task Manager.
+After creating, updating, or deleting a task, tell user to check Task Manager.
 
-You can search the web using the web_search tool when the user asks about current events,
+You can search the web using web_search tool when you ask about current events,
 real-time information, or anything you're unsure about. Use it proactively when your
 knowledge might be outdated.
 
-When the user tells you a preference or instruction to remember (e.g., "앞으로 ~~ 하지마", "항상 ~~해줘", "내 이름은 ~~야"),
-use the save_memory tool to store it. Briefly confirm it's saved.
+When user tells you a preference or instruction to remember (e.g., "앞으로 ~~ 하지마", "항상 ~~해줘", "내 이름은 ~~야"),
+use save_memory tool to store it. Briefly confirm it's saved.
 
 You can also manage memories: use list_memories to show what you remember,
 update_memory to change an existing memory, and delete_memory to remove one.
-Always call list_memories first when the user asks to update or delete a memory, so you can find the correct ID.
+Always call list_memories first when you ask to update or delete a memory, so you can find the correct ID.
 
-Match the user's language (Korean if they write in Korean).
+Match user's language (Korean if they write in Korean).
 Never use bold (**) formatting in your messages.
 
 ## UI Output
-When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), output a complete HTML document directly in your message (starting with <!DOCTYPE html>). It will be automatically detected and rendered live in a preview panel alongside the chat.
-- You may include explanatory text before or after the HTML in the same response.
-- Use inline styles or <style> blocks (no external CDN links) so the output is self-contained.`;
+When you want to display structured content (cards, tables, charts, dashboards, data visualizations, etc.), output a complete HTML document directly in your message (starting with <!DOCTYPE html>). It will be automatically detected and rendered live in a preview panel alongside chat.
+- You may include explanatory text before or after HTML in same response.
+- Use inline styles or <style> blocks (no external CDN links) so output is self-contained.`;
 
   prompt += getMemorySystemPromptSection();
 
@@ -77,15 +84,44 @@ function sendToChat(channel: string, ...args: unknown[]): void {
   }
 }
 
-/** 앱 설정에서 API 키 조회 */
-function getOpenAiApiKey(): string | undefined {
-  return getSettings().openaiApiKey || undefined;
+/** 앱 설정에서 OpenAI 자격 증명 조회 (OAuth or API Key, 만료 시 자동 갱신) */
+async function getOpenAiCredential(): Promise<OpenAICredential | undefined> {
+  const settings = getSettings();
+
+  // OAuth 자격 증명이 있으면 우선 사용
+  if (settings.openaiCredential?.type === "oauth") {
+    // 만료 시 자동 갱신
+    if (isOAuthCredentialExpired(settings.openaiCredential)) {
+      try {
+        const refreshed = await refreshAccessToken(settings.openaiCredential.refresh);
+        const { setSettings } = await import("./settings");
+        setSettings({ ...settings, openaiCredential: refreshed });
+        return refreshed;
+      } catch (err) {
+        console.error("[Chat] OAuth token refresh failed:", err);
+        return undefined;
+      }
+    }
+    return settings.openaiCredential;
+  }
+
+  // 없으면 API Key 사용
+  return settings.openaiApiKey ? { type: "api", key: settings.openaiApiKey } : undefined;
 }
 
-/** 사용 가능 모델 목록 */
-const MODELS: AiModelOption[] = [
+/** API Key 사용 가능 모델 */
+const API_KEY_MODELS: AiModelOption[] = [
   { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
   { id: "gpt-5-mini", label: "GPT-5 Mini", provider: "openai" },
+];
+
+/** OAuth (Codex) 사용 가능 모델 — chatgpt.com/backend-api/codex 엔드포인트 (visibility=list + api=true) */
+const CODEX_MODELS: AiModelOption[] = [
+  { id: "gpt-5.3-codex", label: "GPT-5.3 Codex", provider: "openai" },
+  { id: "gpt-5.2-codex", label: "GPT-5.2 Codex", provider: "openai" },
+  { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
+  { id: "gpt-5.1-codex-max", label: "GPT-5.1 Codex Max", provider: "openai" },
+  { id: "gpt-5.1-codex-mini", label: "GPT-5.1 Codex Mini", provider: "openai" },
 ];
 
 /** 스트리밍 채팅 메시지 전송 (fire-and-forget, 완료 후 main에서 직접 저장) */
@@ -96,18 +132,19 @@ export async function streamChatMessage(
   config?: ChatConfig,
 ): Promise<void> {
   setCurrentRoomId(roomId);
-  const modelId = config?.model ?? "gpt-5-mini";
   const aiMessages: ChatMessage[] = [];
 
-  const apiKey = getOpenAiApiKey();
+  const credential = await getOpenAiCredential();
 
-  if (!apiKey) {
+  const defaultModel = credential?.type === "oauth" ? "gpt-5.3-codex" : "gpt-5-mini";
+  const modelId = config?.model ?? defaultModel;
+  if (!credential) {
     const ts = Date.now();
     const msg: ChatMessage = {
       id: `msg_${ts}`,
       role: "assistant",
       content:
-        "OpenAI 모델을 사용하려면 Settings에서 API 키를 입력해주세요 🔑\n\n앱 설정 → API Keys → OpenAI API Key",
+        "OpenAI 모델을 사용하려면 Settings에서 인증이 필요해요 🔑\n\n앱 설정 → OpenAI Authentication에서 OAuth 로그인 또는 API Key 입력",
       timestamp: ts,
     };
     sendToChat("chat:stream-message", roomId, msg);
@@ -120,8 +157,40 @@ export async function streamChatMessage(
   try {
     const { streamText, stepCountIs } = await import("ai");
     const { createOpenAI } = await import("@ai-sdk/openai");
-    const openai = createOpenAI({ apiKey });
-    const model = openai.responses(modelId);
+
+    let openai: ReturnType<typeof createOpenAI>;
+    const isOAuth = credential.type === "oauth";
+    if (isOAuth) {
+      const CODEX_ENDPOINT = "https://chatgpt.com/backend-api/codex/responses";
+      const accountId = credential.accountId;
+
+      openai = createOpenAI({
+        apiKey: "prowl-oauth-dummy-key",
+        fetch: async (url, init) => {
+          const headers = new Headers(init?.headers);
+          headers.delete("Authorization");
+          headers.delete("authorization");
+          headers.set("Authorization", `Bearer ${credential.access}`);
+          if (accountId) headers.set("ChatGPT-Account-Id", accountId);
+
+          const parsed = new URL(
+            typeof url === "string" ? url : url instanceof URL ? url.href : (url as Request).url,
+          );
+          const targetUrl =
+            parsed.pathname.includes("/chat/completions") ||
+            parsed.pathname.includes("/v1/responses")
+              ? new URL(CODEX_ENDPOINT)
+              : parsed;
+
+          return fetch(targetUrl, { ...init, headers });
+        },
+      });
+    } else if (credential.type === "api") {
+      openai = createOpenAI({ apiKey: credential.key });
+    } else {
+      throw new Error("Invalid credential type");
+    }
+    const model = isOAuth ? openai.responses(modelId) : openai.chat(modelId);
 
     // history에 유저 메시지가 이미 포함되어 있음 (renderer에서 추가)
     const messages = history.map((m) => ({
@@ -129,20 +198,29 @@ export async function streamChatMessage(
       content: m.content,
     }));
 
+    const systemPrompt = buildSystemPrompt();
     const result = streamText({
       model,
-      system: buildSystemPrompt(),
+      // Responses API: system → providerOptions.openai.instructions (필수)
+      // Chat Completions API: system 파라미터 직접 사용
+      ...(isOAuth
+        ? { providerOptions: { openai: { instructions: systemPrompt, store: false } } }
+        : { system: systemPrompt }),
       messages,
       tools: {
         ...getChatTools(),
-        web_search: openai.tools.webSearch({
-          searchContextSize: "medium",
-          userLocation: {
-            type: "approximate",
-            country: "KR",
-            timezone: "Asia/Seoul",
-          },
-        }),
+        ...(isOAuth
+          ? {}
+          : {
+              web_search: openai.tools.webSearch({
+                searchContextSize: "medium",
+                userLocation: {
+                  type: "approximate",
+                  country: "KR",
+                  timezone: "Asia/Seoul",
+                },
+              }),
+            }),
       },
       toolChoice: "auto",
       stopWhen: stepCountIs(5),
@@ -183,7 +261,7 @@ export async function streamChatMessage(
   }
 }
 
-/** 스트림 완료 후 메시지 저장 + 배지 갱신 + 알림 (읽음 처리는 renderer가 담당) */
+/** 스트림 완료 후 메시지 저장 + 배지 갱신 + 알림 (에러 처리는 renderer가 담당) */
 function persistAfterStream(
   roomId: string,
   history: ChatMessage[],
@@ -199,14 +277,16 @@ function persistAfterStream(
   }
 }
 
-/** OpenAI 프로바이더의 API 키 상태와 사용 가능 모델 목록 반환 */
-export function getProviderStatuses(): ProviderStatus[] {
+/** OpenAI 프로바이더의 자격 증명 상태와 사용 가능 모델 목록 반환 */
+export async function getProviderStatuses(): Promise<ProviderStatus[]> {
+  const credential = await getOpenAiCredential();
+  const models = credential?.type === "oauth" ? CODEX_MODELS : API_KEY_MODELS;
   return [
     {
       provider: "openai",
       label: "OpenAI",
-      available: !!getOpenAiApiKey(),
-      models: MODELS,
+      available: !!credential,
+      models,
     },
   ];
 }
