@@ -2,6 +2,12 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.48.2] - 2026-02-27
+- Task Manager 어젠다 뷰에서 현재 달 이후 전체 일정 표시 (1년 범위 날짜 조회)
+- 어젠다 뷰 날짜 미정 섹션을 목록 맨 아래로 이동
+- 완료·미완료 태스크 혼재 시 구분선 추가 및 완료 작업 기본 숨김 처리
+- 달력 그리드 인접 달 날짜 클릭 시 해당 달로 자동 이동
+
 ## [1.48.1] - 2026-02-27
 - GitHub Actions CI에서 Electron 바이너리 다운로드 실패(socket hang up) 수정 — 불필요한 바이너리 다운로드를 건너뜀
 
