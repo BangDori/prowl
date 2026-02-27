@@ -31,11 +31,13 @@ vi.mock("ai", () => ({
   tool: vi.fn((def: unknown) => def),
 }));
 
+const mockChatFn = vi.fn().mockReturnValue("mock-openai-model");
 const mockResponsesFn = vi.fn().mockReturnValue("mock-openai-model");
 const mockWebSearch = vi.fn().mockReturnValue({ type: "web_search" });
 vi.mock("@ai-sdk/openai", () => ({
   createOpenAI: vi.fn().mockReturnValue(
     Object.assign(vi.fn().mockReturnValue("mock-openai-model"), {
+      chat: mockChatFn,
       responses: mockResponsesFn,
       tools: { webSearch: mockWebSearch },
     }),
@@ -175,17 +177,17 @@ describe("getProviderStatuses", () => {
     delete process.env.OPENAI_API_KEY;
   });
 
-  it("OpenAI 프로바이더 상태를 반환한다", () => {
+  it("OpenAI 프로바이더 상태를 반환한다", async () => {
     mockGetSettings.mockReturnValue({ openaiApiKey: "test" } as ReturnType<typeof getSettings>);
 
-    const statuses = getProviderStatuses();
+    const statuses = await getProviderStatuses();
 
     expect(statuses).toHaveLength(1);
     expect(statuses[0]).toMatchObject({ provider: "openai", available: true });
   });
 
-  it("모델 목록이 포함된다", () => {
-    const statuses = getProviderStatuses();
+  it("모델 목록이 포함된다", async () => {
+    const statuses = await getProviderStatuses();
 
     expect(statuses[0].models.length).toBeGreaterThan(0);
     for (const model of statuses[0].models) {
