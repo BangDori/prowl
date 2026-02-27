@@ -4,6 +4,7 @@ import { DEFAULT_SHORTCUTS } from "../shared/types";
 import { WINDOW } from "./constants";
 import { registerChatHandlers } from "./ipc-chat";
 import { registerDataHandlers } from "./ipc-data";
+import { registerOAuthHandlers } from "./ipc-oauth";
 import { registerTaskHandlers } from "./ipc-tasks";
 import { handleIpc } from "./ipc-utils";
 import { runBrewUpgrade } from "./services/brew-updater";
@@ -30,6 +31,7 @@ export function registerIpcHandlers(): void {
   registerTaskHandlers();
   registerChatHandlers();
   registerDataHandlers();
+  registerOAuthHandlers();
 
   // 설정 조회
   handleIpc("settings:get", async () => {
