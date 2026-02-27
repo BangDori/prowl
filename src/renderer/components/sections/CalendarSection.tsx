@@ -14,7 +14,7 @@ export default function CalendarSection() {
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [isShowingCompleted, setShowCompleted] = useState(true);
+  const [isShowingCompleted, setShowCompleted] = useState(false);
 
   const {
     tasksByDate,
@@ -94,9 +94,14 @@ export default function CalendarSection() {
           viewMonth={viewMonth}
           selectedDate={selectedDate}
           tasksByDate={tasksByDate}
-          onDayClick={(day) =>
-            setSelectedDate(selectedDate && isSameDay(day, selectedDate) ? null : day)
-          }
+          onDayClick={(day) => {
+            // 다른 달 날짜 클릭 시 해당 달로 이동 (그리드 인접 달 날짜 조회 가능)
+            if (day.getFullYear() !== viewYear || day.getMonth() !== viewMonth) {
+              setViewYear(day.getFullYear());
+              setViewMonth(day.getMonth());
+            }
+            setSelectedDate(selectedDate && isSameDay(day, selectedDate) ? null : day);
+          }}
         />
         <TaskFilterBar
           filterCategory={filterCategory}
