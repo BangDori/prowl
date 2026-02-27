@@ -2,19 +2,14 @@
 import {
   DEFAULT_FOCUS_MODE,
   DEFAULT_SHORTCUTS,
-  DEFAULT_THEME,
   type FocusMode,
   type ShortcutConfig,
-  type Theme,
 } from "@shared/types";
 import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import LogOut from "lucide-react/dist/esm/icons/log-out";
-import Monitor from "lucide-react/dist/esm/icons/monitor";
-import Moon from "lucide-react/dist/esm/icons/moon";
 import Pencil from "lucide-react/dist/esm/icons/pencil";
-import Sun from "lucide-react/dist/esm/icons/sun";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
@@ -38,7 +33,6 @@ export default function SettingsSection() {
 
   const loading = settingsLoading || focusLoading;
   const notificationsEnabled = settings?.notificationsEnabled ?? true;
-  const theme = settings?.theme ?? DEFAULT_THEME;
   const openaiCredential = settings?.openaiCredential;
 
   // OAuth 연결 상태 확인
@@ -60,12 +54,6 @@ export default function SettingsSection() {
     );
   };
 
-  const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
-    { value: "system", label: "System", icon: <Monitor className="w-4 h-4" /> },
-    { value: "light", label: "Light", icon: <Sun className="w-4 h-4" /> },
-    { value: "dark", label: "Dark", icon: <Moon className="w-4 h-4" /> },
-  ];
-
   const toggleNotifications = async () => {
     if (!settings) return;
     updateSettings.mutate({ ...settings, notificationsEnabled: !notificationsEnabled });
@@ -78,11 +66,6 @@ export default function SettingsSection() {
   const saveShortcuts = (updated: ShortcutConfig) => {
     if (!settings) return;
     updateSettings.mutate({ ...settings, shortcuts: updated });
-  };
-
-  const saveTheme = (newTheme: Theme) => {
-    if (!settings) return;
-    updateSettings.mutate({ ...settings, theme: newTheme });
   };
 
   // OAuth 핸들러
@@ -161,33 +144,6 @@ export default function SettingsSection() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 space-y-6">
-        {/* Appearance 설정 */}
-        <div>
-          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
-            Appearance
-          </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
-            <div className="flex gap-2">
-              {themeOptions.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => saveTheme(option.value)}
-                  disabled={updateSettings.isPending}
-                  className={`flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border transition-all ${
-                    theme === option.value
-                      ? "bg-accent/20 border-accent text-accent"
-                      : "bg-transparent border-prowl-border text-app-text-secondary hover:bg-prowl-border"
-                  } disabled:opacity-50`}
-                >
-                  {option.icon}
-                  <span className="text-[11px] font-medium">{option.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Night Watch 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
