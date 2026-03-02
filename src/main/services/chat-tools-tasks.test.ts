@@ -25,6 +25,7 @@ vi.mock("./chat-tools-shared", () => ({
 
 vi.mock("./task-reminder", () => ({ refreshReminders: vi.fn() }));
 vi.mock("./approval", () => ({ waitForApproval: vi.fn().mockResolvedValue(true) }));
+vi.mock("./categories", () => ({ resolveCategory: vi.fn((name: string) => name) }));
 
 import {
   addDateTask,
