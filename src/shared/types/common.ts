@@ -18,6 +18,27 @@ export const DEFAULT_FOCUS_MODE: FocusMode = {
   endTime: "07:00",
 };
 
+// 테마 설정
+export type Theme = "system" | "light" | "dark";
+
+export const DEFAULT_THEME: Theme = "system";
+
+// OpenAI OAuth 자격 증명
+export interface OAuthCredential {
+  type: "oauth";
+  access: string;
+  refresh: string;
+  expires: number;
+  accountId?: string;
+}
+
+export interface ApiKeyCredential {
+  type: "api";
+  key: string;
+}
+
+export type OpenAICredential = OAuthCredential | ApiKeyCredential;
+
 // 글로벌 단축키 설정
 export interface ShortcutConfig {
   toggleChat: string; // Prowl Chat 토글 (빈 문자열 = 비활성화)
@@ -36,7 +57,9 @@ export interface AppSettings {
   focusMode: FocusMode;
   notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
+  theme: Theme; // 테마 설정
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
+  openaiCredential?: OpenAICredential; // OpenAI OAuth 자격 증명
   favoritedRoomIds: string[]; // 즐겨찾기 ChatRoom ID 목록 (ChatRoom 도메인과 분리)
 }
 
@@ -44,6 +67,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
+  theme: DEFAULT_THEME,
   openaiApiKey: "",
   favoritedRoomIds: [],
 };
@@ -150,3 +174,14 @@ export interface ChatRoom {
   locked?: boolean; // 삭제 잠금 여부 (도메인 규칙: 잠금 시 삭제 불가)
   // favorited 없음 — 즐겨찾기는 AppSettings.favoritedRoomIds로 관리
 }
+
+// OAuth 관련 타입
+export interface OAuthAuthorization {
+  url: string;
+  method: "code" | "token";
+  instructions?: string;
+}
+
+export type OAuthCallbackResult =
+  | { type: "success"; access: string; refresh: string; expires: number; accountId?: string }
+  | { type: "failed"; error: string };

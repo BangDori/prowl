@@ -52,6 +52,15 @@ const electronAPI = {
   rejectTool: invokeIpc("chat:reject-tool"),
   setPageContext: invokeIpc("chat:set-page-context"),
 
+  // OAuth
+  startOAuthServer: invokeIpc("oauth:start-server"),
+  createOAuthAuthorization: invokeIpc("oauth:create-authorization"),
+  openOAuthUrl: invokeIpc("oauth:open-url"),
+  handleOAuthCallback: invokeIpc("oauth:callback"),
+  refreshAccessToken: invokeIpc("oauth:refresh-token"),
+  isOAuthCredentialExpired: invokeIpc("oauth:is-expired"),
+  validateCredential: invokeIpc("oauth:validate-credential"),
+
   // Compact
   toggleCompactView: invokeIpc("compact:toggle"),
   resizeCompactView: invokeIpc("compact:resize"),
@@ -167,6 +176,14 @@ const electronAPI = {
     const handler = () => callback();
     ipcRenderer.on("chat:shown", handler);
     return () => ipcRenderer.removeListener("chat:shown", handler);
+  },
+  onOAuthCallbackResult: (
+    callback: (result: import("@shared/types").OAuthCallbackResult) => void,
+  ): (() => void) => {
+    const handler = (_event: unknown, result: import("@shared/types").OAuthCallbackResult) =>
+      callback(result);
+    ipcRenderer.on("oauth:callback-result", handler as never);
+    return () => ipcRenderer.removeListener("oauth:callback-result", handler as never);
   },
 };
 

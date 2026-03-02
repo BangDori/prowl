@@ -2,6 +2,13 @@
 
 All notable changes to Prowl will be documented in this file.
 
+## [1.49.0] - 2026-02-28
+- OpenAI OAuth 로그인 연동 (PKCE flow로 ChatGPT 계정 인증)
+- OAuth 토큰으로 Codex 엔드포인트를 통한 AI 채팅 전송
+- API Key 방식 병행 지원 및 토큰 자동 갱신
+- Codex 전용 모델 목록 분리 (gpt-5.3-codex 등 5종)
+- Settings UI에 OAuth Connect/Disconnect 추가
+
 ## [1.48.2] - 2026-02-27
 - Task Manager 어젠다 뷰에서 현재 달 이후 전체 일정 표시 (1년 범위 날짜 조회)
 - 어젠다 뷰 날짜 미정 섹션을 목록 맨 아래로 이동
