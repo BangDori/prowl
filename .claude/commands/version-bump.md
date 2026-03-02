@@ -14,6 +14,26 @@ CHANGELOG.md를 작성하고 package.json 버전을 범프합니다.
 - **develop 브랜치에서 실행**
 - develop → main PR을 만들기 직전에 수행
 
+## 브랜치 검증 (필수)
+
+**가장 먼저** 현재 브랜치를 확인한다:
+
+```bash
+git branch --show-current
+```
+
+- `develop`이면 계속 진행
+- `develop`이 아니면 **즉시 중단**하고 아래 메시지를 출력:
+
+```
+❌ version-bump는 develop 브랜치에서만 실행할 수 있습니다.
+   현재 브랜치: {현재 브랜치명}
+
+   develop 브랜치로 전환 후 다시 실행하세요.
+```
+
+---
+
 ## 수행 작업
 
 1. **범프 레벨 결정** (major/minor/patch)
