@@ -33,5 +33,7 @@ Thumbs.db
 # Claude hooks temp
 .claude/.lint-needed-*
 
-.agents/
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 skills-lock.json

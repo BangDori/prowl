@@ -22,6 +22,7 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
   const [chatConfig, setChatConfig] = useState<ChatConfig | null>(null);
   const [providers, setProviders] = useState<ProviderStatus[]>([]);
   const [initialized, setInitialized] = useState(false);
+  const [aiGeneratedTitle, setAiGeneratedTitle] = useState<string | null>(null);
 
   const messagesRef = useRef<ChatMessage[]>(messages);
   messagesRef.current = messages;
@@ -144,10 +145,16 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
       if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
+    // AI 제목 생성 완료 시 룸 목록/상세 갱신 + 애니메이션 트리거
+    const offTitleUpdated = window.electronAPI.onChatRoomTitleUpdated((_roomId, title) => {
+      setAiGeneratedTitle(title);
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
+    });
     return () => {
       offMessage();
       offDone();
       offError();
+      offTitleUpdated();
     };
   }, [roomId, queryClient, markRead]);
 
@@ -193,6 +200,17 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
     }
   }, [initialMessage, initialized, sendMessage]);
 
+  const updateApprovalStatus = useCallback(
+    (messageId: string, status: "approved" | "rejected") => {
+      const updated = messagesRef.current.map((m) =>
+        m.id === messageId && m.approval ? { ...m, approval: { ...m.approval, status } } : m,
+      );
+      setMessages(updated);
+      saveMessages.mutate({ roomId, messages: updated });
+    },
+    [roomId, saveMessages],
+  );
+
   return {
     messages,
     loading,
@@ -203,6 +221,8 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
     providers,
     handleConfigChange,
     roomTitle: roomData?.title,
+    aiGeneratedTitle,
     initialized,
+    updateApprovalStatus,
   };
 }

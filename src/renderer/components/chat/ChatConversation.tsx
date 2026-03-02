@@ -1,5 +1,4 @@
 /** 채팅 대화 뷰 (개별 룸의 메시지 표시 및 전송) */
-import prowlLying from "@assets/prowl-lying.png";
 import ChevronLeft from "lucide-react/dist/esm/icons/chevron-left";
 import Maximize2 from "lucide-react/dist/esm/icons/maximize-2";
 import Minimize2 from "lucide-react/dist/esm/icons/minimize-2";
@@ -51,6 +50,8 @@ export default function ChatConversation({
     providers,
     handleConfigChange,
     roomTitle,
+    aiGeneratedTitle,
+    updateApprovalStatus,
   } = useChatMessages(roomId, initialMessage);
 
   const [splitRatio, setSplitRatio] = useState(0.5);
@@ -167,6 +168,7 @@ export default function ChatConversation({
         <div className="chat-messages-area">
           <ConversationHeader
             title={roomTitle}
+            aiGeneratedTitle={aiGeneratedTitle}
             onBack={onBack}
             onClose={() => window.electronAPI.closeChatWindow()}
             isExpanded={isExpanded}
@@ -190,6 +192,7 @@ export default function ChatConversation({
                         addOrActivateTab({ type: "html", content: html, label: "HTML" })
                       }
                       onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
+                      onApprovalChange={updateApprovalStatus}
                     />
                   </Fragment>
                 );
@@ -234,14 +237,6 @@ export default function ChatConversation({
             </div>
           </div>
           <div className="flex-1" />
-          <div className="relative flex justify-end pr-0 z-10">
-            <img
-              src={prowlLying}
-              alt="Prowl"
-              className="w-28 h-auto object-contain opacity-60 drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)]"
-              style={{ marginBottom: "-12px" }}
-            />
-          </div>
         </>
       )}
 

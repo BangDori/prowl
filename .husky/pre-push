@@ -1,29 +1,96 @@
-# 버전 관리 파일 변경 확인
-git fetch origin main --quiet 2>/dev/null
-CHANGED_FILES=$(git diff origin/main...HEAD --name-only 2>/dev/null)
-
-# main 브랜치가 없거나 첫 push인 경우 스킵
-if [ -z "$CHANGED_FILES" ]; then
-  exit 0
-fi
-
-# src/ 변경이 있는지 확인 (기능 변경)
-if echo "$CHANGED_FILES" | grep -q "^src/"; then
-  # package.json 변경 확인
-  if ! echo "$CHANGED_FILES" | grep -q "^package.json$"; then
-    echo "❌ package.json 버전을 업데이트해주세요."
+# Skill validation (only when skills change)
+skill_changes=$(git diff origin/develop..HEAD --name-only -- .agents/skills 2>/dev/null)
+if [ -n "$skill_changes" ]; then
+  # Ensure SKILL.md is not added outside .agents/skills
+  outside_skill=$(git diff --name-only --diff-filter=A origin/develop..HEAD 2>/dev/null | grep 'SKILL\.md$' | grep -v '^\.agents/skills/' || true)
+  if [ -n "$outside_skill" ]; then
     echo ""
-    echo "   /version-bump 명령어를 실행하세요."
+    echo "❌ SKILL.md 파일은 .agents/skills/<skill>/SKILL.md 경로에만 추가해야 합니다."
+    echo ""
+    echo "잘못된 경로:"
+    echo "$outside_skill"
     echo ""
     exit 1
   fi
 
-  # CHANGELOG.md 변경 확인
-  if ! echo "$CHANGED_FILES" | grep -q "^CHANGELOG.md$"; then
-    echo "❌ CHANGELOG.md를 업데이트해주세요."
+  # Ensure each changed skill directory has SKILL.md
+  skill_dirs=$(echo "$skill_changes" | awk -F/ 'NF>=3 {print $1"/"$2"/"$3}' | sort -u)
+  missing_skill_md=""
+  for dir in $skill_dirs; do
+    if [ ! -f "$dir/SKILL.md" ]; then
+      missing_skill_md="${missing_skill_md}\n${dir}/SKILL.md"
+    fi
+  done
+  if [ -n "$missing_skill_md" ]; then
     echo ""
-    echo "   변경사항을 기록해주세요."
+    echo "❌ 스킬 디렉터리에 SKILL.md가 필요합니다."
+    echo ""
+    echo "누락된 파일:"
+    echo "$missing_skill_md"
     echo ""
     exit 1
   fi
 fi
+
+# Ensure symlink wiring for each skill
+check_skill_links() {
+  target_root="$1"
+  if [ ! -d "$target_root" ]; then
+    echo ""
+    echo "❌ $target_root 디렉터리가 없습니다."
+    echo ""
+    exit 1
+  fi
+
+  for skill_dir in .agents/skills/*; do
+    [ -d "$skill_dir" ] || continue
+    name=$(basename "$skill_dir")
+    link_path="$target_root/$name"
+    if [ ! -L "$link_path" ]; then
+      echo ""
+      echo "❌ $link_path 가 심링크가 아닙니다."
+      echo ""
+      exit 1
+    fi
+    actual_target=$(readlink "$link_path")
+    if [ "$actual_target" != "../../.agents/skills/$name" ]; then
+      echo ""
+      echo "❌ $link_path 심링크 대상이 올바르지 않습니다."
+      echo "기대: ../../.agents/skills/$name"
+      echo "현재: $actual_target"
+      echo ""
+      exit 1
+    fi
+    if [ ! -e "$link_path" ]; then
+      echo ""
+      echo "❌ $link_path 심링크 대상이 존재하지 않습니다."
+      echo ""
+      exit 1
+    fi
+  done
+}
+
+check_skill_links ".claude/skills"
+check_skill_links ".codex/skills"
+
+bash .claude/skills/create-pr/check-changeset.sh > /tmp/changeset-check.txt 2>&1
+result=$(cat /tmp/changeset-check.txt | head -1)
+
+if [ "$result" = "CHANGESET_NEEDED" ]; then
+  # src/ 변경이 있는 경우, 브랜치에 changeset 파일이 추가됐는지 확인
+  has_changeset=$(git diff origin/develop..HEAD --name-only 2>/dev/null | grep '^\.changeset/' | grep -v 'README\.md' || true)
+
+  if [ -z "$has_changeset" ]; then
+    echo ""
+    echo "❌ changeset이 필요합니다."
+    echo ""
+    echo "src/ 변경이 감지됐지만 changeset 파일이 없습니다."
+    echo "아래 명령어를 실행한 뒤 다시 push하세요:"
+    echo ""
+    echo "  bun changeset"
+    echo ""
+    exit 1
+  fi
+fi
+
+exit 0

@@ -3,6 +3,7 @@ import type { Task } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { waitForApproval } from "./approval";
+import { resolveCategory } from "./categories";
 import { generateId, getCurrentRoomId, notifyTasksChanged, sendToChat } from "./chat-tools-shared";
 import { refreshReminders } from "./task-reminder";
 import {
@@ -65,12 +66,13 @@ const add_task = tool({
   }),
   execute: async ({ title, date, backlog, description, dueTime, category }) => {
     try {
+      const resolvedCategory = category ? (resolveCategory(category) ?? category) : undefined;
       const task: Task = {
         id: generateId(),
         title,
         description,
         dueTime,
-        category,
+        category: resolvedCategory,
         completed: false,
         createdAt: new Date().toISOString(),
       };
@@ -117,7 +119,7 @@ const update_task = tool({
       if (updates.title) merged.title = updates.title;
       if (updates.description) merged.description = updates.description;
       if (updates.dueTime) merged.dueTime = updates.dueTime;
-      if (updates.category) merged.category = updates.category;
+      if (updates.category) merged.category = resolveCategory(updates.category) ?? updates.category;
 
       // 날짜 이동
       if (newDate) {

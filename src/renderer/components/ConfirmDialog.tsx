@@ -40,13 +40,13 @@ export default function ConfirmDialog({
     // biome-ignore lint/a11y/useKeyWithClickEvents: 오버레이 클릭은 보조 닫기 수단
     // biome-ignore lint/a11y/noStaticElementInteractions: 오버레이 클릭은 보조 닫기 수단
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
       onClick={(e) => {
         if (e.target === e.currentTarget) onCancel();
       }}
     >
       {/* 다이얼로그 카드 */}
-      <div className="bg-prowl-surface border border-prowl-border rounded-xl shadow-2xl w-72 p-5 space-y-4">
+      <div className="bg-prowl-surface rounded-xl shadow-[0_20px_60px_rgba(0,0,0,0.6)] w-72 p-5 space-y-4">
         <div className="flex items-start gap-3">
           <div className="shrink-0 mt-0.5 p-1.5 rounded-lg bg-red-500/15">
             <AlertTriangle className="w-4 h-4 text-red-400" />
@@ -69,7 +69,7 @@ export default function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className="px-3 py-1.5 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+            className="px-3 py-1.5 text-xs rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors disabled:opacity-50"
           >
             {isLoading ? "삭제 중…" : confirmLabel}
           </button>

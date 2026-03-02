@@ -91,17 +91,6 @@ export const windowMaxHeight = 600;  // camelCase 금지
 "memory:add_item"           // snake_case 금지
 ```
 
-### 현재 채널 마이그레이션 필요
-
-다음 채널들은 kebab-case로 변경 필요:
-
-| 현재 | 변경 후 |
-|------|---------|
-| `shell:showInFolder` | `shell:show-in-folder` |
-| `shell:openExternal` | `shell:open-external` |
-| `focusMode:get` | `focus-mode:get` |
-| `focusMode:set` | `focus-mode:set` |
-
 ## 타입 / 인터페이스
 
 **규칙**: PascalCase, 접미사로 용도 표현.

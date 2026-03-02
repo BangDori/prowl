@@ -2,9 +2,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.hoisted ensures these are available before vi.mock factory runs
-const { mockGet, mockSet } = vi.hoisted(() => ({
+const {
+  mockGet,
+  mockSet,
+  mockReadSystemPrompt,
+  mockReadTone,
+  mockWriteSystemPrompt,
+  mockWriteTone,
+} = vi.hoisted(() => ({
   mockGet: vi.fn(),
   mockSet: vi.fn(),
+  mockReadSystemPrompt: vi.fn().mockReturnValue(""),
+  mockReadTone: vi.fn().mockReturnValue(""),
+  mockWriteSystemPrompt: vi.fn(),
+  mockWriteTone: vi.fn(),
 }));
 
 vi.mock("electron-store", () => ({
@@ -14,73 +25,69 @@ vi.mock("electron-store", () => ({
   },
 }));
 
-import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "@shared/types";
-import {
-  getFavoritedRoomIds,
-  getFocusMode,
-  getSettings,
-  setFocusMode,
-  setSettings,
-  toggleFavoritedRoom,
-} from "./settings";
+vi.mock("./personalize", () => ({
+  readSystemPrompt: mockReadSystemPrompt,
+  readTone: mockReadTone,
+  writeSystemPrompt: mockWriteSystemPrompt,
+  writeTone: mockWriteTone,
+  ensurePersonalizeDir: vi.fn(),
+}));
+
+import { DEFAULT_SETTINGS } from "@shared/types";
+import { getFavoritedRoomIds, getSettings, setSettings, toggleFavoritedRoom } from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockReadSystemPrompt.mockReturnValue("");
+    mockReadTone.mockReturnValue("");
   });
 
   describe("getSettings", () => {
-    it("저장된 설정을 반환한다", () => {
-      const settings = { patterns: ["com.test.*"], focusMode: DEFAULT_FOCUS_MODE };
-      mockGet.mockReturnValue(settings);
+    it("저장된 설정에 aiPersonalization을 파일에서 병합해 반환한다", () => {
+      const stored = { notificationsEnabled: true, favoritedRoomIds: [] };
+      mockGet.mockReturnValue(stored);
+      mockReadSystemPrompt.mockReturnValue("custom prompt");
+      mockReadTone.mockReturnValue("formal");
 
-      expect(getSettings()).toEqual(settings);
-      expect(mockGet).toHaveBeenCalledWith("settings");
+      const result = getSettings();
+
+      expect(result).toMatchObject(stored);
+      expect(result.aiPersonalization).toEqual({
+        systemPromptOverride: "custom prompt",
+        toneCustom: "formal",
+      });
     });
 
-    it("값이 없으면 DEFAULT_SETTINGS를 반환한다", () => {
+    it("값이 없으면 DEFAULT_SETTINGS에 빈 aiPersonalization을 병합한다", () => {
       mockGet.mockReturnValue(null);
 
-      expect(getSettings()).toEqual(DEFAULT_SETTINGS);
+      const result = getSettings();
+
+      expect(result).toMatchObject(DEFAULT_SETTINGS);
+      expect(result.aiPersonalization).toEqual({ systemPromptOverride: "", toneCustom: "" });
     });
   });
 
   describe("setSettings", () => {
-    it("설정을 저장한다", () => {
-      const settings = { patterns: ["com.app.*"], focusMode: DEFAULT_FOCUS_MODE };
+    it("aiPersonalization을 파일로 쓰고 나머지는 store에 저장한다", () => {
+      const settings = {
+        ...DEFAULT_SETTINGS,
+        aiPersonalization: { systemPromptOverride: "my prompt", toneCustom: "casual" },
+      };
+
       setSettings(settings);
 
-      expect(mockSet).toHaveBeenCalledWith("settings", settings);
-    });
-  });
-
-  describe("getFocusMode", () => {
-    it("focusMode가 있으면 반환한다", () => {
-      const fm = { enabled: true, startTime: "22:00", endTime: "07:00" };
-      mockGet.mockReturnValue({ patterns: [], focusMode: fm });
-
-      expect(getFocusMode()).toEqual(fm);
+      expect(mockWriteSystemPrompt).toHaveBeenCalledWith("my prompt");
+      expect(mockWriteTone).toHaveBeenCalledWith("casual");
+      expect(mockSet).toHaveBeenCalledWith("settings", DEFAULT_SETTINGS);
     });
 
-    it("focusMode가 없으면 DEFAULT_FOCUS_MODE를 반환한다", () => {
-      mockGet.mockReturnValue({ patterns: [] });
+    it("aiPersonalization이 없어도 store에 정상 저장한다", () => {
+      setSettings(DEFAULT_SETTINGS);
 
-      expect(getFocusMode()).toEqual(DEFAULT_FOCUS_MODE);
-    });
-  });
-
-  describe("setFocusMode", () => {
-    it("기존 설정을 유지하면서 focusMode를 업데이트한다", () => {
-      const existing = { patterns: ["com.test.*"], focusMode: DEFAULT_FOCUS_MODE };
-      mockGet.mockReturnValue(existing);
-
-      const newFm = { enabled: true, startTime: "23:00", endTime: "06:00" };
-      setFocusMode(newFm);
-
-      expect(mockSet).toHaveBeenCalledWith("settings", {
-        patterns: ["com.test.*"],
-        focusMode: newFm,
-      });
+      expect(mockWriteSystemPrompt).not.toHaveBeenCalled();
+      expect(mockSet).toHaveBeenCalledWith("settings", DEFAULT_SETTINGS);
     });
   });
 
@@ -92,7 +99,7 @@ describe("settings 서비스", () => {
     });
 
     it("favoritedRoomIds가 없으면 빈 배열을 반환한다", () => {
-      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE }); // 필드 없음
+      mockGet.mockReturnValue({});
 
       expect(getFavoritedRoomIds()).toEqual([]);
     });
@@ -122,13 +129,11 @@ describe("settings 서비스", () => {
     });
 
     it("favoritedRoomIds 필드가 없는 기존 설정에서도 동작한다 (마이그레이션 시나리오)", () => {
-      // 리팩터링 전 저장된 설정 (favoritedRoomIds 없음)
-      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE, notificationsEnabled: true });
+      mockGet.mockReturnValue({ notificationsEnabled: true });
 
       toggleFavoritedRoom("roomX");
 
       expect(mockSet).toHaveBeenCalledWith("settings", {
-        focusMode: DEFAULT_FOCUS_MODE,
         notificationsEnabled: true,
         favoritedRoomIds: ["roomX"],
       });

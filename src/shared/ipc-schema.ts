@@ -5,7 +5,6 @@ import type {
   ChatMessage,
   ChatRoom,
   ChatRoomSummary,
-  FocusMode,
   IpcResult,
   Memory,
   OAuthAuthorization,
@@ -39,10 +38,6 @@ export interface IpcInvokeSchema {
   // Shell (2 channels)
   "shell:show-in-folder": { params: [filePath: string]; return: void };
   "shell:open-external": { params: [url: string]; return: void };
-
-  // Focus Mode (2 channels)
-  "focus-mode:get": { params: []; return: FocusMode };
-  "focus-mode:set": { params: [focusMode: FocusMode]; return: IpcResult };
 
   // Window (1 channel)
   "window:resize": { params: [height: number]; return: void };
@@ -186,6 +181,7 @@ export interface IpcEventSchema {
   "chat:stream-done": { params: [roomId: string] };
   "chat:stream-error": { params: [roomId: string, error: string] };
   "chat-rooms:unread-changed": { params: [totalUnread: number] };
+  "chat-rooms:title-updated": { params: [roomId: string, title: string] };
   "chat:navigate-to-room": { params: [roomId: string] };
   "chat:expand-reset": { params: [] };
   "chat:shown": { params: [] };

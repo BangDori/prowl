@@ -8,14 +8,7 @@ import { registerOAuthHandlers } from "./ipc-oauth";
 import { registerTaskHandlers } from "./ipc-tasks";
 import { handleIpc } from "./ipc-utils";
 import { runBrewUpgrade } from "./services/brew-updater";
-import { updateFocusModeMonitor } from "./services/focus-mode";
-import {
-  getCompactExpandedHeight,
-  getFocusMode,
-  getSettings,
-  setFocusMode,
-  setSettings,
-} from "./services/settings";
+import { getCompactExpandedHeight, getSettings, setSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { checkForUpdates } from "./services/update-checker";
 import {
@@ -68,22 +61,6 @@ export function registerIpcHandlers(): void {
   // 외부 URL 열기
   handleIpc("shell:open-external", async (url) => {
     shell.openExternal(url);
-  });
-
-  // 집중 모드 조회
-  handleIpc("focus-mode:get", async () => {
-    return getFocusMode();
-  });
-
-  // 집중 모드 설정 저장 + 모니터 업데이트
-  handleIpc("focus-mode:set", async (focusMode) => {
-    try {
-      setFocusMode(focusMode);
-      updateFocusModeMonitor(focusMode);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: String(error) };
-    }
   });
 
   // 윈도우 높이 동적 조정

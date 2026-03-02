@@ -25,10 +25,6 @@ const electronAPI = {
   showInFolder: invokeIpc("shell:show-in-folder"),
   openExternal: invokeIpc("shell:open-external"),
 
-  // Focus Mode
-  getFocusMode: invokeIpc("focus-mode:get"),
-  setFocusMode: invokeIpc("focus-mode:set"),
-
   // Window
   resizeWindow: invokeIpc("window:resize"),
   navigateBack: invokeIpc("nav:back"),
@@ -166,6 +162,11 @@ const electronAPI = {
     const handler = (_event: unknown, roomId: string) => callback(roomId);
     ipcRenderer.on("chat:navigate-to-room", handler as never);
     return () => ipcRenderer.removeListener("chat:navigate-to-room", handler as never);
+  },
+  onChatRoomTitleUpdated: (callback: (roomId: string, title: string) => void): (() => void) => {
+    const handler = (_event: unknown, roomId: string, title: string) => callback(roomId, title);
+    ipcRenderer.on("chat-rooms:title-updated", handler as never);
+    return () => ipcRenderer.removeListener("chat-rooms:title-updated", handler as never);
   },
   onChatExpandReset: (callback: () => void): (() => void) => {
     const handler = () => callback();

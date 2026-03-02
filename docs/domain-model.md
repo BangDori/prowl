@@ -52,8 +52,9 @@ interface Preferences {
   focusMode: FocusMode;
   notificationsEnabled: boolean;
   shortcuts: ShortcutConfig;
-  openaiApiKey?: string;
-  favoritedRoomIds: string[];  // ChatRoom 즐겨찾기
+  openaiApiKey?: string;               // API Key 방식
+  openaiCredential?: OAuthCredential;  // OAuth 방식 (access/refresh/expires)
+  favoritedRoomIds: string[];          // ChatRoom 즐겨찾기
 }
 ```
 

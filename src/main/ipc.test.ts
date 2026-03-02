@@ -13,8 +13,6 @@ vi.mock("electron", () => ({
 vi.mock("./services/settings", () => ({
   getSettings: vi.fn(),
   setSettings: vi.fn(),
-  getFocusMode: vi.fn(),
-  setFocusMode: vi.fn(),
   getChatConfig: vi.fn().mockReturnValue({ provider: "openai", model: "gpt-5-mini" }),
   setChatConfig: vi.fn(),
   getFavoritedRoomIds: vi.fn().mockReturnValue([]),
@@ -28,10 +26,6 @@ vi.mock("./services/chat-rooms", () => ({
   deleteChatRoom: vi.fn(),
   saveChatMessages: vi.fn(),
   toggleChatRoomLock: vi.fn(),
-}));
-
-vi.mock("./services/focus-mode", () => ({
-  updateFocusModeMonitor: vi.fn(),
 }));
 
 vi.mock("./services/chat", () => ({
@@ -51,11 +45,9 @@ import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
 import { setPageContext, streamChatMessage } from "./services/chat";
 import { listChatRooms } from "./services/chat-rooms";
-import { updateFocusModeMonitor } from "./services/focus-mode";
 import {
   getFavoritedRoomIds,
   getSettings,
-  setFocusMode,
   setSettings,
   toggleFavoritedRoom,
 } from "./services/settings";
@@ -82,8 +74,6 @@ describe("registerIpcHandlers", () => {
     expect(channels).toContain("settings:set");
     expect(channels).toContain("shell:show-in-folder");
     expect(channels).toContain("shell:open-external");
-    expect(channels).toContain("focus-mode:get");
-    expect(channels).toContain("focus-mode:set");
     expect(channels).toContain("window:resize");
     expect(channels).toContain("app:quit");
     expect(channels).toContain("chat-rooms:list");
@@ -100,7 +90,6 @@ describe("registerIpcHandlers", () => {
     it("setSettings를 호출한다", async () => {
       const incoming = {
         patterns: ["test"],
-        focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" },
         favoritedRoomIds: [],
       };
       vi.mocked(getSettings).mockReturnValue({ ...incoming } as never);
@@ -115,7 +104,6 @@ describe("registerIpcHandlers", () => {
       vi.mocked(getSettings).mockReturnValue(stored as never);
 
       const incomingWithStale = {
-        focusMode: { enabled: false, startTime: "00:00", endTime: "07:00" },
         favoritedRoomIds: [], // Dashboard stale 캐시 (빈 배열)
       };
       const handler = getHandler("settings:set");
@@ -139,17 +127,6 @@ describe("registerIpcHandlers", () => {
       const handler = getHandler("shell:open-external");
       await handler({}, "https://example.com");
       expect(shell.openExternal).toHaveBeenCalledWith("https://example.com");
-    });
-  });
-
-  describe("focus-mode:set", () => {
-    it("setFocusMode와 updateFocusModeMonitor를 모두 호출한다", async () => {
-      const fm = { enabled: true, startTime: "22:00", endTime: "07:00" };
-      const handler = getHandler("focus-mode:set");
-      await handler({}, fm);
-
-      expect(setFocusMode).toHaveBeenCalledWith(fm);
-      expect(updateFocusModeMonitor).toHaveBeenCalledWith(fm);
     });
   });
 

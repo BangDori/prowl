@@ -1,6 +1,6 @@
 {
   "name": "prowl",
-  "version": "1.49.0",
+  "version": "1.50.0",
   "description": "A cat that watches your background jobs from the macOS menubar",
   "main": "dist/main/index.js",
   "type": "commonjs",
@@ -22,7 +22,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "node node_modules/electron/install.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version-packages": "changeset version && node scripts/fix-changelog-headings.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.29",
@@ -39,6 +40,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
+    "@changesets/changelog-github": "^0.5.2",
+    "@prowl/changelog": "file:./scripts",
+    "@changesets/cli": "^2.29.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^20.10.0",

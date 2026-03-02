@@ -5,19 +5,6 @@ export interface IpcResult {
   error?: string;
 }
 
-// 집중 모드 설정
-export interface FocusMode {
-  enabled: boolean;
-  startTime: string; // "22:00"
-  endTime: string; // "07:00"
-}
-
-export const DEFAULT_FOCUS_MODE: FocusMode = {
-  enabled: false,
-  startTime: "00:00",
-  endTime: "07:00",
-};
-
 // 테마 설정
 export type Theme = "system" | "light" | "dark";
 
@@ -52,19 +39,24 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   openDashboard: "",
 };
 
+// AI 퍼스널라이제이션 설정
+export interface AiPersonalizationSettings {
+  systemPromptOverride?: string; // "" or undefined = 기본 Prowl 프롬프트 사용
+  toneCustom?: string; // 자유 텍스트 톤 & 매너 지침
+}
+
 // 앱 설정
 export interface AppSettings {
-  focusMode: FocusMode;
   notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
   theme: Theme; // 테마 설정
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
   openaiCredential?: OpenAICredential; // OpenAI OAuth 자격 증명
   favoritedRoomIds: string[]; // 즐겨찾기 ChatRoom ID 목록 (ChatRoom 도메인과 분리)
+  aiPersonalization?: AiPersonalizationSettings; // AI 퍼스널라이제이션 설정
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
   theme: DEFAULT_THEME,

@@ -3,14 +3,16 @@ import {
   type AppSettings,
   type ChatConfig,
   DEFAULT_CHAT_CONFIG,
-  DEFAULT_FOCUS_MODE,
   DEFAULT_SETTINGS,
-  type FocusMode,
 } from "@shared/types";
 import Store from "electron-store";
+import { readSystemPrompt, readTone, writeSystemPrompt, writeTone } from "./personalize";
+
+/** electron-store에 실제 저장되는 스키마 (aiPersonalization은 파일로 분리) */
+type StoredSettings = Omit<AppSettings, "aiPersonalization">;
 
 interface StoreSchema {
-  settings: AppSettings;
+  settings: StoredSettings;
   chatConfig: ChatConfig;
   compactExpandedHeight?: number;
 }
@@ -23,20 +25,25 @@ const store = new Store<StoreSchema>({
 });
 
 export function getSettings(): AppSettings {
-  return store.get("settings") ?? DEFAULT_SETTINGS;
+  const stored = (store.get("settings") ?? DEFAULT_SETTINGS) as StoredSettings;
+  return {
+    ...stored,
+    aiPersonalization: {
+      systemPromptOverride: readSystemPrompt(),
+      toneCustom: readTone(),
+    },
+  };
 }
 
 export function setSettings(settings: AppSettings): void {
-  store.set("settings", settings);
-}
+  const { aiPersonalization, ...rest } = settings;
 
-export function getFocusMode(): FocusMode {
-  return getSettings().focusMode ?? DEFAULT_FOCUS_MODE;
-}
+  if (aiPersonalization !== undefined) {
+    writeSystemPrompt(aiPersonalization.systemPromptOverride ?? "");
+    writeTone(aiPersonalization.toneCustom ?? "");
+  }
 
-export function setFocusMode(focusMode: FocusMode): void {
-  const settings = getSettings();
-  setSettings({ ...settings, focusMode });
+  store.set("settings", rest as StoredSettings);
 }
 
 // 알림 설정

@@ -71,12 +71,22 @@ jobs:
             echo "sha256=$SHA" >> $GITHUB_OUTPUT
           fi
 
+      - name: Extract changelog
+        if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          NOTES=$(awk "/^## (\\[)?${VERSION}(\\])?/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
         run: |
           gh release create "v${{ steps.version.outputs.version }}" \
             --title "Prowl v${{ steps.version.outputs.version }}" \
-            --generate-notes \
+            --notes "${{ steps.changelog.outputs.notes }}" \
             ${{ steps.artifacts.outputs.dmg }} \
             ${{ steps.artifacts.outputs.zip }}
         env:
