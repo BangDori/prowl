@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.50.0] - 2026-03-02
+- AI 퍼스널라이제이션 탭 추가 — 시스템 프롬프트·톤·메모리 통합 관리 ([#124](https://github.com/BangDori/prowl/pull/124), [@BangDori](https://github.com/BangDori))
+- 첫 응답 후 채팅 룸 제목 AI 자동 생성 ([#130](https://github.com/BangDori/prowl/pull/130), [@BangDori](https://github.com/BangDori))
+- 카테고리 대소문자 무시 매칭, 카테고리 HITL 승인, 과거 태스크 이력 조회 버그 수정 ([#127](https://github.com/BangDori/prowl/pull/127), [@BangDori](https://github.com/BangDori))
+- Changesets 커스텀 changelog 포맷 적용 및 Version History PR 링크 클릭 지원 ([#122](https://github.com/BangDori/prowl/pull/122), [@BangDori](https://github.com/BangDori))
+- HITL 승인 상태를 채팅방 재진입 후에도 유지 ([#129](https://github.com/BangDori/prowl/pull/129), [@BangDori](https://github.com/BangDori))
+- 채팅 UI에서 고양이 이미지 제거 ([#134](https://github.com/BangDori/prowl/pull/134), [@BangDori](https://github.com/BangDori))
+- Night Watch 기능 제거 ([#120](https://github.com/BangDori/prowl/pull/120), [@BangDori](https://github.com/BangDori))
+
 All notable changes to Prowl will be documented in this file.
 
 ## [1.49.0] - 2026-02-28
@@ -148,7 +157,7 @@ All notable changes to Prowl will be documented in this file.
 
 ## [1.38.2] - 2026-02-21
 - OS 라이트모드에서 흰 배경에 흰 텍스트가 겹쳐 아무것도 보이지 않는 문제 수정
-- CSS 변수 기반 라이트/다크 테마 시스템 구축 (prowl-*, app-* 시맨틱 토큰)
+- CSS 변수 기반 라이트/다크 테마 시스템 구축 (prowl-_, app-_ 시맨틱 토큰)
 - Chat 윈도우는 항상 다크 유지, 나머지 UI는 OS 설정 자동 반영
 - 모든 컴포넌트의 다크 전용 하드코딩 색상을 시맨틱 토큰으로 교체
 
