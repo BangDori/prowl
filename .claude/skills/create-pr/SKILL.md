@@ -1,6 +1,7 @@
 ---
 name: create-pr
 description: PR 템플릿에 맞춰 Pull Request 생성
+disable-model-invocation: true
 ---
 
 # Create PR
@@ -12,8 +13,9 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 1. `git status`와 `git log develop..HEAD`로 변경사항 파악
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
 3. **changeset 추가** (PR 생성 전 마지막 커밋)
-   - `chore`, `ci`, `docs`만 변경한 경우 → 건너뜀
-   - 그 외(기능 추가, 버그 수정 등) → `bun changeset` 실행 후 커밋
+   - changeset 필요 여부: !`bash .claude/skills/create-pr/check-changeset.sh`
+   - `CHANGESET_NEEDED`이면 → `bun changeset` 실행 후 커밋
+   - `CHANGESET_SKIP`이면 → 건너뜀
 4. 리모트에 push (`git push -u origin HEAD`)
 5. 템플릿에 맞춰 PR 본문 작성
 6. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
@@ -33,12 +35,12 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 
 ## PR 제목 규칙
 
-`[타입] 설명` 형식. 커밋 메시지 타입과 동일.
+`타입: 설명` 형식. 커밋 메시지 형식과 동일.
 
 예시:
-- `[Feat] 작업 카드에 마지막 실행 시간 표시`
-- `[Fix] plist 파싱 시 빈 배열 처리`
-- `[Test] vitest 테스트 환경 구축`
+- `feat: 작업 카드에 마지막 실행 시간 표시`
+- `fix: plist 파싱 시 빈 배열 처리`
+- `test: vitest 테스트 환경 구축`
 
 ## 템플릿
 

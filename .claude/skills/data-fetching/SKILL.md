@@ -1,6 +1,7 @@
 ---
 name: data-fetching
 description: TanStack Query 기반 데이터 페칭 패턴
+user-invocable: false
 ---
 
 # Data Fetching Patterns

@@ -1,6 +1,7 @@
 ---
 name: design-system
 description: Prowl 앱의 디자인 시스템 (Liquid Glass + 골드 액센트)
+user-invocable: false
 ---
 
 # Prowl Design System
