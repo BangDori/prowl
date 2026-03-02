@@ -1,0 +1,46 @@
+name: Release PR to main
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+
+jobs:
+  create-release-pr:
+    if: |
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'changeset-release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Write PR body to file
+        run: |
+          echo "## Commits" > /tmp/pr-body.md
+          echo "" >> /tmp/pr-body.md
+          git log origin/main..origin/develop --pretty=format:"- %s" >> /tmp/pr-body.md
+
+      - name: Create PR develop → main
+        run: |
+          EXISTING=$(gh pr list --base main --head develop --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            echo "PR already exists: #$EXISTING, skipping"
+            exit 0
+          fi
+
+          TITLE=$(echo "$PR_TITLE" | sed 's/^chore: //')
+
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "$TITLE" \
+            --body-file /tmp/pr-body.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
