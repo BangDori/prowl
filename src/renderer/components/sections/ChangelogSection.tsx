@@ -1,7 +1,7 @@
 /** 변경 로그 탭 섹션 */
 import prowlProfile from "@assets/prowl-profile.png";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import changelogRaw from "../../../../CHANGELOG.md?raw";
 
 /** 체인지로그 항목 타입 */
@@ -22,15 +22,24 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
   let currentEntry: ChangelogEntry | null = null;
 
   for (const line of lines) {
-    // Match version header: ## [1.8.0] - 2026-02-04
-    const headerMatch = line.match(/^## \[(.+?)\] - (\d{4}-\d{2}-\d{2})/);
-    if (headerMatch) {
+    // 기존 형식: ## [1.8.0] - 2026-02-04
+    const bracketMatch = line.match(/^## \[(.+?)\] - (\d{4}-\d{2}-\d{2})/);
+    if (bracketMatch) {
       if (currentEntry) entries.push(currentEntry);
-      currentEntry = { version: headerMatch[1], date: headerMatch[2], changes: [] };
+      currentEntry = { version: bracketMatch[1], date: bracketMatch[2], changes: [] };
       continue;
     }
-    // Match change item: - 변경사항
-    const itemMatch = line.match(/^- (.+)/);
+    // Changesets 형식: ## 1.8.0 (날짜 없음)
+    const versionMatch = line.match(/^## (\d+\.\d+\.\d+)\s*$/);
+    if (versionMatch) {
+      if (currentEntry) entries.push(currentEntry);
+      currentEntry = { version: versionMatch[1], date: "", changes: [] };
+      continue;
+    }
+    // Changesets 섹션 헤더 스킵: ### Patch Changes 등
+    if (line.startsWith("### ")) continue;
+    // 변경사항 항목: - 텍스트
+    const itemMatch = line.match(/^-\s+(.+)/);
     if (itemMatch && currentEntry) {
       currentEntry.changes.push(itemMatch[1]);
     }
@@ -40,6 +49,31 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
 }
 
 const CHANGELOG = parseChangelog(changelogRaw);
+
+/**
+ * "[텍스트](url)" 패턴을 클릭 가능한 링크로 렌더링
+ * 링크가 없는 순수 텍스트는 그대로 반환
+ */
+function renderWithLinks(text: string): ReactNode {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  if (parts.length === 1) return text;
+  return parts.map((part) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (match) {
+      return (
+        <button
+          key={match[2]}
+          type="button"
+          className="text-accent hover:underline cursor-pointer"
+          onClick={() => window.electronAPI.openExternal(match[2])}
+        >
+          {match[1]}
+        </button>
+      );
+    }
+    return part;
+  });
+}
 
 /**
  * 체인지로그 섹션 컴포넌트
@@ -83,7 +117,7 @@ export default function ChangelogSection() {
                 <span className={`text-sm font-medium ${index === 0 ? "text-accent" : ""}`}>
                   v{release.version}
                 </span>
-                <span className="text-[10px] text-gray-500">{release.date}</span>
+                {release.date && <span className="text-[10px] text-gray-500">{release.date}</span>}
               </div>
               <ul className="space-y-1">
                 {release.changes.map((change) => (
@@ -92,7 +126,7 @@ export default function ChangelogSection() {
                     className="text-xs text-app-text-secondary flex items-start gap-2"
                   >
                     <span className="text-gray-600 mt-0.5">•</span>
-                    {change}
+                    <span>{renderWithLinks(change)}</span>
                   </li>
                 ))}
               </ul>
