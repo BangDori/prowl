@@ -23,10 +23,24 @@ jobs:
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: 1
 
+      - name: Get next version from changesets
+        id: get-version
+        run: |
+          bunx changeset status --output=.changeset-status.json 2>/dev/null || true
+          if [ -f .changeset-status.json ]; then
+            VERSION=$(node -p "const s = require('./.changeset-status.json'); s.releases?.find(r => r.name === 'prowl')?.newVersion ?? s.releases?.[0]?.newVersion ?? ''")
+            rm -f .changeset-status.json
+            if [ -n "$VERSION" ]; then
+              echo "pr_title=chore: release v$VERSION" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          fi
+          echo "pr_title=chore: version packages" >> $GITHUB_OUTPUT
+
       - name: Create or update Version Packages PR
         uses: changesets/action@v1
         with:
-          title: "chore: version packages"
+          title: ${{ steps.get-version.outputs.pr_title }}
           commit: "chore: version packages"
           version: bun run version-packages
         env:
