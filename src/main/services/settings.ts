@@ -6,9 +6,13 @@ import {
   DEFAULT_SETTINGS,
 } from "@shared/types";
 import Store from "electron-store";
+import { readSystemPrompt, readTone, writeSystemPrompt, writeTone } from "./personalize";
+
+/** electron-store에 실제 저장되는 스키마 (aiPersonalization은 파일로 분리) */
+type StoredSettings = Omit<AppSettings, "aiPersonalization">;
 
 interface StoreSchema {
-  settings: AppSettings;
+  settings: StoredSettings;
   chatConfig: ChatConfig;
   compactExpandedHeight?: number;
 }
@@ -20,12 +24,42 @@ const store = new Store<StoreSchema>({
   },
 });
 
+/** electron-store에 남아있는 구 aiPersonalization 데이터를 파일로 1회 마이그레이션 */
+function migrateLegacyPersonalization(): void {
+  const raw = store.get("settings") as AppSettings | undefined;
+  const legacy = (raw as AppSettings | undefined)?.aiPersonalization;
+  if (!legacy) return;
+
+  if (legacy.systemPromptOverride) writeSystemPrompt(legacy.systemPromptOverride);
+  if (legacy.toneCustom) writeTone(legacy.toneCustom);
+
+  const { aiPersonalization: _, ...rest } = raw as AppSettings;
+  store.set("settings", rest as StoredSettings);
+}
+
+// 앱 시작 시 1회 실행
+migrateLegacyPersonalization();
+
 export function getSettings(): AppSettings {
-  return store.get("settings") ?? DEFAULT_SETTINGS;
+  const stored = (store.get("settings") ?? DEFAULT_SETTINGS) as StoredSettings;
+  return {
+    ...stored,
+    aiPersonalization: {
+      systemPromptOverride: readSystemPrompt(),
+      toneCustom: readTone(),
+    },
+  };
 }
 
 export function setSettings(settings: AppSettings): void {
-  store.set("settings", settings);
+  const { aiPersonalization, ...rest } = settings;
+
+  if (aiPersonalization !== undefined) {
+    writeSystemPrompt(aiPersonalization.systemPromptOverride ?? "");
+    writeTone(aiPersonalization.toneCustom ?? "");
+  }
+
+  store.set("settings", rest as StoredSettings);
 }
 
 // 알림 설정

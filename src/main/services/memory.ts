@@ -1,23 +1,32 @@
-/** 파일 기반 Memory CRUD 서비스 (~/.prowl/memories.json) */
+/** 파일 기반 Memory CRUD 서비스 (~/.prowl/personalize/memories.json) */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Memory } from "@shared/types";
 import { PROWL_DATA_DIR } from "@shared/types";
 import { app } from "electron";
+import { ensurePersonalizeDir } from "./personalize";
 
 const MEMORY_FILE = "memories.json";
+const LEGACY_MEMORY_FILE = "memories.json"; // 구 경로: ~/.prowl/memories.json
 
-/** Prowl 데이터 루트 (~/.prowl) 확보 */
-function ensureDataDir(): string {
-  const dir = join(app.getPath("home"), PROWL_DATA_DIR);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  return dir;
+/** ~/.prowl/memories.json → ~/.prowl/personalize/memories.json 1회 마이그레이션 */
+function migrateLegacyMemoryFile(): void {
+  const legacyPath = join(app.getPath("home"), PROWL_DATA_DIR, LEGACY_MEMORY_FILE);
+  const newPath = join(ensurePersonalizeDir(), MEMORY_FILE);
+  if (existsSync(legacyPath) && !existsSync(newPath)) {
+    try {
+      renameSync(legacyPath, newPath);
+    } catch {
+      // 마이그레이션 실패 시 무시 (다음 번에 재시도)
+    }
+  }
 }
 
-/** memories.json 경로 */
+/** memories.json 경로 (마이그레이션 포함) */
 function memoryFilePath(): string {
-  return join(ensureDataDir(), MEMORY_FILE);
+  migrateLegacyMemoryFile();
+  return join(ensurePersonalizeDir(), MEMORY_FILE);
 }
 
 /** 메모리 파일 읽기 */
