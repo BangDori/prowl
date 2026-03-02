@@ -52,9 +52,13 @@ interface Preferences {
   focusMode: FocusMode;
   notificationsEnabled: boolean;
   shortcuts: ShortcutConfig;
-  openaiApiKey?: string;
-  favoritedRoomIds: string[];  // ChatRoom 즐겨찾기
+  openaiApiKey?: string;              // 레거시 (하위 호환)
+  openaiCredential?: OpenAICredential; // OAuth 또는 API Key 자격 증명
+  favoritedRoomIds: string[];          // ChatRoom 즐겨찾기
 }
+
+// OpenAI 인증 타입 — oauth 우선, 없으면 api
+type OpenAICredential = OAuthCredential | ApiKeyCredential;
 ```
 
 ---

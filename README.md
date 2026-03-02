@@ -16,24 +16,25 @@
 
 ---
 
-## 🪄 What is Prowl?
+## What is Prowl?
 
-**Prowl**은 사용자의 백그라운드에 서식하며 작업을 보조하는 macOS 메뉴바 앱입니다.
+**Prowl**은 macOS 메뉴바에 상주하는 생산성 앱입니다.
 
-자동화 도구가 늘어나고 AI와의 작업이 일상이 된 지금, 반복 작업을 직접 스케줄링하고 로컬 환경 전체를 한 곳에서 관리하는 것이 점점 더 중요해지고 있습니다. Prowl은 메뉴바에 조용히 상주하며 스크립트 자동화부터 태스크 관리, AI 채팅까지 모두 처리합니다.
-
----
-
-## ✨ Features
-
-- **Script Library** — 자연어로 설명하면 AI가 셸 스크립트를 생성하고 스케줄까지 등록. 매일/매주/인터벌/수동 실행 지원
-- **Task Manager** — 파일 기반 태스크를 캘린더 그리드에서 관리하고, 스티키 윈도우로 오늘 할 일을 바로 확인
-- **AI Chat** — OpenAI 기반 AI 채팅, 입력바에서 모델을 즉시 전환
-- **Memory** — AI가 기억할 선호·지시사항을 영구 저장
+태스크 관리, AI 채팅, 파일 브라우저, AI 메모리를 메뉴바 하나에서 처리합니다.
 
 ---
 
-## 🚀 Installation
+## Features
+
+- **Task Manager** — 날짜별 캘린더 그리드에서 태스크 관리. 스티키 윈도우로 오늘 할 일 바로 확인
+- **AI Chat** — ChatGPT OAuth 또는 API Key로 AI 채팅. 채팅창 드롭다운에서 모델 즉시 전환
+- **Memory** — AI에게 기억시킬 선호·규칙을 영구 저장
+- **Files** — 로컬 파일 브라우저
+- **AI Personalization** — AI 응답 방식을 취향에 맞게 조정
+
+---
+
+## Installation
 
 ### Homebrew (권장)
 
@@ -55,53 +56,40 @@ Homebrew로 설치하면 앱 내에서 자동 업데이트가 지원됩니다.
 
 ---
 
-## 🖥 Script Library
+## AI Chat
 
-자연어로 원하는 작업을 입력하면 Prowl이 셸 스크립트를 생성하고 스케줄을 등록합니다.
+Prowl은 두 가지 인증 방식으로 AI 채팅을 지원합니다.
 
-### 사용 방법
+### ChatGPT OAuth (권장)
 
-1. Dashboard → **Script Library** 탭 열기
-2. `+ 추가` 버튼 클릭
-3. 원하는 작업을 자연어로 입력 (예: `매일 오전 9시에 ~/backup 폴더를 압축해서 ~/archives에 저장`)
-4. AI가 생성한 스크립트와 스케줄을 확인 후 저장
-5. 토글로 활성화/비활성화, ▶ 버튼으로 즉시 실행
+Dashboard → Settings → **Connect with ChatGPT** 버튼으로 연결합니다.
 
-### 지원 스케줄
+브라우저에서 OpenAI 로그인 후 자동으로 인증이 완료되며, 토큰은 만료 5분 전 자동 갱신됩니다.
 
-| 타입 | 설명 |
+| 모델 | 비고 |
 |------|------|
-| `daily` | 매일 지정 시간 실행 |
-| `weekly` | 매주 지정 요일·시간 실행 |
-| `interval` | N초마다 반복 실행 |
-| `manual` | 수동 실행만 |
+| gpt-5.3-codex | 기본 모델 |
+| gpt-5.2-codex | |
+| gpt-5.2 | |
+| gpt-5.1-codex-max | |
+| gpt-5.1-codex-mini | |
 
-### OpenAI API 키 설정
-
-Script Library의 AI 스크립트 생성 기능은 OpenAI API를 사용합니다.
+### OpenAI API Key
 
 ```bash
 # ~/.zshrc에 추가
 export OPENAI_API_KEY=sk-...
 ```
 
----
+또는 Dashboard → Settings에서 직접 입력할 수 있습니다.
 
-## 🤖 AI Chat
-
-Prowl은 OpenAI 기반 AI 채팅 기능을 내장하고 있습니다. 채팅 입력바의 드롭다운에서 모델을 즉시 전환할 수 있습니다.
-
-### 지원 모델
-
-| 모델 | 환경변수 |
-|------|---------|
-| GPT-5.2, GPT-4o | `OPENAI_API_KEY` |
-
-API 키가 등록되지 않으면 채팅 메시지로 설정 방법을 안내합니다.
+| 모델 |
+|------|
+| gpt-5.2, gpt-5-mini 등 범용 모델 |
 
 ---
 
-## 🛠 Development
+## Development
 
 ```bash
 git clone https://github.com/BangDori/prowl.git
@@ -109,23 +97,24 @@ cd prowl
 bun install
 bun run dev        # 개발 모드
 bun run build      # 프로덕션 빌드
+bun run test       # 테스트
+bun run lint       # 린트
 bun run package    # DMG 생성
 ```
 
 ---
 
-## ❓ FAQ
+## FAQ
 
-### 스크립트가 생성되지 않아요
+### API 키가 없어도 채팅을 쓸 수 있나요?
 
-- `OPENAI_API_KEY` 환경변수가 설정되어 있는지 확인하세요
-- Dashboard → Settings에서 API 키를 직접 입력할 수도 있습니다
+ChatGPT OAuth로 로그인하면 API Key 없이 채팅이 가능합니다. Settings에서 Connect with ChatGPT 버튼을 사용하세요.
 
-### 스크립트 실행이 실패해요
+### AI 채팅이 동작하지 않아요
 
-1. 스크립트 카드에서 마지막 실행 결과 확인
-2. `파일 위치 열기` 버튼으로 스크립트 파일을 직접 편집
-3. 터미널에서 스크립트를 직접 실행해 오류 확인
+- Settings에서 ChatGPT OAuth 연결 상태를 확인하세요
+- API Key 방식을 사용하는 경우 `OPENAI_API_KEY` 환경변수가 설정됐는지 확인하세요
+- OAuth 토큰이 만료된 경우 Disconnect 후 다시 Connect하면 됩니다
 
 ### "손상된 파일" 또는 "확인되지 않은 개발자" 경고
 
