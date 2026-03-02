@@ -1,13 +1,10 @@
 /** 앱 루트 컴포넌트: 라우팅 및 전역 상태 */
-import { DEFAULT_FOCUS_MODE, type FocusMode } from "@shared/types";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ChatView from "./components/ChatView";
 import CompactView from "./components/compact/CompactView";
 import Dashboard from "./components/Dashboard";
-import FocusModePanel from "./components/FocusModePanel";
 import { useAutoResize } from "./hooks/useAutoResize";
-import { useFocusMode, useUpdateFocusMode } from "./hooks/useFocusMode";
 import { queryClient } from "./queries/client";
 
 function getHashRoute(): string {
@@ -27,9 +24,6 @@ function AppContent() {
   const isChat = route === "chat";
   const containerRef = useAutoResize(isChat);
 
-  const { data: focusMode = DEFAULT_FOCUS_MODE } = useFocusMode();
-  const updateFocusMode = useUpdateFocusMode();
-
   useEffect(() => {
     const onHashChange = () => setRoute(getHashRoute());
     window.addEventListener("hashchange", onHashChange);
@@ -48,17 +42,6 @@ function AppContent() {
     };
   }, [route]);
 
-  const saveFocusMode = useCallback(
-    (updated: FocusMode) => {
-      updateFocusMode.mutate(updated);
-    },
-    [updateFocusMode],
-  );
-
-  const closeWindow = useCallback(() => {
-    window.electronAPI.navigateBack();
-  }, []);
-
   if (route === "dashboard") {
     return <Dashboard />;
   }
@@ -76,13 +59,7 @@ function AppContent() {
           : "bg-surface-light dark:bg-surface-dark text-gray-900 dark:text-gray-100"
       }
     >
-      {route === "quiet-hours" ? (
-        <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} onBack={closeWindow} />
-      ) : isChat ? (
-        <ChatView />
-      ) : (
-        <div className="p-4 text-sm text-gray-500">Loading...</div>
-      )}
+      {isChat ? <ChatView /> : <div className="p-4 text-sm text-gray-500">Loading...</div>}
     </div>
   );
 }

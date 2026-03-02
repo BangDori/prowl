@@ -14,15 +14,8 @@ vi.mock("electron-store", () => ({
   },
 }));
 
-import { DEFAULT_FOCUS_MODE, DEFAULT_SETTINGS } from "@shared/types";
-import {
-  getFavoritedRoomIds,
-  getFocusMode,
-  getSettings,
-  setFocusMode,
-  setSettings,
-  toggleFavoritedRoom,
-} from "./settings";
+import { DEFAULT_SETTINGS } from "@shared/types";
+import { getFavoritedRoomIds, getSettings, setSettings, toggleFavoritedRoom } from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {
@@ -31,7 +24,7 @@ describe("settings 서비스", () => {
 
   describe("getSettings", () => {
     it("저장된 설정을 반환한다", () => {
-      const settings = { patterns: ["com.test.*"], focusMode: DEFAULT_FOCUS_MODE };
+      const settings = { patterns: ["com.test.*"] };
       mockGet.mockReturnValue(settings);
 
       expect(getSettings()).toEqual(settings);
@@ -47,40 +40,10 @@ describe("settings 서비스", () => {
 
   describe("setSettings", () => {
     it("설정을 저장한다", () => {
-      const settings = { patterns: ["com.app.*"], focusMode: DEFAULT_FOCUS_MODE };
+      const settings = { patterns: ["com.app.*"] };
       setSettings(settings);
 
       expect(mockSet).toHaveBeenCalledWith("settings", settings);
-    });
-  });
-
-  describe("getFocusMode", () => {
-    it("focusMode가 있으면 반환한다", () => {
-      const fm = { enabled: true, startTime: "22:00", endTime: "07:00" };
-      mockGet.mockReturnValue({ patterns: [], focusMode: fm });
-
-      expect(getFocusMode()).toEqual(fm);
-    });
-
-    it("focusMode가 없으면 DEFAULT_FOCUS_MODE를 반환한다", () => {
-      mockGet.mockReturnValue({ patterns: [] });
-
-      expect(getFocusMode()).toEqual(DEFAULT_FOCUS_MODE);
-    });
-  });
-
-  describe("setFocusMode", () => {
-    it("기존 설정을 유지하면서 focusMode를 업데이트한다", () => {
-      const existing = { patterns: ["com.test.*"], focusMode: DEFAULT_FOCUS_MODE };
-      mockGet.mockReturnValue(existing);
-
-      const newFm = { enabled: true, startTime: "23:00", endTime: "06:00" };
-      setFocusMode(newFm);
-
-      expect(mockSet).toHaveBeenCalledWith("settings", {
-        patterns: ["com.test.*"],
-        focusMode: newFm,
-      });
     });
   });
 
@@ -92,7 +55,7 @@ describe("settings 서비스", () => {
     });
 
     it("favoritedRoomIds가 없으면 빈 배열을 반환한다", () => {
-      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE }); // 필드 없음
+      mockGet.mockReturnValue({}); // 필드 없음
 
       expect(getFavoritedRoomIds()).toEqual([]);
     });
@@ -123,12 +86,11 @@ describe("settings 서비스", () => {
 
     it("favoritedRoomIds 필드가 없는 기존 설정에서도 동작한다 (마이그레이션 시나리오)", () => {
       // 리팩터링 전 저장된 설정 (favoritedRoomIds 없음)
-      mockGet.mockReturnValue({ focusMode: DEFAULT_FOCUS_MODE, notificationsEnabled: true });
+      mockGet.mockReturnValue({ notificationsEnabled: true });
 
       toggleFavoritedRoom("roomX");
 
       expect(mockSet).toHaveBeenCalledWith("settings", {
-        focusMode: DEFAULT_FOCUS_MODE,
         notificationsEnabled: true,
         favoritedRoomIds: ["roomX"],
       });

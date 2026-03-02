@@ -25,10 +25,6 @@ const electronAPI = {
   showInFolder: invokeIpc("shell:show-in-folder"),
   openExternal: invokeIpc("shell:open-external"),
 
-  // Focus Mode
-  getFocusMode: invokeIpc("focus-mode:get"),
-  setFocusMode: invokeIpc("focus-mode:set"),
-
   // Window
   resizeWindow: invokeIpc("window:resize"),
   navigateBack: invokeIpc("nav:back"),

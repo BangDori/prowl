@@ -14,7 +14,9 @@ disable-model-invocation: true
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
 3. **changeset 추가** (PR 생성 전 마지막 커밋)
    - changeset 필요 여부: !`bash .claude/skills/create-pr/check-changeset.sh`
-   - `CHANGESET_NEEDED`이면 → `bun changeset` 실행 후 커밋
+   - `CHANGESET_NEEDED`이면 → `bash .claude/skills/create-pr/create-changeset.sh patch "변경 내용 한 줄 요약"` 실행 후 커밋
+     - bump 타입: `patch`(버그 수정/기능 제거), `minor`(하위호환 신기능), `major`(breaking change)
+     - **`bun changeset` 사용 금지** — TTY 없는 에이전트 환경에서 실행 불가
    - `CHANGESET_SKIP`이면 → 건너뜀
 4. 리모트에 push (`git push -u origin HEAD`)
 5. 템플릿에 맞춰 PR 본문 작성

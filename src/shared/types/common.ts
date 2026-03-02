@@ -5,19 +5,6 @@ export interface IpcResult {
   error?: string;
 }
 
-// 집중 모드 설정
-export interface FocusMode {
-  enabled: boolean;
-  startTime: string; // "22:00"
-  endTime: string; // "07:00"
-}
-
-export const DEFAULT_FOCUS_MODE: FocusMode = {
-  enabled: false,
-  startTime: "00:00",
-  endTime: "07:00",
-};
-
 // 테마 설정
 export type Theme = "system" | "light" | "dark";
 
@@ -54,7 +41,6 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
 
 // 앱 설정
 export interface AppSettings {
-  focusMode: FocusMode;
   notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
   theme: Theme; // 테마 설정
@@ -64,7 +50,6 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  focusMode: DEFAULT_FOCUS_MODE,
   notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
   theme: DEFAULT_THEME,

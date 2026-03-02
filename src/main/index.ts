@@ -4,8 +4,7 @@ import { DEFAULT_SHORTCUTS } from "@shared/types";
 import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
-import { updateFocusModeMonitor } from "./services/focus-mode";
-import { getFocusMode, getSettings } from "./services/settings";
+import { getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { startTaskReminderScheduler } from "./services/task-reminder";
 import { startOverdueMigrationScheduler } from "./services/tasks";
@@ -34,7 +33,6 @@ if (!gotTheLock) {
     if (isDev) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
       createTray();
-      updateFocusModeMonitor(getFocusMode());
       registerGlobalShortcuts(getSettings().shortcuts ?? DEFAULT_SHORTCUTS);
     } else {
       // 프로덕션: 스플래시 윈도우 표시 후 트레이 전환
@@ -42,7 +40,6 @@ if (!gotTheLock) {
       setTimeout(async () => {
         await dismissSplash();
         createTray();
-        updateFocusModeMonitor(getFocusMode());
         registerGlobalShortcuts(getSettings().shortcuts ?? DEFAULT_SHORTCUTS);
       }, SPLASH.DISPLAY_DURATION_MS);
     }
