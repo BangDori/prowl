@@ -1,5 +1,4 @@
 /** 채팅 로비 (대화방 목록 + 즉시 입력 가능한 인터페이스) */
-import prowlLying from "@assets/prowl-lying.png";
 import type { ChatConfig, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import Maximize2 from "lucide-react/dist/esm/icons/maximize-2";
@@ -141,19 +140,8 @@ export default function ChatLobby({
         {/* 대화방 목록 */}
         {hasRooms && <ChatRoomList onSelectRoom={onSelectRoom} />}
 
-        {/* 고양이 이미지 (레이아웃 흐름 밖, 우하단 오버레이) */}
-        {hasRooms ? (
-          <div className="absolute bottom-0 right-0 z-10 pointer-events-none">
-            <img
-              src={prowlLying}
-              alt="Prowl"
-              className="w-28 h-auto object-contain opacity-60 drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)]"
-              style={{ marginBottom: "-12px" }}
-            />
-          </div>
-        ) : (
-          <div className="flex-1 flex flex-col items-center justify-center gap-3 pb-4">
-            <img src={prowlLying} alt="Prowl" className="w-24 h-auto object-contain opacity-50" />
+        {!hasRooms && (
+          <div className="flex-1 flex items-center justify-center">
             <p className="text-[12px] text-white/30">대화를 시작해보세요</p>
           </div>
         )}
