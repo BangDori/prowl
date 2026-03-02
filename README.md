@@ -53,3 +53,7 @@ brew install BangDori/prowl/prowl
 
 Homebrew로 설치하면 앱 내에서 자동 업데이트가 지원됩니다.
 
+## Requirements
+
+- macOS 10.15 Catalina 이상
+
