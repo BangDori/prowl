@@ -77,12 +77,7 @@ Dashboard → Settings → **Connect with ChatGPT** 버튼으로 연결합니다
 
 ### OpenAI API Key
 
-```bash
-# ~/.zshrc에 추가
-export OPENAI_API_KEY=sk-...
-```
-
-또는 Dashboard → Settings에서 직접 입력할 수 있습니다.
+Dashboard → Settings에서 API Key를 입력합니다.
 
 | 모델 |
 |------|
