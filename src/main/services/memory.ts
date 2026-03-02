@@ -1,23 +1,15 @@
-/** 파일 기반 Memory CRUD 서비스 (~/.prowl/memories.json) */
+/** 파일 기반 Memory CRUD 서비스 (~/.prowl/personalize/memories.json) */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Memory } from "@shared/types";
-import { PROWL_DATA_DIR } from "@shared/types";
-import { app } from "electron";
+import { ensurePersonalizeDir } from "./personalize";
 
 const MEMORY_FILE = "memories.json";
 
-/** Prowl 데이터 루트 (~/.prowl) 확보 */
-function ensureDataDir(): string {
-  const dir = join(app.getPath("home"), PROWL_DATA_DIR);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  return dir;
-}
-
 /** memories.json 경로 */
 function memoryFilePath(): string {
-  return join(ensureDataDir(), MEMORY_FILE);
+  return join(ensurePersonalizeDir(), MEMORY_FILE);
 }
 
 /** 메모리 파일 읽기 */

@@ -39,6 +39,12 @@ export const DEFAULT_SHORTCUTS: ShortcutConfig = {
   openDashboard: "",
 };
 
+// AI 퍼스널라이제이션 설정
+export interface AiPersonalizationSettings {
+  systemPromptOverride?: string; // "" or undefined = 기본 Prowl 프롬프트 사용
+  toneCustom?: string; // 자유 텍스트 톤 & 매너 지침
+}
+
 // 앱 설정
 export interface AppSettings {
   notificationsEnabled: boolean; // 알림 활성화
@@ -47,6 +53,7 @@ export interface AppSettings {
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
   openaiCredential?: OpenAICredential; // OpenAI OAuth 자격 증명
   favoritedRoomIds: string[]; // 즐겨찾기 ChatRoom ID 목록 (ChatRoom 도메인과 분리)
+  aiPersonalization?: AiPersonalizationSettings; // AI 퍼스널라이제이션 설정
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
