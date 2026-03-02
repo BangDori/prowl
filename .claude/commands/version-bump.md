@@ -5,62 +5,67 @@ description: package.json 버전 범프 및 changelog 업데이트
 
 # Version Bump
 
-package.json 버전을 범프하고 CHANGELOG.md에 변경 내역을 추가합니다.
+develop → main 릴리즈 PR 생성 전에 실행합니다.
+`origin/main` 대비 develop에 쌓인 PR 목록을 GitHub API로 조회하여
+CHANGELOG.md를 작성하고 package.json 버전을 범프합니다.
+
+## 실행 조건
+
+- **develop 브랜치에서 실행**
+- develop → main PR을 만들기 직전에 수행
 
 ## 수행 작업
 
-1. **버전 범프 필요 여부 확인**
-2. **범프 레벨 결정** (major/minor/patch)
-3. **package.json 버전 업데이트**
-4. **CHANGELOG.md에 새 버전 항목 추가**
-5. **버전 범프 커밋 생성**
+1. **범프 레벨 결정** (major/minor/patch)
+2. **package.json 버전 업데이트**
+3. **CHANGELOG.md에 새 버전 항목 추가**
+4. **버전 범프 커밋 생성**
 
-## 버전 범프 조건
+---
 
-다음 조건을 **모두** 만족해야 버전 범프를 수행한다:
+## 1. PR 목록 수집
 
-1. 현재 package.json 버전이 이미 릴리스됨 (태그 존재):
-   ```bash
-   git tag -l "v$(node -p "require('./package.json').version")"
-   ```
-2. main 브랜치 대비 커밋이 존재
-3. 앱 코드(`src/`)나 빌드 설정(`package.json`, `tsconfig`, `vite.config` 등)에 변경이 있음
-   - `.claude/`, `.github/`, `docs/`, `.gitignore` 등만 변경된 경우 건너뜀
+`git log origin/main..HEAD --oneline`으로 커밋 목록을 추출하고,
+커밋 메시지에서 `(#숫자)` 패턴으로 PR 번호를 수집한다.
 
-## 범프 레벨 결정
+각 PR 번호로 GitHub API를 호출하여 제목과 작성자를 가져온다:
 
-`git log main..HEAD --format='%s%n%b'`로 커밋 메시지를 분석:
+```bash
+gh pr view {PR번호} --json title,author --jq '{title: .title, author: .author.login}'
+```
+
+## 2. 범프 레벨 결정
+
+수집한 PR 제목들을 분석:
 
 | 조건 | 범프 | 예시 |
 |------|------|------|
-| 커밋 본문에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
-| `feat` 타입이고 **사용자에게 노출되는 새 기능** 추가 | **minor** | 1.3.0 → 1.4.0 |
-| 그 외 (`fix`, `enhance`, `refactor`, `chore`, `test`, 또는 내부 개선성 `feat`) | **patch** | 1.3.0 → 1.3.1 |
+| PR 제목에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
+| `[Feat]` 타입이고 사용자에게 노출되는 새 기능 | **minor** | 1.3.0 → 1.4.0 |
+| 그 외 (`[Fix]`, `[Refactor]`, `[Chore]` 등) | **patch** | 1.3.0 → 1.3.1 |
 
 - 가장 높은 범프 레벨 선택 (major > minor > patch)
-- `feat`라도 스플래시, 내부 UI 개선 등은 patch
 
-## CHANGELOG.md 업데이트
+## 3. CHANGELOG.md 업데이트
 
 루트의 `CHANGELOG.md` 파일에 새 버전 섹션을 **맨 위에** 추가한다:
 
 ```markdown
-## [1.9.0] - 2025-02-04
-- 변경사항 1
-- 변경사항 2
+## [1.49.0] - 2026-03-02
 
-## [1.8.0] - 2025-02-03
-...
+- PR 제목 (by @username, #120)
+- PR 제목 (by @username, #119)
+- PR 제목 (by @username, #118)
 ```
 
-### changes 작성 규칙
+### 작성 규칙
 
-- 커밋 메시지를 기반으로 **사용자 관점**에서 요약
-- 기술적 세부사항보다 **기능/개선 내용** 위주로
-- 한국어로 간결하게 작성
-- 불필요한 커밋 (lint fix, typo 등)은 제외
+- PR 제목을 **그대로** 사용 (커밋 메시지 아님)
+- `(by @작성자아이디, #PR번호)` 형식을 각 항목 끝에 추가
+- 한국어로 된 PR 제목은 그대로 유지
+- `chore`, `ci`, `docs` 성격의 PR은 제외
 
-## 커밋 생성
+## 4. 커밋 생성
 
 ```bash
 git add package.json CHANGELOG.md
@@ -69,6 +74,6 @@ git commit -m "chore: bump version to {new_version}"
 
 ## 주의사항
 
-- 버전 범프 커밋은 PR의 **마지막 커밋**이어야 한다
-- `/create-pr` 실행 전에 이 커맨드를 먼저 실행
-- 이미 미릴리스 버전이면 (태그 없으면) 건너뛴다
+- 버전 범프 커밋은 develop → main PR의 **마지막 커밋**이어야 한다
+- `gh` CLI가 설치되어 있어야 한다 (`gh auth status`로 인증 확인)
+- PR이 없는 커밋(직접 커밋)은 CHANGELOG에서 제외한다
