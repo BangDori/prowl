@@ -8,6 +8,9 @@ import type {
   FocusMode,
   IpcResult,
   Memory,
+  OAuthAuthorization,
+  OAuthCallbackResult,
+  OAuthCredential,
   ProviderStatus,
   ProwlEntry,
   Task,
@@ -148,6 +151,27 @@ export interface IpcInvokeSchema {
   "prowl-files:read": { params: [relPath: string]; return: string };
   "prowl-files:write": { params: [relPath: string, content: string]; return: IpcResult };
   "prowl-files:delete": { params: [relPath: string]; return: IpcResult };
+
+  // OAuth (7 channels)
+  "oauth:start-server": { params: []; return: IpcResult };
+  "oauth:create-authorization": { params: []; return: OAuthAuthorization };
+  "oauth:open-url": { params: [url: string]; return: IpcResult };
+  "oauth:callback": {
+    params: [input: { code: string; state: string }];
+    return: OAuthCallbackResult;
+  };
+  "oauth:refresh-token": {
+    params: [refreshToken: string];
+    return: { success: boolean; credential?: OAuthCredential; error?: string };
+  };
+  "oauth:is-expired": {
+    params: [credential: unknown];
+    return: { valid: boolean; expired: boolean };
+  };
+  "oauth:validate-credential": {
+    params: [credential: unknown];
+    return: { isValid: boolean; type: string | null };
+  };
 }
 
 /**
@@ -165,6 +189,7 @@ export interface IpcEventSchema {
   "chat:navigate-to-room": { params: [roomId: string] };
   "chat:expand-reset": { params: [] };
   "chat:shown": { params: [] };
+  "oauth:callback-result": { params: [result: OAuthCallbackResult] };
 }
 
 // 유틸리티 타입
