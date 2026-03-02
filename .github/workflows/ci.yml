@@ -5,7 +5,25 @@ on:
     branches: [main, develop]
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check src changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - "src/**"
+
   ci:
+    needs: check
+    if: needs.check.outputs.src == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -43,3 +61,13 @@ jobs:
 
       - name: Test
         run: bun run test
+
+  ci-status:
+    needs: [check, ci]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check result
+        run: |
+          if [ "${{ needs.ci.result }}" = "failure" ]; then exit 1; fi
+          echo "CI passed or skipped"

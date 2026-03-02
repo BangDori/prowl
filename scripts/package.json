@@ -1,0 +1,6 @@
+{
+  "name": "@prowl/changelog",
+  "version": "1.0.0",
+  "main": "changelog.cjs",
+  "private": true
+}
