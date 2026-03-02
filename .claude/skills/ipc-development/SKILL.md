@@ -1,6 +1,7 @@
 ---
 name: ipc-development
 description: IPC 채널 추가/수정 시 안전 규칙과 절차
+user-invocable: false
 ---
 
 # IPC Development Guide

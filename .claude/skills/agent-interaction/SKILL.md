@@ -1,6 +1,7 @@
 ---
 name: agent-interaction
 description: 에이전트 간 상호작용 구조와 워크플로우 정의
+user-invocable: false
 ---
 
 # Agent Interaction Guide
