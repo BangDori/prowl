@@ -77,9 +77,14 @@ export default function TaskListPanel({
   onUpdateTask,
   onDeleteTask,
 }: TaskListPanelProps) {
-  const applyFilters = (tasks: Task[]): Task[] => {
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+
+  const applyFilters = (tasks: Task[], forDate?: Date): Task[] => {
     let filtered = tasks;
-    if (!isShowingCompleted) filtered = filtered.filter((t) => !t.completed);
+    // 과거 날짜는 완료된 태스크도 항상 표시 (moveOverdueTasksToBacklog로 미완료 태스크가 이동되므로)
+    const isPastDate = forDate ? forDate < todayMidnight : false;
+    if (!isShowingCompleted && !isPastDate) filtered = filtered.filter((t) => !t.completed);
     if (filterCategory)
       filtered = filtered.filter((t) => (t.category ?? "기타") === filterCategory);
     return sortTasks(filtered);
@@ -88,7 +93,7 @@ export default function TaskListPanel({
   // 선택 날짜 뷰
   if (selectedDate) {
     const dateStr = toDateStr(selectedDate);
-    const tasks = applyFilters(getTasksForDate(tasksByDate, dateStr));
+    const tasks = applyFilters(getTasksForDate(tasksByDate, dateStr), selectedDate);
     const isDateToday = isToday(selectedDate);
 
     return (
