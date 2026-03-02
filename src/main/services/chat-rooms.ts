@@ -106,6 +106,15 @@ export function deleteChatRoom(roomId: string): void {
   if (existsSync(filePath)) unlinkSync(filePath);
 }
 
+/** 룸 제목 업데이트 */
+export function updateChatRoomTitle(roomId: string, title: string): void {
+  const room = readRoomFile(roomId);
+  if (!room) throw new Error(`Chat room not found: ${roomId}`);
+  room.title = title;
+  room.updatedAt = new Date().toISOString();
+  writeRoomFile(room);
+}
+
 /** 룸 잠금 토글 */
 export function toggleChatRoomLock(roomId: string): void {
   const room = readRoomFile(roomId);
@@ -121,15 +130,5 @@ export function saveChatMessages(roomId: string, messages: ChatMessage[]): void 
 
   room.messages = messages;
   room.updatedAt = new Date().toISOString();
-
-  // 자동 제목: 기본 제목이고 사용자 메시지가 있으면 첫 메시지에서 추출
-  if (room.title === "새 대화" && messages.length > 0) {
-    const firstUserMsg = messages.find((m) => m.role === "user");
-    if (firstUserMsg) {
-      const text = firstUserMsg.content.slice(0, 30);
-      room.title = firstUserMsg.content.length > 30 ? `${text}...` : text;
-    }
-  }
-
   writeRoomFile(room);
 }

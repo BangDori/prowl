@@ -144,10 +144,15 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
       if (lastMsg) markRead.mutate({ roomId, lastMessageId: lastMsg.id });
       queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
     });
+    // AI 제목 생성 완료 시 룸 목록/상세 갱신
+    const offTitleUpdated = window.electronAPI.onChatRoomTitleUpdated(() => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.chatRooms.all });
+    });
     return () => {
       offMessage();
       offDone();
       offError();
+      offTitleUpdated();
     };
   }, [roomId, queryClient, markRead]);
 

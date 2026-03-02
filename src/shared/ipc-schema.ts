@@ -181,6 +181,7 @@ export interface IpcEventSchema {
   "chat:stream-done": { params: [roomId: string] };
   "chat:stream-error": { params: [roomId: string, error: string] };
   "chat-rooms:unread-changed": { params: [totalUnread: number] };
+  "chat-rooms:title-updated": { params: [roomId: string, title: string] };
   "chat:navigate-to-room": { params: [roomId: string] };
   "chat:expand-reset": { params: [] };
   "chat:shown": { params: [] };
