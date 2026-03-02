@@ -54,6 +54,8 @@ jobs:
 
       - name: Create tag
         if: steps.version.outputs.changed == 'true' && steps.tag.outputs.exists == 'false'
+        env:
+          HUSKY: "0"
         run: |
           git tag "v${{ steps.version.outputs.version }}"
           git push origin "v${{ steps.version.outputs.version }}"
