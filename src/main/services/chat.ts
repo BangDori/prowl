@@ -11,6 +11,7 @@ import type {
 import { getChatWindow, isChatWindowActive } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
+import { maybeGenerateTitle } from "./chat-title";
 import { getChatTools, getMemorySystemPromptSection, setCurrentRoomId } from "./chat-tools";
 import { sendChatNotification } from "./notification";
 import { isOAuthCredentialExpired, refreshAccessToken } from "./oauth";
@@ -235,6 +236,11 @@ export async function streamChatMessage(
 
     persistAfterStream(roomId, history, aiMessages);
     sendToChat("chat:stream-done", roomId);
+
+    // 첫 번째 응답 완료 후 AI로 제목 생성 (best-effort)
+    maybeGenerateTitle(roomId, history, aiMessages, credential, modelId).catch((err) =>
+      console.error("[Chat] Title generation failed:", err),
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다.";
     const errMsg: ChatMessage = {

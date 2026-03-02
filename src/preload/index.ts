@@ -163,6 +163,11 @@ const electronAPI = {
     ipcRenderer.on("chat:navigate-to-room", handler as never);
     return () => ipcRenderer.removeListener("chat:navigate-to-room", handler as never);
   },
+  onChatRoomTitleUpdated: (callback: (roomId: string, title: string) => void): (() => void) => {
+    const handler = (_event: unknown, roomId: string, title: string) => callback(roomId, title);
+    ipcRenderer.on("chat-rooms:title-updated", handler as never);
+    return () => ipcRenderer.removeListener("chat-rooms:title-updated", handler as never);
+  },
   onChatExpandReset: (callback: () => void): (() => void) => {
     const handler = () => callback();
     ipcRenderer.on("chat:expand-reset", handler);

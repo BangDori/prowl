@@ -51,6 +51,7 @@ export default function ChatConversation({
     providers,
     handleConfigChange,
     roomTitle,
+    aiGeneratedTitle,
     updateApprovalStatus,
   } = useChatMessages(roomId, initialMessage);
 
@@ -168,6 +169,7 @@ export default function ChatConversation({
         <div className="chat-messages-area">
           <ConversationHeader
             title={roomTitle}
+            aiGeneratedTitle={aiGeneratedTitle}
             onBack={onBack}
             onClose={() => window.electronAPI.closeChatWindow()}
             isExpanded={isExpanded}
