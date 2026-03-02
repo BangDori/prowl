@@ -3,7 +3,7 @@ result=$(cat /tmp/changeset-check.txt | head -1)
 
 if [ "$result" = "CHANGESET_NEEDED" ]; then
   # src/ 변경이 있는 경우, 브랜치에 changeset 파일이 추가됐는지 확인
-  has_changeset=$(git diff develop..HEAD --name-only 2>/dev/null | grep '^\.changeset/' | grep -v 'README\.md')
+  has_changeset=$(git diff origin/develop..HEAD --name-only 2>/dev/null | grep '^\.changeset/' | grep -v 'README\.md')
 
   if [ -z "$has_changeset" ]; then
     echo ""
