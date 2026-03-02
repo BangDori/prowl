@@ -9,9 +9,11 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 
 ## 단계
 
-1. `git status`와 `git log main..HEAD`로 변경사항 파악
+1. `git status`와 `git log develop..HEAD`로 변경사항 파악
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
-3. **버전 범프 필요 시 `/version-bump` 실행** (PR 생성 전 마지막 커밋)
+3. **changeset 추가** (PR 생성 전 마지막 커밋)
+   - `chore`, `ci`, `docs`만 변경한 경우 → 건너뜀
+   - 그 외(기능 추가, 버그 수정 등) → `bun changeset` 실행 후 커밋
 4. 리모트에 push (`git push -u origin HEAD`)
 5. 템플릿에 맞춰 PR 본문 작성
 6. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
@@ -68,7 +70,7 @@ description: PR 템플릿에 맞춰 Pull Request 생성
 
 ## 규칙
 
-- target branch: `main`
+- target branch: `develop`
 - base 브랜치를 checkout/merge 하지 않는다
 - `bun run test`와 `bun run build`를 실행하여 결과를 검증 섹션에 기록한다
 - **반드시 `GITHUB_TOKEN= gh pr create ...` 형식으로 실행** (다른 계정으로 PR 올라가는 것 방지)
