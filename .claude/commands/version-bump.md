@@ -1,18 +1,19 @@
 ---
 name: version-bump
-description: package.json 버전 범프 및 changelog 업데이트
+description: feature PR에 changeset 파일 추가
 ---
 
-# Version Bump
+# Changeset 추가
 
-develop → main 릴리즈 PR 생성 전에 실행합니다.
-`origin/main` 대비 develop에 쌓인 PR 목록을 GitHub API로 조회하여
-CHANGELOG.md를 작성하고 package.json 버전을 범프합니다.
+feature 작업 완료 후 PR 생성 전에 실행합니다.
+`.changeset/` 파일을 생성하여 변경 내용과 버전 범프 레벨을 기록합니다.
 
-## 실행 조건
+> **버전 관리 방식 변경 안내**
+> 이 프로젝트는 Changesets를 사용합니다.
+> 버전 bump와 CHANGELOG는 changesets-bot이 자동으로 생성하는
+> "Version Packages" PR을 통해 develop 브랜치에 반영됩니다.
 
-- **develop 브랜치에서 실행**
-- develop → main PR을 만들기 직전에 수행
+---
 
 ## 브랜치 검증 (필수)
 
@@ -22,78 +23,71 @@ CHANGELOG.md를 작성하고 package.json 버전을 범프합니다.
 git branch --show-current
 ```
 
-- `develop`이면 계속 진행
-- `develop`이 아니면 **즉시 중단**하고 아래 메시지를 출력:
+- feature 브랜치(`develop`이 아닌 브랜치)이면 계속 진행
+- `develop` 또는 `main`이면 **즉시 중단**하고 아래 메시지를 출력:
 
 ```
-❌ version-bump는 develop 브랜치에서만 실행할 수 있습니다.
-   현재 브랜치: {현재 브랜치명}
-
-   develop 브랜치로 전환 후 다시 실행하세요.
+❌ changeset은 feature 브랜치에서만 추가할 수 있습니다.
+   feature 브랜치에서 작업 후 실행하세요.
 ```
 
 ---
 
 ## 수행 작업
 
-1. **범프 레벨 결정** (major/minor/patch)
-2. **package.json 버전 업데이트**
-3. **CHANGELOG.md에 새 버전 항목 추가**
-4. **버전 범프 커밋 생성**
+1. **변경 내용 파악** — 이번 PR에서 어떤 기능/버그 수정이 있었는지 확인
+2. **changeset 파일 생성**
+3. **파일을 커밋에 포함**
 
 ---
 
-## 1. PR 목록 수집
-
-`git log origin/main..HEAD --oneline`으로 커밋 목록을 추출하고,
-커밋 메시지에서 `(#숫자)` 패턴으로 PR 번호를 수집한다.
-
-각 PR 번호로 GitHub API를 호출하여 제목과 작성자를 가져온다:
+## 1. changeset 파일 생성
 
 ```bash
-gh pr view {PR번호} --json title,author --jq '{title: .title, author: .author.login}'
+bun changeset
 ```
 
-## 2. 범프 레벨 결정
+인터랙티브 CLI가 실행되면:
 
-수집한 PR 제목들을 분석:
+1. 패키지 선택: `prowl` (스페이스로 선택 후 Enter)
+2. 범프 레벨 선택:
 
-| 조건 | 범프 | 예시 |
-|------|------|------|
-| PR 제목에 `BREAKING CHANGE` 포함 | **major** | 1.3.0 → 2.0.0 |
-| `[Feat]` 타입이고 사용자에게 노출되는 새 기능 | **minor** | 1.3.0 → 1.4.0 |
-| 그 외 (`[Fix]`, `[Refactor]`, `[Chore]` 등) | **patch** | 1.3.0 → 1.3.1 |
+| 변경 종류 | 범프 | 예시 |
+|-----------|------|------|
+| 하위 호환 불가 변경 | **major** | API 제거, 데이터 마이그레이션 필요 |
+| 사용자에게 노출되는 새 기능 | **minor** | 새 UI 기능, 새 단축키 |
+| 버그 수정, 내부 개선 | **patch** | 오류 수정, 성능 개선, 리팩토링 |
 
-- 가장 높은 범프 레벨 선택 (major > minor > patch)
+3. 설명 입력: **사용자 관점**에서 한국어로 간결하게 작성
+   - 좋은 예: `Task Manager 드래그 앤 드롭 기능 추가`
+   - 나쁜 예: `TaskDragHandler 컴포넌트 리팩토링`
 
-## 3. CHANGELOG.md 업데이트
+실행 후 `.changeset/random-name.md` 파일이 생성된다.
 
-루트의 `CHANGELOG.md` 파일에 새 버전 섹션을 **맨 위에** 추가한다:
+## 2. 커밋에 포함
 
-```markdown
-## [1.49.0] - 2026-03-02
-
-- PR 제목 (by @username, #120)
-- PR 제목 (by @username, #119)
-- PR 제목 (by @username, #118)
-```
-
-### 작성 규칙
-
-- PR 제목을 **그대로** 사용 (커밋 메시지 아님)
-- `(by @작성자아이디, #PR번호)` 형식을 각 항목 끝에 추가
-- 한국어로 된 PR 제목은 그대로 유지
-- `chore`, `ci`, `docs` 성격의 PR은 제외
-
-## 4. 커밋 생성
+생성된 `.changeset/*.md` 파일을 PR 커밋에 포함시킨다:
 
 ```bash
-git add package.json CHANGELOG.md
-git commit -m "chore: bump version to {new_version}"
+git add .changeset/
+git commit -m "chore: add changeset"
+```
+
+---
+
+## 이후 자동화 흐름
+
+```
+feature PR → develop merge
+    ↓
+changesets-bot이 "Version Packages" PR 자동 생성/업데이트
+    ↓
+"Version Packages" PR merge → 버전 bump + CHANGELOG 자동 반영
+    ↓
+develop → main PR → release.yml → GitHub Release
 ```
 
 ## 주의사항
 
-- 버전 범프 커밋은 develop → main PR의 **마지막 커밋**이어야 한다
-- `gh` CLI가 설치되어 있어야 한다 (`gh auth status`로 인증 확인)
-- PR이 없는 커밋(직접 커밋)은 CHANGELOG에서 제외한다
+- changeset 파일 없이 PR을 올리면 changeset-bot이 경고 코멘트를 남김
+- `chore`, `ci`, `docs`만 변경한 PR은 changeset 파일 불필요
