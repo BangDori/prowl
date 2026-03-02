@@ -1,10 +1,5 @@
 /** 앱 설정 탭 섹션 */
-import {
-  DEFAULT_FOCUS_MODE,
-  DEFAULT_SHORTCUTS,
-  type FocusMode,
-  type ShortcutConfig,
-} from "@shared/types";
+import { DEFAULT_SHORTCUTS, type ShortcutConfig } from "@shared/types";
 import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
@@ -13,25 +8,21 @@ import Pencil from "lucide-react/dist/esm/icons/pencil";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
-import { useFocusMode, useUpdateFocusMode } from "../../hooks/useFocusMode";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
-import FocusModePanel from "../FocusModePanel";
 import ShortcutsPanel from "../ShortcutsPanel";
 import ToggleSwitch from "../ToggleSwitch";
 import SettingsUpdateCard from "./SettingsUpdateCard";
 
 export default function SettingsSection() {
   const { data: settings, isLoading: settingsLoading } = useSettings();
-  const { data: focusMode = DEFAULT_FOCUS_MODE, isLoading: focusLoading } = useFocusMode();
   const updateSettings = useUpdateSettings();
-  const updateFocusMode = useUpdateFocusMode();
 
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [apiKeyEditing, setApiKeyEditing] = useState(false);
   const [oauthLoading, setOAuthLoading] = useState(false);
   const [oauthError, setOAuthError] = useState<string | null>(null);
 
-  const loading = settingsLoading || focusLoading;
+  const loading = settingsLoading;
   const notificationsEnabled = settings?.notificationsEnabled ?? true;
   const openaiCredential = settings?.openaiCredential;
 
@@ -57,10 +48,6 @@ export default function SettingsSection() {
   const toggleNotifications = async () => {
     if (!settings) return;
     updateSettings.mutate({ ...settings, notificationsEnabled: !notificationsEnabled });
-  };
-
-  const saveFocusMode = (updated: FocusMode) => {
-    updateFocusMode.mutate(updated);
   };
 
   const saveShortcuts = (updated: ShortcutConfig) => {
@@ -144,16 +131,6 @@ export default function SettingsSection() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 space-y-6">
-        {/* Night Watch 설정 */}
-        <div>
-          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
-            Night Watch
-          </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
-            <FocusModePanel focusMode={focusMode} onUpdate={saveFocusMode} />
-          </div>
-        </div>
-
         {/* 알림 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">

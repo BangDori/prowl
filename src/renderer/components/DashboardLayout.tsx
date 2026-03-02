@@ -62,7 +62,7 @@ function SidebarItem({ icon, label, isActive, onClick }: SidebarItemProps) {
  * 각 섹션은 별도 컴포넌트로 분리:
  * - JobsSection: 작업 목록
  * - ChangelogSection: 버전 히스토리
- * - SettingsSection: 앱 설정 (Night Watch 포함)
+ * - SettingsSection: 앱 설정
  */
 export default function DashboardLayout() {
   const [isActiveNav, setActiveNav] = useState<NavItem>("calendar");

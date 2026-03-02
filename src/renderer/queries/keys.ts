@@ -4,10 +4,6 @@ export const queryKeys = {
     all: ["settings"] as const,
     get: () => [...queryKeys.settings.all, "get"] as const,
   },
-  focusMode: {
-    all: ["focusMode"] as const,
-    get: () => [...queryKeys.focusMode.all, "get"] as const,
-  },
   tasks: {
     all: ["tasks"] as const,
     month: (year: number, month: number) => [...queryKeys.tasks.all, "month", year, month] as const,

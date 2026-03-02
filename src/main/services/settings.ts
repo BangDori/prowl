@@ -3,9 +3,7 @@ import {
   type AppSettings,
   type ChatConfig,
   DEFAULT_CHAT_CONFIG,
-  DEFAULT_FOCUS_MODE,
   DEFAULT_SETTINGS,
-  type FocusMode,
 } from "@shared/types";
 import Store from "electron-store";
 
@@ -28,15 +26,6 @@ export function getSettings(): AppSettings {
 
 export function setSettings(settings: AppSettings): void {
   store.set("settings", settings);
-}
-
-export function getFocusMode(): FocusMode {
-  return getSettings().focusMode ?? DEFAULT_FOCUS_MODE;
-}
-
-export function setFocusMode(focusMode: FocusMode): void {
-  const settings = getSettings();
-  setSettings({ ...settings, focusMode });
 }
 
 // 알림 설정
