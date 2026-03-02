@@ -2,91 +2,109 @@
 
 Electron IPC 통신 규칙
 
+## Single Source of Truth
+
+IPC 채널 스키마는 `src/shared/ipc-schema.ts`에서 중앙 관리한다.
+
+```
+IpcInvokeSchema → main(handleIpc) + preload(invokeIpc) + renderer(global.d.ts)
+IpcEventSchema  → main(sendIpc) + preload(onIpc) + renderer(global.d.ts)
+```
+
+새 채널 추가 시:
+1. `src/shared/ipc-schema.ts`에 타입 정의 추가
+2. `src/main/ipc.ts`에 `handleIpc()` 핸들러 추가
+3. `src/preload/index.ts`에 `invokeIpc()` 메서드 추가
+→ renderer 타입은 자동 반영됨
+
 ## 채널 네이밍
 
 ### 형식: `{domain}:{action}`
 
 ```typescript
-// 도메인별 채널
-"jobs:list"      // 작업 목록 조회
-"jobs:toggle"    // 작업 활성화/비활성화
-"settings:get"   // 설정 조회
-"window:resize"  // 윈도우 크기 변경
+"tasks:add-task"          // 태스크 추가
+"chat-rooms:toggle-lock"  // 채팅방 잠금 토글
+"settings:get"            // 설정 조회
+"oauth:start-server"      // OAuth 서버 시작
 ```
 
 ### 도메인 목록
 
-| 도메인 | 설명 | 예시 |
-|--------|------|------|
-| `jobs` | launchd 작업 관리 | `jobs:list`, `jobs:toggle`, `jobs:run` |
-| `settings` | 앱 설정 | `settings:get`, `settings:set` |
-| `focusMode` | 집중 모드 | `focusMode:get`, `focusMode:set` |
-| `shell` | OS 연동 | `shell:openExternal`, `shell:showInFolder` |
-| `window` | 윈도우 제어 | `window:resize`, `window:show` |
-| `chat` | 채팅 기능 | `chat:send`, `chat:close` |
-| `app` | 앱 제어 | `app:quit`, `app:version` |
+| 도메인 | 설명 |
+|--------|------|
+| `settings` | 앱 설정 |
+| `shell` | OS 연동 (파일, 외부 URL) |
+| `window` | 윈도우 제어 |
+| `nav` | 네비게이션 |
+| `app` | 앱 제어 (quit, version, update) |
+| `chat` | 채팅 전송 · 설정 |
+| `chat-rooms` | 채팅방 관리 |
+| `compact` | 컴팩트 윈도우 |
+| `tasks` | 태스크 관리 |
+| `categories` | 태스크 카테고리 |
+| `memory` | AI 메모리 |
+| `oauth` | OpenAI OAuth 인증 |
+| `personalize` | AI 퍼스널라이제이션 |
+| `prowl-fs` | 파일 브라우저 |
 
 ### 액션 네이밍
 
 | 유형 | 동사 | 예시 |
 |------|------|------|
-| 조회 | `list`, `get` | `jobs:list`, `settings:get` |
-| 수정 | `set`, `toggle` | `settings:set`, `jobs:toggle` |
-| 실행 | `run`, `send` | `jobs:run`, `chat:send` |
-| UI | `resize`, `close`, `show` | `window:resize` |
+| 조회 | `list`, `get`, `scan` | `tasks:list-month`, `settings:get` |
+| 추가 | `add`, `create` | `tasks:add-task`, `chat-rooms:create` |
+| 수정 | `set`, `update`, `toggle` | `settings:set`, `tasks:toggle-complete` |
+| 삭제 | `delete` | `tasks:delete-task` |
+| 실행 | `send`, `run`, `check` | `chat:send`, `app:check-update` |
+| UI | `resize`, `close`, `expand-toggle` | `chat:resize` |
+
+## 결과 타입
+
+### Mutation 채널은 반드시 IpcResult 반환
+
+```typescript
+// shared/types/common.ts
+interface IpcResult {
+  success: boolean;
+  error?: string;
+}
+```
+
+- **Mutation** (`add`, `set`, `update`, `delete`, `toggle`): `IpcResult` 반환
+- **조회** (`get`, `list`): 데이터 타입 직접 반환
+- **Fire-and-forget** (`quit`, `resize`, `close`, `nav:back`): `void` 반환
+
+```typescript
+// Good
+"tasks:add-task": { params: [date: string, task: Task]; return: IpcResult }
+"tasks:list-month": { params: [year: number, month: number]; return: TasksByDate }
+"app:quit": { params: []; return: void }
+
+// Bad — mutation인데 void 반환
+"tasks:delete-task": { params: [date: string, taskId: string]; return: void }
+```
 
 ## 핸들러 등록 (Main Process)
 
 ### 파일: `src/main/ipc.ts`
 
-```typescript
-import { ipcMain } from "electron";
-import type { JobActionResult, LaunchdJob } from "@shared/types";
-
-export function registerIpcHandlers(): void {
-  // 조회
-  ipcMain.handle("jobs:list", async (): Promise<LaunchdJob[]> => {
-    return listJobs();
-  });
-
-  // 액션 (파라미터 타입 명시)
-  ipcMain.handle("jobs:toggle", async (_event, jobId: string): Promise<JobActionResult> => {
-    return toggleJob(jobId);
-  });
-
-  // 복합 연산
-  ipcMain.handle("focusMode:set", async (_event, focusMode: FocusMode): Promise<void> => {
-    setFocusMode(focusMode);         // 저장
-    updateFocusModeMonitor(focusMode); // 모니터링 시작
-  });
-}
-```
-
-### 규칙
-
-1. **단일 파일에서 등록**: 모든 핸들러는 `registerIpcHandlers()`에서 등록
-2. **반환 타입 명시**: `Promise<ReturnType>` 형태로 명확하게
-3. **파라미터 타입**: `_event` 다음에 타입 명시 (`jobId: string`)
-4. **에러 처리**: `JobActionResult` 형태로 통일
-
-## 결과 타입
-
-### 표준 응답 형식
+`handleIpc` 헬퍼를 사용해 등록한다. 타입은 `IpcInvokeSchema`에서 자동 추론됨.
 
 ```typescript
-// shared/types.ts
-interface JobActionResult {
-  success: boolean;
-  message: string;
-}
+import { handleIpc } from "@main/utils/ipc-handler";
 
-// 사용
-ipcMain.handle("jobs:toggle", async (_event, jobId: string): Promise<JobActionResult> => {
+// 조회
+handleIpc("settings:get", async () => {
+  return getSettings();
+});
+
+// Mutation
+handleIpc("tasks:add-task", async (_event, date, task) => {
   try {
-    await toggleJob(jobId);
-    return { success: true, message: "작업이 전환되었습니다." };
+    await addTask(date, task);
+    return { success: true };
   } catch (error) {
-    return { success: false, message: error.message };
+    return { success: false, error: String(error) };
   }
 });
 ```
@@ -95,112 +113,72 @@ ipcMain.handle("jobs:toggle", async (_event, jobId: string): Promise<JobActionRe
 
 ### 파일: `src/preload/index.ts`
 
+`invokeIpc` 헬퍼로 채널을 wrapping. 채널명 → camelCase 메서드명으로 변환.
+
 ```typescript
-import { contextBridge, ipcRenderer } from "electron";
+import { invokeIpc } from "./ipc-helper";
 
 const electronAPI = {
-  // 채널: jobs:list → 메서드: listJobs
-  listJobs: (): Promise<LaunchdJob[]> =>
-    ipcRenderer.invoke("jobs:list"),
-
-  // 채널: jobs:toggle → 메서드: toggleJob
-  toggleJob: (jobId: string): Promise<JobActionResult> =>
-    ipcRenderer.invoke("jobs:toggle", jobId),
-
-  // 이벤트 구독 (cleanup 함수 반환)
-  onWindowShow: (callback: () => void): (() => void) => {
-    const handler = () => callback();
-    ipcRenderer.on("window:show", handler);
-    return () => ipcRenderer.removeListener("window:show", handler);
-  },
+  getSettings: () => invokeIpc("settings:get"),
+  setSettings: (s: AppSettings) => invokeIpc("settings:set", s),
+  addTask: (date: string, task: Task) => invokeIpc("tasks:add-task", date, task),
+  // ...
 };
-
-contextBridge.exposeInMainWorld("electronAPI", electronAPI);
-export type ElectronAPI = typeof electronAPI;
 ```
 
-### 네이밍 변환
+### 채널 → 메서드 네이밍 변환
 
 | 채널 (kebab) | 메서드 (camelCase) |
 |-------------|-------------------|
-| `jobs:list` | `listJobs()` |
-| `jobs:toggle` | `toggleJob(id)` |
-| `focusMode:get` | `getFocusMode()` |
-| `settings:set` | `setSettings(data)` |
+| `settings:get` | `getSettings()` |
+| `tasks:add-task` | `addTask(date, task)` |
+| `chat-rooms:toggle-lock` | `toggleLock(roomId)` |
+| `oauth:start-server` | `startOAuthServer()` |
 
 ## Renderer 사용
 
-```typescript
-// 직접 호출
-const jobs = await window.electronAPI.listJobs();
-const result = await window.electronAPI.toggleJob(jobId);
-
-// 이벤트 구독
-useEffect(() => {
-  const unsubscribe = window.electronAPI.onWindowShow(() => {
-    refresh();
-  });
-  return () => unsubscribe();
-}, [refresh]);
-```
-
-## 타입 정의
-
-### shared/types.ts
+**컴포넌트에서 `window.electronAPI` 직접 호출 금지** — hooks를 통해 접근한다.
 
 ```typescript
-// Discriminated Union (판별 유니온)
-export type JobSchedule =
-  | { type: "calendar"; weekdays?: number[]; hour?: number; minute?: number }
-  | { type: "interval"; intervalSeconds: number }
-  | { type: "keepAlive" }
-  | { type: "unknown" };
+// Bad — 컴포넌트 내 직접 호출
+const settings = await window.electronAPI.getSettings();
 
-// 표준 결과 타입
-export interface JobActionResult {
-  success: boolean;
-  message: string;
-}
-
-// 데이터 타입
-export interface LaunchdJob {
-  id: string;
-  label: string;
-  name: string;
-  schedule: JobSchedule;
-  isLoaded: boolean;
-  // ...
-}
-```
-
-## 테스트 패턴
-
-```typescript
-// ipc.test.ts
-import { ipcMain } from "electron";
-
-vi.mock("electron", () => ({
-  ipcMain: { handle: vi.fn() },
-}));
-
-const mockIpcHandle = ipcMain.handle as Mock;
-
-function getHandler(channel: string) {
-  const call = mockIpcHandle.mock.calls.find(c => c[0] === channel);
-  return call?.[1];
-}
-
-test("jobs:list 핸들러", async () => {
-  registerIpcHandlers();
-  const handler = getHandler("jobs:list");
-  const result = await handler({});
-  expect(result).toEqual([...]);
+// Good — hook 사용
+const { data: settings } = useQuery({
+  queryKey: queryKeys.settings,
+  queryFn: () => window.electronAPI.getSettings(),
 });
 ```
 
-## 주의사항
+## IPC 이벤트 (Main → Renderer)
 
-1. **윈도우 null 체크**: 핸들러 내에서 윈도우 참조 시 `isDestroyed()` 확인
-2. **단방향 이벤트**: `ipcRenderer.on`은 cleanup 함수 필수 반환
-3. **타입 일관성**: Main ↔ Preload ↔ Renderer 타입 동기화
-4. **민감 정보**: Preload에서 노출하는 API 최소화
+단방향 push 이벤트. `IpcEventSchema`에 정의하고, cleanup 함수를 반드시 반환한다.
+
+```typescript
+// preload
+onChatStreamMessage: (cb: (roomId: string, msg: ChatMessage) => void) => {
+  const handler = (_: IpcRendererEvent, roomId: string, msg: ChatMessage) => cb(roomId, msg);
+  ipcRenderer.on("chat:stream-message", handler);
+  return () => ipcRenderer.removeListener("chat:stream-message", handler);
+},
+
+// renderer (hook 내)
+useEffect(() => {
+  const unsubscribe = window.electronAPI.onChatStreamMessage((roomId, msg) => {
+    setMessages(curr => [...curr, msg]);
+  });
+  return () => unsubscribe();
+}, []);
+```
+
+## Date 전달 규칙
+
+**Date 객체는 IPC 통과 불가** — 반드시 ISO 8601 문자열로 전달한다.
+
+```typescript
+// Bad
+params: [date: Date]
+
+// Good
+params: [date: string]  // "2024-01-15", "2024-01-15T09:00:00.000Z"
+```
