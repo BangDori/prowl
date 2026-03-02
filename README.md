@@ -22,6 +22,12 @@
 
 ## ✨ Features
 
+### Prowl Chat
+
+<img width="800" src="demo/prowl-chat.jpg" alt="Prowl Chat" style="max-width: 100%;">
+
+ChatGPT OAuth 또는 API Key로 AI 채팅을 사용합니다. 인증 설정은 Settings 탭에서 할 수 있으며, 채팅창 드롭다운에서 모델을 즉시 전환할 수 있습니다.
+
 ### Task Manager
 
 <img width="800" src="demo/task-manager.jpg" alt="Task Manager — Compact View and Dashboard" style="max-width: 100%;">
@@ -38,12 +44,6 @@ AI 동작 방식을 내 취향으로 조정합니다.
 - **Memory** — AI에게 기억시킬 선호·규칙을 영구 저장
 - **System Prompt** — 기본 시스템 프롬프트를 직접 편집
 - **톤 & 매너** — AI 응답 스타일 설정
-
-### Prowl Chat
-
-<img width="800" src="demo/prowl-chat.jpg" alt="Prowl Chat" style="max-width: 100%;">
-
-ChatGPT OAuth 또는 API Key로 AI 채팅을 사용합니다. 인증 설정은 Settings 탭에서 할 수 있으며, 채팅창 드롭다운에서 모델을 즉시 전환할 수 있습니다.
 
 ## 🚀 Installation
 
