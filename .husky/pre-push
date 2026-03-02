@@ -1,2 +1,0 @@
-# version-bump는 develop → main PR 생성 시에만 수행
-# feature → develop 단계에서는 버전 관리 검사 생략
