@@ -45,7 +45,7 @@ function MemoryCard({
   };
 
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border group">
+    <div className="border-b border-prowl-border last:border-b-0 py-2 group">
       {editing ? (
         <div className="space-y-2">
           <textarea
@@ -122,13 +122,13 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
     if (e.key === "Escape") onClose();
   };
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-accent/20">
+    <div className="border-b border-prowl-border pb-2">
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="예: 항상 한국어로 대답해줘, 이모지 쓰지마..."
-        className="w-full bg-app-input-bg border border-app-input-border rounded px-2 py-1.5 text-sm text-app-text-primary placeholder-app-text-ghost resize-none focus:outline-none focus:border-accent/50"
+        className="w-full bg-app-input-bg border border-accent/30 rounded px-2 py-1.5 text-sm text-app-text-primary placeholder-app-text-ghost resize-none focus:outline-none focus:border-accent/50"
         rows={2}
         // biome-ignore lint/a11y/noAutofocus: 추가 폼 열릴 때 즉시 입력 가능해야 함
         autoFocus
@@ -137,7 +137,7 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
         <button
           type="button"
           onClick={onClose}
-          className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-app-input-border transition-colors"
+          className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors"
         >
           Cancel
         </button>
@@ -145,8 +145,9 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={handleSubmit}
           disabled={!content.trim()}
-          className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors disabled:opacity-50"
         >
+          <Save className="w-3 h-3" />
           추가
         </button>
       </div>
@@ -280,41 +281,47 @@ export default function PersonalizeSection() {
       <div className="p-4 space-y-6">
         {/* Memory */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider">
-              Memory
-            </h3>
-            {!adding && (
-              <button
-                type="button"
-                onClick={() => setAdding(true)}
-                className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                추가
-              </button>
-            )}
-          </div>
-          <div className="space-y-2">
-            {adding && <AddMemoryForm onClose={() => setAdding(false)} />}
-            {memories.length === 0 && !adding ? (
-              <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <Brain className="w-8 h-8 mb-3 opacity-50" />
-                <p className="text-sm">No memories yet</p>
-                <p className="text-[10px] mt-1">
-                  Chat에서 "앞으로 ~~ 해줘" 같은 지시를 하면 자동 저장돼요
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
+            Memory
+          </h3>
+          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border p-3 space-y-2">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-sm font-medium">Memory</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">
+                  AI가 대화에서 기억할 선호도와 지시사항. Chat에서 "앞으로 ~~ 해줘"처럼 말하면 자동
+                  저장됩니다.
                 </p>
               </div>
+              {!adding && (
+                <button
+                  type="button"
+                  onClick={() => setAdding(true)}
+                  className="flex items-center gap-1 px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors shrink-0"
+                >
+                  <Plus className="w-3 h-3" />
+                  추가
+                </button>
+              )}
+            </div>
+            {adding && <AddMemoryForm onClose={() => setAdding(false)} />}
+            {memories.length === 0 && !adding ? (
+              <div className="flex flex-col items-center justify-center py-6 text-gray-500">
+                <Brain className="w-6 h-6 mb-2 opacity-40" />
+                <p className="text-[11px]">No memories yet</p>
+              </div>
             ) : (
-              memories.map((memory) => (
-                <MemoryCard
-                  key={memory.id}
-                  memory={memory}
-                  editing={editingId === memory.id}
-                  onEdit={() => setEditingId(memory.id)}
-                  onCancelEdit={() => setEditingId(null)}
-                />
-              ))
+              <div>
+                {memories.map((memory) => (
+                  <MemoryCard
+                    key={memory.id}
+                    memory={memory}
+                    editing={editingId === memory.id}
+                    onEdit={() => setEditingId(memory.id)}
+                    onCancelEdit={() => setEditingId(null)}
+                  />
+                ))}
+              </div>
             )}
           </div>
         </div>
