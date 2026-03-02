@@ -55,31 +55,3 @@ brew install BangDori/prowl/prowl
 
 Homebrew로 설치하면 앱 내에서 자동 업데이트가 지원됩니다.
 
----
-
-## AI Chat
-
-Prowl은 두 가지 인증 방식으로 AI 채팅을 지원합니다.
-
-### ChatGPT OAuth (권장)
-
-Dashboard → Settings → **Connect with ChatGPT** 버튼으로 연결합니다.
-
-브라우저에서 OpenAI 로그인 후 자동으로 인증이 완료되며, 토큰은 만료 5분 전 자동 갱신됩니다.
-
-| 모델 | 비고 |
-|------|------|
-| gpt-5.3-codex | 기본 모델 |
-| gpt-5.2-codex | |
-| gpt-5.2 | |
-| gpt-5.1-codex-max | |
-| gpt-5.1-codex-mini | |
-
-### OpenAI API Key
-
-Dashboard → Settings에서 API Key를 입력합니다.
-
-| 모델 |
-|------|
-| gpt-5.2, gpt-5-mini 등 범용 모델 |
-
