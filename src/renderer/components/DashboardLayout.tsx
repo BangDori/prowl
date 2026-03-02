@@ -1,23 +1,21 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
-import Bot from "lucide-react/dist/esm/icons/bot";
-import Brain from "lucide-react/dist/esm/icons/brain";
 import Cog from "lucide-react/dist/esm/icons/cog";
 import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
 import History from "lucide-react/dist/esm/icons/history";
 import ListTodo from "lucide-react/dist/esm/icons/list-todo";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
-import AiSection from "./sections/AiSection";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import FilesSection from "./sections/FilesSection";
-import MemorySection from "./sections/MemorySection";
+import PersonalizeSection from "./sections/PersonalizeSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "calendar" | "memory" | "changelog" | "settings" | "files" | "ai";
+type NavItem = "calendar" | "changelog" | "settings" | "files" | "personalize";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -62,7 +60,8 @@ function SidebarItem({ icon, label, isActive, onClick }: SidebarItemProps) {
  * - 메인 영역: 헤더 + 콘텐츠
  *
  * 각 섹션은 별도 컴포넌트로 분리:
- * - JobsSection: 작업 목록
+ * - CalendarSection: 태스크 관리
+ * - PersonalizeSection: 메모리 + AI 커스터마이징
  * - ChangelogSection: 버전 히스토리
  * - SettingsSection: 앱 설정
  */
@@ -93,10 +92,10 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("calendar")}
           />
           <SidebarItem
-            icon={<Brain className="w-4 h-4" />}
-            label="Memory"
-            isActive={isActiveNav === "memory"}
-            onClick={() => setActiveNav("memory")}
+            icon={<Sparkles className="w-4 h-4" />}
+            label="Personalize"
+            isActive={isActiveNav === "personalize"}
+            onClick={() => setActiveNav("personalize")}
           />
           <SidebarItem
             icon={<FolderOpen className="w-4 h-4" />}
@@ -109,12 +108,6 @@ export default function DashboardLayout() {
             label="Version History"
             isActive={isActiveNav === "changelog"}
             onClick={() => setActiveNav("changelog")}
-          />
-          <SidebarItem
-            icon={<Bot className="w-4 h-4" />}
-            label="AI"
-            isActive={isActiveNav === "ai"}
-            onClick={() => setActiveNav("ai")}
           />
           <SidebarItem
             icon={<Cog className="w-4 h-4" />}
@@ -136,9 +129,9 @@ export default function DashboardLayout() {
               <CalendarSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${isActiveNav === "memory" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Memory">
-              <MemorySection />
+          <div className={`h-full ${isActiveNav === "personalize" ? "" : "hidden"}`}>
+            <ErrorBoundary section="Personalize">
+              <PersonalizeSection />
             </ErrorBoundary>
           </div>
           <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`}>
@@ -154,11 +147,6 @@ export default function DashboardLayout() {
           <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`}>
             <ErrorBoundary section="Files">
               <FilesSection />
-            </ErrorBoundary>
-          </div>
-          <div className={`h-full ${isActiveNav === "ai" ? "" : "hidden"}`}>
-            <ErrorBoundary section="AI">
-              <AiSection />
             </ErrorBoundary>
           </div>
         </div>
