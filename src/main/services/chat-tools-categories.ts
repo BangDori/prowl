@@ -31,6 +31,26 @@ const add_category = tool({
   }),
   execute: async ({ name }) => {
     try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: `"${name}" 카테고리를 추가할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "add_category",
+          displayName: name,
+          args: { name },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 추가를 취소했습니다." };
+      }
+
       const category = addCategory(name);
       notifyCategoriesChanged();
       return { success: true, category };
@@ -49,6 +69,26 @@ const rename_category = tool({
   }),
   execute: async ({ oldName, newName }) => {
     try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: `"${oldName}" 카테고리 이름을 "${newName}"으로 변경할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "rename_category",
+          displayName: oldName,
+          args: { oldName, newName },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 변경을 취소했습니다." };
+      }
+
       renameCategory(oldName, newName);
       notifyCategoriesChanged();
       notifyTasksChanged();
