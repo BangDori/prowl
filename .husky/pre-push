@@ -61,6 +61,12 @@ check_skill_links() {
       echo ""
       exit 1
     fi
+    if [ ! -e "$link_path" ]; then
+      echo ""
+      echo "❌ $link_path 심링크 대상이 존재하지 않습니다."
+      echo ""
+      exit 1
+    fi
   done
 }
 
