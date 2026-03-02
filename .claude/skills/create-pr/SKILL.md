@@ -13,8 +13,9 @@ disable-model-invocation: true
 1. `git status`와 `git log develop..HEAD`로 변경사항 파악
 2. 브랜치명이 컨벤션에 맞는지 확인 (맞지 않으면 `git branch -m`으로 변경)
 3. **changeset 추가** (PR 생성 전 마지막 커밋)
-   - `src/` 내부 변경이 없는 경우 → 건너뜀
-   - `src/` 내부 변경이 있는 경우 → `bun changeset` 실행 후 커밋
+   - changeset 필요 여부: !`bash .claude/skills/create-pr/check-changeset.sh`
+   - `CHANGESET_NEEDED`이면 → `bun changeset` 실행 후 커밋
+   - `CHANGESET_SKIP`이면 → 건너뜀
 4. 리모트에 push (`git push -u origin HEAD`)
 5. 템플릿에 맞춰 PR 본문 작성
 6. `GITHUB_TOKEN= gh pr create`로 PR 생성 (workflow scope 오류 방지)
