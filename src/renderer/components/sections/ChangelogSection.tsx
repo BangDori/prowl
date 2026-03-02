@@ -1,7 +1,7 @@
 /** 변경 로그 탭 섹션 */
 import prowlProfile from "@assets/prowl-profile.png";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import changelogRaw from "../../../../CHANGELOG.md?raw";
 
 /** 체인지로그 항목 타입 */
@@ -41,9 +41,7 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
     // 변경사항 항목: - 텍스트
     const itemMatch = line.match(/^-\s+(.+)/);
     if (itemMatch && currentEntry) {
-      // "[텍스트](url)" → "텍스트" 로 마크다운 링크 제거
-      const text = itemMatch[1].replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-      currentEntry.changes.push(text);
+      currentEntry.changes.push(itemMatch[1]);
     }
   }
   if (currentEntry) entries.push(currentEntry);
@@ -51,6 +49,31 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
 }
 
 const CHANGELOG = parseChangelog(changelogRaw);
+
+/**
+ * "[텍스트](url)" 패턴을 클릭 가능한 링크로 렌더링
+ * 링크가 없는 순수 텍스트는 그대로 반환
+ */
+function renderWithLinks(text: string): ReactNode {
+  const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
+  if (parts.length === 1) return text;
+  return parts.map((part) => {
+    const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (match) {
+      return (
+        <button
+          key={match[2]}
+          type="button"
+          className="text-accent hover:underline cursor-pointer"
+          onClick={() => window.electronAPI.openExternal(match[2])}
+        >
+          {match[1]}
+        </button>
+      );
+    }
+    return part;
+  });
+}
 
 /**
  * 체인지로그 섹션 컴포넌트
@@ -103,7 +126,7 @@ export default function ChangelogSection() {
                     className="text-xs text-app-text-secondary flex items-start gap-2"
                   >
                     <span className="text-gray-600 mt-0.5">•</span>
-                    {change}
+                    <span>{renderWithLinks(change)}</span>
                   </li>
                 ))}
               </ul>

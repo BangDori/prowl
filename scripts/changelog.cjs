@@ -20,7 +20,7 @@ function reformatLine(line) {
   if (!match) return line;
 
   const [, prNum, prUrl, author, authorUrl, summary] = match;
-  return `- ${summary} ([#${prNum}](${prUrl}), [@${author}](${authorUrl})!)`;
+  return `- ${summary} ([#${prNum}](${prUrl}), [@${author}](${authorUrl}))`;
 }
 
 /**
