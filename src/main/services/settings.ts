@@ -24,22 +24,6 @@ const store = new Store<StoreSchema>({
   },
 });
 
-/** electron-store에 남아있는 구 aiPersonalization 데이터를 파일로 1회 마이그레이션 */
-function migrateLegacyPersonalization(): void {
-  const raw = store.get("settings") as AppSettings | undefined;
-  const legacy = (raw as AppSettings | undefined)?.aiPersonalization;
-  if (!legacy) return;
-
-  if (legacy.systemPromptOverride) writeSystemPrompt(legacy.systemPromptOverride);
-  if (legacy.toneCustom) writeTone(legacy.toneCustom);
-
-  const { aiPersonalization: _, ...rest } = raw as AppSettings;
-  store.set("settings", rest as StoredSettings);
-}
-
-// 앱 시작 시 1회 실행
-migrateLegacyPersonalization();
-
 export function getSettings(): AppSettings {
   const stored = (store.get("settings") ?? DEFAULT_SETTINGS) as StoredSettings;
   return {
