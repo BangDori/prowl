@@ -10,6 +10,7 @@ import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useEffect, useState } from "react";
 import { useAddMemory, useDeleteMemory, useMemories, useUpdateMemory } from "../../hooks/useMemory";
 import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
+import ConfirmDialog from "../ConfirmDialog";
 
 // ─── Memory 서브컴포넌트 ──────────────────────────────────────────────────────
 
@@ -25,6 +26,7 @@ function MemoryCard({
   onCancelEdit: () => void;
 }) {
   const [editContent, setEditContent] = useState(memory.content);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const updateMemory = useUpdateMemory();
   const deleteMemory = useDeleteMemory();
 
@@ -45,59 +47,74 @@ function MemoryCard({
   };
 
   return (
-    <div className="border-b border-prowl-border last:border-b-0 py-2 group">
-      {editing ? (
-        <div className="space-y-2">
-          <textarea
-            value={editContent}
-            onChange={(e) => setEditContent(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full bg-app-input-bg border border-app-input-border rounded px-2 py-1.5 text-sm text-app-text-primary resize-none focus:outline-none focus:border-accent/50"
-            rows={2}
-            // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
-            autoFocus
-          />
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onCancelEdit}
-              className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-            >
-              Save
-            </button>
+    <>
+      <div className="border-b border-prowl-border last:border-b-0 py-2 group">
+        {editing ? (
+          <div className="space-y-2">
+            <textarea
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full bg-app-input-bg border border-app-input-border rounded px-2 py-1.5 text-sm text-app-text-primary resize-none focus:outline-none focus:border-accent/50"
+              rows={2}
+              // biome-ignore lint/a11y/noAutofocus: 편집 모드 진입 시 즉시 입력 가능해야 함
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={onCancelEdit}
+                className="px-2 py-1 text-[10px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
+              >
+                Save
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex items-start justify-between gap-2">
-          <p className="text-sm text-app-text-primary flex-1 whitespace-pre-wrap">
-            {memory.content}
-          </p>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-            <button
-              type="button"
-              onClick={onEdit}
-              className="p-1 rounded hover:bg-app-active-bg text-app-text-muted hover:text-app-text-primary transition-colors"
-            >
-              <Pencil className="w-3 h-3" />
-            </button>
-            <button
-              type="button"
-              onClick={() => deleteMemory.mutate(memory.id)}
-              className="p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
+        ) : (
+          <div className="flex items-start justify-between gap-2">
+            <p className="text-sm text-app-text-primary flex-1 whitespace-pre-wrap">
+              {memory.content}
+            </p>
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              <button
+                type="button"
+                onClick={onEdit}
+                className="p-1 rounded hover:bg-app-active-bg text-app-text-muted hover:text-app-text-primary transition-colors"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+      {confirmDelete && (
+        <ConfirmDialog
+          title="메모리 삭제"
+          message={`"${memory.content.slice(0, 40)}${memory.content.length > 40 ? "…" : ""}"를 삭제할까요?`}
+          confirmLabel="삭제"
+          onCancel={() => setConfirmDelete(false)}
+          onConfirm={() => {
+            deleteMemory.mutate(memory.id);
+            setConfirmDelete(false);
+          }}
+          isLoading={deleteMemory.isPending}
+        />
       )}
-    </div>
+    </>
   );
 }
 
