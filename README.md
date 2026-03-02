@@ -83,18 +83,3 @@ Dashboard → Settings에서 API Key를 입력합니다.
 |------|
 | gpt-5.2, gpt-5-mini 등 범용 모델 |
 
----
-
-## Development
-
-```bash
-git clone https://github.com/BangDori/prowl.git
-cd prowl
-bun install
-bun run dev        # 개발 모드
-bun run build      # 프로덕션 빌드
-bun run test       # 테스트
-bun run lint       # 린트
-bun run package    # DMG 생성
-```
-
