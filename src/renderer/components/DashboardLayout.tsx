@@ -1,5 +1,6 @@
 /** 대시보드 탭 레이아웃 및 네비게이션 */
 import prowlProfile from "@assets/prowl-profile.png";
+import Bot from "lucide-react/dist/esm/icons/bot";
 import Brain from "lucide-react/dist/esm/icons/brain";
 import Cog from "lucide-react/dist/esm/icons/cog";
 import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
@@ -7,6 +8,7 @@ import History from "lucide-react/dist/esm/icons/history";
 import ListTodo from "lucide-react/dist/esm/icons/list-todo";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
+import AiSection from "./sections/AiSection";
 import CalendarSection from "./sections/CalendarSection";
 import ChangelogSection from "./sections/ChangelogSection";
 import FilesSection from "./sections/FilesSection";
@@ -15,7 +17,7 @@ import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
 
 /** 네비게이션 아이템 타입 */
-type NavItem = "calendar" | "memory" | "changelog" | "settings" | "files";
+type NavItem = "calendar" | "memory" | "changelog" | "settings" | "files" | "ai";
 
 /** 사이드바 아이템 Props */
 interface SidebarItemProps {
@@ -109,6 +111,12 @@ export default function DashboardLayout() {
             onClick={() => setActiveNav("changelog")}
           />
           <SidebarItem
+            icon={<Bot className="w-4 h-4" />}
+            label="AI"
+            isActive={isActiveNav === "ai"}
+            onClick={() => setActiveNav("ai")}
+          />
+          <SidebarItem
             icon={<Cog className="w-4 h-4" />}
             label="Settings"
             isActive={isActiveNav === "settings"}
@@ -146,6 +154,11 @@ export default function DashboardLayout() {
           <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`}>
             <ErrorBoundary section="Files">
               <FilesSection />
+            </ErrorBoundary>
+          </div>
+          <div className={`h-full ${isActiveNav === "ai" ? "" : "hidden"}`}>
+            <ErrorBoundary section="AI">
+              <AiSection />
             </ErrorBoundary>
           </div>
         </div>
