@@ -28,5 +28,6 @@ jobs:
         with:
           title: "chore: version packages"
           commit: "chore: version packages"
+          version: bun run version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
