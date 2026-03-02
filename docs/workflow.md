@@ -1,5 +1,8 @@
 # 개발 워크플로우
 
+이 프로젝트는 **에이전트(Claude)와 협업**하는 방식으로 개발한다.
+개발자는 방향을 결정하고, 에이전트가 구현·커밋·PR을 처리한다.
+
 ## 브랜치 전략
 
 ```
@@ -10,55 +13,39 @@ main ← develop ← feature 브랜치
 - `develop`: 통합 브랜치. 모든 feature는 여기로 merge
 - `feature/*`: 기능 단위 작업 브랜치
 
+---
+
 ## 기능 개발 흐름
 
-### 1단계: 작업
+### 개발자가 하는 것
 
-```bash
-git checkout -b feat/my-feature develop
-# 기능 구현 + 커밋
-```
+1. feature 브랜치 생성 (Conductor worktree 또는 `git checkout -b feat/xxx develop`)
+2. 에이전트에게 구현 요청
+3. 에이전트가 올린 PR 리뷰 & merge
 
-### 2단계: changeset 추가
+### 에이전트가 하는 것 (`/create-pr` 스킬)
 
-기능 추가, 버그 수정이 포함된 경우 반드시 실행한다.
-`chore`, `ci`, `docs`만 변경한 경우 생략.
+1. 변경사항 파악
+2. changeset 추가 (`bun changeset`) — 기능/버그 수정인 경우
+3. 커밋 & push
+4. develop 대상으로 PR 생성
 
-```bash
-bun changeset
-```
+### changeset 판단 기준
 
-인터랙티브 CLI에서:
-1. 패키지 선택: `prowl`
-2. 범프 레벨 선택:
+에이전트가 자동으로 판단한다. 개발자는 설명이 사용자 관점으로 작성됐는지만 확인한다.
 
-| 변경 종류 | 범프 |
-|-----------|------|
-| 하위 호환 불가 변경 | `major` |
-| 사용자에게 노출되는 새 기능 | `minor` |
-| 버그 수정, 내부 개선 | `patch` |
-
-3. 설명 입력: **사용자 관점**에서 한국어로 간결하게
-   - ✅ `Task Manager 드래그 앤 드롭 기능 추가`
-   - ❌ `TaskDragHandler 컴포넌트 리팩토링`
-
-```bash
-git add .changeset/
-git commit -m "chore: add changeset"
-```
-
-### 3단계: PR 생성
-
-```bash
-# target: develop
-gh pr create --base develop
-```
+| 변경 종류 | 범프 | 예시 |
+|-----------|------|------|
+| 하위 호환 불가 변경 | `major` | API 제거, 데이터 마이그레이션 필요 |
+| 사용자에게 노출되는 새 기능 | `minor` | 새 UI 기능, 새 단축키 |
+| 버그 수정, 내부 개선 | `patch` | 오류 수정, 성능 개선, 리팩토링 |
+| `chore` / `ci` / `docs`만 변경 | 생략 | 워크플로우 수정, 문서 업데이트 |
 
 ---
 
 ## 버전 관리 자동화
 
-feature PR이 develop에 merge되면 나머지는 자동으로 처리된다.
+feature PR이 develop에 merge되면 나머지는 **전부 자동**이다.
 
 ```
 feature PR merge → develop
@@ -66,7 +53,7 @@ feature PR merge → develop
 changesets-bot이 "Version Packages" PR 자동 생성
 (package.json 버전 bump + CHANGELOG.md 업데이트 포함)
     ↓
-"Version Packages" PR merge
+개발자가 "Version Packages" PR merge
     ↓
 develop → main PR 생성 & merge
     ↓
@@ -75,10 +62,9 @@ release.yml 트리거 → GitHub Release + Homebrew Cask 업데이트
 
 ### Version Packages PR
 
-changesets-bot이 자동으로 만드는 PR. 직접 수정하지 않는다.
-여러 feature가 쌓이면 하나의 PR에 합산된다.
+changesets-bot이 자동으로 만드는 PR. 직접 편집하지 않는다.
+여러 feature가 쌓일수록 하나의 PR에 합산되어 업데이트된다.
 
-예시:
 ```diff
 // package.json
 - "version": "1.48.2"
