@@ -82,7 +82,7 @@ export default function TaskListPanel({
 
   const applyFilters = (tasks: Task[], forDate?: Date): Task[] => {
     let filtered = tasks;
-    // 과거 날짜는 완료된 태스크도 항상 표시 (moveOverdueTasksToBacklog로 미완료 태스크가 이동되므로)
+    // 과거 날짜는 완료된 태스크도 항상 표시 (이력 조회)
     const isPastDate = forDate ? forDate < todayMidnight : false;
     if (!isShowingCompleted && !isPastDate) filtered = filtered.filter((t) => !t.completed);
     if (filterCategory)
