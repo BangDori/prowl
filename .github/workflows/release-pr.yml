@@ -4,12 +4,14 @@ on:
   pull_request:
     types: [closed]
     branches: [develop]
+  workflow_dispatch:
 
 jobs:
   create-release-pr:
     if: |
-      github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.head.ref, 'changeset-release/')
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'changeset-release/'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,6 +21,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Resolve PR title
+        id: title
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION=$(node -p "require('./package.json').version")
+            echo "value=release v$VERSION" >> $GITHUB_OUTPUT
+          else
+            TITLE=$(echo "${{ github.event.pull_request.title }}" | sed 's/^chore: //')
+            echo "value=$TITLE" >> $GITHUB_OUTPUT
+          fi
 
       - name: Write PR body to file
         run: |
@@ -34,13 +47,11 @@ jobs:
             exit 0
           fi
 
-          TITLE=$(echo "$PR_TITLE" | sed 's/^chore: //')
-
           gh pr create \
             --base main \
             --head develop \
-            --title "$TITLE" \
+            --title "$PR_TITLE" \
             --body-file /tmp/pr-body.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_TITLE: ${{ steps.title.outputs.value }}
