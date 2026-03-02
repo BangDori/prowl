@@ -6,38 +6,10 @@
 
 ```
 src/
-├── main/                 # Electron Main Process
-│   ├── index.ts          # 앱 진입점
-│   ├── ipc.ts            # IPC 핸들러 등록
-│   ├── constants.ts
-│   ├── services/         # 비즈니스 로직 (OS 연동)
-│   ├── utils/            # 순수 헬퍼 함수
-│   └── windows/          # 윈도우 관리
-├── renderer/             # React UI
-│   ├── index.tsx         # React 진입점
-│   ├── App.tsx
-│   ├── components/       # React 컴포넌트
-│   │   ├── sections/     # 대시보드 탭 섹션
-│   │   ├── calendar/     # 캘린더 관련 컴포넌트
-│   │   ├── compact/      # 컴팩트 윈도우 컴포넌트
-│   │   ├── chat/         # 채팅 관련 컴포넌트
-│   │   └── files/        # 파일 브라우저 컴포넌트
-│   ├── hooks/            # 커스텀 훅
-│   ├── queries/          # TanStack Query 설정
-│   │   ├── keys.ts       # 쿼리 키 정의
-│   │   └── client.ts     # QueryClient 설정
-│   ├── styles/           # 스타일시트
-│   └── utils/            # UI 헬퍼 함수
-├── preload/              # contextBridge
-│   └── index.ts
-└── shared/               # Main/Renderer 공유
-    ├── types/            # 타입 정의
-    │   ├── common.ts     # 공통 인터페이스 (Task, Memory, ChatRoom 등)
-    │   ├── calendar.ts   # 캘린더 타입
-    │   └── index.ts      # re-export
-    ├── ipc-schema.ts     # IPC 채널 스키마 (Single Source of Truth)
-    ├── constants.ts      # 공유 상수
-    └── prompts.ts        # AI 프롬프트 템플릿
+├── main/      # Electron Main Process — OS 연동, 파일 I/O, 윈도우 관리
+├── renderer/  # React UI — 렌더링, 사용자 입력
+├── preload/   # contextBridge — IPC 브릿지만 담당
+└── shared/    # Main/Renderer 공유 — 타입, IPC 스키마, 상수
 ```
 
 ## Utils vs Services
