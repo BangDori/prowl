@@ -8,23 +8,31 @@ import { useEffect, useRef, useState } from "react";
 const ERASE_MS = 40;
 const TYPE_MS = 60;
 
-/** 제목 변경 시 한 글자씩 지우고 새 제목을 타이핑하는 애니메이션 */
-function useTypewriterTitle(title: string | undefined): string {
-  const finalTitle = title ?? "새 대화";
-  const [displayTitle, setDisplayTitle] = useState(finalTitle);
+/**
+ * AI가 새 제목을 생성했을 때만 타이핑 애니메이션 실행.
+ * - title: 서버에서 내려오는 실제 제목 (로딩 포함) — 애니메이션 없이 즉시 반영
+ * - aiGeneratedTitle: AI 생성 제목 IPC 이벤트로 전달된 값 — 변경 시 타이핑 애니메이션
+ */
+function useTypewriterTitle(title: string | undefined, aiGeneratedTitle: string | null): string {
+  const baseTitle = title ?? "새 대화";
+  const [displayTitle, setDisplayTitle] = useState(baseTitle);
+  const displayRef = useRef(baseTitle);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const displayRef = useRef(finalTitle);
-  const isFirstRender = useRef(true);
+  const animatingRef = useRef(false);
 
+  // 애니메이션 없는 일반 제목 동기화 (채팅방 진입, 로딩 완료 등)
   useEffect(() => {
-    // 최초 마운트는 애니메이션 없이 바로 표시
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      displayRef.current = finalTitle;
-      setDisplayTitle(finalTitle);
-      return;
+    if (!animatingRef.current) {
+      displayRef.current = baseTitle;
+      setDisplayTitle(baseTitle);
     }
+  }, [baseTitle]);
 
+  // AI 제목 생성 시에만 타이핑 애니메이션
+  useEffect(() => {
+    if (!aiGeneratedTitle) return;
+
+    animatingRef.current = true;
     if (timerRef.current) clearTimeout(timerRef.current);
 
     let current = displayRef.current;
@@ -41,38 +49,43 @@ function useTypewriterTitle(title: string | undefined): string {
     }
 
     function typeStep(idx: number) {
-      const partial = finalTitle.slice(0, idx);
+      const partial = aiGeneratedTitle.slice(0, idx);
       displayRef.current = partial;
       setDisplayTitle(partial);
-      if (idx < finalTitle.length) {
+      if (idx < aiGeneratedTitle.length) {
         timerRef.current = setTimeout(() => typeStep(idx + 1), TYPE_MS);
+      } else {
+        animatingRef.current = false;
       }
     }
 
     eraseStep();
 
     return () => {
+      animatingRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [finalTitle]);
+  }, [aiGeneratedTitle]);
 
   return displayTitle;
 }
 
 export default function ConversationHeader({
   title,
+  aiGeneratedTitle,
   onBack,
   onClose,
   isExpanded,
   onToggleExpand,
 }: {
   title?: string;
+  aiGeneratedTitle?: string | null;
   onBack: () => void;
   onClose: () => void;
   isExpanded: boolean;
   onToggleExpand: () => void;
 }) {
-  const displayTitle = useTypewriterTitle(title);
+  const displayTitle = useTypewriterTitle(title, aiGeneratedTitle ?? null);
 
   return (
     <div className="chat-conv-header px-3 py-2">

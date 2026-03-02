@@ -51,6 +51,7 @@ export default function ChatConversation({
     providers,
     handleConfigChange,
     roomTitle,
+    aiGeneratedTitle,
   } = useChatMessages(roomId, initialMessage);
 
   const [splitRatio, setSplitRatio] = useState(0.5);
@@ -167,6 +168,7 @@ export default function ChatConversation({
         <div className="chat-messages-area">
           <ConversationHeader
             title={roomTitle}
+            aiGeneratedTitle={aiGeneratedTitle}
             onBack={onBack}
             onClose={() => window.electronAPI.closeChatWindow()}
             isExpanded={isExpanded}
