@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
   ci:
@@ -23,7 +23,7 @@ jobs:
       - name: Check file headers
         run: |
           missing=()
-          for file in $(git diff --name-only --diff-filter=d origin/main -- 'src/**/*.ts' 'src/**/*.tsx'); do
+          for file in $(git diff --name-only --diff-filter=d origin/${{ github.base_ref }} -- 'src/**/*.ts' 'src/**/*.tsx'); do
             first_line=$(head -n 1 "$file")
             if [[ ! "$first_line" =~ ^/\*\* ]]; then
               missing+=("$file")
