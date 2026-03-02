@@ -1,3 +1,72 @@
+# Skill validation (only when skills change)
+skill_changes=$(git diff origin/develop..HEAD --name-only -- .agents/skills 2>/dev/null)
+if [ -n "$skill_changes" ]; then
+  # Ensure SKILL.md is not added outside .agents/skills
+  outside_skill=$(git diff --name-only --diff-filter=A origin/develop..HEAD 2>/dev/null | grep 'SKILL\.md$' | grep -v '^\.agents/skills/')
+  if [ -n "$outside_skill" ]; then
+    echo ""
+    echo "❌ SKILL.md 파일은 .agents/skills/<skill>/SKILL.md 경로에만 추가해야 합니다."
+    echo ""
+    echo "잘못된 경로:"
+    echo "$outside_skill"
+    echo ""
+    exit 1
+  fi
+
+  # Ensure each changed skill directory has SKILL.md
+  skill_dirs=$(echo "$skill_changes" | awk -F/ 'NF>=3 {print $1"/"$2"/"$3}' | sort -u)
+  missing_skill_md=""
+  for dir in $skill_dirs; do
+    if [ ! -f "$dir/SKILL.md" ]; then
+      missing_skill_md="${missing_skill_md}\n${dir}/SKILL.md"
+    fi
+  done
+  if [ -n "$missing_skill_md" ]; then
+    echo ""
+    echo "❌ 스킬 디렉터리에 SKILL.md가 필요합니다."
+    echo ""
+    echo "누락된 파일:"
+    echo "$missing_skill_md"
+    echo ""
+    exit 1
+  fi
+fi
+
+# Ensure symlink wiring for each skill
+check_skill_links() {
+  target_root="$1"
+  if [ ! -d "$target_root" ]; then
+    echo ""
+    echo "❌ $target_root 디렉터리가 없습니다."
+    echo ""
+    exit 1
+  fi
+
+  for skill_dir in .agents/skills/*; do
+    [ -d "$skill_dir" ] || continue
+    name=$(basename "$skill_dir")
+    link_path="$target_root/$name"
+    if [ ! -L "$link_path" ]; then
+      echo ""
+      echo "❌ $link_path 가 심링크가 아닙니다."
+      echo ""
+      exit 1
+    fi
+    actual_target=$(readlink "$link_path")
+    if [ "$actual_target" != "../../.agents/skills/$name" ]; then
+      echo ""
+      echo "❌ $link_path 심링크 대상이 올바르지 않습니다."
+      echo "기대: ../../.agents/skills/$name"
+      echo "현재: $actual_target"
+      echo ""
+      exit 1
+    fi
+  done
+}
+
+check_skill_links ".claude/skills"
+check_skill_links ".codex/skills"
+
 bash .claude/skills/create-pr/check-changeset.sh > /tmp/changeset-check.txt 2>&1
 result=$(cat /tmp/changeset-check.txt | head -1)
 
