@@ -50,12 +50,20 @@ function getNextColor(currentCount: number): string {
   return COLOR_PALETTE[(currentCount - 1) % COLOR_PALETTE.length];
 }
 
-/** 카테고리 추가 (이미 있으면 에러) */
+/** 카테고리 이름을 대소문자 무시로 검색하여 실제 저장된 이름 반환 */
+export function resolveCategory(name: string): string | undefined {
+  const cats = listCategories();
+  const lower = name.trim().toLowerCase();
+  return cats.find((c) => c.name.toLowerCase() === lower)?.name;
+}
+
+/** 카테고리 추가 (이미 있으면 에러 — 대소문자 무시) */
 export function addCategory(name: string): TaskCategoryItem {
   const trimmed = name.trim();
   if (!trimmed) throw new Error("카테고리 이름이 비어 있습니다.");
   const cats = listCategories();
-  if (cats.some((c) => c.name === trimmed)) throw new Error(`이미 존재하는 카테고리: ${trimmed}`);
+  const existing = cats.find((c) => c.name.toLowerCase() === trimmed.toLowerCase());
+  if (existing) throw new Error(`이미 존재하는 카테고리: ${existing.name}`);
   const color = getNextColor(cats.length);
   const next = [...cats, { name: trimmed, color }];
   saveCategories(next);

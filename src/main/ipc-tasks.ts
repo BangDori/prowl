@@ -9,7 +9,6 @@ import {
   listBacklogTasks,
   listTasksByDateRange,
   listTasksByMonth,
-  moveOverdueTasksToBacklog,
   scanDates,
   toggleBacklogComplete,
   toggleTaskComplete,
@@ -20,13 +19,11 @@ import {
 export function registerTaskHandlers(): void {
   // 월 단위 태스크 조회
   handleIpc("tasks:list-month", async (year, month) => {
-    moveOverdueTasksToBacklog();
     return listTasksByMonth(year, month);
   });
 
   // 날짜 범위 태스크 조회
   handleIpc("tasks:list-date-range", async (startDate, endDate) => {
-    moveOverdueTasksToBacklog();
     return listTasksByDateRange(startDate, endDate);
   });
 
@@ -81,7 +78,6 @@ export function registerTaskHandlers(): void {
   // ── Backlog ──────────────────────────────────────────
 
   handleIpc("tasks:list-backlog", async () => {
-    moveOverdueTasksToBacklog();
     return listBacklogTasks();
   });
 
