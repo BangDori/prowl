@@ -22,7 +22,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "postinstall": "node node_modules/electron/install.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "version-packages": "changeset version && node scripts/fix-changelog-headings.js"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.29",

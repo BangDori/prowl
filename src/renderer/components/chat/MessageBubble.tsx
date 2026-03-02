@@ -83,6 +83,8 @@ interface MessageBubbleProps {
   onOpenHtml?: (html: string) => void;
   /** 외부 링크 탭 열기 콜백 */
   onOpenLink?: (url: string, label: string) => void;
+  /** 승인 상태 변경 시 부모에게 알림 (영속화 목적) */
+  onApprovalChange?: (messageId: string, status: "approved" | "rejected") => void;
 }
 
 /** HTML 카드 (복사 + 열기 버튼 포함) */
@@ -149,6 +151,7 @@ export default function MessageBubble({
   isLastInGroup = true,
   onOpenHtml,
   onOpenLink,
+  onApprovalChange,
 }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const [copied, setCopied] = useState(false);
@@ -272,11 +275,13 @@ export default function MessageBubble({
               state={approvalState}
               onApprove={async () => {
                 setApprovalState("approved");
-                await window.electronAPI.approveTool(message.approval?.id);
+                await window.electronAPI.approveTool(message.approval!.id);
+                onApprovalChange?.(message.id, "approved");
               }}
               onReject={async () => {
                 setApprovalState("rejected");
-                await window.electronAPI.rejectTool(message.approval?.id);
+                await window.electronAPI.rejectTool(message.approval!.id);
+                onApprovalChange?.(message.id, "rejected");
               }}
             />
           )}

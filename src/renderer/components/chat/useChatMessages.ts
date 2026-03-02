@@ -200,6 +200,17 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
     }
   }, [initialMessage, initialized, sendMessage]);
 
+  const updateApprovalStatus = useCallback(
+    (messageId: string, status: "approved" | "rejected") => {
+      const updated = messagesRef.current.map((m) =>
+        m.id === messageId && m.approval ? { ...m, approval: { ...m.approval, status } } : m,
+      );
+      setMessages(updated);
+      saveMessages.mutate({ roomId, messages: updated });
+    },
+    [roomId, saveMessages],
+  );
+
   return {
     messages,
     loading,
@@ -212,5 +223,6 @@ export function useChatMessages(roomId: string, initialMessage?: string | null) 
     roomTitle: roomData?.title,
     aiGeneratedTitle,
     initialized,
+    updateApprovalStatus,
   };
 }

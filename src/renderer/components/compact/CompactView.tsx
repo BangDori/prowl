@@ -78,6 +78,21 @@ export default function CompactView() {
 
     const entries: CategoryTaskEntry[] = [];
 
+    // 이전 날짜 미완료 태스크 (이번 달) — 날짜 오름차순
+    for (const [date, tasks] of Object.entries(tasksByDate).sort(([a], [b]) =>
+      a.localeCompare(b),
+    )) {
+      if (date >= todayStr) continue;
+      for (const task of tasks.filter((t) => !t.completed)) {
+        entries.push({
+          task,
+          dateLabel: getLabel(date),
+          onToggle: () => toggleComplete(date, task.id),
+          onDelete: () => deleteTask(date, task.id),
+        });
+      }
+    }
+
     for (const task of todayTasks) {
       entries.push({
         task,
@@ -111,6 +126,7 @@ export default function CompactView() {
 
     return entries;
   }, [
+    tasksByDate,
     todayTasks,
     upcomingTasksByDate,
     incompleteBacklogTasks,

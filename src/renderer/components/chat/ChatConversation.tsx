@@ -52,6 +52,7 @@ export default function ChatConversation({
     handleConfigChange,
     roomTitle,
     aiGeneratedTitle,
+    updateApprovalStatus,
   } = useChatMessages(roomId, initialMessage);
 
   const [splitRatio, setSplitRatio] = useState(0.5);
@@ -192,6 +193,7 @@ export default function ChatConversation({
                         addOrActivateTab({ type: "html", content: html, label: "HTML" })
                       }
                       onOpenLink={(url, label) => addOrActivateTab({ type: "url", url, label })}
+                      onApprovalChange={updateApprovalStatus}
                     />
                   </Fragment>
                 );
