@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.50.1] - 2026-03-03
+- API Key 없는 초기 상태에서 입력 버튼 누락 수정 ([#141](https://github.com/BangDori/prowl/pull/141), [@BangDori](https://github.com/BangDori))
+
 ## [1.50.0] - 2026-03-02
 - AI 퍼스널라이제이션 탭 추가 — 시스템 프롬프트·톤·메모리 통합 관리 ([#124](https://github.com/BangDori/prowl/pull/124), [@BangDori](https://github.com/BangDori))
 - 첫 응답 후 채팅 룸 제목 AI 자동 생성 ([#130](https://github.com/BangDori/prowl/pull/130), [@BangDori](https://github.com/BangDori))
