@@ -2,15 +2,15 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import { PERSONALIZE_SUBFOLDER, PROWL_DATA_DIR } from "@shared/types";
-import { app } from "electron";
 
 const SYSTEM_PROMPT_FILE = "systemprompt.json";
 const TONE_FILE = "tone.json";
 
 /** ~/.prowl/personalize 디렉터리 확보 후 경로 반환 */
 export function ensurePersonalizeDir(): string {
-  const dir = join(app.getPath("home"), PROWL_DATA_DIR, PERSONALIZE_SUBFOLDER);
+  const dir = join(getDataHome(), PROWL_DATA_DIR, PERSONALIZE_SUBFOLDER);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   return dir;
 }

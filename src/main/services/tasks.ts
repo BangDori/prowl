@@ -9,15 +9,15 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import type { Task, TasksByDate } from "@shared/types";
 import { LEGACY_TASK_FOLDER, PROWL_DATA_DIR, TASK_SUBFOLDER } from "@shared/types";
-import { app } from "electron";
 
 const DATE_FILE_RE = /^\d{4}-\d{2}-\d{2}\.json$/;
 
 /** 태스크 폴더 절대 경로 (~/.prowl/task-calendar) */
 function getTaskFolder(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR, TASK_SUBFOLDER);
+  return join(getDataHome(), PROWL_DATA_DIR, TASK_SUBFOLDER);
 }
 
 /** 폴더가 없으면 생성 + 기존 데이터 마이그레이션 */
@@ -32,7 +32,7 @@ function ensureFolder(): string {
 
 /** ~/prowl-task-calendar/ → ~/.prowl/task-calendar/ 마이그레이션 */
 function migrateLegacyData(newFolder: string): void {
-  const legacyFolder = join(app.getPath("home"), LEGACY_TASK_FOLDER);
+  const legacyFolder = join(getDataHome(), LEGACY_TASK_FOLDER);
   if (!existsSync(legacyFolder)) return;
   try {
     const files = readdirSync(legacyFolder).filter((f) => f.endsWith(".json"));
