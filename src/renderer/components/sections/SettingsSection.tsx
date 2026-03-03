@@ -217,7 +217,7 @@ export default function SettingsSection() {
                     : "Alternatively, use an OpenAI API Key"}
                 </p>
               </div>
-              {!isOAuthConnected && (isApiKeyConnected || apiKeyEditing) ? (
+              {!isOAuthConnected && (
                 <div className="flex gap-1 shrink-0">
                   {isApiKeyConnected && !apiKeyEditing ? (
                     <>
@@ -239,7 +239,7 @@ export default function SettingsSection() {
                         Remove
                       </button>
                     </>
-                  ) : (
+                  ) : apiKeyEditing ? (
                     <>
                       <input
                         type="password"
@@ -258,9 +258,17 @@ export default function SettingsSection() {
                         Save
                       </button>
                     </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setApiKeyEditing(true)}
+                      className="px-3 py-1.5 text-[11px] rounded bg-app-active-bg text-app-text-secondary hover:bg-prowl-border transition-colors font-medium"
+                    >
+                      Enter
+                    </button>
                   )}
                 </div>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
