@@ -23,7 +23,8 @@
     "test:watch": "vitest",
     "postinstall": "node node_modules/electron/install.js",
     "prepare": "husky",
-    "version-packages": "changeset version && node scripts/fix-changelog-headings.js"
+    "version-packages": "changeset version && node scripts/fix-changelog-headings.js",
+    "codegen:map": "bun scripts/generate-code-map.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.29",
