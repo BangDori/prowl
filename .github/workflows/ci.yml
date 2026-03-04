@@ -6,6 +6,7 @@ on:
 
 jobs:
   check:
+    name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
       src: ${{ steps.filter.outputs.src }}
@@ -22,6 +23,7 @@ jobs:
               - "src/**"
 
   ci:
+    name: Lint / Build / Test
     needs: check
     if: needs.check.outputs.src == 'true'
     runs-on: ubuntu-latest
@@ -63,6 +65,7 @@ jobs:
         run: bun run test
 
   e2e:
+    name: E2E Test
     needs: check
     if: needs.check.outputs.src == 'true'
     runs-on: macos-latest
@@ -84,6 +87,7 @@ jobs:
         run: bun run e2e:test
 
   ci-status:
+    name: Status
     needs: [check, ci, e2e]
     if: always()
     runs-on: ubuntu-latest
