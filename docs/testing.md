@@ -199,7 +199,9 @@ await page.click('[data-testid="task-input"]');
 | 파일 | Journey |
 |------|---------|
 | `e2e/specs/task-management.spec.ts` | 대시보드 로드, 태스크 생성/완료 |
+| `e2e/specs/task-crud.spec.ts` | 태스크 인라인 편집 / 삭제 |
 | `e2e/specs/compact-sync.spec.ts` | Compact에서 완료 → Dashboard 반영 |
+| `e2e/specs/personalize.spec.ts` | Memory CRUD, System Prompt, Tone & Manner 저장 |
 | `e2e/specs/chat.spec.ts` | 채팅 메시지 전송, Tool Calling (E2E_OPENAI_KEY 필요) |
 
 ### OpenAI 의존 테스트
