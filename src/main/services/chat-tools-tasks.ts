@@ -1,5 +1,5 @@
 /** 태스크 관리 AI 도구 — 조회/추가/수정/삭제/완료 토글 */
-import type { Task } from "@shared/types";
+import type { ApprovalDetails, Task } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { waitForApproval } from "./approval";
@@ -122,12 +122,42 @@ const update_task = tool({
       if (updates.dueTime) merged.dueTime = updates.dueTime;
       if (updates.category) merged.category = resolveCategory(updates.category) ?? updates.category;
 
+      // 변경된 필드만 changes에 수집, 타이틀이 변경 안 되면 context로 식별자 제공
+      const changes: { label: string; before: string; after: string }[] = [];
+      if (merged.title !== currentTask.title)
+        changes.push({ label: "제목", before: currentTask.title, after: merged.title });
+      if (merged.description !== currentTask.description)
+        changes.push({
+          label: "메모",
+          before: currentTask.description ?? "(없음)",
+          after: merged.description ?? "(없음)",
+        });
+      if (merged.dueTime !== currentTask.dueTime)
+        changes.push({
+          label: "시간",
+          before: currentTask.dueTime ?? "(없음)",
+          after: merged.dueTime ?? "(없음)",
+        });
+      if (merged.category !== currentTask.category)
+        changes.push({
+          label: "카테고리",
+          before: currentTask.category ?? "(없음)",
+          after: merged.category ?? "(없음)",
+        });
+      if (newDate) changes.push({ label: "날짜", before: date ?? "백로그", after: newDate });
+
+      const titleIsChanging = merged.title !== currentTask.title;
+      const details: ApprovalDetails = {
+        type: "update",
+        context: titleIsChanging ? [] : [{ label: "제목", value: currentTask.title }],
+        changes,
+      };
+
       const approvalId = `approval_${generateId()}`;
-      const moveLabel = newDate ? ` (→ ${newDate})` : "";
       sendToChat("chat:stream-message", getCurrentRoomId(), {
         id: approvalId,
         role: "assistant",
-        content: `"${currentTask.title}" 태스크를 수정할까요?${moveLabel}`,
+        content: `"${currentTask.title}" 태스크를 수정할까요?`,
         timestamp: Date.now(),
         approval: {
           id: approvalId,
@@ -135,6 +165,7 @@ const update_task = tool({
           toolName: "update_task",
           displayName: currentTask.title,
           args: { taskId, date, backlog, newDate, ...updates },
+          details,
         },
       });
 
@@ -200,6 +231,13 @@ const delete_task = tool({
           toolName: "delete_task",
           displayName: taskTitle,
           args: { taskId, date, backlog },
+          details: {
+            type: "delete",
+            fields: [
+              { label: "제목", value: taskTitle },
+              { label: "위치", value: backlog ? "백로그" : (date ?? "알 수 없음") },
+            ],
+          },
         },
       });
 

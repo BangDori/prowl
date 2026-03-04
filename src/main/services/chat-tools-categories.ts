@@ -1,4 +1,5 @@
 /** 카테고리 관리 AI 도구 — 목록/추가/이름변경/삭제 */
+import type { ApprovalDetails } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { waitForApproval } from "./approval";
@@ -43,6 +44,10 @@ const add_category = tool({
           toolName: "add_category",
           displayName: name,
           args: { name },
+          details: {
+            type: "add",
+            fields: [{ label: "이름", value: name }],
+          } satisfies ApprovalDetails,
         },
       });
 
@@ -81,6 +86,10 @@ const rename_category = tool({
           toolName: "rename_category",
           displayName: oldName,
           args: { oldName, newName },
+          details: {
+            type: "update",
+            changes: [{ label: "이름", before: oldName, after: newName }],
+          } satisfies ApprovalDetails,
         },
       });
 
@@ -119,6 +128,13 @@ const delete_category = tool({
           toolName: "delete_category",
           displayName: name,
           args: { name },
+          details: {
+            type: "delete",
+            fields: [
+              { label: "이름", value: name },
+              { label: "태스크", value: "모두 '기타'로 이동" },
+            ],
+          } satisfies ApprovalDetails,
         },
       });
 
