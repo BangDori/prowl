@@ -7,6 +7,7 @@ vi.mock("ai", () => ({ tool: vi.fn((c) => c) }));
 
 vi.mock("./tasks", () => ({
   listBacklogTasks: vi.fn(),
+  listTasksByDateRange: vi.fn().mockReturnValue({}),
   getDateTasks: vi.fn(),
   deleteBacklogTask: vi.fn(),
   deleteTask: vi.fn(),
@@ -31,8 +32,10 @@ import {
   addDateTask,
   addTaskToBacklog,
   deleteBacklogTask,
+  deleteTask,
   getDateTasks,
   listBacklogTasks,
+  listTasksByDateRange,
   updateBacklogTask,
   updateTask,
 } from "./tasks";
@@ -40,7 +43,12 @@ import { toolRegistry } from "./tool-registry";
 // side effect: update_task 등 도구를 toolRegistry에 등록
 import "./chat-tools-tasks";
 
-const execute = (toolRegistry.getAllTools().update_task as { execute: Function }).execute;
+const tools = toolRegistry.getAllTools();
+const execute = (tools.update_task as { execute: Function }).execute;
+const executeAddTask = (tools.add_task as { execute: Function }).execute;
+const executeDeleteTask = (tools.delete_task as { execute: Function }).execute;
+const executeGetTodayInfo = (tools.get_today_info as { execute: Function }).execute;
+const executeListTasks = (tools.list_tasks as { execute: Function }).execute;
 
 const BASE_TASK: Task = {
   id: "task-1",
@@ -140,5 +148,98 @@ describe("update_task — 빈 문자열 필드 가드", () => {
     const result = await execute({ taskId: "not-exist", backlog: true });
 
     expect(result.error).toMatch("Task not found");
+  });
+});
+
+describe("get_today_info", () => {
+  it("오늘 날짜, 시간, 요일을 반환한다", async () => {
+    const result = await executeGetTodayInfo({});
+
+    expect(result.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(result.time).toMatch(/^\d{2}:\d{2}$/);
+    expect(["일", "월", "화", "수", "목", "금", "토"]).toContain(result.dayOfWeek);
+  });
+});
+
+describe("list_tasks", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("backlog:true이면 백로그 태스크를 반환한다", async () => {
+    vi.mocked(listBacklogTasks).mockReturnValue([BASE_TASK]);
+
+    const result = await executeListTasks({ backlog: true });
+
+    expect(result.backlog).toHaveLength(1);
+  });
+
+  it("startDate/endDate 없으면 error 반환", async () => {
+    const result = await executeListTasks({});
+
+    expect(result.error).toBeTruthy();
+  });
+
+  it("날짜 범위가 있으면 listTasksByDateRange를 사용한다", async () => {
+    vi.mocked(listTasksByDateRange).mockReturnValue({ "2025-01-15": [BASE_TASK] });
+
+    const result = await executeListTasks({ startDate: "2025-01-15", endDate: "2025-01-15" });
+
+    expect(result.tasksByDate).toBeDefined();
+  });
+});
+
+describe("add_task", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("날짜와 함께 태스크를 추가한다", async () => {
+    const result = await executeAddTask({ title: "새 태스크", date: "2025-01-15" });
+
+    expect(result.success).toBe(true);
+    expect(result.task.title).toBe("새 태스크");
+    expect(addDateTask).toHaveBeenCalledWith(
+      "2025-01-15",
+      expect.objectContaining({ title: "새 태스크" }),
+    );
+  });
+
+  it("date 없으면 백로그에 추가한다", async () => {
+    const result = await executeAddTask({ title: "백로그 태스크" });
+
+    expect(result.success).toBe(true);
+    expect(addTaskToBacklog).toHaveBeenCalled();
+  });
+
+  it("backlog:true이면 백로그에 추가한다", async () => {
+    const result = await executeAddTask({ title: "명시 백로그", backlog: true });
+
+    expect(result.success).toBe(true);
+    expect(addTaskToBacklog).toHaveBeenCalled();
+  });
+});
+
+describe("delete_task", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("승인 후 날짜 기반 태스크를 삭제한다", async () => {
+    vi.mocked(getDateTasks).mockReturnValue([BASE_TASK]);
+
+    const result = await executeDeleteTask({ taskId: "task-1", date: "2026-02-20" });
+
+    expect(result.success).toBe(true);
+    expect(deleteTask).toHaveBeenCalledWith("2026-02-20", "task-1");
+  });
+
+  it("승인 후 백로그 태스크를 삭제한다", async () => {
+    vi.mocked(listBacklogTasks).mockReturnValue([BASE_TASK]);
+
+    const result = await executeDeleteTask({ taskId: "task-1", backlog: true });
+
+    expect(result.success).toBe(true);
+    expect(deleteBacklogTask).toHaveBeenCalledWith("task-1");
+  });
+
+  it("date도 backlog도 없으면 error 반환", async () => {
+    const result = await executeDeleteTask({ taskId: "task-1" });
+
+    expect(result.error).toBeTruthy();
   });
 });

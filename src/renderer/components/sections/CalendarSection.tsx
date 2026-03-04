@@ -1,13 +1,13 @@
 /** 캘린더 탭 섹션: 파일 기반 태스크 캘린더 */
 import { useMemo, useState } from "react";
-import { useAgendaTasks } from "../../hooks/useAgendaTasks";
-import { useBacklogData } from "../../hooks/useBacklogData";
-import { useTaskData } from "../../hooks/useTaskData";
 import { getCalendarDays, isSameDay } from "../../utils/calendar";
 import CalendarGrid from "../calendar/CalendarGrid";
 import CalendarHeader from "../calendar/CalendarHeader";
 import TaskFilterBar from "../calendar/TaskFilterBar";
 import TaskListPanel from "../calendar/TaskListPanel";
+import { useAgendaTasks } from "../calendar/useAgendaTasks";
+import { useBacklogData } from "../calendar/useBacklogData";
+import { useTaskData } from "../calendar/useTaskData";
 
 export default function CalendarSection() {
   const now = new Date();

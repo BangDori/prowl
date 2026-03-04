@@ -15,6 +15,14 @@ import {
   updateBacklogTask,
   updateTask,
 } from "./services/tasks";
+import { getCompactWindow, getDashboardWindow } from "./windows";
+
+/** 모든 창에 tasks:changed 이벤트 브로드캐스트 — 크로스 창 캐시 동기화 */
+function notifyTasksChanged(): void {
+  for (const win of [getCompactWindow(), getDashboardWindow()]) {
+    if (win && !win.isDestroyed()) win.webContents.send("tasks:changed");
+  }
+}
 
 export function registerTaskHandlers(): void {
   // 월 단위 태스크 조회
@@ -32,6 +40,7 @@ export function registerTaskHandlers(): void {
     try {
       updateTask(date, task);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -42,6 +51,7 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:toggle-complete", async (date, taskId) => {
     try {
       toggleTaskComplete(date, taskId);
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -53,6 +63,7 @@ export function registerTaskHandlers(): void {
     try {
       deleteTask(date, taskId);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -64,6 +75,7 @@ export function registerTaskHandlers(): void {
     try {
       addDateTask(date, task);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -85,6 +97,7 @@ export function registerTaskHandlers(): void {
     try {
       addTaskToBacklog(task);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -95,6 +108,7 @@ export function registerTaskHandlers(): void {
     try {
       updateBacklogTask(task);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -104,6 +118,7 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:toggle-backlog-complete", async (taskId) => {
     try {
       toggleBacklogComplete(taskId);
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };
@@ -114,6 +129,7 @@ export function registerTaskHandlers(): void {
     try {
       deleteBacklogTask(taskId);
       refreshReminders();
+      notifyTasksChanged();
       return { success: true };
     } catch (error) {
       return { success: false, error: String(error) };

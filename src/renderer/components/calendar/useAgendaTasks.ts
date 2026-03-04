@@ -1,8 +1,9 @@
 /** 어젠다 뷰용: 오늘부터 1년치 태스크 날짜 범위 조회 */
+
+import { queryKeys } from "@renderer/queries/keys";
+import { toDateStr } from "@renderer/utils/calendar";
 import type { TasksByDate } from "@shared/types";
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
-import { toDateStr } from "../utils/calendar";
 
 export function useAgendaTasks(): TasksByDate {
   const today = new Date();

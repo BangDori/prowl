@@ -1,6 +1,7 @@
 /** ~/.prowl/ 파일 탐색 및 편집 TanStack Query 훅 */
+
+import { queryKeys } from "@renderer/queries/keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
 
 /** 디렉터리 목록 조회 */
 export function useProwlDir(relPath?: string) {

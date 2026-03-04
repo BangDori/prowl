@@ -9,20 +9,35 @@ const { mockReaddirSync, mockExistsSync, mockMkdirSync, mockReadFileSync } = vi.
   mockReadFileSync: vi.fn(),
 }));
 
+const { mockWriteFileSync, mockUnlinkSync } = vi.hoisted(() => ({
+  mockWriteFileSync: vi.fn(),
+  mockUnlinkSync: vi.fn(),
+}));
+
 vi.mock("node:fs", () => ({
   readdirSync: mockReaddirSync,
   existsSync: mockExistsSync,
   mkdirSync: mockMkdirSync,
   readFileSync: mockReadFileSync,
-  writeFileSync: vi.fn(),
-  unlinkSync: vi.fn(),
+  writeFileSync: mockWriteFileSync,
+  unlinkSync: mockUnlinkSync,
 }));
 
 vi.mock("electron", () => ({
   app: { getPath: vi.fn().mockReturnValue("/home/test") },
 }));
 
-import { listChatRooms } from "./chat-rooms";
+vi.mock("@main/lib/prowl-home", () => ({
+  getDataHome: vi.fn().mockReturnValue("/home/test"),
+}));
+
+import {
+  createChatRoom,
+  deleteChatRoom,
+  getChatRoom,
+  listChatRooms,
+  saveChatMessages,
+} from "./chat-rooms";
 
 function makeRoomJson(id: string, updatedAt: string, extra: object = {}): string {
   return JSON.stringify({
@@ -106,5 +121,87 @@ describe("listChatRooms", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].id).toBe("a");
+  });
+});
+
+describe("createChatRoom", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExistsSync.mockReturnValue(true);
+  });
+
+  it("기본 제목 '새 대화'로 룸을 생성하고 반환한다", () => {
+    const room = createChatRoom();
+    expect(room.title).toBe("새 대화");
+    expect(room.id).toBeTruthy();
+    expect(room.messages).toEqual([]);
+    expect(mockWriteFileSync).toHaveBeenCalled();
+  });
+
+  it("지정한 제목으로 룸을 생성한다", () => {
+    const room = createChatRoom("나만의 채팅방");
+    expect(room.title).toBe("나만의 채팅방");
+  });
+});
+
+describe("getChatRoom", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExistsSync.mockReturnValue(true);
+  });
+
+  it("존재하는 룸을 반환한다", () => {
+    mockReadFileSync.mockReturnValue(makeRoomJson("room-1", "2024-01-01T00:00:00.000Z"));
+    const room = getChatRoom("room-1");
+    expect(room.id).toBe("room-1");
+  });
+
+  it("파일이 없으면 에러", () => {
+    mockExistsSync.mockReturnValue(false);
+    expect(() => getChatRoom("no-room")).toThrow("Chat room not found");
+  });
+});
+
+describe("deleteChatRoom", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExistsSync.mockReturnValue(true);
+  });
+
+  it("잠금되지 않은 룸을 삭제한다", () => {
+    mockReadFileSync.mockReturnValue(makeRoomJson("room-1", "2024-01-01T00:00:00.000Z"));
+    deleteChatRoom("room-1");
+    expect(mockUnlinkSync).toHaveBeenCalled();
+  });
+
+  it("잠금된 룸 삭제 시 에러", () => {
+    mockReadFileSync.mockReturnValue(
+      makeRoomJson("room-1", "2024-01-01T00:00:00.000Z", { locked: true }),
+    );
+    expect(() => deleteChatRoom("room-1")).toThrow("잠금된");
+  });
+});
+
+describe("saveChatMessages", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockExistsSync.mockReturnValue(true);
+  });
+
+  it("메시지를 저장하고 updatedAt을 갱신한다", () => {
+    const before = "2024-01-01T00:00:00.000Z";
+    mockReadFileSync.mockReturnValue(makeRoomJson("room-1", before));
+
+    const messages = [{ id: "m1", role: "user" as const, content: "안녕", timestamp: Date.now() }];
+    saveChatMessages("room-1", messages);
+
+    const written = JSON.parse(vi.mocked(mockWriteFileSync).mock.calls[0][1] as string);
+    expect(written.messages).toHaveLength(1);
+    expect(written.updatedAt).not.toBe(before);
+  });
+
+  it("존재하지 않는 룸에 저장 시 에러", () => {
+    mockExistsSync.mockReturnValue(false);
+    expect(() => saveChatMessages("no-room", [])).toThrow("Chat room not found");
   });
 });

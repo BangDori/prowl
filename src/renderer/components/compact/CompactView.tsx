@@ -3,13 +3,12 @@
 import type { UpcomingRange } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useBacklogData } from "../../hooks/useBacklogData";
-import { useCategories } from "../../hooks/useCategories";
-import { useTaskData } from "../../hooks/useTaskData";
-import { useUpcomingTasks } from "../../hooks/useUpcomingTasks";
 import { queryKeys } from "../../queries/keys";
 import { toDateStr } from "../../utils/calendar";
 import { getTasksForDate, getUpcomingTasks, type TaskSortMode } from "../../utils/task-helpers";
+import { useBacklogData } from "../calendar/useBacklogData";
+import { useCategories } from "../calendar/useCategories";
+import { useTaskData } from "../calendar/useTaskData";
 import CompactBacklog from "./CompactBacklog";
 import type { CategoryTaskEntry } from "./CompactCategoryAll";
 import CompactCategoryAll from "./CompactCategoryAll";
@@ -17,6 +16,7 @@ import CompactCompleted from "./CompactCompleted";
 import CompactHeader from "./CompactHeader";
 import CompactTaskList from "./CompactTaskList";
 import CompactUpcoming from "./CompactUpcoming";
+import { useUpcomingTasks } from "./useUpcomingTasks";
 
 const HEADER_HEIGHT = 32;
 const DAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
@@ -205,7 +205,10 @@ export default function CompactView() {
           </div>
         ) : sortMode === "category" ? (
           <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
-            <CompactCategoryAll entries={categoryEntries} />
+            <CompactCategoryAll
+              entries={categoryEntries}
+              categoryNames={categories.map((c) => c.name)}
+            />
             {hasCompleted && (
               <CompactCompleted groups={completedGroups} onToggleComplete={handleToggleCompleted} />
             )}

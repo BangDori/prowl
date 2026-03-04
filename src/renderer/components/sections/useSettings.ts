@@ -1,7 +1,8 @@
 /** 앱 설정 조회 및 업데이트 훅 */
+
+import { queryKeys } from "@renderer/queries/keys";
 import type { AppSettings } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
 
 export function useSettings() {
   return useQuery({

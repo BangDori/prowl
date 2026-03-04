@@ -4,7 +4,7 @@ import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
 import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
-import { getCategoryColor, getCategoryNames } from "../../utils/category-utils";
+import { getCategoryColor } from "../../utils/category-utils";
 import ConfirmDialog from "../ConfirmDialog";
 import CompactTaskDetail from "./CompactTaskDetail";
 
@@ -21,12 +21,11 @@ interface CategoryGroup {
   entries: CategoryTaskEntry[];
 }
 
-function buildGroups(entries: CategoryTaskEntry[]): CategoryGroup[] {
-  const order = getCategoryNames();
+function buildGroups(entries: CategoryTaskEntry[], categoryNames: string[]): CategoryGroup[] {
   const map = new Map<string, CategoryTaskEntry[]>();
 
   // 알려진 카테고리를 빈 배열로 먼저 초기화 (태스크 없는 카테고리도 노출)
-  for (const name of order) {
+  for (const name of categoryNames) {
     map.set(name, []);
   }
 
@@ -46,10 +45,11 @@ function buildGroups(entries: CategoryTaskEntry[]): CategoryGroup[] {
 
 interface CompactCategoryAllProps {
   entries: CategoryTaskEntry[];
+  categoryNames: string[];
 }
 
-export default function CompactCategoryAll({ entries }: CompactCategoryAllProps) {
-  const groups = buildGroups(entries);
+export default function CompactCategoryAll({ entries, categoryNames }: CompactCategoryAllProps) {
+  const groups = buildGroups(entries, categoryNames);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
 
   if (groups.length === 0) {

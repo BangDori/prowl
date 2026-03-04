@@ -52,3 +52,16 @@ jobs:
           version: bun run version-packages
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Trim PR body to latest version only
+        run: |
+          PR_NUMBER=$(gh pr list --head "changeset-release/develop" --state open --json number --jq '.[0].number')
+          if [ -z "$PR_NUMBER" ] || [ "$PR_NUMBER" = "null" ]; then
+            echo "No release PR found, skipping"
+            exit 0
+          fi
+          gh pr view "$PR_NUMBER" --json body --jq '.body' | \
+            awk '/^## \[[0-9]/{count++; if(count==2)exit} {print}' > /tmp/pr-body.md
+          gh pr edit "$PR_NUMBER" --body-file /tmp/pr-body.md
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}

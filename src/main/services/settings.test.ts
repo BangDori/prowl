@@ -33,8 +33,15 @@ vi.mock("./personalize", () => ({
   ensurePersonalizeDir: vi.fn(),
 }));
 
-import { DEFAULT_SETTINGS } from "@shared/types";
-import { getFavoritedRoomIds, getSettings, setSettings, toggleFavoritedRoom } from "./settings";
+import { DEFAULT_CHAT_CONFIG, DEFAULT_SETTINGS } from "@shared/types";
+import {
+  getChatConfig,
+  getFavoritedRoomIds,
+  getSettings,
+  setChatConfig,
+  setSettings,
+  toggleFavoritedRoom,
+} from "./settings";
 
 describe("settings 서비스", () => {
   beforeEach(() => {
@@ -102,6 +109,32 @@ describe("settings 서비스", () => {
       mockGet.mockReturnValue({});
 
       expect(getFavoritedRoomIds()).toEqual([]);
+    });
+  });
+
+  describe("getChatConfig / setChatConfig", () => {
+    it("저장된 chatConfig를 반환한다", () => {
+      mockGet.mockReturnValue({ provider: "openai", model: "gpt-5-mini" });
+
+      const result = getChatConfig();
+
+      expect(result).toEqual({ provider: "openai", model: "gpt-5-mini" });
+    });
+
+    it("저장된 값이 없으면 DEFAULT_CHAT_CONFIG를 반환한다", () => {
+      mockGet.mockReturnValue(null);
+
+      const result = getChatConfig();
+
+      expect(result).toEqual(DEFAULT_CHAT_CONFIG);
+    });
+
+    it("setChatConfig는 chatConfig 키로 저장한다", () => {
+      const config = { provider: "openai" as const, model: "gpt-4o" };
+
+      setChatConfig(config);
+
+      expect(mockSet).toHaveBeenCalledWith("chatConfig", config);
     });
   });
 

@@ -1,7 +1,8 @@
 /** ChatRoom CRUD 훅 (TanStack Query) + 읽음 상태 */
+
+import { queryKeys } from "@renderer/queries/keys";
 import type { ChatMessage } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
 
 /** 채팅 룸 목록 조회 */
 export function useChatRooms(options?: { enabled?: boolean }) {

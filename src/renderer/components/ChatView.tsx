@@ -1,8 +1,8 @@
 /** AI 채팅 인터페이스 뷰 (로비/대화 내비게이션) */
 import { useCallback, useEffect, useState } from "react";
-import { useCreateChatRoom } from "../hooks/useChatRooms";
 import ChatConversation from "./chat/ChatConversation";
 import ChatLobby from "./chat/ChatLobby";
+import { useCreateChatRoom } from "./chat/useChatRooms";
 
 export default function ChatView() {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);

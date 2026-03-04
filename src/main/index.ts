@@ -8,9 +8,10 @@ import { getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { startTaskReminderScheduler } from "./services/task-reminder";
 import { checkForUpdates } from "./services/update-checker";
-import { createSplashWindow, createTray, dismissSplash } from "./windows";
+import { createSplashWindow, createTray, dismissSplash, showDashboardWindow } from "./windows";
 
 const isDev = process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
+const isE2E = process.env.E2E_TEST === "true";
 
 // 단일 인스턴스 잠금
 const gotTheLock = app.requestSingleInstanceLock();
@@ -26,7 +27,10 @@ if (!gotTheLock) {
     // 일정 알림 스케줄러 시작
     startTaskReminderScheduler();
 
-    if (isDev) {
+    if (isE2E) {
+      // E2E 모드: 트레이 없이 대시보드 창 직접 표시
+      showDashboardWindow();
+    } else if (isDev) {
       // 개발 모드: 스플래시 건너뛰고 바로 트레이 생성
       createTray();
       registerGlobalShortcuts(getSettings().shortcuts ?? DEFAULT_SHORTCUTS);

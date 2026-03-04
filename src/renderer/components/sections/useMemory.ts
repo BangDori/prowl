@@ -1,7 +1,8 @@
 /** Memory CRUD 훅 (TanStack Query) */
+
+import { queryKeys } from "@renderer/queries/keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { queryKeys } from "../queries/keys";
 
 /** 전체 메모리 조회 */
 export function useMemories() {

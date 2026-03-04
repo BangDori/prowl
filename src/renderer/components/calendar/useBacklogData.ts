@@ -1,7 +1,8 @@
 /** 백로그 태스크 조회 및 mutation 훅 */
+
+import { queryKeys } from "@renderer/queries/keys";
 import type { Task } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
 
 export function useBacklogData() {
   const queryClient = useQueryClient();

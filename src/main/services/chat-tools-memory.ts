@@ -1,4 +1,5 @@
 /** 메모리 관리 AI 도구 — 사용자 선호/지시 저장/조회/수정/삭제 */
+import type { ApprovalDetails } from "@shared/types";
 import { tool } from "ai";
 import { z } from "zod";
 import { waitForApproval } from "./approval";
@@ -14,6 +15,30 @@ const save_memory = tool({
   }),
   execute: async ({ content }) => {
     try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: "메모리를 저장할까요?",
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "save_memory",
+          displayName: content.slice(0, 40),
+          args: { content },
+          details: {
+            type: "add",
+            fields: [{ label: "내용", value: content }],
+          } satisfies ApprovalDetails,
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 저장을 취소했습니다." };
+      }
+
       const memory = addMemory(content);
       notifyMemoryChanged();
       return { success: true, memory };
@@ -45,6 +70,33 @@ const update_memory = tool({
   }),
   execute: async ({ id, content }) => {
     try {
+      const existing = listMemories().find((m) => m.id === id);
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: "메모리를 수정할까요?",
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "update_memory",
+          displayName: content.slice(0, 40),
+          args: { id, content },
+          details: {
+            type: "update",
+            changes: [
+              { label: "내용", before: existing?.content ?? "(알 수 없음)", after: content },
+            ],
+          } satisfies ApprovalDetails,
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 수정을 취소했습니다." };
+      }
+
       updateMemory(id, content);
       notifyMemoryChanged();
       return { success: true };
@@ -61,7 +113,6 @@ const delete_memory = tool({
   }),
   execute: async ({ id }) => {
     try {
-      // 삭제 전 메모리 내용 조회
       const memory = listMemories().find((m) => m.id === id);
       const displayName = memory ? memory.content.slice(0, 40) : id;
 
@@ -69,7 +120,7 @@ const delete_memory = tool({
       sendToChat("chat:stream-message", getCurrentRoomId(), {
         id: approvalId,
         role: "assistant",
-        content: `"${displayName}" 메모리를 삭제할까요?`,
+        content: "메모리를 삭제할까요?",
         timestamp: Date.now(),
         approval: {
           id: approvalId,
@@ -77,6 +128,10 @@ const delete_memory = tool({
           toolName: "delete_memory",
           displayName,
           args: { id },
+          details: {
+            type: "delete",
+            fields: [{ label: "내용", value: memory?.content ?? id }],
+          } satisfies ApprovalDetails,
         },
       });
 

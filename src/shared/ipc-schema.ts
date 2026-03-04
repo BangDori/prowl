@@ -52,7 +52,7 @@ export interface IpcInvokeSchema {
   "app:install-update": { params: []; return: IpcResult };
   "app:relaunch": { params: []; return: void };
 
-  // Chat (9 channels)
+  // Chat (10 channels)
   "chat:send": {
     params: [roomId: string, content: string, history: ChatMessage[]];
     return: IpcResult;
@@ -62,6 +62,7 @@ export interface IpcInvokeSchema {
   "chat:providers": { params: []; return: ProviderStatus[] };
   "chat:resize": { params: [height: number]; return: void };
   "chat:close": { params: []; return: void };
+  "chat:toggle": { params: []; return: IpcResult };
   "chat:expand-toggle": { params: []; return: boolean };
   "chat:approve-tool": { params: [approvalId: string]; return: IpcResult };
   "chat:reject-tool": { params: [approvalId: string]; return: IpcResult };

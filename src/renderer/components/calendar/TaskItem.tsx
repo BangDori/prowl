@@ -6,10 +6,10 @@ import Pencil from "lucide-react/dist/esm/icons/pencil";
 import Plus from "lucide-react/dist/esm/icons/plus";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useRef, useState } from "react";
-import { useCategories } from "../../hooks/useCategories";
 import { getCategoryColor } from "../../utils/category-utils";
 import ConfirmDialog from "../ConfirmDialog";
 import ReminderPicker from "./ReminderPicker";
+import { useCategories } from "./useCategories";
 
 interface TaskItemProps {
   task: Task;
