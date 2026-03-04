@@ -91,6 +91,17 @@ export interface ProviderStatus {
   models: AiModelOption[];
 }
 
+// 승인 UI에 표시할 구조화된 상세 정보
+export type ApprovalDetails =
+  | { type: "add"; fields: { label: string; value: string }[] }
+  | { type: "delete"; fields: { label: string; value: string }[] }
+  | {
+      type: "update";
+      /** 변경되지 않는 식별 정보 (어떤 항목인지 맥락 제공) */
+      context?: { label: string; value: string }[];
+      changes: { label: string; before: string; after: string }[];
+    };
+
 // 위험 도구 실행 전 사용자 승인 메타데이터
 export interface ToolApprovalMeta {
   id: string;
@@ -98,6 +109,7 @@ export interface ToolApprovalMeta {
   toolName: string;
   displayName: string;
   args: Record<string, unknown>;
+  details?: ApprovalDetails;
 }
 
 // 채팅
