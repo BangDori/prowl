@@ -1,9 +1,10 @@
 /** 날짜 범위 기반 다가오는 태스크 조회 훅 */
+
+import { queryKeys } from "@renderer/queries/keys";
+import { toDateStr } from "@renderer/utils/calendar";
 import type { TasksByDate, UpcomingRange } from "@shared/types";
 import { UPCOMING_RANGE_DAYS } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "../queries/keys";
-import { toDateStr } from "../utils/calendar";
 
 export function useUpcomingTasks(range: UpcomingRange) {
   const queryClient = useQueryClient();

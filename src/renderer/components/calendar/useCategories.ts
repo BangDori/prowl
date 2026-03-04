@@ -1,12 +1,13 @@
 /** 동적 카테고리 관리 훅 — IPC + TanStack Query 기반 */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { queryKeys } from "../queries/keys";
+
+import { queryKeys } from "@renderer/queries/keys";
 import {
   CATEGORIES_CHANGED_EVENT,
   setCategoryCache,
   type TaskCategoryItem,
-} from "../utils/category-utils";
+} from "@renderer/utils/category-utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export type { TaskCategoryItem };
 
