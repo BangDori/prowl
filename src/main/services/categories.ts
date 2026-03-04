@@ -2,9 +2,9 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import type { TaskCategoryItem } from "@shared/types";
 import { PROWL_DATA_DIR, TASK_SUBFOLDER } from "@shared/types";
-import { app } from "electron";
 
 const CATEGORIES_FILE = "task-categories.json";
 
@@ -25,7 +25,7 @@ const COLOR_PALETTE = [
 
 /** categories.json 파일 경로 */
 function categoriesFilePath(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR, TASK_SUBFOLDER, CATEGORIES_FILE);
+  return join(getDataHome(), PROWL_DATA_DIR, TASK_SUBFOLDER, CATEGORIES_FILE);
 }
 
 /** 카테고리 목록 읽기 */
@@ -110,7 +110,7 @@ import { mkdirSync, readdirSync } from "node:fs";
 const DATE_FILE_RE = /^\d{4}-\d{2}-\d{2}\.json$/;
 
 function getTaskFolder(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR, TASK_SUBFOLDER);
+  return join(getDataHome(), PROWL_DATA_DIR, TASK_SUBFOLDER);
 }
 
 function ensureFolder(): string {

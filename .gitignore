@@ -30,6 +30,10 @@ Thumbs.db
 # Vite
 .vite/
 
+# Playwright
+test-results/
+e2e/report/
+
 # Claude hooks temp
 .claude/.lint-needed-*
 

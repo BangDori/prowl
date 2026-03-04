@@ -94,8 +94,9 @@ async function getOpenAiCredential(): Promise<OpenAICredential | undefined> {
     return settings.openaiCredential;
   }
 
-  // 없으면 API Key 사용
-  return settings.openaiApiKey ? { type: "api", key: settings.openaiApiKey } : undefined;
+  // 없으면 API Key 사용 (E2E 테스트 환경에서는 환경변수로 주입)
+  const apiKey = process.env.E2E_OPENAI_KEY || settings.openaiApiKey;
+  return apiKey ? { type: "api", key: apiKey } : undefined;
 }
 
 /** API Key 사용 가능 모델 */

@@ -2,21 +2,22 @@
 
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import type { ChatRoom } from "@shared/types";
 import { CHAT_READ_STATE_FILE, CHAT_ROOMS_SUBFOLDER, PROWL_DATA_DIR } from "@shared/types";
-import { app, BrowserWindow } from "electron";
+import { BrowserWindow } from "electron";
 
 /** 읽음 상태: roomId → lastReadMessageId */
 type ChatReadState = Record<string, string>;
 
 /** 읽음 상태 파일 경로 */
 function readStateFilePath(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR, CHAT_READ_STATE_FILE);
+  return join(getDataHome(), PROWL_DATA_DIR, CHAT_READ_STATE_FILE);
 }
 
 /** 채팅 룸 폴더 경로 */
 function chatRoomsFolder(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR, CHAT_ROOMS_SUBFOLDER);
+  return join(getDataHome(), PROWL_DATA_DIR, CHAT_ROOMS_SUBFOLDER);
 }
 
 /** 읽음 상태 읽기 (파일 없으면 빈 객체) */

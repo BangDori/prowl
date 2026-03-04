@@ -11,14 +11,14 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import { PROWL_DATA_DIR } from "@shared/types";
-import { app } from "electron";
 
 const MAX_FILE_SIZE = 50 * 1024; // 50KB
 
 /** Prowl 데이터 루트 절대 경로 (~/.prowl) */
 function getProwlDir(): string {
-  return join(app.getPath("home"), PROWL_DATA_DIR);
+  return join(getDataHome(), PROWL_DATA_DIR);
 }
 
 /** 상대 경로를 절대 경로로 변환하고 경로 이탈 여부 검증 */

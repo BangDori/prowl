@@ -9,9 +9,9 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { getDataHome } from "@main/lib/prowl-home";
 import type { ChatMessage, ChatRoom, ChatRoomSummary } from "@shared/types";
 import { CHAT_ROOMS_SUBFOLDER, PROWL_DATA_DIR } from "@shared/types";
-import { app } from "electron";
 
 /** 고유 ID 생성 */
 function generateId(): string {
@@ -20,7 +20,7 @@ function generateId(): string {
 
 /** 채팅 룸 폴더 확보 (~/.prowl/chat-rooms) */
 function ensureFolder(): string {
-  const folder = join(app.getPath("home"), PROWL_DATA_DIR, CHAT_ROOMS_SUBFOLDER);
+  const folder = join(getDataHome(), PROWL_DATA_DIR, CHAT_ROOMS_SUBFOLDER);
   if (!existsSync(folder)) mkdirSync(folder, { recursive: true });
   return folder;
 }
