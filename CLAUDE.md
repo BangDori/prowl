@@ -58,3 +58,4 @@ bun run lint       # biome 린트
 - 도메인 모델: `docs/domain-model.md`
 - 네이밍: `docs/naming-convention.md`
 - 개발 워크플로우 (브랜치 전략, changeset, 릴리즈): `docs/workflow.md`
+- 테스트 작성 가이드 (vitest 패턴, E2E): `docs/testing.md`
