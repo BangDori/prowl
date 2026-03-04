@@ -6,10 +6,10 @@ import Minimize2 from "lucide-react/dist/esm/icons/minimize-2";
 import Send from "lucide-react/dist/esm/icons/send";
 import X from "lucide-react/dist/esm/icons/x";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useChatRooms } from "../../hooks/useChatRooms";
 import { queryKeys } from "../../queries/keys";
 import ModelSelector from "../ModelSelector";
 import ChatRoomList from "./ChatRoomList";
+import { useChatRooms } from "./useChatRooms";
 
 const PLACEHOLDERS = [
   "무엇이든 물어봐라냥~",

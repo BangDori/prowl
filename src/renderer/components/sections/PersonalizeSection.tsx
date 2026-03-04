@@ -8,9 +8,9 @@ import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
 import Save from "lucide-react/dist/esm/icons/save";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useEffect, useState } from "react";
-import { useAddMemory, useDeleteMemory, useMemories, useUpdateMemory } from "../../hooks/useMemory";
-import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
 import ConfirmDialog from "../ConfirmDialog";
+import { useAddMemory, useDeleteMemory, useMemories, useUpdateMemory } from "./useMemory";
+import { useSettings, useUpdateSettings } from "./useSettings";
 
 // ─── Memory 서브컴포넌트 ──────────────────────────────────────────────────────
 

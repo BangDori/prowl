@@ -2,13 +2,13 @@
 import type { ChatConfig, ChatMessage, ProviderStatus } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { queryKeys } from "../../queries/keys";
 import {
   useChatRoom,
   useChatUnreadCounts,
   useMarkChatRoomRead,
   useSaveChatMessages,
-} from "../../hooks/useChatRooms";
-import { queryKeys } from "../../queries/keys";
+} from "./useChatRooms";
 
 export function useChatMessages(roomId: string, initialMessage?: string | null) {
   const queryClient = useQueryClient();

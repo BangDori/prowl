@@ -13,8 +13,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { useDeleteProwlEntry, useProwlDir } from "../../hooks/useProwlFiles";
 import ConfirmDialog from "../ConfirmDialog";
+import { useDeleteProwlEntry, useProwlDir } from "./useProwlFiles";
 
 /** 파일 확장자에 맞는 아이콘 컴포넌트 반환 */
 function getFileIcon(name: string) {

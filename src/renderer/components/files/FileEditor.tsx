@@ -5,8 +5,8 @@ import RotateCcw from "lucide-react/dist/esm/icons/rotate-ccw";
 import Save from "lucide-react/dist/esm/icons/save";
 import X from "lucide-react/dist/esm/icons/x";
 import { useEffect, useState } from "react";
-import { useProwlFile, useWriteProwlFile } from "../../hooks/useProwlFiles";
 import FileContentView from "./FileContentView";
+import { useProwlFile, useWriteProwlFile } from "./useProwlFiles";
 
 interface FileEditorProps {
   filePath: string;
