@@ -148,26 +148,6 @@ describe("서비스/함수명", () => {
 
 ---
 
-### 작성된 테스트 목록
-
-| 파일 | 검증 대상 | 케이스 수 |
-|------|-----------|---------|
-| `src/main/lib/prowl-home.test.ts` | `getDataHome` — env 분기 | 2 |
-| `src/main/services/approval.test.ts` | `waitForApproval`, `resolveApproval`, 타임아웃 | 6 |
-| `src/main/services/memory.test.ts` | Memory CRUD | 9 |
-| `src/main/services/tasks.test.ts` | 날짜 기반 + 백로그 Task CRUD | 28 |
-| `src/main/services/categories.test.ts` | 카테고리 CRUD, resolveCategory | 18 |
-| `src/main/services/settings.test.ts` | getSettings, setSettings, getChatConfig, setChatConfig, favoritedRooms | 12 |
-| `src/main/services/chat-rooms.test.ts` | listChatRooms, createChatRoom, getChatRoom, deleteChatRoom, saveChatMessages | 13 |
-| `src/main/services/chat-tools-tasks.test.ts` | update_task, add_task, delete_task, get_today_info, list_tasks | 15 |
-| `src/main/services/chat.test.ts` | streamChatMessage, getProviderStatuses | 7 |
-| `src/main/ipc.test.ts` | 모든 IPC 핸들러 등록 + 동작 검증 | 24 |
-| `src/main/windows/tray.test.ts` | createTray, 이벤트 등록, 컨텍스트 메뉴 | 5 |
-| `src/main/utils/pattern-matcher.test.ts` | matchesAnyPattern, filterByPatterns | 6 |
-| `src/renderer/utils/date.test.ts` | formatRelativeTime, formatDateTime | 6 |
-
----
-
 ## E2E 테스트 (Playwright)
 
 ### 실행 환경
@@ -193,15 +173,6 @@ await dashboard.createTask("2025-01-15", "할 일");
 // ❌ 테스트 코드에서 셀렉터 직접 사용 금지
 await page.click('[data-testid="task-input"]');
 ```
-
-### 현재 E2E 시나리오
-
-| 파일 | 커버 |
-|------|------|
-| `e2e/specs/task-management.spec.ts` | 대시보드 로드, 태스크 생성/완료 |
-| `e2e/specs/task-crud.spec.ts` | 태스크 인라인 편집 / 삭제 |
-| `e2e/specs/compact-sync.spec.ts` | Compact에서 완료 → Dashboard 반영 |
-| `e2e/specs/personalize.spec.ts` | Memory CRUD, System Prompt, Tone & Manner 저장 |
 
 ---
 
