@@ -11,7 +11,7 @@ import {
   useDeleteChatRoom,
   useToggleChatRoomFavorite,
   useToggleChatRoomLock,
-} from "../../hooks/useChatRooms";
+} from "./useChatRooms";
 
 interface ChatRoomListProps {
   onSelectRoom: (roomId: string) => void;

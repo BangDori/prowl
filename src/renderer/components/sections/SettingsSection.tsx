@@ -8,10 +8,10 @@ import Pencil from "lucide-react/dist/esm/icons/pencil";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
-import { useSettings, useUpdateSettings } from "../../hooks/useSettings";
 import ShortcutsPanel from "../ShortcutsPanel";
 import ToggleSwitch from "../ToggleSwitch";
 import SettingsUpdateCard from "./SettingsUpdateCard";
+import { useSettings, useUpdateSettings } from "./useSettings";
 
 export default function SettingsSection() {
   const { data: settings, isLoading: settingsLoading } = useSettings();

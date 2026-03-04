@@ -4,7 +4,7 @@ import EyeOff from "lucide-react/dist/esm/icons/eye-off";
 import Plus from "lucide-react/dist/esm/icons/plus";
 import X from "lucide-react/dist/esm/icons/x";
 import { useRef, useState } from "react";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "./useCategories";
 
 interface TaskFilterBarProps {
   filterCategory: string | null;
