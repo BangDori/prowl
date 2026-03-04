@@ -14,6 +14,26 @@ const save_memory = tool({
   }),
   execute: async ({ content }) => {
     try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: `"${content.slice(0, 40)}" 메모리를 저장할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "save_memory",
+          displayName: content.slice(0, 40),
+          args: { content },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 저장을 취소했습니다." };
+      }
+
       const memory = addMemory(content);
       notifyMemoryChanged();
       return { success: true, memory };
@@ -45,6 +65,26 @@ const update_memory = tool({
   }),
   execute: async ({ id, content }) => {
     try {
+      const approvalId = `approval_${generateId()}`;
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: `"${content.slice(0, 40)}"으로 메모리를 수정할까요?`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "update_memory",
+          displayName: content.slice(0, 40),
+          args: { id, content },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 수정을 취소했습니다." };
+      }
+
       updateMemory(id, content);
       notifyMemoryChanged();
       return { success: true };

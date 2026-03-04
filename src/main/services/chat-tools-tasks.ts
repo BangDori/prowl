@@ -76,6 +76,7 @@ const add_task = tool({
         completed: false,
         createdAt: new Date().toISOString(),
       };
+
       if (backlog || !date) {
         addTaskToBacklog(task);
       } else {
@@ -120,6 +121,27 @@ const update_task = tool({
       if (updates.description) merged.description = updates.description;
       if (updates.dueTime) merged.dueTime = updates.dueTime;
       if (updates.category) merged.category = resolveCategory(updates.category) ?? updates.category;
+
+      const approvalId = `approval_${generateId()}`;
+      const moveLabel = newDate ? ` (→ ${newDate})` : "";
+      sendToChat("chat:stream-message", getCurrentRoomId(), {
+        id: approvalId,
+        role: "assistant",
+        content: `"${currentTask.title}" 태스크를 수정할까요?${moveLabel}`,
+        timestamp: Date.now(),
+        approval: {
+          id: approvalId,
+          status: "pending",
+          toolName: "update_task",
+          displayName: currentTask.title,
+          args: { taskId, date, backlog, newDate, ...updates },
+        },
+      });
+
+      const approved = await waitForApproval(approvalId);
+      if (!approved) {
+        return { cancelled: true, message: "사용자가 수정을 취소했습니다." };
+      }
 
       // 날짜 이동
       if (newDate) {
