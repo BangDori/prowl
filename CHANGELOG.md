@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.51.0] - 2026-03-04
+- AI 도구 HITL 승인 UI에 상세 정보 카드 추가 및 카테고리 추가 시 Compact View 즉시 반영 버그 수정 ([#146](https://github.com/BangDori/prowl/pull/146), [@BangDori](https://github.com/BangDori))
+- E2E 테스트 시스템 구축 및 HITL IPC 채널 추가 ([#148](https://github.com/BangDori/prowl/pull/148), [@BangDori](https://github.com/BangDori))
+- renderer 훅을 feature 폴더로 co-location 리팩토링 ([#144](https://github.com/BangDori/prowl/pull/144), [@BangDori](https://github.com/BangDori))
+
 ## [1.50.1] - 2026-03-03
 - API Key 없는 초기 상태에서 입력 버튼 누락 수정 ([#141](https://github.com/BangDori/prowl/pull/141), [@BangDori](https://github.com/BangDori))
 
