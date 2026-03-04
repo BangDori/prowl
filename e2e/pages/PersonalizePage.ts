@@ -30,11 +30,11 @@ export class PersonalizePage {
     const card = this.memoryCard(oldContent);
     await card.hover();
     await card.locator("button").nth(0).click({ force: true });
-    // 편집 textarea: 이전 내용이 채워진 채로 표시됨
-    const editArea = card.locator("textarea");
-    await editArea.clear();
+    // MemoryCard textarea는 autoFocus — 편집 진입 직후 포커스됨
+    // card 로케이터를 재사용하면 hasText 필터가 무효화될 수 있으므로 page 레벨에서 찾음
+    const editArea = this.page.locator("textarea:focus");
     await editArea.fill(newContent);
-    await card.getByRole("button", { name: "Save" }).click();
+    await this.page.getByRole("button", { name: "Save" }).last().click();
     await this.page.waitForTimeout(500);
   }
 
