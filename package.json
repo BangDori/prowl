@@ -24,7 +24,8 @@
     "postinstall": "node node_modules/electron/install.js",
     "prepare": "husky",
     "version-packages": "changeset version && node scripts/fix-changelog-headings.js",
-    "e2e:test": "npx playwright test"
+    "e2e:test": "npx playwright test",
+    "e2e:test:ui": "npx playwright test --ui"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.29",
