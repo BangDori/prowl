@@ -24,7 +24,6 @@
     "postinstall": "node node_modules/electron/install.js",
     "prepare": "husky",
     "version-packages": "changeset version && node scripts/fix-changelog-headings.js",
-    "e2e:server": "npx tsx e2e/state-server.ts",
     "e2e:test": "npx playwright test"
   },
   "dependencies": {
