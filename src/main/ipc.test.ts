@@ -36,13 +36,30 @@ vi.mock("./services/chat", () => ({
 
 vi.mock("./windows", () => ({
   getSubWindow: vi.fn(),
+  getCompactWindow: vi.fn(),
+  getChatWindow: vi.fn(),
   popUpTrayMenu: vi.fn(),
   resizeChatWindow: vi.fn(),
   closeChatWindow: vi.fn(),
+  toggleChatWindow: vi.fn(),
+  toggleExpandChatWindow: vi.fn().mockReturnValue(false),
+  toggleCompactWindow: vi.fn(),
+}));
+
+vi.mock("./services/approval", () => ({
+  resolveApproval: vi.fn().mockReturnValue(true),
+}));
+
+vi.mock("./services/chat-read-state", () => ({
+  getAllUnreadCounts: vi.fn().mockReturnValue({}),
+  markRoomAsRead: vi.fn(),
+  removeRoomReadState: vi.fn(),
+  updateTrayBadge: vi.fn(),
 }));
 
 import { app, ipcMain, shell } from "electron";
 import { registerIpcHandlers } from "./ipc";
+import { resolveApproval } from "./services/approval";
 import { setPageContext, streamChatMessage } from "./services/chat";
 import { listChatRooms } from "./services/chat-rooms";
 import {
@@ -51,7 +68,7 @@ import {
   setSettings,
   toggleFavoritedRoom,
 } from "./services/settings";
-import { closeChatWindow, getSubWindow, resizeChatWindow } from "./windows";
+import { closeChatWindow, getSubWindow, resizeChatWindow, toggleChatWindow } from "./windows";
 
 const mockIpcHandle = vi.mocked(ipcMain.handle);
 
@@ -183,7 +200,62 @@ describe("registerIpcHandlers", () => {
     expect(channels).toContain("chat:providers");
     expect(channels).toContain("chat:resize");
     expect(channels).toContain("chat:close");
+    expect(channels).toContain("chat:toggle");
+    expect(channels).toContain("chat:approve-tool");
+    expect(channels).toContain("chat:reject-tool");
     expect(channels).toContain("chat:set-page-context");
+  });
+
+  describe("chat:toggle", () => {
+    it("toggleChatWindow를 호출하고 success를 반환한다", async () => {
+      const handler = getHandler("chat:toggle");
+      const result = await handler({});
+
+      expect(toggleChatWindow).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
+
+    it("예외 발생 시 success: false를 반환한다", async () => {
+      vi.mocked(toggleChatWindow).mockImplementationOnce(() => {
+        throw new Error("window error");
+      });
+
+      const handler = getHandler("chat:toggle");
+      const result = await handler({});
+
+      expect(result).toEqual({ success: false, error: "Error: window error" });
+    });
+  });
+
+  describe("chat:approve-tool / chat:reject-tool", () => {
+    it("approve-tool: resolveApproval(id, true)를 호출하고 success를 반환한다", async () => {
+      vi.mocked(resolveApproval).mockReturnValue(true);
+
+      const handler = getHandler("chat:approve-tool");
+      const result = await handler({}, "approval-123");
+
+      expect(resolveApproval).toHaveBeenCalledWith("approval-123", true);
+      expect(result).toEqual({ success: true });
+    });
+
+    it("reject-tool: resolveApproval(id, false)를 호출한다", async () => {
+      vi.mocked(resolveApproval).mockReturnValue(true);
+
+      const handler = getHandler("chat:reject-tool");
+      const result = await handler({}, "approval-123");
+
+      expect(resolveApproval).toHaveBeenCalledWith("approval-123", false);
+      expect(result).toEqual({ success: true });
+    });
+
+    it("pending에 없는 id면 success: false 반환", async () => {
+      vi.mocked(resolveApproval).mockReturnValue(false);
+
+      const handler = getHandler("chat:approve-tool");
+      const result = await handler({}, "not-exist");
+
+      expect(result).toEqual({ success: false });
+    });
   });
 
   describe("chat:set-page-context", () => {
