@@ -202,15 +202,6 @@ await page.click('[data-testid="task-input"]');
 | `e2e/specs/task-crud.spec.ts` | 태스크 인라인 편집 / 삭제 |
 | `e2e/specs/compact-sync.spec.ts` | Compact에서 완료 → Dashboard 반영 |
 | `e2e/specs/personalize.spec.ts` | Memory CRUD, System Prompt, Tone & Manner 저장 |
-| `e2e/specs/chat.spec.ts` | 채팅 메시지 전송, Tool Calling (E2E_OPENAI_KEY 필요) |
-
-### OpenAI 의존 테스트
-
-`chat.spec.ts`는 실제 API 호출이 필요하다. `E2E_OPENAI_KEY` 미설정 시 자동 skip된다.
-
-```ts
-test.skip(!process.env.E2E_OPENAI_KEY, "E2E_OPENAI_KEY 환경변수 필요");
-```
 
 ---
 

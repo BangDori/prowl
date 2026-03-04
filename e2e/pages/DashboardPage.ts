@@ -67,17 +67,6 @@ export class DashboardPage {
     return compactPagePromise;
   }
 
-  async openChatView(): Promise<Page> {
-    if (!this.app) throw new Error("openChatView에는 app 레퍼런스가 필요합니다");
-    const chatPagePromise = this.app.waitForEvent("window");
-    await this.page.evaluate(() => {
-      (
-        window as Window & { electronAPI: { toggleChatWindow: () => void } }
-      ).electronAPI.toggleChatWindow();
-    });
-    return chatPagePromise;
-  }
-
   /** 태스크 hover → pencil 클릭 → 제목 수정 → Enter 저장 */
   async editTask(title: string, newTitle: string): Promise<void> {
     const taskRow = this.page.locator(".group").filter({ hasText: title }).first();
