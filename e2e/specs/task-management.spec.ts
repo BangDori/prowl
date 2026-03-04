@@ -1,4 +1,4 @@
-/** Journey 2 E2E — 태스크 생성 → Calendar 표시 → 완료 처리 */
+/** E2E — 태스크 생성 → Calendar 표시 → 완료 처리 */
 import { expect, test } from "@playwright/test";
 import { getTodayDateString } from "../helpers";
 import { DashboardPage } from "../pages/DashboardPage";

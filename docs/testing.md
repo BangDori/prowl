@@ -196,8 +196,8 @@ await page.click('[data-testid="task-input"]');
 
 ### 현재 E2E 시나리오
 
-| 파일 | Journey |
-|------|---------|
+| 파일 | 커버 |
+|------|------|
 | `e2e/specs/task-management.spec.ts` | 대시보드 로드, 태스크 생성/완료 |
 | `e2e/specs/task-crud.spec.ts` | 태스크 인라인 편집 / 삭제 |
 | `e2e/specs/compact-sync.spec.ts` | Compact에서 완료 → Dashboard 반영 |

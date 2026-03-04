@@ -61,7 +61,7 @@ bun run e2e:test
 # 특정 스펙만 실행
 bun run e2e:test --grep "시나리오 설명"
 
-# Journey 3 (AI 채팅) — API 키 필요
+# AI 채팅 스펙 — API 키 필요
 E2E_OPENAI_KEY=sk-... bun run e2e:test e2e/specs/chat.spec.ts
 ```
 
@@ -88,7 +88,7 @@ open e2e/report/index.html
 
 ```typescript
 // e2e/specs/{기능명}.spec.ts
-/** Journey N E2E — {기능 설명} */
+/** E2E — {기능 설명} */
 import { expect, test } from "@playwright/test";
 import { DashboardPage } from "../pages/DashboardPage";
 import { launchApp } from "../runner";
@@ -112,4 +112,4 @@ test("{시나리오 설명}", async () => {
 - `PROWL_DATA_HOME`이 자동 설정되므로 실제 `~/.prowl` 데이터는 변경되지 않습니다
 - 테스트 데이터는 종료 시 `/tmp/prowl-test-XXXX/`와 함께 자동 삭제됩니다
 - `workers: 1` — 앱 인스턴스 격리를 위해 직렬 실행
-- Journey 3 (AI 채팅) 스펙은 `E2E_OPENAI_KEY` 미설정 시 자동 skip
+- AI 채팅 스펙(`chat.spec.ts`)은 `E2E_OPENAI_KEY` 미설정 시 자동 skip

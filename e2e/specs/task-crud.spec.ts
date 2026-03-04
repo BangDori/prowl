@@ -1,4 +1,4 @@
-/** Journey 4 E2E — 태스크 인라인 편집 / 삭제 */
+/** E2E — 태스크 인라인 편집 / 삭제 */
 import { expect, test } from "@playwright/test";
 import { getTodayDateString } from "../helpers";
 import { DashboardPage } from "../pages/DashboardPage";

@@ -1,4 +1,4 @@
-/** Journey 3 E2E — AI 채팅 메시지 전송 → 응답 렌더링 + Tool Calling → Calendar 반영 */
+/** E2E — AI 채팅 메시지 전송 → 응답 렌더링 + Tool Calling → Calendar 반영 */
 import { expect, test } from "@playwright/test";
 import { ChatPage } from "../pages/ChatPage";
 import { DashboardPage } from "../pages/DashboardPage";

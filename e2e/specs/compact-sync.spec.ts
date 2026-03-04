@@ -1,4 +1,4 @@
-/** Journey 5 E2E — Compact View 완료 처리 → Dashboard Calendar 동기화 */
+/** E2E — Compact View 완료 처리 → Dashboard Calendar 동기화 */
 import { expect, test } from "@playwright/test";
 import { getTodayDateString } from "../helpers";
 import { CompactPage } from "../pages/CompactPage";

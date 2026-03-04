@@ -1,4 +1,4 @@
-/** Journey 6 E2E — Personalize 탭: Memory CRUD / System Prompt / Tone & Manner */
+/** E2E — Personalize 탭: Memory CRUD / System Prompt / Tone & Manner */
 import { expect, test } from "@playwright/test";
 import { DashboardPage } from "../pages/DashboardPage";
 import { PersonalizePage } from "../pages/PersonalizePage";
