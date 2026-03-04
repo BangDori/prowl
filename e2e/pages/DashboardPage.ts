@@ -78,6 +78,29 @@ export class DashboardPage {
     return chatPagePromise;
   }
 
+  /** 태스크 hover → pencil 클릭 → 제목 수정 → Enter 저장 */
+  async editTask(title: string, newTitle: string): Promise<void> {
+    const taskRow = this.page.locator(".group").filter({ hasText: title }).first();
+    await taskRow.hover();
+    // checkbox=nth(0), pencil=nth(1), trash=nth(2) after hover reveals hidden buttons
+    await taskRow.locator("button").nth(1).click();
+    const input = this.page.locator("input[type='text']").last();
+    await input.clear();
+    await input.fill(newTitle);
+    await input.press("Enter");
+    await this.page.waitForTimeout(500);
+  }
+
+  /** 태스크 hover → trash 클릭 → ConfirmDialog 확인 */
+  async deleteTask(title: string): Promise<void> {
+    const taskRow = this.page.locator(".group").filter({ hasText: title }).first();
+    await taskRow.hover();
+    // trash button is last in the hidden div
+    await taskRow.locator("button").last().click();
+    await this.page.getByRole("button", { name: "삭제" }).click();
+    await this.page.waitForTimeout(500);
+  }
+
   taskLocator(title: string): Locator {
     return this.page.getByText(title);
   }
