@@ -22,7 +22,12 @@ import {
   setChatConfig,
   toggleFavoritedRoom,
 } from "./services/settings";
-import { closeChatWindow, resizeChatWindow, toggleExpandChatWindow } from "./windows";
+import {
+  closeChatWindow,
+  resizeChatWindow,
+  toggleChatWindow,
+  toggleExpandChatWindow,
+} from "./windows";
 
 export function registerChatHandlers(): void {
   // 채팅 메시지 스트리밍 전송 (fire-and-forget, main에서 저장)
@@ -62,6 +67,16 @@ export function registerChatHandlers(): void {
   // 채팅 윈도우 닫기
   handleIpc("chat:close", async () => {
     closeChatWindow();
+  });
+
+  // 채팅 윈도우 토글 (열기/닫기)
+  handleIpc("chat:toggle", async () => {
+    try {
+      toggleChatWindow();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: String(error) };
+    }
   });
 
   // 채팅 윈도우 전체화면 토글 (isExpanded 반환)
