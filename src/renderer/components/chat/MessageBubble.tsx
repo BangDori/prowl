@@ -5,7 +5,7 @@ import ArrowUpRight from "lucide-react/dist/esm/icons/arrow-up-right";
 import Check from "lucide-react/dist/esm/icons/check";
 import Code from "lucide-react/dist/esm/icons/code";
 import Copy from "lucide-react/dist/esm/icons/copy";
-import { useCallback, useMemo, useState } from "react";
+import { isValidElement, useCallback, useMemo, useState } from "react";
 import Markdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
@@ -88,7 +88,8 @@ const HTML_DOC_REGEX = /<!DOCTYPE\s+html>[\s\S]*<\/html>/i;
 
 function stripHtmlDoc(content: string): string {
   // 코드 펜스(```...```)로 감싸진 경우 펜스까지 함께 제거 (빈 코드 블록 방지)
-  const result = content.replace(/```[a-z]*\r?\n[\s\S]*?<\/html>\r?\n```/i, "");
+  // </html> 이후 빈 줄이 있어도 매칭되도록 [\s\S]*? 사용
+  const result = content.replace(/```[a-z]*\r?\n[\s\S]*?<\/html>[\s\S]*?\n```/gi, "");
   if (result !== content) return result.trim();
   return content.replace(HTML_DOC_REGEX, "").trim();
 }
@@ -146,11 +147,18 @@ export default function MessageBubble({
       code: ({ children }: { children?: React.ReactNode }) => (
         <code className="bg-white/10 px-1 py-0.5 rounded text-[12px]">{children}</code>
       ),
-      pre: ({ children }: { children?: React.ReactNode }) => (
-        <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px] max-w-full">
-          {children}
-        </pre>
-      ),
+      pre: ({ children }: { children?: React.ReactNode }) => {
+        // 빈 코드 블록 렌더링 방지
+        const codeContent = isValidElement(children)
+          ? String((children.props as { children?: unknown }).children ?? "")
+          : String(children ?? "");
+        if (!codeContent.trim()) return null;
+        return (
+          <pre className="bg-white/10 p-2 rounded-lg my-1 overflow-x-auto text-[12px] max-w-full">
+            {children}
+          </pre>
+        );
+      },
       a: ({ href, children }: { href?: string; children?: React.ReactNode }) => {
         const label = href ? getLinkLabel(href, children) : String(children ?? "");
         return (
