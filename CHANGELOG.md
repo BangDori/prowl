@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.51.1] - 2026-03-06
+- API Key 모델 목록에 GPT-5.4 추가 ([#154](https://github.com/BangDori/prowl/pull/154), [@BangDori](https://github.com/BangDori))
+- AI 알림 메시지 마크다운 제거 및 15자 트런케이션 ([#153](https://github.com/BangDori/prowl/pull/153), [@BangDori](https://github.com/BangDori))
+- 카테고리 뷰에서 같은 날짜 내 태스크 시간순 정렬 추가 ([#152](https://github.com/BangDori/prowl/pull/152), [@BangDori](https://github.com/BangDori))
+- HTML 코드블럭 스트립 후 빈 코드블럭 렌더링 방지 ([#150](https://github.com/BangDori/prowl/pull/150), [@BangDori](https://github.com/BangDori))
+
 ## [1.51.0] - 2026-03-04
 - AI 도구 HITL 승인 UI에 상세 정보 카드 추가 및 카테고리 추가 시 Compact View 즉시 반영 버그 수정 ([#146](https://github.com/BangDori/prowl/pull/146), [@BangDori](https://github.com/BangDori))
 - E2E 테스트 시스템 구축 및 HITL IPC 채널 추가 ([#148](https://github.com/BangDori/prowl/pull/148), [@BangDori](https://github.com/BangDori))
