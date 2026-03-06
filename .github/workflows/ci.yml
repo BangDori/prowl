@@ -3,10 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [main, develop]
-  push:
-    branches:
-      - 'changeset-release/develop'
-      - 'changeset-release/main'
 
 jobs:
   check:
