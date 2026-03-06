@@ -1,5 +1,6 @@
 /** macOS 네이티브 알림 발송 */
 import { Notification } from "electron";
+import { formatNotificationBody } from "./notification-format";
 import { isNotificationsEnabled } from "./settings";
 
 // macOS 알림 권한 확인
@@ -15,9 +16,12 @@ export function sendChatNotification(message: string): void {
     return;
   }
 
+  const body = formatNotificationBody(message);
+  if (!body) return;
+
   const notification = new Notification({
     title: "Prowl",
-    body: message,
+    body,
     silent: false,
   });
 
