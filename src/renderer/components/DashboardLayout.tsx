@@ -69,9 +69,9 @@ export default function DashboardLayout() {
   const [isActiveNav, setActiveNav] = useState<NavItem>("calendar");
 
   return (
-    <div className="flex h-screen bg-transparent text-app-text-primary">
+    <div className="flex h-screen bg-surface-light dark:bg-prowl-surface text-app-text-primary">
       {/* Sidebar */}
-      <aside className="w-52 flex-shrink-0 bg-prowl-surface border-r border-prowl-border flex flex-col">
+      <aside className="w-52 flex-shrink-0 bg-surface-light dark:bg-prowl-surface border-r border-gray-200 dark:border-prowl-border flex flex-col">
         {/* Drag region for window */}
         <div className="h-10 -webkit-app-region-drag" />
 
@@ -122,8 +122,8 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0">
-        <div className="h-full overflow-hidden relative">
+      <main className="flex-1 min-w-0 bg-surface-light dark:bg-prowl-surface">
+        <div className="h-full overflow-hidden relative bg-surface-light dark:bg-prowl-surface">
           <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`}>
             <ErrorBoundary section="Task Manager">
               <CalendarSection />

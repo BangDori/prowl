@@ -4,7 +4,10 @@ import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import LogOut from "lucide-react/dist/esm/icons/log-out";
+import Monitor from "lucide-react/dist/esm/icons/monitor";
+import Moon from "lucide-react/dist/esm/icons/moon";
 import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Sun from "lucide-react/dist/esm/icons/sun";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
@@ -131,12 +134,71 @@ export default function SettingsSection() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 space-y-6">
+        {/* 테마 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
+            Theme
+          </h3>
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  !settings ? undefined : updateSettings.mutate({ ...settings, theme: "system" })
+                }
+                disabled={updateSettings.isPending}
+                className={`w-full rounded-xl border px-3 py-3 text-center transition-all ${
+                  settings?.theme === "system"
+                    ? "bg-accent/20 text-accent border-accent/50 shadow-glow-accent"
+                    : "bg-prowl-card text-app-text-secondary border-prowl-border hover:bg-app-hover-bg hover:border-prowl-border-hover"
+                }`}
+              >
+                <Monitor className="w-4 h-4 mx-auto mb-1.5" />
+                <p className="text-sm font-medium">System</p>
+                <p className="text-[10px] text-app-text-muted">Preference</p>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  !settings ? undefined : updateSettings.mutate({ ...settings, theme: "light" })
+                }
+                disabled={updateSettings.isPending}
+                className={`w-full rounded-xl border px-3 py-3 text-center transition-all ${
+                  settings?.theme === "light"
+                    ? "bg-accent/20 text-accent border-accent/50 shadow-glow-accent"
+                    : "bg-prowl-card text-app-text-secondary border-prowl-border hover:bg-app-hover-bg hover:border-prowl-border-hover"
+                }`}
+              >
+                <Sun className="w-4 h-4 mx-auto mb-1.5" />
+                <p className="text-sm font-medium">Light</p>
+                <p className="text-[10px] text-app-text-muted">Light</p>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  !settings ? undefined : updateSettings.mutate({ ...settings, theme: "dark" })
+                }
+                disabled={updateSettings.isPending}
+                className={`w-full rounded-xl border px-3 py-3 text-center transition-all ${
+                  settings?.theme === "dark"
+                    ? "bg-accent/20 text-accent border-accent/50 shadow-glow-accent"
+                    : "bg-prowl-card text-app-text-secondary border-prowl-border hover:bg-app-hover-bg hover:border-prowl-border-hover"
+                }`}
+              >
+                <Moon className="w-4 h-4 mx-auto mb-1.5" />
+                <p className="text-sm font-medium">Dark</p>
+                <p className="text-[10px] text-app-text-muted">Dark</p>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* 알림 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Notifications
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-gray-400" />
@@ -158,7 +220,7 @@ export default function SettingsSection() {
 
           {/* OAuth 연결 상태 */}
           {isOAuthConnected ? (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
@@ -181,7 +243,7 @@ export default function SettingsSection() {
               </div>
             </div>
           ) : (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <KeyRound className="w-4 h-4 text-gray-400" />
@@ -205,7 +267,7 @@ export default function SettingsSection() {
 
           {/* API Key 입력 (OAuth 연결 시 비활성화) */}
           <div
-            className={`glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
+            className={`glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
           >
             <div className="flex items-center gap-3">
               <KeyRound className="w-4 h-4 text-gray-400 shrink-0" />
@@ -278,7 +340,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Shortcuts
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border">
             <ShortcutsPanel
               shortcuts={settings?.shortcuts ?? DEFAULT_SHORTCUTS}
               onUpdate={saveShortcuts}
@@ -295,7 +357,7 @@ export default function SettingsSection() {
             <button
               type="button"
               onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border text-left"
+              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card border border-prowl-border text-left"
             >
               <ExternalLink className="w-4 h-4 text-gray-400" />
               <div>

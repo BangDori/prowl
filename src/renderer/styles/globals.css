@@ -30,39 +30,95 @@
   :root {
     --prowl-surface:      rgba(255, 255, 255, 0.06);
     --prowl-card:         rgba(255, 255, 255, 0.04);
-    --prowl-border:       rgba(255, 255, 255, 0.08);
-    --prowl-border-hover: rgba(255, 255, 255, 0.15);
+    --prowl-border:       rgba(255, 255, 255, 0.14);
+    --prowl-border-hover: rgba(255, 255, 255, 0.24);
 
     --app-text-primary:   rgba(255, 255, 255, 0.90);
-    --app-text-secondary: rgba(255, 255, 255, 0.70);
-    --app-text-muted:     rgba(255, 255, 255, 0.50);
-    --app-text-faint:     rgba(255, 255, 255, 0.30);
-    --app-text-ghost:     rgba(255, 255, 255, 0.20);
+    --app-text-secondary: rgba(255, 255, 255, 0.82);
+    --app-text-muted:     rgba(255, 255, 255, 0.68);
+    --app-text-faint:     rgba(255, 255, 255, 0.52);
+    --app-text-ghost:     rgba(255, 255, 255, 0.40);
 
     --app-hover-bg:       rgba(255, 255, 255, 0.05);
     --app-active-bg:      rgba(255, 255, 255, 0.10);
     --app-input-bg:       rgba(255, 255, 255, 0.04);
-    --app-input-border:   rgba(255, 255, 255, 0.08);
+    --app-input-border:   rgba(255, 255, 255, 0.16);
   }
+}
+
+/* 사용자 선택: 강제 라이트 */
+[data-theme="light"] {
+  --prowl-surface:      rgba(0, 0, 0, 0.04);
+  --prowl-card:         rgba(255, 255, 255, 0.85);
+  --prowl-border:       rgba(0, 0, 0, 0.10);
+  --prowl-border-hover: rgba(0, 0, 0, 0.20);
+
+  --app-text-primary:   rgba(17, 24, 39, 0.92);
+  --app-text-secondary: rgba(55, 65, 81, 0.75);
+  --app-text-muted:     rgba(107, 114, 128, 0.85);
+  --app-text-faint:     rgba(107, 114, 128, 0.55);
+  --app-text-ghost:     rgba(107, 114, 128, 0.35);
+
+  --app-hover-bg:       rgba(0, 0, 0, 0.05);
+  --app-active-bg:      rgba(0, 0, 0, 0.09);
+  --app-input-bg:       rgba(255, 255, 255, 0.85);
+  --app-input-border:   rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .glass-card-3d {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(0, 0, 0, 0.04) inset;
+}
+
+[data-theme="light"] .glass-card-3d:hover {
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(0, 0, 0, 0.06) inset;
+  border-color: rgba(0, 0, 0, 0.10);
 }
 
 /* Chat 윈도우 강제 다크 — data-theme="dark" 범위 */
 [data-theme="dark"] {
   --prowl-surface:      rgba(255, 255, 255, 0.06);
   --prowl-card:         rgba(255, 255, 255, 0.04);
-  --prowl-border:       rgba(255, 255, 255, 0.08);
-  --prowl-border-hover: rgba(255, 255, 255, 0.15);
+  --prowl-border:       rgba(255, 255, 255, 0.14);
+  --prowl-border-hover: rgba(255, 255, 255, 0.24);
 
   --app-text-primary:   rgba(255, 255, 255, 0.90);
-  --app-text-secondary: rgba(255, 255, 255, 0.70);
-  --app-text-muted:     rgba(255, 255, 255, 0.50);
-  --app-text-faint:     rgba(255, 255, 255, 0.30);
-  --app-text-ghost:     rgba(255, 255, 255, 0.20);
+  --app-text-secondary: rgba(255, 255, 255, 0.82);
+  --app-text-muted:     rgba(255, 255, 255, 0.68);
+  --app-text-faint:     rgba(255, 255, 255, 0.52);
+  --app-text-ghost:     rgba(255, 255, 255, 0.40);
 
   --app-hover-bg:       rgba(255, 255, 255, 0.05);
   --app-active-bg:      rgba(255, 255, 255, 0.10);
   --app-input-bg:       rgba(255, 255, 255, 0.04);
-  --app-input-border:   rgba(255, 255, 255, 0.08);
+  --app-input-border:   rgba(255, 255, 255, 0.16);
+}
+
+[data-theme="dark"] .text-gray-600 {
+  color: rgba(229, 231, 235, 0.9);
+}
+
+[data-theme="dark"] .text-gray-500 {
+  color: rgba(209, 213, 219, 0.82);
+}
+
+[data-theme="dark"] .text-gray-400 {
+  color: rgba(209, 213, 219, 0.72);
+}
+
+[data-theme="dark"] .dark\:text-gray-400 {
+  color: rgba(209, 213, 219, 0.82);
+}
+
+[data-theme="dark"] .dark\:text-gray-500 {
+  color: rgba(209, 213, 219, 0.76);
+}
+
+[data-theme="dark"] .dark\:text-gray-600 {
+  color: rgba(209, 213, 219, 0.7);
 }
 
 /* 기본 스타일 */
