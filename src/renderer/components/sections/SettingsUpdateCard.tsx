@@ -40,7 +40,7 @@ export default function SettingsUpdateCard() {
   }, [cooldown]);
 
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <RefreshCw className={`w-4 h-4 text-gray-400 ${updateChecking ? "animate-spin" : ""}`} />

@@ -1,10 +1,13 @@
 /** 앱 설정 탭 섹션 */
-import { DEFAULT_SHORTCUTS, type ShortcutConfig } from "@shared/types";
+import { DEFAULT_SHORTCUTS, type ShortcutConfig, type Theme } from "@shared/types";
 import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import LogOut from "lucide-react/dist/esm/icons/log-out";
+import Monitor from "lucide-react/dist/esm/icons/monitor";
+import Moon from "lucide-react/dist/esm/icons/moon";
 import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Sun from "lucide-react/dist/esm/icons/sun";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
@@ -136,7 +139,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Notifications
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-gray-400" />
@@ -150,6 +153,47 @@ export default function SettingsSection() {
           </div>
         </div>
 
+        {/* 테마 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
+            Appearance
+          </h3>
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
+            <p className="text-[10px] text-gray-500 mb-2">
+              Choose how Prowl looks. System follows your macOS appearance.
+            </p>
+            <div className="flex items-center gap-2">
+              {(
+                [
+                  { value: "system", label: "System", Icon: Monitor },
+                  { value: "light", label: "Light", Icon: Sun },
+                  { value: "dark", label: "Dark", Icon: Moon },
+                ] as const
+              ).map(({ value, label, Icon }) => {
+                const isActive = (settings?.theme ?? "system") === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      if (!settings) return;
+                      updateSettings.mutate({ ...settings, theme: value as Theme });
+                    }}
+                    className={`flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg text-[11px] font-medium transition-all ${
+                      isActive
+                        ? "bg-accent/20 text-accent border border-accent/30"
+                        : "text-app-text-secondary hover:bg-app-hover-bg border border-transparent"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         {/* OpenAI 인증 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
@@ -158,7 +202,7 @@ export default function SettingsSection() {
 
           {/* OAuth 연결 상태 */}
           {isOAuthConnected ? (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
@@ -181,7 +225,7 @@ export default function SettingsSection() {
               </div>
             </div>
           ) : (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <KeyRound className="w-4 h-4 text-gray-400" />
@@ -205,7 +249,7 @@ export default function SettingsSection() {
 
           {/* API Key 입력 (OAuth 연결 시 비활성화) */}
           <div
-            className={`glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
+            className={`glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
           >
             <div className="flex items-center gap-3">
               <KeyRound className="w-4 h-4 text-gray-400 shrink-0" />
@@ -278,7 +322,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Shortcuts
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border">
             <ShortcutsPanel
               shortcuts={settings?.shortcuts ?? DEFAULT_SHORTCUTS}
               onUpdate={saveShortcuts}
@@ -295,7 +339,7 @@ export default function SettingsSection() {
             <button
               type="button"
               onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border text-left"
+              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card border border-prowl-border text-left"
             >
               <ExternalLink className="w-4 h-4 text-gray-400" />
               <div>

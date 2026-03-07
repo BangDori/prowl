@@ -122,7 +122,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 bg-white dark:bg-transparent">
         <div className="h-full overflow-hidden relative">
           <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`}>
             <ErrorBoundary section="Task Manager">

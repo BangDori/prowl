@@ -4,7 +4,7 @@ import { DEFAULT_SHORTCUTS } from "@shared/types";
 import { app, globalShortcut } from "electron";
 import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
-import { getSettings } from "./services/settings";
+import { applyNativeTheme, getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
 import { startTaskReminderScheduler } from "./services/task-reminder";
 import { checkForUpdates } from "./services/update-checker";
@@ -21,6 +21,9 @@ if (!gotTheLock) {
 } else {
   // 앱 준비 완료 시
   app.on("ready", () => {
+    // 저장된 테마 설정 적용
+    applyNativeTheme(getSettings().theme);
+
     // IPC 핸들러 등록
     registerIpcHandlers();
 
