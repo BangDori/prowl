@@ -139,7 +139,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Notifications
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Bell className="w-4 h-4 text-gray-400" />
@@ -156,9 +156,9 @@ export default function SettingsSection() {
         {/* 테마 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
-            Appearance
+            Appearancezzz~~~
           </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
             <p className="text-[10px] text-gray-500 mb-2">
               Choose how Prowl looks. System follows your macOS appearance.
             </p>
@@ -202,7 +202,7 @@ export default function SettingsSection() {
 
           {/* OAuth 연결 상태 */}
           {isOAuthConnected ? (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
@@ -225,7 +225,7 @@ export default function SettingsSection() {
               </div>
             </div>
           ) : (
-            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border mb-2">
+            <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border mb-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <KeyRound className="w-4 h-4 text-gray-400" />
@@ -249,7 +249,7 @@ export default function SettingsSection() {
 
           {/* API Key 입력 (OAuth 연결 시 비활성화) */}
           <div
-            className={`glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
+            className={`glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border ${isOAuthConnected ? "opacity-50" : ""}`}
           >
             <div className="flex items-center gap-3">
               <KeyRound className="w-4 h-4 text-gray-400 shrink-0" />
@@ -322,7 +322,7 @@ export default function SettingsSection() {
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Shortcuts
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+          <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border">
             <ShortcutsPanel
               shortcuts={settings?.shortcuts ?? DEFAULT_SHORTCUTS}
               onUpdate={saveShortcuts}
@@ -339,7 +339,7 @@ export default function SettingsSection() {
             <button
               type="button"
               onClick={() => window.electronAPI.openExternal("https://github.com/BangDori/prowl")}
-              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border text-left"
+              className="glass-card-3d w-full flex items-center gap-3 p-3 rounded-lg bg-prowl-card border border-prowl-border text-left"
             >
               <ExternalLink className="w-4 h-4 text-gray-400" />
               <div>

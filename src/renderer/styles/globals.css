@@ -24,9 +24,6 @@
   --app-active-bg:      rgba(0, 0, 0, 0.07);
   --app-input-bg:       rgba(255, 255, 255, 0.70);
   --app-input-border:   rgba(0, 0, 0, 0.12);
-
-  /* 라이트 모드에서 backdrop-blur 비활성화 */
-  --prowl-blur: 0px;
 }
 
 /* 시스템 다크 모드 (prefers-color-scheme) */
@@ -48,7 +45,6 @@
     --app-input-bg:       rgba(255, 255, 255, 0.04);
     --app-input-border:   rgba(255, 255, 255, 0.08);
 
-    --prowl-blur: 20px;
   }
 }
 
@@ -70,7 +66,6 @@
   --app-input-bg:       rgba(255, 255, 255, 0.70);
   --app-input-border:   rgba(0, 0, 0, 0.12);
 
-  --prowl-blur: 0px;
 }
 
 /* 강제 라이트 모드 — 글래스 카드 쉐도우 */
@@ -104,7 +99,6 @@
   --app-input-bg:       rgba(255, 255, 255, 0.04);
   --app-input-border:   rgba(255, 255, 255, 0.16);
 
-  --prowl-blur: 20px;
 }
 
 /* 강제 다크 — Tailwind gray 텍스트 보정 */
@@ -114,22 +108,6 @@
 [data-theme="dark"] .dark\:text-gray-600 { color: rgba(255, 255, 255, 0.70); }
 [data-theme="dark"] .dark\:text-gray-500 { color: rgba(255, 255, 255, 0.60); }
 [data-theme="dark"] .dark\:text-gray-400 { color: rgba(255, 255, 255, 0.50); }
-
-/* 라이트 모드: backdrop-blur 비활성화 (다크 모드에서만 blur 활성) */
-:root:not([data-theme="dark"]) [class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-[data-theme="light"] [class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) [class*="backdrop-blur"] {
-    -webkit-backdrop-filter: var(--tw-backdrop-filter) !important;
-    backdrop-filter: var(--tw-backdrop-filter) !important;
-  }
-}
 
 /* 기본 스타일 */
 * {
@@ -215,7 +193,7 @@ body {
 /* 로그 뷰어 - 터미널 스타일 */
 .log-viewer {
   @apply font-mono text-xs leading-relaxed;
-  @apply bg-black/40 text-green-400 p-4 rounded-lg backdrop-blur-md;
+  @apply bg-black/40 text-green-400 p-4 rounded-lg;
   @apply overflow-auto max-h-64;
   @apply border border-prowl-border;
   white-space: pre-wrap;
@@ -225,7 +203,7 @@ body {
 /* 인풋 필드 */
 .input-field {
   @apply px-3 py-2 text-sm rounded-lg transition-all duration-200;
-  @apply bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm;
+  @apply bg-white/80 dark:bg-white/[0.04];
   @apply border border-gray-300 dark:border-prowl-border;
   @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
   @apply placeholder:text-gray-400 dark:placeholder:text-gray-600;
@@ -313,7 +291,6 @@ select.input-field {
 .app-header {
   @apply sticky top-0 z-10 px-4 py-3;
   background-color: var(--prowl-card);
-  @apply backdrop-blur-xl;
   border-bottom: 1px solid var(--prowl-border);
 }
 
