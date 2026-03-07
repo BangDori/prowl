@@ -1,10 +1,13 @@
 /** 앱 설정 탭 섹션 */
-import { DEFAULT_SHORTCUTS, type ShortcutConfig } from "@shared/types";
+import { DEFAULT_SHORTCUTS, type ShortcutConfig, type Theme } from "@shared/types";
 import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import LogOut from "lucide-react/dist/esm/icons/log-out";
+import Monitor from "lucide-react/dist/esm/icons/monitor";
+import Moon from "lucide-react/dist/esm/icons/moon";
 import Pencil from "lucide-react/dist/esm/icons/pencil";
+import Sun from "lucide-react/dist/esm/icons/sun";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
@@ -146,6 +149,44 @@ export default function SettingsSection() {
                 </div>
               </div>
               <ToggleSwitch isEnabled={notificationsEnabled} onChange={toggleNotifications} />
+            </div>
+          </div>
+        </div>
+
+        {/* 테마 설정 */}
+        <div>
+          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
+            Appearance
+          </h3>
+          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+            <div className="flex items-center gap-2">
+              {(
+                [
+                  { value: "system", label: "System", Icon: Monitor },
+                  { value: "light", label: "Light", Icon: Sun },
+                  { value: "dark", label: "Dark", Icon: Moon },
+                ] as const
+              ).map(({ value, label, Icon }) => {
+                const isActive = (settings?.theme ?? "system") === value;
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => {
+                      if (!settings) return;
+                      updateSettings.mutate({ ...settings, theme: value as Theme });
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all ${
+                      isActive
+                        ? "bg-accent/20 text-accent border border-accent/30"
+                        : "text-app-text-secondary hover:bg-app-hover-bg border border-transparent"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

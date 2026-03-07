@@ -26,24 +26,22 @@
   --app-input-border:   rgba(0, 0, 0, 0.15);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --prowl-surface:      rgba(255, 255, 255, 0.06);
-    --prowl-card:         rgba(255, 255, 255, 0.04);
-    --prowl-border:       rgba(255, 255, 255, 0.08);
-    --prowl-border-hover: rgba(255, 255, 255, 0.15);
+:root.dark {
+  --prowl-surface:      rgba(255, 255, 255, 0.06);
+  --prowl-card:         rgba(255, 255, 255, 0.04);
+  --prowl-border:       rgba(255, 255, 255, 0.08);
+  --prowl-border-hover: rgba(255, 255, 255, 0.15);
 
-    --app-text-primary:   rgba(255, 255, 255, 0.90);
-    --app-text-secondary: rgba(255, 255, 255, 0.70);
-    --app-text-muted:     rgba(255, 255, 255, 0.50);
-    --app-text-faint:     rgba(255, 255, 255, 0.30);
-    --app-text-ghost:     rgba(255, 255, 255, 0.20);
+  --app-text-primary:   rgba(255, 255, 255, 0.90);
+  --app-text-secondary: rgba(255, 255, 255, 0.70);
+  --app-text-muted:     rgba(255, 255, 255, 0.50);
+  --app-text-faint:     rgba(255, 255, 255, 0.30);
+  --app-text-ghost:     rgba(255, 255, 255, 0.20);
 
-    --app-hover-bg:       rgba(255, 255, 255, 0.05);
-    --app-active-bg:      rgba(255, 255, 255, 0.10);
-    --app-input-bg:       rgba(255, 255, 255, 0.04);
-    --app-input-border:   rgba(255, 255, 255, 0.08);
-  }
+  --app-hover-bg:       rgba(255, 255, 255, 0.05);
+  --app-active-bg:      rgba(255, 255, 255, 0.10);
+  --app-input-bg:       rgba(255, 255, 255, 0.04);
+  --app-input-border:   rgba(255, 255, 255, 0.08);
 }
 
 /* Chat 윈도우 강제 다크 — data-theme="dark" 범위 */
@@ -303,18 +301,16 @@ select.input-field {
   border-color: rgba(0, 0, 0, 0.10);
 }
 
-@media (prefers-color-scheme: dark) {
-  .glass-card-3d {
-    box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.25),
-      0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  }
-  .glass-card-3d:hover {
-    box-shadow:
-      0 8px 30px rgba(0, 0, 0, 0.35),
-      0 1px 0 rgba(255, 255, 255, 0.1) inset;
-    border-color: rgba(255, 255, 255, 0.12);
-  }
+.dark .glass-card-3d {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+.dark .glass-card-3d:hover {
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .glass-card-3d {
