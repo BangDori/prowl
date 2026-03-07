@@ -159,6 +159,9 @@ export default function SettingsSection() {
             Appearance
           </h3>
           <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+            <p className="text-[10px] text-gray-500 mb-2">
+              Choose how Prowl looks. System follows your macOS appearance.
+            </p>
             <div className="flex items-center gap-2">
               {(
                 [
@@ -176,13 +179,13 @@ export default function SettingsSection() {
                       if (!settings) return;
                       updateSettings.mutate({ ...settings, theme: value as Theme });
                     }}
-                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-medium transition-all ${
+                    className={`flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg text-[11px] font-medium transition-all ${
                       isActive
                         ? "bg-accent/20 text-accent border border-accent/30"
                         : "text-app-text-secondary hover:bg-app-hover-bg border border-transparent"
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
+                    <Icon className="w-4 h-4" />
                     {label}
                   </button>
                 );
