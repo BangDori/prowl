@@ -18,6 +18,10 @@ const {
   mockWriteTone: vi.fn(),
 }));
 
+vi.mock("electron", () => ({
+  nativeTheme: { themeSource: "system" },
+}));
+
 vi.mock("electron-store", () => ({
   default: class {
     get = mockGet;
