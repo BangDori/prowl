@@ -156,7 +156,7 @@ export default function SettingsSection() {
         {/* 테마 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
-            Appearancezzz~~~
+            Appearance
           </h3>
           <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
             <p className="text-[10px] text-gray-500 mb-2">
