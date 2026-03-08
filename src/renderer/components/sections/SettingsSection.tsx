@@ -16,6 +16,13 @@ import ToggleSwitch from "../ToggleSwitch";
 import SettingsUpdateCard from "./SettingsUpdateCard";
 import { useSettings, useUpdateSettings } from "./useSettings";
 
+/** 테마 옵션 목록 */
+const THEME_OPTIONS: readonly { value: Theme; label: string; Icon: typeof Monitor }[] = [
+  { value: "system", label: "System", Icon: Monitor },
+  { value: "light", label: "Light", Icon: Sun },
+  { value: "dark", label: "Dark", Icon: Moon },
+];
+
 export default function SettingsSection() {
   const { data: settings, isLoading: settingsLoading } = useSettings();
   const updateSettings = useUpdateSettings();
@@ -163,13 +170,7 @@ export default function SettingsSection() {
               Choose how Prowl looks. System follows your macOS appearance.
             </p>
             <div className="flex items-center gap-2">
-              {(
-                [
-                  { value: "system", label: "System", Icon: Monitor },
-                  { value: "light", label: "Light", Icon: Sun },
-                  { value: "dark", label: "Dark", Icon: Moon },
-                ] as const
-              ).map(({ value, label, Icon }) => {
+              {THEME_OPTIONS.map(({ value, label, Icon }) => {
                 const isActive = (settings?.theme ?? "system") === value;
                 return (
                   <button
@@ -177,7 +178,7 @@ export default function SettingsSection() {
                     type="button"
                     onClick={() => {
                       if (!settings) return;
-                      updateSettings.mutate({ ...settings, theme: value as Theme });
+                      updateSettings.mutate({ ...settings, theme: value });
                     }}
                     className={`flex-1 flex flex-col items-center justify-center gap-1 px-3 py-3 rounded-lg text-[11px] font-medium transition-all ${
                       isActive

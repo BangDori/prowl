@@ -191,7 +191,7 @@ export default function CompactView() {
       : todayTasks.length === 0 && upcomingGroups.length === 0 && !hasBacklog && !hasCompleted;
 
   return (
-    <div className="flex flex-col h-screen bg-transparent text-app-text-primary">
+    <div className="flex flex-col h-screen bg-prowl-surface text-app-text-primary">
       <CompactHeader
         isMinimized={minimized}
         isRefreshing={refreshing}
