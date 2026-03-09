@@ -1,9 +1,15 @@
 /** 대시보드 BrowserWindow 생성 및 관리 */
 import * as path from "node:path";
-import { BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import { DASHBOARD, DEV_SERVER_PORT } from "../constants";
 
 let dashboardWindow: BrowserWindow | null = null;
+let forceClose = false;
+
+// 앱 종료 시 창을 실제로 닫을 수 있도록 플래그 설정
+app.on("before-quit", () => {
+  forceClose = true;
+});
 
 const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -15,10 +21,13 @@ function getIndexUrl(): string {
 
 export function showDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+    dashboardWindow.show();
     dashboardWindow.focus();
     dashboardWindow.webContents.send("window:show");
     return;
   }
+
+  forceClose = false;
 
   const cursor = screen.getCursorScreenPoint();
   const display = screen.getDisplayNearestPoint(cursor);
@@ -59,6 +68,15 @@ export function showDashboardWindow(): void {
     dashboardWindow?.show();
     dashboardWindow?.webContents.send("window:show");
   });
+
+  // 빨간 버튼(⌘W) 클릭 시 창을 파괴하지 않고 숨김 — 재진입 시 즉시 표시
+  dashboardWindow.on("close", (e) => {
+    if (!forceClose) {
+      e.preventDefault();
+      dashboardWindow?.hide();
+    }
+  });
+
   dashboardWindow.on("closed", () => {
     dashboardWindow = null;
   });
@@ -66,13 +84,13 @@ export function showDashboardWindow(): void {
 
 export function closeDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed()) {
-    dashboardWindow.close();
+    dashboardWindow.hide();
   }
 }
 
 export function toggleDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed() && dashboardWindow.isVisible()) {
-    closeDashboardWindow();
+    dashboardWindow.hide();
   } else {
     showDashboardWindow();
   }
