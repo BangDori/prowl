@@ -5,6 +5,7 @@ import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
 import History from "lucide-react/dist/esm/icons/history";
 import ListTodo from "lucide-react/dist/esm/icons/list-todo";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import type React from "react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
@@ -13,6 +14,8 @@ import FilesSection from "./sections/FilesSection";
 import PersonalizeSection from "./sections/PersonalizeSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
+
+const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
 
 /** 네비게이션 아이템 타입 */
 type NavItem = "calendar" | "changelog" | "settings" | "files" | "personalize";
@@ -122,29 +125,29 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0 bg-prowl-surface">
-        <div className="h-full overflow-hidden relative">
-          <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`}>
+      <main className="flex-1 min-w-0 bg-prowl-surface" style={drag}>
+        <div className="h-full overflow-hidden relative" style={drag}>
+          <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`} style={drag}>
             <ErrorBoundary section="Task Manager">
               <CalendarSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${isActiveNav === "personalize" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "personalize" ? "" : "hidden"}`} style={drag}>
             <ErrorBoundary section="Personalize">
               <PersonalizeSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`} style={drag}>
             <ErrorBoundary section="Version History">
               <ChangelogSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${isActiveNav === "settings" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "settings" ? "" : "hidden"}`} style={drag}>
             <ErrorBoundary section="Settings">
               <SettingsSection />
             </ErrorBoundary>
           </div>
-          <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`}>
+          <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`} style={drag}>
             <ErrorBoundary section="Files">
               <FilesSection />
             </ErrorBoundary>

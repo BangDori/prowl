@@ -709,3 +709,19 @@ select.input-field {
 .-webkit-app-region-no-drag {
   -webkit-app-region: no-drag;
 }
+
+/* 우측 콘텐츠 영역 전체를 드래그 가능 영역으로 지정 */
+main {
+  -webkit-app-region: drag;
+}
+
+/* 인터랙티브 요소는 드래그 비활성화 */
+main button,
+main a,
+main input,
+main select,
+main textarea,
+main [role="button"],
+main label {
+  -webkit-app-region: no-drag;
+}

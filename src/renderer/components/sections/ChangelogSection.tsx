@@ -122,7 +122,7 @@ export default function ChangelogSection() {
   }, []);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto -webkit-app-region-drag">
       <div className="p-4">
         {/* 현재 버전 헤더 */}
         <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card border border-prowl-border">
