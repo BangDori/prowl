@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.52.1] - 2026-03-09
+- main 콘텐츠 영역 드래그 설정으로 인한 스크롤 불가 수정 ([@BangDori](https://github.com/BangDori))
+
 ## [1.52.0] - 2026-03-09
 - 수동 테마 전환 기능 추가 (시스템/라이트/다크) ([@ckdwns9121](https://github.com/ckdwns9121))
 - OAuth 모델 목록에 GPT-5.4 추가 및 기본 모델 변경 ([@BangDori](https://github.com/BangDori))
