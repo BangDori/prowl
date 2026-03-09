@@ -5,6 +5,7 @@ import FolderOpen from "lucide-react/dist/esm/icons/folder-open";
 import History from "lucide-react/dist/esm/icons/history";
 import ListTodo from "lucide-react/dist/esm/icons/list-todo";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
+import type React from "react";
 import { useState } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import CalendarSection from "./sections/CalendarSection";
@@ -13,6 +14,8 @@ import FilesSection from "./sections/FilesSection";
 import PersonalizeSection from "./sections/PersonalizeSection";
 import SettingsSection from "./sections/SettingsSection";
 import UpdateBanner from "./UpdateBanner";
+
+const drag = { WebkitAppRegion: "drag" } as React.CSSProperties;
 
 /** 네비게이션 아이템 타입 */
 type NavItem = "calendar" | "changelog" | "settings" | "files" | "personalize";
@@ -67,6 +70,17 @@ function SidebarItem({ icon, label, isActive, onClick }: SidebarItemProps) {
  */
 export default function DashboardLayout() {
   const [isActiveNav, setActiveNav] = useState<NavItem>("calendar");
+  const [mounted, setMounted] = useState<Set<NavItem>>(new Set(["calendar"]));
+
+  const handleNavChange = (nav: NavItem) => {
+    setActiveNav(nav);
+    setMounted((prev) => {
+      if (prev.has(nav)) return prev;
+      const next = new Set(prev);
+      next.add(nav);
+      return next;
+    });
+  };
 
   return (
     <div className="flex h-screen bg-transparent text-app-text-primary">
@@ -89,31 +103,31 @@ export default function DashboardLayout() {
             icon={<ListTodo className="w-4 h-4" />}
             label="Task Manager"
             isActive={isActiveNav === "calendar"}
-            onClick={() => setActiveNav("calendar")}
+            onClick={() => handleNavChange("calendar")}
           />
           <SidebarItem
             icon={<Sparkles className="w-4 h-4" />}
             label="Personalize"
             isActive={isActiveNav === "personalize"}
-            onClick={() => setActiveNav("personalize")}
+            onClick={() => handleNavChange("personalize")}
           />
           <SidebarItem
             icon={<FolderOpen className="w-4 h-4" />}
             label="Files"
             isActive={isActiveNav === "files"}
-            onClick={() => setActiveNav("files")}
+            onClick={() => handleNavChange("files")}
           />
           <SidebarItem
             icon={<History className="w-4 h-4" />}
             label="Version History"
             isActive={isActiveNav === "changelog"}
-            onClick={() => setActiveNav("changelog")}
+            onClick={() => handleNavChange("changelog")}
           />
           <SidebarItem
             icon={<Cog className="w-4 h-4" />}
             label="Settings"
             isActive={isActiveNav === "settings"}
-            onClick={() => setActiveNav("settings")}
+            onClick={() => handleNavChange("settings")}
           />
         </nav>
 
@@ -122,33 +136,43 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-w-0">
-        <div className="h-full overflow-hidden relative">
-          <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Task Manager">
-              <CalendarSection />
-            </ErrorBoundary>
-          </div>
-          <div className={`h-full ${isActiveNav === "personalize" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Personalize">
-              <PersonalizeSection />
-            </ErrorBoundary>
-          </div>
-          <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Version History">
-              <ChangelogSection />
-            </ErrorBoundary>
-          </div>
-          <div className={`h-full ${isActiveNav === "settings" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Settings">
-              <SettingsSection />
-            </ErrorBoundary>
-          </div>
-          <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`}>
-            <ErrorBoundary section="Files">
-              <FilesSection />
-            </ErrorBoundary>
-          </div>
+      <main className="flex-1 min-w-0 bg-prowl-surface" style={drag}>
+        <div className="h-full overflow-hidden relative" style={drag}>
+          {mounted.has("calendar") && (
+            <div className={`h-full ${isActiveNav === "calendar" ? "" : "hidden"}`} style={drag}>
+              <ErrorBoundary section="Task Manager">
+                <CalendarSection />
+              </ErrorBoundary>
+            </div>
+          )}
+          {mounted.has("personalize") && (
+            <div className={`h-full ${isActiveNav === "personalize" ? "" : "hidden"}`} style={drag}>
+              <ErrorBoundary section="Personalize">
+                <PersonalizeSection />
+              </ErrorBoundary>
+            </div>
+          )}
+          {mounted.has("changelog") && (
+            <div className={`h-full ${isActiveNav === "changelog" ? "" : "hidden"}`} style={drag}>
+              <ErrorBoundary section="Version History">
+                <ChangelogSection />
+              </ErrorBoundary>
+            </div>
+          )}
+          {mounted.has("settings") && (
+            <div className={`h-full ${isActiveNav === "settings" ? "" : "hidden"}`} style={drag}>
+              <ErrorBoundary section="Settings">
+                <SettingsSection />
+              </ErrorBoundary>
+            </div>
+          )}
+          {mounted.has("files") && (
+            <div className={`h-full ${isActiveNav === "files" ? "" : "hidden"}`} style={drag}>
+              <ErrorBoundary section="Files">
+                <FilesSection />
+              </ErrorBoundary>
+            </div>
+          )}
         </div>
       </main>
     </div>

@@ -5,6 +5,7 @@ import ChatView from "./components/ChatView";
 import CompactView from "./components/compact/CompactView";
 import Dashboard from "./components/Dashboard";
 import { useAutoResize } from "./hooks/useAutoResize";
+import { useTheme } from "./hooks/useTheme";
 import { queryClient } from "./queries/client";
 
 function getHashRoute(): string {
@@ -23,6 +24,7 @@ function AppContent() {
   const [route, setRoute] = useState(getHashRoute);
   const isChat = route === "chat";
   const containerRef = useAutoResize(isChat);
+  useTheme();
 
   useEffect(() => {
     const onHashChange = () => setRoute(getHashRoute());

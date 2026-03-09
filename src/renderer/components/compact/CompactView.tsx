@@ -78,12 +78,14 @@ export default function CompactView() {
 
     const entries: CategoryTaskEntry[] = [];
 
-    // 이전 날짜 미완료 태스크 (이번 달) — 날짜 오름차순
+    const byTime = (a: Task, b: Task) => (a.dueTime ?? "\xff").localeCompare(b.dueTime ?? "\xff");
+
+    // 이전 날짜 미완료 태스크 (이번 달) — 날짜 오름차순, 같은 날짜는 시간순
     for (const [date, tasks] of Object.entries(tasksByDate).sort(([a], [b]) =>
       a.localeCompare(b),
     )) {
       if (date >= todayStr) continue;
-      for (const task of tasks.filter((t) => !t.completed)) {
+      for (const task of tasks.filter((t) => !t.completed).sort(byTime)) {
         entries.push({
           task,
           dateLabel: getLabel(date),
@@ -93,7 +95,7 @@ export default function CompactView() {
       }
     }
 
-    for (const task of todayTasks) {
+    for (const task of [...todayTasks].sort(byTime)) {
       entries.push({
         task,
         dateLabel: "오늘",
@@ -105,7 +107,7 @@ export default function CompactView() {
     for (const [date, tasks] of Object.entries(upcomingTasksByDate).sort(([a], [b]) =>
       a.localeCompare(b),
     )) {
-      for (const task of tasks.filter((t) => !t.completed)) {
+      for (const task of tasks.filter((t) => !t.completed).sort(byTime)) {
         entries.push({
           task,
           dateLabel: getLabel(date),
@@ -189,7 +191,7 @@ export default function CompactView() {
       : todayTasks.length === 0 && upcomingGroups.length === 0 && !hasBacklog && !hasCompleted;
 
   return (
-    <div className="flex flex-col h-screen bg-transparent text-app-text-primary">
+    <div className="flex flex-col h-screen bg-prowl-surface text-app-text-primary">
       <CompactHeader
         isMinimized={minimized}
         isRefreshing={refreshing}

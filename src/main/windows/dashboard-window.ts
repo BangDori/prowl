@@ -1,9 +1,25 @@
 /** 대시보드 BrowserWindow 생성 및 관리 */
 import * as path from "node:path";
-import { BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, screen } from "electron";
 import { DASHBOARD, DEV_SERVER_PORT } from "../constants";
 
 let dashboardWindow: BrowserWindow | null = null;
+let forceClose = false;
+/** ready-to-show 이후 true — show() 안전 호출 여부 판단 */
+let isReady = false;
+/** prewarm 중 showDashboardWindow() 호출 시 ready 되면 바로 표시 */
+let pendingShow = false;
+/** before-quit 리스너 중복 등록 방지 */
+let quitListenerRegistered = false;
+
+function ensureQuitListener(): void {
+  if (quitListenerRegistered) return;
+  quitListenerRegistered = true;
+  // 앱 종료 시 창을 실제로 닫을 수 있도록 플래그 설정
+  app.on("before-quit", () => {
+    forceClose = true;
+  });
+}
 
 const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -13,12 +29,9 @@ function getIndexUrl(): string {
     : `file://${path.join(__dirname, "../../renderer/index.html")}`;
 }
 
-export function showDashboardWindow(): void {
-  if (dashboardWindow && !dashboardWindow.isDestroyed()) {
-    dashboardWindow.focus();
-    dashboardWindow.webContents.send("window:show");
-    return;
-  }
+function createDashboardWindow(): void {
+  ensureQuitListener();
+  isReady = false;
 
   const cursor = screen.getCursorScreenPoint();
   const display = screen.getDisplayNearestPoint(cursor);
@@ -55,24 +68,69 @@ export function showDashboardWindow(): void {
   });
 
   dashboardWindow.loadURL(`${getIndexUrl()}#dashboard`);
+
   dashboardWindow.once("ready-to-show", () => {
-    dashboardWindow?.show();
-    dashboardWindow?.webContents.send("window:show");
+    isReady = true;
+    if (pendingShow) {
+      pendingShow = false;
+      dashboardWindow?.show();
+      dashboardWindow?.focus();
+      dashboardWindow?.webContents.send("window:show");
+    }
   });
+
+  // 빨간 버튼(⌘W) 클릭 시 창을 파괴하지 않고 숨김 — 재진입 시 즉시 표시
+  dashboardWindow.on("close", (e) => {
+    if (!forceClose) {
+      e.preventDefault();
+      dashboardWindow?.hide();
+    }
+  });
+
   dashboardWindow.on("closed", () => {
     dashboardWindow = null;
+    isReady = false;
   });
+}
+
+/**
+ * 앱 시작 시 대시보드 창을 백그라운드에서 미리 로드.
+ * 첫 번째 showDashboardWindow() 호출 시 즉시 표시 가능.
+ */
+export function prewarmDashboardWindow(): void {
+  if (dashboardWindow && !dashboardWindow.isDestroyed()) return;
+  forceClose = false;
+  pendingShow = false;
+  createDashboardWindow();
+}
+
+export function showDashboardWindow(): void {
+  if (dashboardWindow && !dashboardWindow.isDestroyed()) {
+    if (isReady) {
+      dashboardWindow.show();
+      dashboardWindow.focus();
+      dashboardWindow.webContents.send("window:show");
+    } else {
+      // prewarm 진행 중 — ready-to-show 후 자동 표시
+      pendingShow = true;
+    }
+    return;
+  }
+
+  forceClose = false;
+  pendingShow = true;
+  createDashboardWindow();
 }
 
 export function closeDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed()) {
-    dashboardWindow.close();
+    dashboardWindow.hide();
   }
 }
 
 export function toggleDashboardWindow(): void {
   if (dashboardWindow && !dashboardWindow.isDestroyed() && dashboardWindow.isVisible()) {
-    closeDashboardWindow();
+    dashboardWindow.hide();
   } else {
     showDashboardWindow();
   }

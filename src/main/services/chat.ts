@@ -101,12 +101,13 @@ async function getOpenAiCredential(): Promise<OpenAICredential | undefined> {
 
 /** API Key 사용 가능 모델 */
 const API_KEY_MODELS: AiModelOption[] = [
-  { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
+  { id: "gpt-5.4", label: "GPT-5.4", provider: "openai" },
   { id: "gpt-5-mini", label: "GPT-5 Mini", provider: "openai" },
 ];
 
 /** OAuth (Codex) 사용 가능 모델 — chatgpt.com/backend-api/codex 엔드포인트 (visibility=list + api=true) */
 const CODEX_MODELS: AiModelOption[] = [
+  { id: "gpt-5.4", label: "GPT-5.4", provider: "openai" },
   { id: "gpt-5.3-codex", label: "GPT-5.3 Codex", provider: "openai" },
   { id: "gpt-5.2-codex", label: "GPT-5.2 Codex", provider: "openai" },
   { id: "gpt-5.2", label: "GPT-5.2", provider: "openai" },
@@ -126,7 +127,7 @@ export async function streamChatMessage(
 
   const credential = await getOpenAiCredential();
 
-  const defaultModel = credential?.type === "oauth" ? "gpt-5.3-codex" : "gpt-5-mini";
+  const defaultModel = "gpt-5.4";
   const modelId = config?.model ?? defaultModel;
   if (!credential) {
     const ts = Date.now();

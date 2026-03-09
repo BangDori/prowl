@@ -7,25 +7,26 @@
    ============================================ */
 :root {
   /* prowl 컴포넌트 배경/테두리 (라이트 기본값) */
-  --prowl-surface:      rgba(0, 0, 0, 0.04);         /* 사이드바/서피스 — 미묘한 회색 */
-  --prowl-card:         rgba(255, 255, 255, 0.85);   /* 카드 — 반투명 흰색 */
-  --prowl-border:       rgba(0, 0, 0, 0.10);
-  --prowl-border-hover: rgba(0, 0, 0, 0.20);
+  --prowl-surface:      #ffffff;
+  --prowl-card:         #ffffff;
+  --prowl-border:       rgba(0, 0, 0, 0.08);
+  --prowl-border-hover: rgba(0, 0, 0, 0.15);
 
   /* 의미론적 텍스트 토큰 */
-  --app-text-primary:   rgba(17, 24, 39, 0.92);
-  --app-text-secondary: rgba(55, 65, 81, 0.75);
+  --app-text-primary:   rgba(17, 24, 39, 0.95);
+  --app-text-secondary: rgba(55, 65, 81, 0.80);
   --app-text-muted:     rgba(107, 114, 128, 0.85);
   --app-text-faint:     rgba(107, 114, 128, 0.55);
   --app-text-ghost:     rgba(107, 114, 128, 0.35);
 
   /* 인터랙션 배경 */
-  --app-hover-bg:       rgba(0, 0, 0, 0.05);
-  --app-active-bg:      rgba(0, 0, 0, 0.09);
-  --app-input-bg:       rgba(255, 255, 255, 0.85);   /* 인풋 — 반투명 흰색 */
-  --app-input-border:   rgba(0, 0, 0, 0.15);
+  --app-hover-bg:       rgba(0, 0, 0, 0.04);
+  --app-active-bg:      rgba(0, 0, 0, 0.07);
+  --app-input-bg:       rgba(255, 255, 255, 0.70);
+  --app-input-border:   rgba(0, 0, 0, 0.12);
 }
 
+/* 시스템 다크 모드 (prefers-color-scheme) */
 @media (prefers-color-scheme: dark) {
   :root {
     --prowl-surface:      rgba(255, 255, 255, 0.06);
@@ -43,27 +44,70 @@
     --app-active-bg:      rgba(255, 255, 255, 0.10);
     --app-input-bg:       rgba(255, 255, 255, 0.04);
     --app-input-border:   rgba(255, 255, 255, 0.08);
+
   }
 }
 
-/* Chat 윈도우 강제 다크 — data-theme="dark" 범위 */
+/* 강제 라이트 모드 */
+[data-theme="light"] {
+  --prowl-surface:      #ffffff;
+  --prowl-card:         #ffffff;
+  --prowl-border:       rgba(0, 0, 0, 0.08);
+  --prowl-border-hover: rgba(0, 0, 0, 0.15);
+
+  --app-text-primary:   rgba(17, 24, 39, 0.95);
+  --app-text-secondary: rgba(55, 65, 81, 0.80);
+  --app-text-muted:     rgba(107, 114, 128, 0.85);
+  --app-text-faint:     rgba(107, 114, 128, 0.55);
+  --app-text-ghost:     rgba(107, 114, 128, 0.35);
+
+  --app-hover-bg:       rgba(0, 0, 0, 0.04);
+  --app-active-bg:      rgba(0, 0, 0, 0.07);
+  --app-input-bg:       rgba(255, 255, 255, 0.70);
+  --app-input-border:   rgba(0, 0, 0, 0.12);
+
+}
+
+/* 강제 라이트 모드 — 글래스 카드 쉐도우 */
+[data-theme="light"] .glass-card-3d {
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(0, 0, 0, 0.04) inset;
+}
+[data-theme="light"] .glass-card-3d:hover {
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(0, 0, 0, 0.06) inset;
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+/* 강제 다크 모드 */
 [data-theme="dark"] {
   --prowl-surface:      rgba(255, 255, 255, 0.06);
   --prowl-card:         rgba(255, 255, 255, 0.04);
-  --prowl-border:       rgba(255, 255, 255, 0.08);
+  --prowl-border:       rgba(255, 255, 255, 0.14);
   --prowl-border-hover: rgba(255, 255, 255, 0.15);
 
   --app-text-primary:   rgba(255, 255, 255, 0.90);
-  --app-text-secondary: rgba(255, 255, 255, 0.70);
-  --app-text-muted:     rgba(255, 255, 255, 0.50);
-  --app-text-faint:     rgba(255, 255, 255, 0.30);
-  --app-text-ghost:     rgba(255, 255, 255, 0.20);
+  --app-text-secondary: rgba(255, 255, 255, 0.82);
+  --app-text-muted:     rgba(255, 255, 255, 0.68);
+  --app-text-faint:     rgba(255, 255, 255, 0.52);
+  --app-text-ghost:     rgba(255, 255, 255, 0.40);
 
   --app-hover-bg:       rgba(255, 255, 255, 0.05);
   --app-active-bg:      rgba(255, 255, 255, 0.10);
   --app-input-bg:       rgba(255, 255, 255, 0.04);
-  --app-input-border:   rgba(255, 255, 255, 0.08);
+  --app-input-border:   rgba(255, 255, 255, 0.16);
+
 }
+
+/* 강제 다크 — Tailwind gray 텍스트 보정 */
+[data-theme="dark"] .text-gray-600 { color: rgba(255, 255, 255, 0.70); }
+[data-theme="dark"] .text-gray-500 { color: rgba(255, 255, 255, 0.60); }
+[data-theme="dark"] .text-gray-400 { color: rgba(255, 255, 255, 0.50); }
+[data-theme="dark"] .dark\:text-gray-600 { color: rgba(255, 255, 255, 0.70); }
+[data-theme="dark"] .dark\:text-gray-500 { color: rgba(255, 255, 255, 0.60); }
+[data-theme="dark"] .dark\:text-gray-400 { color: rgba(255, 255, 255, 0.50); }
 
 /* 기본 스타일 */
 * {
@@ -149,7 +193,7 @@ body {
 /* 로그 뷰어 - 터미널 스타일 */
 .log-viewer {
   @apply font-mono text-xs leading-relaxed;
-  @apply bg-black/40 text-green-400 p-4 rounded-lg backdrop-blur-md;
+  @apply bg-black/40 text-green-400 p-4 rounded-lg;
   @apply overflow-auto max-h-64;
   @apply border border-prowl-border;
   white-space: pre-wrap;
@@ -159,7 +203,7 @@ body {
 /* 인풋 필드 */
 .input-field {
   @apply px-3 py-2 text-sm rounded-lg transition-all duration-200;
-  @apply bg-white/80 dark:bg-white/[0.04] backdrop-blur-sm;
+  @apply bg-white/80 dark:bg-white/[0.04];
   @apply border border-gray-300 dark:border-prowl-border;
   @apply focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500;
   @apply placeholder:text-gray-400 dark:placeholder:text-gray-600;
@@ -247,7 +291,6 @@ select.input-field {
 .app-header {
   @apply sticky top-0 z-10 px-4 py-3;
   background-color: var(--prowl-card);
-  @apply backdrop-blur-xl;
   border-bottom: 1px solid var(--prowl-border);
 }
 
@@ -664,5 +707,21 @@ select.input-field {
 }
 
 .-webkit-app-region-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* 우측 콘텐츠 영역 전체를 드래그 가능 영역으로 지정 */
+main {
+  -webkit-app-region: drag;
+}
+
+/* 인터랙티브 요소는 드래그 비활성화 */
+main button,
+main a,
+main input,
+main select,
+main textarea,
+main [role="button"],
+main label {
   -webkit-app-region: no-drag;
 }

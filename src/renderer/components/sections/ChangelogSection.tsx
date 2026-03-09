@@ -1,20 +1,40 @@
 /** 변경 로그 탭 섹션 */
 import prowlProfile from "@assets/prowl-profile.png";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
 import { type ReactNode, useEffect, useState } from "react";
 import changelogRaw from "../../../../CHANGELOG.md?raw";
+
+/** 기여자 정보 */
+interface Contributor {
+  handle: string;
+  url: string;
+}
 
 /** 체인지로그 항목 타입 */
 interface ChangelogEntry {
   version: string;
   date: string;
   changes: string[];
+  contributors: Contributor[];
+}
+
+/**
+ * 변경 항목 텍스트에서 기여자(@username) 패턴을 제거하고
+ * 추출된 기여자 목록을 반환
+ */
+function extractContributors(text: string): { cleaned: string; contributors: Contributor[] } {
+  const contributors: Contributor[] = [];
+  const cleaned = text.replace(/,?\s*\[@([^\]]+)\]\(([^)]+)\)/g, (_, handle, url) => {
+    contributors.push({ handle, url });
+    return "";
+  });
+  return { cleaned: cleaned.replace(/\(\s*\)/g, "").trim(), contributors };
 }
 
 /**
  * CHANGELOG.md 파일을 파싱하여 구조화된 데이터로 변환
- * @param markdown - CHANGELOG.md 원본 문자열
- * @returns 파싱된 체인지로그 엔트리 배열
+ * 각 릴리즈별로 unique 기여자를 수집
  */
 function parseChangelog(markdown: string): ChangelogEntry[] {
   const entries: ChangelogEntry[] = [];
@@ -26,14 +46,19 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
     const bracketMatch = line.match(/^## \[(.+?)\] - (\d{4}-\d{2}-\d{2})/);
     if (bracketMatch) {
       if (currentEntry) entries.push(currentEntry);
-      currentEntry = { version: bracketMatch[1], date: bracketMatch[2], changes: [] };
+      currentEntry = {
+        version: bracketMatch[1],
+        date: bracketMatch[2],
+        changes: [],
+        contributors: [],
+      };
       continue;
     }
     // Changesets 형식: ## 1.8.0 (날짜 없음)
     const versionMatch = line.match(/^## (\d+\.\d+\.\d+)\s*$/);
     if (versionMatch) {
       if (currentEntry) entries.push(currentEntry);
-      currentEntry = { version: versionMatch[1], date: "", changes: [] };
+      currentEntry = { version: versionMatch[1], date: "", changes: [], contributors: [] };
       continue;
     }
     // Changesets 섹션 헤더 스킵: ### Patch Changes 등
@@ -41,7 +66,13 @@ function parseChangelog(markdown: string): ChangelogEntry[] {
     // 변경사항 항목: - 텍스트
     const itemMatch = line.match(/^-\s+(.+)/);
     if (itemMatch && currentEntry) {
-      currentEntry.changes.push(itemMatch[1]);
+      const { cleaned, contributors } = extractContributors(itemMatch[1]);
+      currentEntry.changes.push(cleaned);
+      for (const c of contributors) {
+        if (!currentEntry.contributors.some((x) => x.handle === c.handle)) {
+          currentEntry.contributors.push(c);
+        }
+      }
     }
   }
   if (currentEntry) entries.push(currentEntry);
@@ -80,7 +111,8 @@ function renderWithLinks(text: string): ReactNode {
  *
  * 앱의 버전 히스토리를 표시합니다.
  * - 현재 버전 헤더
- * - 각 릴리즈의 변경사항 목록
+ * - 각 릴리즈의 변경사항 목록 (PR 링크만 표시)
+ * - 각 릴리즈 카드 하단에 해당 버전 기여자 표시 (중복 없이)
  */
 export default function ChangelogSection() {
   const [currentVersion, setCurrentVersion] = useState("");
@@ -90,18 +122,30 @@ export default function ChangelogSection() {
   }, []);
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto -webkit-app-region-drag">
       <div className="p-4">
         {/* 현재 버전 헤더 */}
-        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card border border-prowl-border">
           <img src={prowlProfile} alt="Prowl" className="w-8 h-8 rounded-full" />
           <div>
             <h4 className="text-sm font-medium">Prowl</h4>
             <p className="text-[10px] text-gray-500">Background job monitor for macOS</p>
           </div>
-          <span className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
-            <Sparkles className="w-3 h-3" />v{currentVersion}
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-prowl-border text-[10px] text-gray-400 hover:text-accent hover:border-accent/40 transition-colors cursor-pointer"
+              onClick={() =>
+                window.electronAPI.openExternal("https://github.com/BangDori/prowl/releases")
+              }
+            >
+              <ExternalLink className="w-3 h-3" />
+              Releases
+            </button>
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
+              <Sparkles className="w-3 h-3" />v{currentVersion}
+            </span>
+          </div>
         </div>
 
         {/* 버전 히스토리 */}
@@ -109,7 +153,7 @@ export default function ChangelogSection() {
           {CHANGELOG.map((release, index) => (
             <div
               key={release.version}
-              className={`glass-card-3d p-3 rounded-lg border backdrop-blur-xl ${
+              className={`glass-card-3d p-3 rounded-lg border ${
                 index === 0 ? "bg-accent/5 border-accent/20" : "bg-prowl-card border-prowl-border"
               }`}
             >
@@ -130,6 +174,23 @@ export default function ChangelogSection() {
                   </li>
                 ))}
               </ul>
+              {release.contributors.filter((c) => c.handle !== "BangDori").length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  <span className="text-[10px] text-gray-500 self-center">by</span>
+                  {release.contributors
+                    .filter((c) => c.handle !== "BangDori")
+                    .map((c) => (
+                      <button
+                        key={c.handle}
+                        type="button"
+                        className="text-[10px] text-accent hover:underline cursor-pointer"
+                        onClick={() => window.electronAPI.openExternal(c.url)}
+                      >
+                        @{c.handle}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -196,7 +196,7 @@ function PromptCard({
   isDirty: boolean;
 }) {
   return (
-    <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border p-3 space-y-2">
+    <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border p-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <div>
           <p className="text-sm font-medium">{label}</p>
@@ -294,14 +294,14 @@ export default function PersonalizeSection() {
   }
 
   return (
-    <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto -webkit-app-region-drag">
       <div className="p-4 space-y-6">
         {/* Memory */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
             Memory
           </h3>
-          <div className="glass-card-3d rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border p-3 space-y-2">
+          <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border p-3 space-y-2">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-sm font-medium">Memory</p>

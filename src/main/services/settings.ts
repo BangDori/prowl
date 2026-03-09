@@ -4,7 +4,9 @@ import {
   type ChatConfig,
   DEFAULT_CHAT_CONFIG,
   DEFAULT_SETTINGS,
+  type Theme,
 } from "@shared/types";
+import { nativeTheme } from "electron";
 import Store from "electron-store";
 import { readSystemPrompt, readTone, writeSystemPrompt, writeTone } from "./personalize";
 
@@ -44,6 +46,12 @@ export function setSettings(settings: AppSettings): void {
   }
 
   store.set("settings", rest as StoredSettings);
+  applyNativeTheme(settings.theme);
+}
+
+/** nativeTheme.themeSource를 설정하여 macOS appearance와 동기화 */
+export function applyNativeTheme(theme: Theme = "system"): void {
+  nativeTheme.themeSource = theme;
 }
 
 // 알림 설정
