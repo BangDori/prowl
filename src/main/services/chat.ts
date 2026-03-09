@@ -127,7 +127,7 @@ export async function streamChatMessage(
 
   const credential = await getOpenAiCredential();
 
-  const defaultModel = credential?.type === "oauth" ? "gpt-5.4" : "gpt-5-mini";
+  const defaultModel = "gpt-5.4";
   const modelId = config?.model ?? defaultModel;
   if (!credential) {
     const ts = Date.now();
