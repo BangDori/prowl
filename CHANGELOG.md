@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.52.0] - 2026-03-09
+- 수동 테마 전환 기능 추가 (시스템/라이트/다크) ([@ckdwns9121](https://github.com/ckdwns9121))
+- OAuth 모델 목록에 GPT-5.4 추가 및 기본 모델 변경 ([@BangDori](https://github.com/BangDori))
+- AI 알림 메시지 마크다운 제거 및 15자 트런케이션 ([@BangDori](https://github.com/BangDori))
+- 카테고리 뷰에서 같은 날짜 내 태스크 시간순 정렬 추가 ([@BangDori](https://github.com/BangDori))
+- 우측 콘텐츠 영역 전체에 윈도우 드래그(창 이동) 지원 추가 ([@BangDori](https://github.com/BangDori))
+- 대시보드 탭 진입 시 초기 렌더 속도 최적화 (섹션 lazy mount, 창 hide/show, prewarm) ([@BangDori](https://github.com/BangDori))
+- HTML 코드블럭 스트립 후 빈 코드블럭 렌더링 방지 ([@BangDori](https://github.com/BangDori))
+- 버전 히스토리 기여자 하단 표시 및 GitHub Releases 버튼 추가 ([@BangDori](https://github.com/BangDori))
+
 ## [1.51.0] - 2026-03-04
 - AI 도구 HITL 승인 UI에 상세 정보 카드 추가 및 카테고리 추가 시 Compact View 즉시 반영 버그 수정 ([@BangDori](https://github.com/BangDori))
 - E2E 테스트 시스템 구축 및 HITL IPC 채널 추가 ([@BangDori](https://github.com/BangDori))
