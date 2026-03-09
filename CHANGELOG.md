@@ -1,506 +1,506 @@
 # Changelog
 
 ## [1.51.0] - 2026-03-04
-- AI 도구 HITL 승인 UI에 상세 정보 카드 추가 및 카테고리 추가 시 Compact View 즉시 반영 버그 수정 ([#146](https://github.com/BangDori/prowl/pull/146), [@BangDori](https://github.com/BangDori))
-- E2E 테스트 시스템 구축 및 HITL IPC 채널 추가 ([#148](https://github.com/BangDori/prowl/pull/148), [@BangDori](https://github.com/BangDori))
-- renderer 훅을 feature 폴더로 co-location 리팩토링 ([#144](https://github.com/BangDori/prowl/pull/144), [@BangDori](https://github.com/BangDori))
+- AI 도구 HITL 승인 UI에 상세 정보 카드 추가 및 카테고리 추가 시 Compact View 즉시 반영 버그 수정 ([@BangDori](https://github.com/BangDori))
+- E2E 테스트 시스템 구축 및 HITL IPC 채널 추가 ([@BangDori](https://github.com/BangDori))
+- renderer 훅을 feature 폴더로 co-location 리팩토링 ([@BangDori](https://github.com/BangDori))
 
 ## [1.50.1] - 2026-03-03
-- API Key 없는 초기 상태에서 입력 버튼 누락 수정 ([#141](https://github.com/BangDori/prowl/pull/141), [@BangDori](https://github.com/BangDori))
+- API Key 없는 초기 상태에서 입력 버튼 누락 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.50.0] - 2026-03-02
-- AI 퍼스널라이제이션 탭 추가 — 시스템 프롬프트·톤·메모리 통합 관리 ([#124](https://github.com/BangDori/prowl/pull/124), [@BangDori](https://github.com/BangDori))
-- 첫 응답 후 채팅 룸 제목 AI 자동 생성 ([#130](https://github.com/BangDori/prowl/pull/130), [@BangDori](https://github.com/BangDori))
-- 카테고리 대소문자 무시 매칭, 카테고리 HITL 승인, 과거 태스크 이력 조회 버그 수정 ([#127](https://github.com/BangDori/prowl/pull/127), [@BangDori](https://github.com/BangDori))
-- Changesets 커스텀 changelog 포맷 적용 및 Version History PR 링크 클릭 지원 ([#122](https://github.com/BangDori/prowl/pull/122), [@BangDori](https://github.com/BangDori))
-- HITL 승인 상태를 채팅방 재진입 후에도 유지 ([#129](https://github.com/BangDori/prowl/pull/129), [@BangDori](https://github.com/BangDori))
-- 채팅 UI에서 고양이 이미지 제거 ([#134](https://github.com/BangDori/prowl/pull/134), [@BangDori](https://github.com/BangDori))
-- Night Watch 기능 제거 ([#120](https://github.com/BangDori/prowl/pull/120), [@BangDori](https://github.com/BangDori))
+- AI 퍼스널라이제이션 탭 추가 — 시스템 프롬프트·톤·메모리 통합 관리 ([@BangDori](https://github.com/BangDori))
+- 첫 응답 후 채팅 룸 제목 AI 자동 생성 ([@BangDori](https://github.com/BangDori))
+- 카테고리 대소문자 무시 매칭, 카테고리 HITL 승인, 과거 태스크 이력 조회 버그 수정 ([@BangDori](https://github.com/BangDori))
+- Changesets 커스텀 changelog 포맷 적용 및 Version History PR 링크 클릭 지원 ([@BangDori](https://github.com/BangDori))
+- HITL 승인 상태를 채팅방 재진입 후에도 유지 ([@BangDori](https://github.com/BangDori))
+- 채팅 UI에서 고양이 이미지 제거 ([@BangDori](https://github.com/BangDori))
+- Night Watch 기능 제거 ([@BangDori](https://github.com/BangDori))
 
 All notable changes to Prowl will be documented in this file.
 
 ## [1.49.0] - 2026-02-28
-- OpenAI OAuth 로그인 연동 (PKCE flow로 ChatGPT 계정 인증)
-- OAuth 토큰으로 Codex 엔드포인트를 통한 AI 채팅 전송
-- API Key 방식 병행 지원 및 토큰 자동 갱신
-- Codex 전용 모델 목록 분리 (gpt-5.3-codex 등 5종)
-- Settings UI에 OAuth Connect/Disconnect 추가
+- OpenAI OAuth 로그인 연동 (PKCE flow로 ChatGPT 계정 인증) ([@ckdwns9121](https://github.com/ckdwns9121))
+- OAuth 토큰으로 Codex 엔드포인트를 통한 AI 채팅 전송 ([@ckdwns9121](https://github.com/ckdwns9121))
+- API Key 방식 병행 지원 및 토큰 자동 갱신 ([@ckdwns9121](https://github.com/ckdwns9121))
+- Codex 전용 모델 목록 분리 (gpt-5.3-codex 등 5종) ([@ckdwns9121](https://github.com/ckdwns9121))
+- Settings UI에 OAuth Connect/Disconnect 추가 ([@ckdwns9121](https://github.com/ckdwns9121))
 
 ## [1.48.2] - 2026-02-27
-- Task Manager 어젠다 뷰에서 현재 달 이후 전체 일정 표시 (1년 범위 날짜 조회)
-- 어젠다 뷰 날짜 미정 섹션을 목록 맨 아래로 이동
-- 완료·미완료 태스크 혼재 시 구분선 추가 및 완료 작업 기본 숨김 처리
-- 달력 그리드 인접 달 날짜 클릭 시 해당 달로 자동 이동
+- Task Manager 어젠다 뷰에서 현재 달 이후 전체 일정 표시 (1년 범위 날짜 조회) ([@BangDori](https://github.com/BangDori))
+- 어젠다 뷰 날짜 미정 섹션을 목록 맨 아래로 이동 ([@BangDori](https://github.com/BangDori))
+- 완료·미완료 태스크 혼재 시 구분선 추가 및 완료 작업 기본 숨김 처리 ([@BangDori](https://github.com/BangDori))
+- 달력 그리드 인접 달 날짜 클릭 시 해당 달로 자동 이동 ([@BangDori](https://github.com/BangDori))
 
 ## [1.48.1] - 2026-02-27
-- GitHub Actions CI에서 Electron 바이너리 다운로드 실패(socket hang up) 수정 — 불필요한 바이너리 다운로드를 건너뜀
+- GitHub Actions CI에서 Electron 바이너리 다운로드 실패(socket hang up) 수정 — 불필요한 바이너리 다운로드를 건너뜀 ([@BangDori](https://github.com/BangDori))
 
 ## [1.48.0] - 2026-02-26
-- Compact View 카테고리 헤더 클릭으로 태스크 목록 접기/펼치기 기능 추가
+- Compact View 카테고리 헤더 클릭으로 태스크 목록 접기/펼치기 기능 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.47.3] - 2026-02-26
-- AI 태스크 도구(update_task)에서 날짜 이동 시 빈 문자열 필드가 기존 제목/카테고리/설명을 덮어쓰던 버그 수정
+- AI 태스크 도구(update_task)에서 날짜 이동 시 빈 문자열 필드가 기존 제목/카테고리/설명을 덮어쓰던 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.47.2] - 2026-02-26
-- 채팅 메시지 내 bare URL이 포함될 때 버블 레이아웃이 깨지던 현상 수정 — URL은 hostname만 표시되도록 개선
+- 채팅 메시지 내 bare URL이 포함될 때 버블 레이아웃이 깨지던 현상 수정 — URL은 hostname만 표시되도록 개선 ([@BangDori](https://github.com/BangDori))
 
 ## [1.47.1] - 2026-02-25
-- chat-read-state.json에 없는 채팅방의 안 읽은 메시지 수가 표시되지 않던 버그 수정
+- chat-read-state.json에 없는 채팅방의 안 읽은 메시지 수가 표시되지 않던 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.47.0] - 2026-02-25
-- Prowl Chat을 열 때 채팅방 목록 자동 새로고침 — 다른 기기나 세션에서 변경된 대화방이 즉시 반영됨
+- Prowl Chat을 열 때 채팅방 목록 자동 새로고침 — 다른 기기나 세션에서 변경된 대화방이 즉시 반영됨 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.8] - 2026-02-25
-- docs 컨벤션 기반 전면 리팩토링 — IPC 채널 네이밍, JSDoc 헤더, boolean prop 접두사(is/has/can) 통일
-- lucide-react 배럴 임포트를 직접 경로 임포트로 전환 (번들 크기 최적화)
-- 300줄 초과 파일 도메인별 분리 — ipc, chat-tools, PreviewPanel, ChatConversation, SettingsSection
+- docs 컨벤션 기반 전면 리팩토링 — IPC 채널 네이밍, JSDoc 헤더, boolean prop 접두사(is/has/can) 통일 ([@BangDori](https://github.com/BangDori))
+- lucide-react 배럴 임포트를 직접 경로 임포트로 전환 (번들 크기 최적화) ([@BangDori](https://github.com/BangDori))
+- 300줄 초과 파일 도메인별 분리 — ipc, chat-tools, PreviewPanel, ChatConversation, SettingsSection ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.7] - 2026-02-25
-- 즐겨찾기 상단 정렬 버그 수정 — Dashboard 설정 저장 시 favoritedRoomIds가 덮어쓰여지던 문제 해결
-- settings.ts / chat-rooms.ts 유닛 테스트 보강 (60개)
+- 즐겨찾기 상단 정렬 버그 수정 — Dashboard 설정 저장 시 favoritedRoomIds가 덮어쓰여지던 문제 해결 ([@BangDori](https://github.com/BangDori))
+- settings.ts / chat-rooms.ts 유닛 테스트 보강 (60개) ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.6] - 2026-02-25
-- 태스크 삭제 버튼에 확인 모달 추가 — 실수로 삭제되는 경우 방지
-- ConfirmDialog Portal 렌더링으로 전환 — 부모 레이어 스타일 영향 없이 앱 전체 기준으로 표시
+- 태스크 삭제 버튼에 확인 모달 추가 — 실수로 삭제되는 경우 방지 ([@BangDori](https://github.com/BangDori))
+- ConfirmDialog Portal 렌더링으로 전환 — 부모 레이어 스타일 영향 없이 앱 전체 기준으로 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.5] - 2026-02-25
-- Task.roomId 제거 — 도메인 경계 위반 수정
-- ChatRoom.favorited → AppSettings.favoritedRoomIds로 이동
-- chat.ts의 Memory 직접 참조 제거 — Tool 인터페이스로 추상화
+- Task.roomId 제거 — 도메인 경계 위반 수정 ([@BangDori](https://github.com/BangDori))
+- ChatRoom.favorited → AppSettings.favoritedRoomIds로 이동 ([@BangDori](https://github.com/BangDori))
+- chat.ts의 Memory 직접 참조 제거 — Tool 인터페이스로 추상화 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.4] - 2026-02-25
-- Files 섹션: 파일 확장자별 아이콘 구분 (.json, .plist, .sh, .txt 등)
-- Files 섹션: Python·JS·TS·JSON·Bash·XML·Markdown·YAML 등 코드 파일 syntax highlighting 지원
-- JSON 파일 자동 pretty-print 및 파싱 오류 시 에러 배너 표시
+- Files 섹션: 파일 확장자별 아이콘 구분 (.json, .plist, .sh, .txt 등) ([@BangDori](https://github.com/BangDori))
+- Files 섹션: Python·JS·TS·JSON·Bash·XML·Markdown·YAML 등 코드 파일 syntax highlighting 지원 ([@BangDori](https://github.com/BangDori))
+- JSON 파일 자동 pretty-print 및 파싱 오류 시 에러 배너 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.3] - 2026-02-24
-- 카테고리 뷰에서 태스크 없는 카테고리도 항상 표시
-- 카테고리 목록 정렬을 유니코드(가나다) 순으로 변경
+- 카테고리 뷰에서 태스크 없는 카테고리도 항상 표시 ([@BangDori](https://github.com/BangDori))
+- 카테고리 목록 정렬을 유니코드(가나다) 순으로 변경 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.2] - 2026-02-24
-- 완료된 태스크 수정/삭제 잠금 — 완료 후에는 편집·삭제 버튼이 표시되지 않으며, 서비스 레이어에서도 요청 자체를 거부
-- 태스크 삭제 버튼 레이아웃 개선 — hover 전까지 공간을 차지하지 않도록 수정
+- 완료된 태스크 수정/삭제 잠금 — 완료 후에는 편집·삭제 버튼이 표시되지 않으며, 서비스 레이어에서도 요청 자체를 거부 ([@BangDori](https://github.com/BangDori))
+- 태스크 삭제 버튼 레이아웃 개선 — hover 전까지 공간을 차지하지 않도록 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.1] - 2026-02-24
-- Compact View(메뉴바 팝업)에서 태스크 삭제 기능 추가 — 태스크 hover 시 휴지통 버튼 표시
-- 오늘 태스크, 다가오는 일정, 날짜 미정(백로그) 전 영역 및 카테고리 뷰에서 삭제 가능
+- Compact View(메뉴바 팝업)에서 태스크 삭제 기능 추가 — 태스크 hover 시 휴지통 버튼 표시 ([@BangDori](https://github.com/BangDori))
+- 오늘 태스크, 다가오는 일정, 날짜 미정(백로그) 전 영역 및 카테고리 뷰에서 삭제 가능 ([@BangDori](https://github.com/BangDori))
 
 ## [1.46.0] - 2026-02-24
-- Dashboard에 Files 탭 추가 — `~/.prowl/` 내부 파일 탐색, 조회, 편집 기능
-- 파일 트리: 폴더 클릭으로 하위 항목 펼치기/접기, 폴더 우선 알파벳 정렬
-- 파일 편집기: 인라인 편집 및 ⌘S 저장, 전체 새로고침 버튼
-- 파일/빈 폴더 삭제 기능 (hover 시 휴지통 버튼, 삭제 확인 모달 포함)
+- Dashboard에 Files 탭 추가 — `~/.prowl/` 내부 파일 탐색, 조회, 편집 기능 ([@BangDori](https://github.com/BangDori))
+- 파일 트리: 폴더 클릭으로 하위 항목 펼치기/접기, 폴더 우선 알파벳 정렬 ([@BangDori](https://github.com/BangDori))
+- 파일 편집기: 인라인 편집 및 ⌘S 저장, 전체 새로고침 버튼 ([@BangDori](https://github.com/BangDori))
+- 파일/빈 폴더 삭제 기능 (hover 시 휴지통 버튼, 삭제 확인 모달 포함) ([@BangDori](https://github.com/BangDori))
 
 ## [1.45.1] - 2026-02-23
-- Dashboard에서 Claude Config 탭 제거
+- Dashboard에서 Claude Config 탭 제거 ([@BangDori](https://github.com/BangDori))
 
 ## [1.45.0] - 2026-02-23
-- Task Manager에 파일 기반 동적 카테고리 시스템 추가 (카테고리 생성/수정/삭제)
-- Prowl Chat에서 카테고리 관리 가능 (추가/이름 변경/삭제, 삭제 시 HITL 승인)
-- 카테고리 이름 변경/삭제 시 연결된 모든 태스크 자동 업데이트
-- Task Manager 카테고리 모드에서 오늘·다가오는 일정·날짜 미정을 카테고리별로 통합 표시
-- Task Manager 헤더에 날짜별/카테고리별 정렬 토글 추가
-- Task Manager 창 크기를 앱 재시작 후에도 유지
-- 캘린더 날짜 셀에 태스크 카테고리 색상 점 표시 (중복 색상 제거)
+- Task Manager에 파일 기반 동적 카테고리 시스템 추가 (카테고리 생성/수정/삭제) ([@BangDori](https://github.com/BangDori))
+- Prowl Chat에서 카테고리 관리 가능 (추가/이름 변경/삭제, 삭제 시 HITL 승인) ([@BangDori](https://github.com/BangDori))
+- 카테고리 이름 변경/삭제 시 연결된 모든 태스크 자동 업데이트 ([@BangDori](https://github.com/BangDori))
+- Task Manager 카테고리 모드에서 오늘·다가오는 일정·날짜 미정을 카테고리별로 통합 표시 ([@BangDori](https://github.com/BangDori))
+- Task Manager 헤더에 날짜별/카테고리별 정렬 토글 추가 ([@BangDori](https://github.com/BangDori))
+- Task Manager 창 크기를 앱 재시작 후에도 유지 ([@BangDori](https://github.com/BangDori))
+- 캘린더 날짜 셀에 태스크 카테고리 색상 점 표시 (중복 색상 제거) ([@BangDori](https://github.com/BangDori))
 
 ## [1.44.3] - 2026-02-23
-- Task Manager가 멀티 모니터 환경에서 주 모니터가 아닌 커서가 위치한 모니터에 표시되도록 수정
+- Task Manager가 멀티 모니터 환경에서 주 모니터가 아닌 커서가 위치한 모니터에 표시되도록 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.44.2] - 2026-02-22
-- AI 채팅 삭제 HITL 승인 메시지가 표시되지 않던 버그 수정 (roomId 누락으로 30초 타임아웃 후 자동 거부)
+- AI 채팅 삭제 HITL 승인 메시지가 표시되지 않던 버그 수정 (roomId 누락으로 30초 타임아웃 후 자동 거부) ([@BangDori](https://github.com/BangDori))
 
 ## [1.44.1] - 2026-02-22
-- AI 응답 멀티 메시지(--- 구분자) 방식 제거, 단일 메시지로 응답 품질 개선
-- 채팅 창 재오픈 시 입력창 자동 포커스
+- AI 응답 멀티 메시지(--- 구분자) 방식 제거, 단일 메시지로 응답 품질 개선 ([@BangDori](https://github.com/BangDori))
+- 채팅 창 재오픈 시 입력창 자동 포커스 ([@BangDori](https://github.com/BangDori))
 
 ## [1.44.0] - 2026-02-22
-- AI 채팅에서 ~/.prowl/ 전체 파일 조회 가능 (economic-freedom, scripts 등 모든 하위 경로 탐색 및 읽기)
+- AI 채팅에서 ~/.prowl/ 전체 파일 조회 가능 (economic-freedom, scripts 등 모든 하위 경로 탐색 및 읽기) ([@BangDori](https://github.com/BangDori))
 
 ## [1.43.3] - 2026-02-22
-- 전체화면에서 HTML 보기 클릭 시 창이 작은 크기로 변경되는 버그 수정
-- "Prowl이 함께 보고 있어요" 영역 배경 불투명 처리 (뒷 텍스트 비침 현상 수정)
+- 전체화면에서 HTML 보기 클릭 시 창이 작은 크기로 변경되는 버그 수정 ([@BangDori](https://github.com/BangDori))
+- "Prowl이 함께 보고 있어요" 영역 배경 불투명 처리 (뒷 텍스트 비침 현상 수정) ([@BangDori](https://github.com/BangDori))
 
 ## [1.43.2] - 2026-02-22
-- 메시지 버블 코드 블록 포함 시 UI 깨짐 수정
-- Prowl Chat 커맨드로 껐다 켤 때 전체화면 상태 복원
-- HTML 카드에 복사 버튼 추가 (열기 버튼 좌측)
-- 분할 뷰 진입 시 메시지 버블 텍스트 오버플로우 수정 (flex min-width: 0)
-- 분할 뷰 진입 시 메시지 스크롤이 최상단으로 초기화되는 버그 수정
+- 메시지 버블 코드 블록 포함 시 UI 깨짐 수정 ([@BangDori](https://github.com/BangDori))
+- Prowl Chat 커맨드로 껐다 켤 때 전체화면 상태 복원 ([@BangDori](https://github.com/BangDori))
+- HTML 카드에 복사 버튼 추가 (열기 버튼 좌측) ([@BangDori](https://github.com/BangDori))
+- 분할 뷰 진입 시 메시지 버블 텍스트 오버플로우 수정 (flex min-width: 0) ([@BangDori](https://github.com/BangDori))
+- 분할 뷰 진입 시 메시지 스크롤이 최상단으로 초기화되는 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.43.1] - 2026-02-22
-- Settings API 키 저장 시 Prowl Chat에 즉시 반영 (재시작 불필요)
-- OpenAI API 키 전역 환경변수 fallback 제거 (Settings에서 명시적으로 저장한 키만 사용)
-- API Keys 설정에 Remove 버튼 추가로 저장된 키 즉시 삭제 가능
-- API 키 Change 후 Save 시 UI가 갱신되지 않던 버그 수정 (queryKeys.jobs 참조 오류)
+- Settings API 키 저장 시 Prowl Chat에 즉시 반영 (재시작 불필요) ([@BangDori](https://github.com/BangDori))
+- OpenAI API 키 전역 환경변수 fallback 제거 (Settings에서 명시적으로 저장한 키만 사용) ([@BangDori](https://github.com/BangDori))
+- API Keys 설정에 Remove 버튼 추가로 저장된 키 즉시 삭제 가능 ([@BangDori](https://github.com/BangDori))
+- API 키 Change 후 Save 시 UI가 갱신되지 않던 버그 수정 (queryKeys.jobs 참조 오류) ([@BangDori](https://github.com/BangDori))
 
 ## [1.43.0] - 2026-02-22
-- 프리뷰 패널 인탭 브라우저 히스토리 스택 추가: HTML 링크 클릭 및 새 창 이벤트가 새 탭 대신 현재 탭 히스토리에 쌓임
-- 뒤로/앞으로 버튼이 webview 내부 히스토리와 커스텀 히스토리를 계층적으로 통합 탐색
-- blank 탭 URL 입력 시 새 탭 생성 없이 현재 탭에서 탐색
+- 프리뷰 패널 인탭 브라우저 히스토리 스택 추가: HTML 링크 클릭 및 새 창 이벤트가 새 탭 대신 현재 탭 히스토리에 쌓임 ([@BangDori](https://github.com/BangDori))
+- 뒤로/앞으로 버튼이 webview 내부 히스토리와 커스텀 히스토리를 계층적으로 통합 탐색 ([@BangDori](https://github.com/BangDori))
+- blank 탭 URL 입력 시 새 탭 생성 없이 현재 탭에서 탐색 ([@BangDori](https://github.com/BangDori))
 
 ## [1.42.0] - 2026-02-22
-- 프리뷰 패널 URL 탭에 네비게이션 바 추가: 뒤로/앞으로/새로고침/중지/URL 입력 지원
-- 탭 바에 새 탭(+) 버튼 추가: 빈 URL 탭 생성 및 URL 입력창 자동 포커스
-- about:blank 탭에 Prowl 브랜딩 페이지 표시: 로고, 타이틀, GitHub 링크
+- 프리뷰 패널 URL 탭에 네비게이션 바 추가: 뒤로/앞으로/새로고침/중지/URL 입력 지원 ([@BangDori](https://github.com/BangDori))
+- 탭 바에 새 탭(+) 버튼 추가: 빈 URL 탭 생성 및 URL 입력창 자동 포커스 ([@BangDori](https://github.com/BangDori))
+- about:blank 탭에 Prowl 브랜딩 페이지 표시: 로고, 타이틀, GitHub 링크 ([@BangDori](https://github.com/BangDori))
 
 ## [1.41.0] - 2026-02-22
-- Prowl Chat 함께 보기(co-browsing): PreviewPanel에서 외부 URL 또는 HTML 탭 열기 시 페이지 텍스트를 AI 컨텍스트에 자동 주입
-- 입력창 위 "👁 Prowl이 함께 보고 있어요 · hostname" 인디케이터 표시
-- 채팅 입력 딜레이 제거: input 상태를 ChatInputBar로 격리하여 타이핑 시 메시지 목록 재렌더 방지
+- Prowl Chat 함께 보기(co-browsing): PreviewPanel에서 외부 URL 또는 HTML 탭 열기 시 페이지 텍스트를 AI 컨텍스트에 자동 주입 ([@BangDori](https://github.com/BangDori))
+- 입력창 위 "👁 Prowl이 함께 보고 있어요 · hostname" 인디케이터 표시 ([@BangDori](https://github.com/BangDori))
+- 채팅 입력 딜레이 제거: input 상태를 ChatInputBar로 격리하여 타이핑 시 메시지 목록 재렌더 방지 ([@BangDori](https://github.com/BangDori))
 
 ## [1.40.0] - 2026-02-22
-- 채팅방 즐겨찾기(별) 기능 추가 — 별 클릭 시 목록 최상단으로 고정
+- 채팅방 즐겨찾기(별) 기능 추가 — 별 클릭 시 목록 최상단으로 고정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.39.3] - 2026-02-22
-- 채팅방 진입 시 스크롤 애니메이션 없이 즉시 최하단에서 시작
+- 채팅방 진입 시 스크롤 애니메이션 없이 즉시 최하단에서 시작 ([@BangDori](https://github.com/BangDori))
 
 ## [1.39.2] - 2026-02-22
-- Script Library 기능 및 관련 툴 전체 제거
+- Script Library 기능 및 관련 툴 전체 제거 ([@BangDori](https://github.com/BangDori))
 
 ## [1.39.1] - 2026-02-22
-- 날짜 미정 작업 완료 시 완료됨 섹션으로 이동하지 않던 버그 수정
+- 날짜 미정 작업 완료 시 완료됨 섹션으로 이동하지 않던 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.39.0] - 2026-02-21
-- Prowl Chat 박스 헤더를 드래그해 화면 원하는 위치로 이동 가능
+- Prowl Chat 박스 헤더를 드래그해 화면 원하는 위치로 이동 가능 ([@BangDori](https://github.com/BangDori))
 
 ## [1.38.2] - 2026-02-21
-- OS 라이트모드에서 흰 배경에 흰 텍스트가 겹쳐 아무것도 보이지 않는 문제 수정
-- CSS 변수 기반 라이트/다크 테마 시스템 구축 (prowl-_, app-_ 시맨틱 토큰)
-- Chat 윈도우는 항상 다크 유지, 나머지 UI는 OS 설정 자동 반영
-- 모든 컴포넌트의 다크 전용 하드코딩 색상을 시맨틱 토큰으로 교체
+- OS 라이트모드에서 흰 배경에 흰 텍스트가 겹쳐 아무것도 보이지 않는 문제 수정 ([@BangDori](https://github.com/BangDori))
+- CSS 변수 기반 라이트/다크 테마 시스템 구축 (prowl-_, app-_ 시맨틱 토큰) ([@BangDori](https://github.com/BangDori))
+- Chat 윈도우는 항상 다크 유지, 나머지 UI는 OS 설정 자동 반영 ([@BangDori](https://github.com/BangDori))
+- 모든 컴포넌트의 다크 전용 하드코딩 색상을 시맨틱 토큰으로 교체 ([@BangDori](https://github.com/BangDori))
 
 ## [1.38.1] - 2026-02-21
-- 채팅 모델 목록에서 GPT-4o 시리즈 제거 및 GPT-5 Mini 추가
-- 기본 채팅 모델을 GPT-5 Mini로 변경
+- 채팅 모델 목록에서 GPT-4o 시리즈 제거 및 GPT-5 Mini 추가 ([@BangDori](https://github.com/BangDori))
+- 기본 채팅 모델을 GPT-5 Mini로 변경 ([@BangDori](https://github.com/BangDori))
 
 ## [1.38.0] - 2026-02-21
-- Prowl Chat 우측 프리뷰 패널을 브라우저 탭 형식으로 전환: HTML 보기 및 외부 링크 클릭 시 탭으로 관리
-- 외부 링크 클릭 시 기본 브라우저 대신 앱 내 탭(Electron webview)으로 열기
-- HTML 프리뷰 내 링크 클릭도 동일하게 탭 패널에서 열기
-- 탭 X 버튼으로 개별 닫기, 모든 탭 닫히면 분할 뷰 자동 해제
+- Prowl Chat 우측 프리뷰 패널을 브라우저 탭 형식으로 전환: HTML 보기 및 외부 링크 클릭 시 탭으로 관리 ([@BangDori](https://github.com/BangDori))
+- 외부 링크 클릭 시 기본 브라우저 대신 앱 내 탭(Electron webview)으로 열기 ([@BangDori](https://github.com/BangDori))
+- HTML 프리뷰 내 링크 클릭도 동일하게 탭 패널에서 열기 ([@BangDori](https://github.com/BangDori))
+- 탭 X 버튼으로 개별 닫기, 모든 탭 닫히면 분할 뷰 자동 해제 ([@BangDori](https://github.com/BangDori))
 
 ## [1.37.2] - 2026-02-20
-- HTML 분할 뷰에서 채팅 영역과 프리뷰 영역 사이 구분선 드래그로 가로 크기 조정 기능 추가 (기본값 50/50, 최소 20%, 최대 80%)
+- HTML 분할 뷰에서 채팅 영역과 프리뷰 영역 사이 구분선 드래그로 가로 크기 조정 기능 추가 (기본값 50/50, 최소 20%, 최대 80%) ([@BangDori](https://github.com/BangDori))
 
 ## [1.37.1] - 2026-02-20
-- 스플래시 화면이 데스크탑 전환 시 따라오지 않던 문제 수정
+- 스플래시 화면이 데스크탑 전환 시 따라오지 않던 문제 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.37.0] - 2026-02-20
-- Prowl Chat HTML 구조화 출력 UI 추가: AI 응답에 `<prowl-ui>` 태그 포함 시 전체화면에서 좌(채팅)/우(HTML 프리뷰) 분할 레이아웃으로 전환
-- HTML 프리뷰 패널 X 버튼으로 패널만 닫기 (전체화면 유지)
-- "HTML 보기" 버튼으로 비전체화면에서 전체화면 전환 및 프리뷰 표시
-- HTML 출력이 있는 메시지는 복사 버튼 비활성화
+- Prowl Chat HTML 구조화 출력 UI 추가: AI 응답에 `<prowl-ui>` 태그 포함 시 전체화면에서 좌(채팅)/우(HTML 프리뷰) 분할 레이아웃으로 전환 ([@BangDori](https://github.com/BangDori))
+- HTML 프리뷰 패널 X 버튼으로 패널만 닫기 (전체화면 유지) ([@BangDori](https://github.com/BangDori))
+- "HTML 보기" 버튼으로 비전체화면에서 전체화면 전환 및 프리뷰 표시 ([@BangDori](https://github.com/BangDori))
+- HTML 출력이 있는 메시지는 복사 버튼 비활성화 ([@BangDori](https://github.com/BangDori))
 
 ## [1.36.0] - 2026-02-20
-- 태스크 알림 클릭 시 연결된 채팅방으로 딥링크 이동
-- TaskItem 편집 폼에서 채팅방 연결 드롭다운 선택 지원
-- 연결된 채팅방이 있는 태스크에 아이콘 표시
+- 태스크 알림 클릭 시 연결된 채팅방으로 딥링크 이동 ([@BangDori](https://github.com/BangDori))
+- TaskItem 편집 폼에서 채팅방 연결 드롭다운 선택 지원 ([@BangDori](https://github.com/BangDori))
+- 연결된 채팅방이 있는 태스크에 아이콘 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.35.0] - 2026-02-20
-- Prowl Chat에서 스크립트 조회/생성/토글/실행/삭제 지원 (AI 스크립트 도구)
-- 위험 도구(삭제, 스크립트 실행) 실행 전 채팅 내 사용자 승인 UI 표시 (HITL)
-- 채팅 AI가 스크립트/태스크/메모리를 변경하면 대시보드 즉시 자동 새로고침
-- Script Library 수동 새로고침 버튼 추가
-- 채팅 AI 툴 레지스트리 도입으로 도구 등록/관리 구조 개선
+- Prowl Chat에서 스크립트 조회/생성/토글/실행/삭제 지원 (AI 스크립트 도구) ([@BangDori](https://github.com/BangDori))
+- 위험 도구(삭제, 스크립트 실행) 실행 전 채팅 내 사용자 승인 UI 표시 (HITL) ([@BangDori](https://github.com/BangDori))
+- 채팅 AI가 스크립트/태스크/메모리를 변경하면 대시보드 즉시 자동 새로고침 ([@BangDori](https://github.com/BangDori))
+- Script Library 수동 새로고침 버튼 추가 ([@BangDori](https://github.com/BangDori))
+- 채팅 AI 툴 레지스트리 도입으로 도구 등록/관리 구조 개선 ([@BangDori](https://github.com/BangDori))
 
 ## [1.34.0] - 2026-02-20
-- Prowl Chat 전체화면 토글 기능 추가: 헤더 버튼 또는 Cmd+Enter로 전체화면 전환
+- Prowl Chat 전체화면 토글 기능 추가: 헤더 버튼 또는 Cmd+Enter로 전체화면 전환 ([@BangDori](https://github.com/BangDori))
 
 ## [1.33.2] - 2026-02-20
-- 대시보드 섹션 헤더 UI 통일: 불필요한 구분선 제거, 추가 버튼 스타일 통일 (accent 컬러)
+- 대시보드 섹션 헤더 UI 통일: 불필요한 구분선 제거, 추가 버튼 스타일 통일 (accent 컬러) ([@BangDori](https://github.com/BangDori))
 
 ## [1.33.1] - 2026-02-20
-- Background Monitor 제거: Script Library가 스케줄링을 대체하므로 시스템 launchd 에이전트 감시 기능 전체 삭제
-- 앱 단순화: 불필요한 IPC 채널 8개, 관련 타입, 서비스 파일 정리
+- Background Monitor 제거: Script Library가 스케줄링을 대체하므로 시스템 launchd 에이전트 감시 기능 전체 삭제 ([@BangDori](https://github.com/BangDori))
+- 앱 단순화: 불필요한 IPC 채널 8개, 관련 타입, 서비스 파일 정리 ([@BangDori](https://github.com/BangDori))
 
 ## [1.33.0] - 2026-02-20
-- 채팅방 삭제 잠금 기능 추가: 실수로 채팅방을 삭제하는 것을 방지
-- 호버 시 자물쇠 아이콘으로 잠금/해제 토글, 잠긴 방은 삭제 버튼 숨김
-- 채팅방 목록 액션 버튼 위치 개선: 타임스탬프 아래에 표시
+- 채팅방 삭제 잠금 기능 추가: 실수로 채팅방을 삭제하는 것을 방지 ([@BangDori](https://github.com/BangDori))
+- 호버 시 자물쇠 아이콘으로 잠금/해제 토글, 잠긴 방은 삭제 버튼 숨김 ([@BangDori](https://github.com/BangDori))
+- 채팅방 목록 액션 버튼 위치 개선: 타임스탬프 아래에 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.32.0] - 2026-02-20
-- 내부 Script Library 추가: 자연어로 스크립트와 스케줄을 동시에 생성 (launchd 독립)
-- daily/weekly/interval/manual 스케줄 지원, 앱 내부 Node.js 스케줄러로 실행
-- 스크립트 데이터를 `~/.prowl/scripts.json`에 저장하여 다른 데이터와 경로 통일
-- Script Library 툴바에서 파일 위치 Finder 열기 지원
+- 내부 Script Library 추가: 자연어로 스크립트와 스케줄을 동시에 생성 (launchd 독립) ([@BangDori](https://github.com/BangDori))
+- daily/weekly/interval/manual 스케줄 지원, 앱 내부 Node.js 스케줄러로 실행 ([@BangDori](https://github.com/BangDori))
+- 스크립트 데이터를 `~/.prowl/scripts.json`에 저장하여 다른 데이터와 경로 통일 ([@BangDori](https://github.com/BangDori))
+- Script Library 툴바에서 파일 위치 Finder 열기 지원 ([@BangDori](https://github.com/BangDori))
 
 ## [1.31.1] - 2026-02-20
-- 채팅 알림 개선: AI 응답의 모든 메시지를 개별 macOS 알림으로 전송
+- 채팅 알림 개선: AI 응답의 모든 메시지를 개별 macOS 알림으로 전송 ([@BangDori](https://github.com/BangDori))
 
 ## [1.31.0] - 2026-02-20
-- 기한이 지난 미완료 태스크를 날짜 미정(백로그)으로 자동 이동 (앱 시작 시, 60초 인터벌, 조회 시)
-- 날짜 미정 섹션을 캘린더 어젠다 뷰 및 Task Manager 최상단으로 이동
-- Dashboard 글로벌 단축키 설정 지원 추가 (토글 동작, 기본값: 없음)
-- 트레이 메뉴에 사용자가 설정한 단축키를 동적으로 표시
+- 기한이 지난 미완료 태스크를 날짜 미정(백로그)으로 자동 이동 (앱 시작 시, 60초 인터벌, 조회 시) ([@BangDori](https://github.com/BangDori))
+- 날짜 미정 섹션을 캘린더 어젠다 뷰 및 Task Manager 최상단으로 이동 ([@BangDori](https://github.com/BangDori))
+- Dashboard 글로벌 단축키 설정 지원 추가 (토글 동작, 기본값: 없음) ([@BangDori](https://github.com/BangDori))
+- 트레이 메뉴에 사용자가 설정한 단축키를 동적으로 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.30.2] - 2026-02-20
-- 채팅 알림에 AI 응답의 실제 메시지 내용 표시
+- 채팅 알림에 AI 응답의 실제 메시지 내용 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.30.1] - 2026-02-20
-- Task Manager 윈도우가 macOS Space 전환 시 사라지는 현상 수정
+- Task Manager 윈도우가 macOS Space 전환 시 사라지는 현상 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.30.0] - 2026-02-18
-- 채팅 윈도우 비활성 시 AI 응답에 대한 macOS 네이티브 알림 발송
-- 메뉴바 트레이 아이콘의 미읽음 배지 숫자 표시 제거
+- 채팅 윈도우 비활성 시 AI 응답에 대한 macOS 네이티브 알림 발송 ([@BangDori](https://github.com/BangDori))
+- 메뉴바 트레이 아이콘의 미읽음 배지 숫자 표시 제거 ([@BangDori](https://github.com/BangDori))
 
 ## [1.29.0] - 2026-02-18
-- Settings에서 OpenAI API 키를 직접 입력·저장할 수 있도록 지원
-- API 키 저장 시 입력창 대신 Change 버튼만 표시하도록 UX 개선
-- 환경변수 없이도 앱 설정에서 API 키 관리 가능
+- Settings에서 OpenAI API 키를 직접 입력·저장할 수 있도록 지원 ([@BangDori](https://github.com/BangDori))
+- API 키 저장 시 입력창 대신 Change 버튼만 표시하도록 UX 개선 ([@BangDori](https://github.com/BangDori))
+- 환경변수 없이도 앱 설정에서 API 키 관리 가능 ([@BangDori](https://github.com/BangDori))
 
 ## [1.28.1] - 2026-02-18
-- 시스템 프롬프트 날짜/시간을 KST 기준으로 수정 (Intl.DateTimeFormat 사용)
-- 채팅 목록 높이 잘림 현상 수정
-- 시스템 프롬프트 볼드 사용 금지 및 단축키 안내 제거
+- 시스템 프롬프트 날짜/시간을 KST 기준으로 수정 (Intl.DateTimeFormat 사용) ([@BangDori](https://github.com/BangDori))
+- 채팅 목록 높이 잘림 현상 수정 ([@BangDori](https://github.com/BangDori))
+- 시스템 프롬프트 볼드 사용 금지 및 단축키 안내 제거 ([@BangDori](https://github.com/BangDori))
 
 ## [1.28.0] - 2026-02-17
-- 채팅 미열람 메시지 추적 (룸 목록 배지, 트레이 아이콘, 읽음 구분선)
-- 채팅 메시지 유실 방지 (main process에서 AI 응답 저장)
-- 로비에서 AI 응답 완료 시 미열람 배지 실시간 갱신
+- 채팅 미열람 메시지 추적 (룸 목록 배지, 트레이 아이콘, 읽음 구분선) ([@BangDori](https://github.com/BangDori))
+- 채팅 메시지 유실 방지 (main process에서 AI 응답 저장) ([@BangDori](https://github.com/BangDori))
+- 로비에서 AI 응답 완료 시 미열람 배지 실시간 갱신 ([@BangDori](https://github.com/BangDori))
 
 ## [1.27.0] - 2026-02-17
-- AI 채팅 실시간 스트리밍 멀티 메시지 응답 (메신저 스타일)
-- 채팅방 제목 수정 기능 제거 (자동 제목 생성으로 대체)
+- AI 채팅 실시간 스트리밍 멀티 메시지 응답 (메신저 스타일) ([@BangDori](https://github.com/BangDori))
+- 채팅방 제목 수정 기능 제거 (자동 제목 생성으로 대체) ([@BangDori](https://github.com/BangDori))
 
 ## [1.26.2] - 2026-02-17
-- Compact 모드 태스크 상세 패널에 복사 버튼 추가
+- Compact 모드 태스크 상세 패널에 복사 버튼 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.26.1] - 2026-02-17
-- AI 채팅에서 메모리 조회/수정/삭제 가능 (기존 저장만 가능)
+- AI 채팅에서 메모리 조회/수정/삭제 가능 (기존 저장만 가능) ([@BangDori](https://github.com/BangDori))
 
 ## [1.26.0] - 2026-02-17
-- 채팅방 관리 기능 추가 (생성, 이름 변경, 삭제)
-- 대화 내역 디스크 영속 저장 (~/.prowl/chat-rooms/)
-- 채팅 진입 시 로비 뷰에서 즉시 입력 가능
-- 기존 대화방 목록 상단 노출 및 클릭 진입
+- 채팅방 관리 기능 추가 (생성, 이름 변경, 삭제) ([@BangDori](https://github.com/BangDori))
+- 대화 내역 디스크 영속 저장 (~/.prowl/chat-rooms/) ([@BangDori](https://github.com/BangDori))
+- 채팅 진입 시 로비 뷰에서 즉시 입력 가능 ([@BangDori](https://github.com/BangDori))
+- 기존 대화방 목록 상단 노출 및 클릭 진입 ([@BangDori](https://github.com/BangDori))
 
 ## [1.25.1] - 2026-02-17
-- 채팅 메시지 호버 시 복사 버튼 추가
+- 채팅 메시지 호버 시 복사 버튼 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.25.0] - 2026-02-17
-- AI 채팅에 웹 서치 도구 추가 (대화 중 최신 정보 자동 검색)
-- 시스템 프롬프트에서 캐릭터 페르소나 제거 (메모리 기반 커스텀으로 전환)
+- AI 채팅에 웹 서치 도구 추가 (대화 중 최신 정보 자동 검색) ([@BangDori](https://github.com/BangDori))
+- 시스템 프롬프트에서 캐릭터 페르소나 제거 (메모리 기반 커스텀으로 전환) ([@BangDori](https://github.com/BangDori))
 
 ## [1.24.0] - 2026-02-17
-- AI 채팅 메모리 기능 추가 (사용자 선호/지시사항 저장 및 반영)
-- 대시보드 Memory 탭에서 메모리 조회/수정/삭제 관리
-- 데이터 저장 경로를 ~/.prowl/로 통합 (기존 데이터 자동 마이그레이션)
-- 채팅 메시지 버블 너비 확장
+- AI 채팅 메모리 기능 추가 (사용자 선호/지시사항 저장 및 반영) ([@BangDori](https://github.com/BangDori))
+- 대시보드 Memory 탭에서 메모리 조회/수정/삭제 관리 ([@BangDori](https://github.com/BangDori))
+- 데이터 저장 경로를 ~/.prowl/로 통합 (기존 데이터 자동 마이그레이션) ([@BangDori](https://github.com/BangDori))
+- 채팅 메시지 버블 너비 확장 ([@BangDori](https://github.com/BangDori))
 
 ## [1.23.0] - 2026-02-17
-- 채팅 에이전트에 츤데레 고양이 시스템 프롬프트 적용
-- 채팅 버블 마크다운 렌더링 및 외부 링크 지원 추가
-- Settings 탭에서 글로벌 단축키 변경/제거 가능
+- 채팅 에이전트에 츤데레 고양이 시스템 프롬프트 적용 ([@BangDori](https://github.com/BangDori))
+- 채팅 버블 마크다운 렌더링 및 외부 링크 지원 추가 ([@BangDori](https://github.com/BangDori))
+- Settings 탭에서 글로벌 단축키 변경/제거 가능 ([@BangDori](https://github.com/BangDori))
 
 ## [1.22.0] - 2026-02-17
-- Prowl Chat에서 자연어로 태스크 생성/조회/수정/삭제/완료 관리 가능
-- AI SDK tool calling으로 6개 태스크 관리 도구 연동
-- 날짜 기반 태스크 추가 IPC 채널 신설
+- Prowl Chat에서 자연어로 태스크 생성/조회/수정/삭제/완료 관리 가능 ([@BangDori](https://github.com/BangDori))
+- AI SDK tool calling으로 6개 태스크 관리 도구 연동 ([@BangDori](https://github.com/BangDori))
+- 날짜 기반 태스크 추가 IPC 채널 신설 ([@BangDori](https://github.com/BangDori))
 
 ## [1.21.0] - 2026-02-17
-- 채팅 입력바에 모델 선택 드롭다운 추가 (GPT-5.2 / GPT-4o 전환)
-- OpenAI Responses API로 전환하여 최신 모델 지원
-- 선택한 모델이 앱 재시작 후에도 유지되도록 저장
-- 채팅 플레이스홀더를 활성 상태 메시지로 변경
+- 채팅 입력바에 모델 선택 드롭다운 추가 (GPT-5.2 / GPT-4o 전환) ([@BangDori](https://github.com/BangDori))
+- OpenAI Responses API로 전환하여 최신 모델 지원 ([@BangDori](https://github.com/BangDori))
+- 선택한 모델이 앱 재시작 후에도 유지되도록 저장 ([@BangDori](https://github.com/BangDori))
+- 채팅 플레이스홀더를 활성 상태 메시지로 변경 ([@BangDori](https://github.com/BangDori))
 
 ## [1.20.0] - 2026-02-17
-- Prowl Chat 기능 복원 (Cmd+Shift+P)
-- AI SDK (OpenAI GPT-4o-mini) 채팅 백엔드 연동
-- Task Manager 글로벌 단축키 추가 (Cmd+Shift+O)
-- 채팅 한국어 IME 조합 중 Enter 시 마지막 글자 잔류 버그 수정
+- Prowl Chat 기능 복원 (Cmd+Shift+P) ([@BangDori](https://github.com/BangDori))
+- AI SDK (OpenAI GPT-4o-mini) 채팅 백엔드 연동 ([@BangDori](https://github.com/BangDori))
+- Task Manager 글로벌 단축키 추가 (Cmd+Shift+O) ([@BangDori](https://github.com/BangDori))
+- 채팅 한국어 IME 조합 중 Enter 시 마지막 글자 잔류 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.19.0] - 2026-02-17
-- 스티키 윈도우 다가오는 일정 조회 범위 선택 기능 추가 (1주/2주/1개월/1년)
-- 월 경계를 넘는 태스크가 보이지 않던 문제 해결
+- 스티키 윈도우 다가오는 일정 조회 범위 선택 기능 추가 (1주/2주/1개월/1년) ([@BangDori](https://github.com/BangDori))
+- 월 경계를 넘는 태스크가 보이지 않던 문제 해결 ([@BangDori](https://github.com/BangDori))
 
 ## [1.18.4] - 2026-02-17
-- brew outdated 타임아웃으로 인한 Cask 업데이트 실패 수정
+- brew outdated 타임아웃으로 인한 Cask 업데이트 실패 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.18.3] - 2026-02-17
-- 스티키 윈도우 오늘 섹션에서 완료된 태스크가 노출되지 않도록 수정
+- 스티키 윈도우 오늘 섹션에서 완료된 태스크가 노출되지 않도록 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.18.2] - 2026-02-17
-- 스티키 윈도우 정렬 라벨을 "시간"에서 "마감기한"으로 변경
-- 기본 정렬 모드를 마감기한순으로 설정
+- 스티키 윈도우 정렬 라벨을 "시간"에서 "마감기한"으로 변경 ([@BangDori](https://github.com/BangDori))
+- 기본 정렬 모드를 마감기한순으로 설정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.18.1] - 2026-02-17
-- brew upgrade 실행 전 brew update로 로컬 캐시를 갱신하여 tap 업데이트 인식 오류 수정
+- brew upgrade 실행 전 brew update로 로컬 캐시를 갱신하여 tap 업데이트 인식 오류 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.18.0] - 2026-02-17
-- 백로그(날짜 미정) 태스크 관리 기능 추가
-- Compact View 및 대시보드 어젠다 뷰에 날짜 미정 섹션 표시
+- 백로그(날짜 미정) 태스크 관리 기능 추가 ([@BangDori](https://github.com/BangDori))
+- Compact View 및 대시보드 어젠다 뷰에 날짜 미정 섹션 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.17.0] - 2026-02-17
-- Task Manager 태스크 정렬 기능 추가 (우선순위순/시간순 토글)
-- 태스크 행 펼침 상세 보기 추가 (우선순위, 시간, 카테고리, 설명 표시)
+- Task Manager 태스크 정렬 기능 추가 (우선순위순/시간순 토글) ([@BangDori](https://github.com/BangDori))
+- 태스크 행 펼침 상세 보기 추가 (우선순위, 시간, 카테고리, 설명 표시) ([@BangDori](https://github.com/BangDori))
 
 ## [1.16.0] - 2026-02-17
-- Task Manager 스티키 윈도우 추가 (화면 좌상단 항상 위 고정)
-- 오늘 태스크, 다가오는 일정, 완료된 태스크 토글 섹션 표시
-- 최소화 모드 및 세로 리사이즈 지원
-- Liquid Glass 디자인 적용
-- 트레이 메뉴에 Task Manager 체크박스 토글 추가
-- Compact View / Calendar → Task Manager 네이밍 통일
-- Task Manager 월 인덱스 버그 수정
+- Task Manager 스티키 윈도우 추가 (화면 좌상단 항상 위 고정) ([@BangDori](https://github.com/BangDori))
+- 오늘 태스크, 다가오는 일정, 완료된 태스크 토글 섹션 표시 ([@BangDori](https://github.com/BangDori))
+- 최소화 모드 및 세로 리사이즈 지원 ([@BangDori](https://github.com/BangDori))
+- Liquid Glass 디자인 적용 ([@BangDori](https://github.com/BangDori))
+- 트레이 메뉴에 Task Manager 체크박스 토글 추가 ([@BangDori](https://github.com/BangDori))
+- Compact View / Calendar → Task Manager 네이밍 통일 ([@BangDori](https://github.com/BangDori))
+- Task Manager 월 인덱스 버그 수정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.15.4] - 2026-02-16
-- brew upgrade 시 cask outdated 사전 검증으로 빈 업그레이드 방지
-- 설치 후 불필요한 쿼리 재확인 제거 (배너 재표시 방지)
-- 업데이트 실패 시 GitHub 다운로드 폴백 버튼 추가
+- brew upgrade 시 cask outdated 사전 검증으로 빈 업그레이드 방지 ([@BangDori](https://github.com/BangDori))
+- 설치 후 불필요한 쿼리 재확인 제거 (배너 재표시 방지) ([@BangDori](https://github.com/BangDori))
+- 업데이트 실패 시 GitHub 다운로드 폴백 버튼 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.15.3] - 2026-02-16
-- macOS vibrancy 기반 Liquid Glass 투명 배경 적용
-- 전 섹션 카드에 3D 글래스 효과 적용 (Settings, Version History, Background Monitor, Calendar)
-- 캘린더 태스크 목록 글래스 카드 통합 및 정렬 개선
-- 오늘 날짜 숫자가 보이지 않는 문제 수정
-- 알림 드롭다운 위치 오류 수정 (createPortal 적용)
-- 태스크 기본 알림 1일 전 UI 표시
+- macOS vibrancy 기반 Liquid Glass 투명 배경 적용 ([@BangDori](https://github.com/BangDori))
+- 전 섹션 카드에 3D 글래스 효과 적용 (Settings, Version History, Background Monitor, Calendar) ([@BangDori](https://github.com/BangDori))
+- 캘린더 태스크 목록 글래스 카드 통합 및 정렬 개선 ([@BangDori](https://github.com/BangDori))
+- 오늘 날짜 숫자가 보이지 않는 문제 수정 ([@BangDori](https://github.com/BangDori))
+- 알림 드롭다운 위치 오류 수정 (createPortal 적용) ([@BangDori](https://github.com/BangDori))
+- 태스크 기본 알림 1일 전 UI 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.15.2] - 2026-02-16
-- 채팅 기능 전체 제거 (서비스, 윈도우, UI, IPC, 타입)
-- 트레이 메뉴에서 Background Monitor, Prowl Chat 항목 제거
+- 채팅 기능 전체 제거 (서비스, 윈도우, UI, IPC, 타입) ([@BangDori](https://github.com/BangDori))
+- 트레이 메뉴에서 Background Monitor, Prowl Chat 항목 제거 ([@BangDori](https://github.com/BangDori))
 
 ## [1.15.1] - 2026-02-16
-- 업데이트 인디케이터를 사이드바 하단으로 이동
+- 업데이트 인디케이터를 사이드바 하단으로 이동 ([@BangDori](https://github.com/BangDori))
 
 ## [1.15.0] - 2026-02-16
-- Calendar 탭을 파일 기반 Task Manager Calendar로 전환
-- ~/prowl-task-calendar/ 폴더의 JSON 파일로 태스크 관리
-- 캘린더 그리드에서 날짜별 태스크 표시 및 인라인 편집
-- 우선순위·카테고리 필터, 완료 토글, 어젠다 뷰 지원
-- 태스크 마감 알림 스케줄러 (1일 전 기본 알림 자동 적용)
-- task-manager 통합 커맨드 추가 (조회/추가/완료/삭제/수정)
+- Calendar 탭을 파일 기반 Task Manager Calendar로 전환 ([@BangDori](https://github.com/BangDori))
+- ~/prowl-task-calendar/ 폴더의 JSON 파일로 태스크 관리 ([@BangDori](https://github.com/BangDori))
+- 캘린더 그리드에서 날짜별 태스크 표시 및 인라인 편집 ([@BangDori](https://github.com/BangDori))
+- 우선순위·카테고리 필터, 완료 토글, 어젠다 뷰 지원 ([@BangDori](https://github.com/BangDori))
+- 태스크 마감 알림 스케줄러 (1일 전 기본 알림 자동 적용) ([@BangDori](https://github.com/BangDori))
+- task-manager 통합 커맨드 추가 (조회/추가/완료/삭제/수정) ([@BangDori](https://github.com/BangDori))
 
 ## [1.14.0] - 2026-02-13
-- Homebrew Cask 기반 앱 내 자동 업데이트 시스템 추가
-- 앱 시작 시 업데이트 자동 체크 및 UpdateBanner 표시
-- Settings에서 brew upgrade 또는 Download 폴백 지원
-- Release 워크플로우에 ZIP 업로드 및 Homebrew formula 자동 갱신
+- Homebrew Cask 기반 앱 내 자동 업데이트 시스템 추가 ([@BangDori](https://github.com/BangDori))
+- 앱 시작 시 업데이트 자동 체크 및 UpdateBanner 표시 ([@BangDori](https://github.com/BangDori))
+- Settings에서 brew upgrade 또는 Download 폴백 지원 ([@BangDori](https://github.com/BangDori))
+- Release 워크플로우에 ZIP 업로드 및 Homebrew formula 자동 갱신 ([@BangDori](https://github.com/BangDori))
 
 ## [1.13.3] - 2026-02-12
-- 모든 소스 파일에 한 줄 JSDoc 파일 헤더 추가 (AI 에이전트 탐색 최적화)
-- CLAUDE.md에 파일 헤더 컨벤션 규칙 추가
-- CI에 파일 헤더 누락 검증 스텝 추가
+- 모든 소스 파일에 한 줄 JSDoc 파일 헤더 추가 (AI 에이전트 탐색 최적화) ([@BangDori](https://github.com/BangDori))
+- CLAUDE.md에 파일 헤더 컨벤션 규칙 추가 ([@BangDori](https://github.com/BangDori))
+- CI에 파일 헤더 누락 검증 스텝 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.13.2] - 2026-02-12
-- TanStack Query 도입으로 데이터 페칭 안정성 및 캐시 관리 개선
-- 대시보드 섹션별 크래시 격리 (ErrorBoundary)
-- IPC mutation 에러 처리 강화 (IpcResult 타입 통일)
-- plist 파싱 런타임 검증 추가 (Zod safeParse)
-- Date 직렬화 안정성 개선 (IPC 경계에서 ISO 8601 문자열 사용)
-- CalendarSection 컴포넌트 분리 및 파일 슬림화 (1627줄→539줄)
-- CLAUDE.md Anthropic 가이드라인 기반 슬림화 (294줄→66줄)
+- TanStack Query 도입으로 데이터 페칭 안정성 및 캐시 관리 개선 ([@BangDori](https://github.com/BangDori))
+- 대시보드 섹션별 크래시 격리 (ErrorBoundary) ([@BangDori](https://github.com/BangDori))
+- IPC mutation 에러 처리 강화 (IpcResult 타입 통일) ([@BangDori](https://github.com/BangDori))
+- plist 파싱 런타임 검증 추가 (Zod safeParse) ([@BangDori](https://github.com/BangDori))
+- Date 직렬화 안정성 개선 (IPC 경계에서 ISO 8601 문자열 사용) ([@BangDori](https://github.com/BangDori))
+- CalendarSection 컴포넌트 분리 및 파일 슬림화 (1627줄→539줄) ([@BangDori](https://github.com/BangDori))
+- CLAUDE.md Anthropic 가이드라인 기반 슬림화 (294줄→66줄) ([@BangDori](https://github.com/BangDori))
 
 ## [1.13.1] - 2026-02-11
-- IPC 채널 타입을 단일 스키마(ipc-schema.ts)로 통합하여 컴파일 타임 타입 안전성 확보
-- global.d.ts 수동 동기화 제거 (누락됐던 캘린더 메서드 7개 자동 해결)
+- IPC 채널 타입을 단일 스키마(ipc-schema.ts)로 통합하여 컴파일 타임 타입 안전성 확보 ([@BangDori](https://github.com/BangDori))
+- global.d.ts 수동 동기화 제거 (누락됐던 캘린더 메서드 7개 자동 해결) ([@BangDori](https://github.com/BangDori))
 
 ## [1.13.0] - 2026-02-10
-- 일정 알림 시스템 구축 (다중 알림 등록 가능: 3일 전, 1일 전, 1시간 전 등)
-- 일정 설명(내용) 입력 필드 추가
-- 날짜 선택 캘린더(MiniDatePicker) 잘림 현상 수정
-- 시간 입력 자동 파싱 (1900 → 19:00) 및 유효성 검증
-- 종일 토글 시 당일 날짜 자동 설정
-- 날짜/시간 UI 레이아웃 정렬 개선
-- 기본 알림 1일 전, 1시간 전 자동 설정
+- 일정 알림 시스템 구축 (다중 알림 등록 가능: 3일 전, 1일 전, 1시간 전 등) ([@BangDori](https://github.com/BangDori))
+- 일정 설명(내용) 입력 필드 추가 ([@BangDori](https://github.com/BangDori))
+- 날짜 선택 캘린더(MiniDatePicker) 잘림 현상 수정 ([@BangDori](https://github.com/BangDori))
+- 시간 입력 자동 파싱 (1900 → 19:00) 및 유효성 검증 ([@BangDori](https://github.com/BangDori))
+- 종일 토글 시 당일 날짜 자동 설정 ([@BangDori](https://github.com/BangDori))
+- 날짜/시간 UI 레이아웃 정렬 개선 ([@BangDori](https://github.com/BangDori))
+- 기본 알림 1일 전, 1시간 전 자동 설정 ([@BangDori](https://github.com/BangDori))
 
 ## [1.12.0] - 2026-02-10
-- Google Calendar ICS 피드 연동 및 월별 캘린더 뷰
-- 로컬 일정 CRUD (추가/수정/삭제) 및 낙관적 업데이트
-- 여러 날 일정(multi-day) 생성/수정 지원
-- multi-day 이벤트 캘린더 그리드 바 시각화
-- 날짜 미선택 시 어젠다 뷰 (오늘부터 예정 일정)
-- 날짜/시간 입력 UI 개선 (한국어 포맷)
+- Google Calendar ICS 피드 연동 및 월별 캘린더 뷰 ([@BangDori](https://github.com/BangDori))
+- 로컬 일정 CRUD (추가/수정/삭제) 및 낙관적 업데이트 ([@BangDori](https://github.com/BangDori))
+- 여러 날 일정(multi-day) 생성/수정 지원 ([@BangDori](https://github.com/BangDori))
+- multi-day 이벤트 캘린더 그리드 바 시각화 ([@BangDori](https://github.com/BangDori))
+- 날짜 미선택 시 어젠다 뷰 (오늘부터 예정 일정) ([@BangDori](https://github.com/BangDori))
+- 날짜/시간 입력 UI 개선 (한국어 포맷) ([@BangDori](https://github.com/BangDori))
 
 ## [1.11.0] - 2026-02-08
-- Claude Config 탭 추가 (~/.claude/ 설정 조회)
-- agents, commands, hooks, rules 탐색 가능
-- Obsidian 스타일 2패널 UI (파일 트리 + 콘텐츠 뷰어)
-- Finder에서 설정 파일 열기 지원
+- Claude Config 탭 추가 (~/.claude/ 설정 조회) ([@BangDori](https://github.com/BangDori))
+- agents, commands, hooks, rules 탐색 가능 ([@BangDori](https://github.com/BangDori))
+- Obsidian 스타일 2패널 UI (파일 트리 + 콘텐츠 뷰어) ([@BangDori](https://github.com/BangDori))
+- Finder에서 설정 파일 열기 지원 ([@BangDori](https://github.com/BangDori))
 
 ## [1.10.0] - 2026-02-05
-- Settings에 업데이트 체크 기능 추가 (GitHub API 연동)
-- 최신 버전일 경우 10분 쿨다운으로 API 남용 방지
-- Night Watch 시간 선택 UI 개선 (토글 시 슬라이드 애니메이션)
+- Settings에 업데이트 체크 기능 추가 (GitHub API 연동) ([@BangDori](https://github.com/BangDori))
+- 최신 버전일 경우 10분 쿨다운으로 API 남용 방지 ([@BangDori](https://github.com/BangDori))
+- Night Watch 시간 선택 UI 개선 (토글 시 슬라이드 애니메이션) ([@BangDori](https://github.com/BangDori))
 
 ## [1.9.0] - 2026-02-04
-- Job 완료/실패 시 macOS 알림 발송 (고양이 컨셉 메시지)
-- Job 실행 중 상태 표시 (스피너, "실행 중...")
-- 실행 중인 Job 재실행 방지
-- Settings에서 알림 활성화/비활성화 토글
-- 편집 버튼을 제목 옆으로 이동
+- Job 완료/실패 시 macOS 알림 발송 (고양이 컨셉 메시지) ([@BangDori](https://github.com/BangDori))
+- Job 실행 중 상태 표시 (스피너, "실행 중...") ([@BangDori](https://github.com/BangDori))
+- 실행 중인 Job 재실행 방지 ([@BangDori](https://github.com/BangDori))
+- Settings에서 알림 활성화/비활성화 토글 ([@BangDori](https://github.com/BangDori))
+- 편집 버튼을 제목 옆으로 이동 ([@BangDori](https://github.com/BangDori))
 
 ## [1.8.0] - 2026-02-04
-- Docker 스타일 대시보드 윈도우 추가
-- 트레이 메뉴에 macOS 네이티브 아이콘 추가
-- Version History 사이드바 메뉴 추가
-- Settings에 알림 설정 및 링크 추가
+- Docker 스타일 대시보드 윈도우 추가 ([@BangDori](https://github.com/BangDori))
+- 트레이 메뉴에 macOS 네이티브 아이콘 추가 ([@BangDori](https://github.com/BangDori))
+- Version History 사이드바 메뉴 추가 ([@BangDori](https://github.com/BangDori))
+- Settings에 알림 설정 및 링크 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.7.1] - 2026-02-03
-- 윈도우를 활성 디스플레이/데스크탑에 표시
+- 윈도우를 활성 디스플레이/데스크탑에 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.7.0] - 2026-02-03
-- 플로팅 채팅 인터페이스 추가
-- 스플래시 고양이 눈 자연스러운 열림 효과
-- 프로비던스 스타일 UI 적용
+- 플로팅 채팅 인터페이스 추가 ([@BangDori](https://github.com/BangDori))
+- 스플래시 고양이 눈 자연스러운 열림 효과 ([@BangDori](https://github.com/BangDori))
+- 프로비던스 스타일 UI 적용 ([@BangDori](https://github.com/BangDori))
 
 ## [1.6.2] - 2026-02-02
-- 개발 모드에서 스플래시 화면 건너뛰기
+- 개발 모드에서 스플래시 화면 건너뛰기 ([@BangDori](https://github.com/BangDori))
 
 ## [1.6.1] - 2026-02-02
-- 스플래시 커서 위치 표시
-- 뒤로가기 시 트레이 메뉴로 전환
+- 스플래시 커서 위치 표시 ([@BangDori](https://github.com/BangDori))
+- 뒤로가기 시 트레이 메뉴로 전환 ([@BangDori](https://github.com/BangDori))
 
 ## [1.6.0] - 2026-02-02
-- 트레이 메뉴에 야간 감시 상태 인디케이터 추가
+- 트레이 메뉴에 야간 감시 상태 인디케이터 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.6] - 2026-02-02
-- 잡 카드 영역 스크롤 제한으로 4.5개 카드 표시
+- 잡 카드 영역 스크롤 제한으로 4.5개 카드 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.5] - 2026-02-01
-- 패키지 매니저를 pnpm에서 bun으로 전환
+- 패키지 매니저를 pnpm에서 bun으로 전환 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.4] - 2026-02-01
-- 스플래시 화면 눈 뜨기 애니메이션 추가
+- 스플래시 화면 눈 뜨기 애니메이션 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.3] - 2026-02-01
-- 새벽 작업 감지 시 알림 전송
-- 스플래시 오버레이 표시
+- 새벽 작업 감지 시 알림 전송 ([@BangDori](https://github.com/BangDori))
+- 스플래시 오버레이 표시 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.2] - 2026-02-01
-- 앱 실행 시 스플래시 화면 추가
+- 앱 실행 시 스플래시 화면 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.1] - 2026-02-01
-- IPC·Electron 의존 코드 단위 테스트 추가
+- IPC·Electron 의존 코드 단위 테스트 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.5.0] - 2026-02-01
-- PR 대상 CI 워크플로우 추가
+- PR 대상 CI 워크플로우 추가 ([@BangDori](https://github.com/BangDori))
 
 ## [1.4.0] - 2026-02-01
-- PR 시멘틱 버저닝 및 CI 자동 릴리스 추가
-- 네이티브 NSMenu로 전환
-- 잡 카드 플랫 리스트 스타일 리디자인
+- PR 시멘틱 버저닝 및 CI 자동 릴리스 추가 ([@BangDori](https://github.com/BangDori))
+- 네이티브 NSMenu로 전환 ([@BangDori](https://github.com/BangDori))
+- 잡 카드 플랫 리스트 스타일 리디자인 ([@BangDori](https://github.com/BangDori))
 
 ## [1.3.0] - 2026-01-31
-- 집중 모드(야간 감시) 기능 추가
-- 야간 작업 감지 시 알림 전송
-- Moon 아이콘 상태별 색상 및 glow 효과
+- 집중 모드(야간 감시) 기능 추가 ([@BangDori](https://github.com/BangDori))
+- 야간 작업 감지 시 알림 전송 ([@BangDori](https://github.com/BangDori))
+- Moon 아이콘 상태별 색상 및 glow 효과 ([@BangDori](https://github.com/BangDori))
 
 ## [1.2.1] - 2026-01-28
-- plist 탐색 경로를 LaunchAgents로 변경
+- plist 탐색 경로를 LaunchAgents로 변경 ([@BangDori](https://github.com/BangDori))
 
 ## [1.2.0] - 2026-01-26
-- 이모지 선택 패널 기능 추가
-- plist 경로를 ~/Library/prowl/로 변경
+- 이모지 선택 패널 기능 추가 ([@BangDori](https://github.com/BangDori))
+- plist 경로를 ~/Library/prowl/로 변경 ([@BangDori](https://github.com/BangDori))
 
 ## [1.1.0] - 2026-01-26
-- 작업 커스터마이징 기능 추가
-- 다크 테마 기반 UI 모던화
-- GitHub 링크 추가
-- lucide-react 아이콘으로 전환
+- 작업 커스터마이징 기능 추가 ([@BangDori](https://github.com/BangDori))
+- 다크 테마 기반 UI 모던화 ([@BangDori](https://github.com/BangDori))
+- GitHub 링크 추가 ([@BangDori](https://github.com/BangDori))
+- lucide-react 아이콘으로 전환 ([@BangDori](https://github.com/BangDori))
 
 ## [1.0.0] - 2026-01-26
-- 최초 릴리스
-- launchd 작업 목록 조회 및 관리
-- 작업 활성화/비활성화 토글
-- 수동 실행 기능
+- 최초 릴리스 ([@BangDori](https://github.com/BangDori))
+- launchd 작업 목록 조회 및 관리 ([@BangDori](https://github.com/BangDori))
+- 작업 활성화/비활성화 토글 ([@BangDori](https://github.com/BangDori))
+- 수동 실행 기능 ([@BangDori](https://github.com/BangDori))
