@@ -87,7 +87,7 @@ export default function ReminderPicker({ reminders, onChange }: ReminderPickerPr
         createPortal(
           <div
             data-reminder-dropdown
-            className="fixed z-[9999] p-1 rounded-lg border border-prowl-border bg-prowl-surface backdrop-blur-2xl shadow-xl min-w-[120px]"
+            className="fixed z-[9999] p-1 rounded-lg border border-prowl-border bg-prowl-surface shadow-xl min-w-[120px]"
             style={{ top: dropdownPos.top, left: dropdownPos.left, transform: "translateY(-100%)" }}
           >
             {REMINDER_PRESETS.map((preset) => {

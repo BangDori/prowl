@@ -93,7 +93,7 @@ export default function ChangelogSection() {
     <div className="h-full overflow-y-auto">
       <div className="p-4">
         {/* 현재 버전 헤더 */}
-        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border">
+        <div className="glass-card-3d flex items-center gap-3 mb-4 p-3 rounded-lg bg-prowl-card border border-prowl-border">
           <img src={prowlProfile} alt="Prowl" className="w-8 h-8 rounded-full" />
           <div>
             <h4 className="text-sm font-medium">Prowl</h4>
@@ -109,7 +109,7 @@ export default function ChangelogSection() {
           {CHANGELOG.map((release, index) => (
             <div
               key={release.version}
-              className={`glass-card-3d p-3 rounded-lg border backdrop-blur-xl ${
+              className={`glass-card-3d p-3 rounded-lg border ${
                 index === 0 ? "bg-accent/5 border-accent/20" : "bg-prowl-card border-prowl-border"
               }`}
             >

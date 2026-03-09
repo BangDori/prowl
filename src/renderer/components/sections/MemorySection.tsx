@@ -45,7 +45,7 @@ function MemoryCard({
   };
 
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-prowl-border group">
+    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border group">
       {editing ? (
         <div className="space-y-2">
           <textarea
@@ -126,7 +126,7 @@ function AddMemoryForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card backdrop-blur-xl border border-accent/20">
+    <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-accent/20">
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
