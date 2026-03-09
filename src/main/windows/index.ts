@@ -22,6 +22,7 @@ export {
 export {
   closeDashboardWindow,
   getDashboardWindow,
+  prewarmDashboardWindow,
   showDashboardWindow,
   toggleDashboardWindow,
 } from "./dashboard-window";
