@@ -24,7 +24,7 @@
 
 ### Prowl Chat
 
-<img width="800" src="demo/prowl-chat.jpg" alt="Prowl Chat" style="max-width: 100%;">
+<img width="800" src="demo/prowl-chat-demo.gif" alt="Prowl Chat Demo" style="max-width: 100%;">
 
 ChatGPT OAuth 또는 API Key로 AI 채팅을 사용합니다. 인증 설정은 Settings 탭에서 할 수 있으며, 채팅창 드롭다운에서 모델을 즉시 전환할 수 있습니다.
 
