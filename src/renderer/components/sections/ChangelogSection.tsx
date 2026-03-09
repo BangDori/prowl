@@ -1,5 +1,6 @@
 /** 변경 로그 탭 섹션 */
 import prowlProfile from "@assets/prowl-profile.png";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import Sparkles from "lucide-react/dist/esm/icons/sparkles";
 import { type ReactNode, useEffect, useState } from "react";
 import changelogRaw from "../../../../CHANGELOG.md?raw";
@@ -28,7 +29,7 @@ function extractContributors(text: string): { cleaned: string; contributors: Con
     contributors.push({ handle, url });
     return "";
   });
-  return { cleaned: cleaned.trim(), contributors };
+  return { cleaned: cleaned.replace(/\(\s*\)/g, "").trim(), contributors };
 }
 
 /**
@@ -130,9 +131,21 @@ export default function ChangelogSection() {
             <h4 className="text-sm font-medium">Prowl</h4>
             <p className="text-[10px] text-gray-500">Background job monitor for macOS</p>
           </div>
-          <span className="ml-auto inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
-            <Sparkles className="w-3 h-3" />v{currentVersion}
-          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-prowl-border text-[10px] text-gray-400 hover:text-accent hover:border-accent/40 transition-colors cursor-pointer"
+              onClick={() =>
+                window.electronAPI.openExternal("https://github.com/BangDori/prowl/releases")
+              }
+            >
+              <ExternalLink className="w-3 h-3" />
+              Releases
+            </button>
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-accent/20 text-accent text-xs font-medium">
+              <Sparkles className="w-3 h-3" />v{currentVersion}
+            </span>
+          </div>
         </div>
 
         {/* 버전 히스토리 */}
