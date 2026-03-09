@@ -9,11 +9,17 @@ let forceClose = false;
 let isReady = false;
 /** prewarm 중 showDashboardWindow() 호출 시 ready 되면 바로 표시 */
 let pendingShow = false;
+/** before-quit 리스너 중복 등록 방지 */
+let quitListenerRegistered = false;
 
-// 앱 종료 시 창을 실제로 닫을 수 있도록 플래그 설정
-app.on("before-quit", () => {
-  forceClose = true;
-});
+function ensureQuitListener(): void {
+  if (quitListenerRegistered) return;
+  quitListenerRegistered = true;
+  // 앱 종료 시 창을 실제로 닫을 수 있도록 플래그 설정
+  app.on("before-quit", () => {
+    forceClose = true;
+  });
+}
 
 const isDev = () => process.argv.includes("--dev") || process.env.ELECTRON_DEV === "true";
 
@@ -24,6 +30,7 @@ function getIndexUrl(): string {
 }
 
 function createDashboardWindow(): void {
+  ensureQuitListener();
   isReady = false;
 
   const cursor = screen.getCursorScreenPoint();
