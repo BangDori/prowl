@@ -1,4 +1,5 @@
 /** 캘린더 탭 섹션: 파일 기반 태스크 캘린더 */
+import type { TasksByDate } from "@shared/types";
 import { useMemo, useState } from "react";
 import { getCalendarDays, isSameDay } from "../../utils/calendar";
 import CalendarGrid from "../calendar/CalendarGrid";
@@ -30,6 +31,27 @@ export default function CalendarSection() {
 
   const { backlogTasks, toggleComplete: toggleBacklogComplete } = useBacklogData();
   const agendaTasksByDate = useAgendaTasks();
+
+  // 완료된 백로그 태스크를 completedAt 날짜 기준으로 그룹화
+  const completedBacklogByDate = useMemo(() => {
+    const byDate: TasksByDate = {};
+    for (const task of backlogTasks) {
+      if (task.completed && task.completedAt) {
+        const date = task.completedAt.split("T")[0];
+        byDate[date] = [...(byDate[date] ?? []), task];
+      }
+    }
+    return byDate;
+  }, [backlogTasks]);
+
+  // 캘린더 그리드용: tasksByDate + 완료된 백로그 병합
+  const tasksByDateForGrid = useMemo(() => {
+    const merged: TasksByDate = { ...tasksByDate };
+    for (const [date, tasks] of Object.entries(completedBacklogByDate)) {
+      merged[date] = [...(merged[date] ?? []), ...tasks];
+    }
+    return merged;
+  }, [tasksByDate, completedBacklogByDate]);
 
   // 월 이동
   const goToPrevMonth = () => {
@@ -95,7 +117,7 @@ export default function CalendarSection() {
           calendarDays={calendarDays}
           viewMonth={viewMonth}
           selectedDate={selectedDate}
-          tasksByDate={tasksByDate}
+          tasksByDate={tasksByDateForGrid}
           onDayClick={(day) => {
             // 다른 달 날짜 클릭 시 해당 달로 이동 (그리드 인접 달 날짜 조회 가능)
             if (day.getFullYear() !== viewYear || day.getMonth() !== viewMonth) {
@@ -116,6 +138,7 @@ export default function CalendarSection() {
           tasksByDate={tasksByDate}
           agendaTasksByDate={agendaTasksByDate}
           backlogTasks={backlogTasks}
+          completedBacklogByDate={completedBacklogByDate}
           isShowingCompleted={isShowingCompleted}
           filterCategory={filterCategory}
           onToggleComplete={toggleComplete}
