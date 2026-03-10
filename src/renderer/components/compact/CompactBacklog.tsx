@@ -138,15 +138,13 @@ function BacklogTaskRow({
             />
           )}
         </button>
-        {!isCompleted && (
-          <button
-            type="button"
-            onClick={() => setConfirmPending(true)}
-            className="hidden group-hover:flex flex-shrink-0 items-center p-0.5 rounded text-app-text-ghost hover:text-red-400"
-          >
-            <Trash2 className="w-2.5 h-2.5" />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setConfirmPending(true)}
+          className="hidden group-hover:flex flex-shrink-0 items-center p-0.5 rounded text-app-text-ghost hover:text-red-400"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
+        </button>
       </div>
 
       {expanded && <CompactTaskDetail task={task} />}
