@@ -57,6 +57,7 @@ interface TaskListPanelProps {
   tasksByDate: TasksByDate;
   agendaTasksByDate: TasksByDate;
   backlogTasks: Task[];
+  completedBacklogByDate?: TasksByDate;
   isShowingCompleted: boolean;
   filterCategory: string | null;
   onToggleComplete: (date: string, taskId: string) => void;
@@ -70,6 +71,7 @@ export default function TaskListPanel({
   tasksByDate,
   agendaTasksByDate,
   backlogTasks,
+  completedBacklogByDate = {},
   isShowingCompleted,
   filterCategory,
   onToggleComplete,
@@ -96,6 +98,13 @@ export default function TaskListPanel({
     const tasks = applyFilters(getTasksForDate(tasksByDate, dateStr), selectedDate);
     const isDateToday = isToday(selectedDate);
 
+    // 해당 날짜에 완료된 백로그 태스크
+    const completedBacklogTasks = (completedBacklogByDate[dateStr] ?? []).filter(
+      (t) => !filterCategory || (t.category ?? "기타") === filterCategory,
+    );
+
+    const totalCount = tasks.length + completedBacklogTasks.length;
+
     return (
       <div className="flex-1 border-t border-prowl-border overflow-y-auto px-3 py-2">
         <div className="glass-card-3d rounded-lg bg-prowl-card border border-prowl-border p-2">
@@ -104,20 +113,46 @@ export default function TaskListPanel({
               {formatDateKr(dateStr)}
               {isDateToday && <span className="ml-1.5 text-accent">오늘</span>}
             </span>
-            <span className="text-[10px] text-gray-600">{tasks.length}건</span>
+            <span className="text-[10px] text-gray-600">{totalCount}건</span>
           </div>
-          {tasks.length === 0 ? (
+          {totalCount === 0 ? (
             <div className="flex items-center justify-center py-4">
               <p className="text-[11px] text-gray-600">태스크 없음</p>
             </div>
           ) : (
-            <TaskGroupedList
-              tasks={tasks}
-              dateStr={dateStr}
-              onToggleComplete={onToggleComplete}
-              onUpdateTask={onUpdateTask}
-              onDeleteTask={onDeleteTask}
-            />
+            <div className="space-y-1.5">
+              {tasks.length > 0 && (
+                <TaskGroupedList
+                  tasks={tasks}
+                  dateStr={dateStr}
+                  onToggleComplete={onToggleComplete}
+                  onUpdateTask={onUpdateTask}
+                  onDeleteTask={onDeleteTask}
+                />
+              )}
+              {completedBacklogTasks.length > 0 && (
+                <>
+                  {tasks.length > 0 && (
+                    <div className="flex items-center gap-1.5 py-0.5">
+                      <div className="flex-1 h-px bg-prowl-border opacity-50" />
+                      <span className="text-[9px] text-gray-600">백로그 완료</span>
+                      <div className="flex-1 h-px bg-prowl-border opacity-50" />
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    {completedBacklogTasks.map((task) => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggleComplete={() => onToggleBacklogComplete(task.id)}
+                        onUpdate={() => {}}
+                        onDelete={() => {}}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
         </div>
       </div>
