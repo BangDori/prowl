@@ -61,6 +61,7 @@ export function showChatWindow(): void {
       contextIsolation: true,
       nodeIntegration: false,
       webviewTag: true,
+      devTools: isDev(),
     },
   });
 
