@@ -172,6 +172,17 @@ export default function CompactView() {
     [backlogTasks, toggleBacklogComplete, toggleComplete],
   );
 
+  const handleDeleteCompleted = useCallback(
+    (date: string, taskId: string) => {
+      if (backlogTasks.some((t) => t.id === taskId)) {
+        deleteBacklog(taskId);
+      } else {
+        deleteTask(date, taskId);
+      }
+    },
+    [backlogTasks, deleteBacklog, deleteTask],
+  );
+
   const handleToggleMinimize = useCallback(async () => {
     const next = !minimized;
     setMinimized(next);
@@ -212,7 +223,11 @@ export default function CompactView() {
               categoryNames={categories.map((c) => c.name)}
             />
             {hasCompleted && (
-              <CompactCompleted groups={completedGroups} onToggleComplete={handleToggleCompleted} />
+              <CompactCompleted
+                groups={completedGroups}
+                onToggleComplete={handleToggleCompleted}
+                onDelete={handleDeleteCompleted}
+              />
             )}
           </div>
         ) : (
@@ -240,7 +255,11 @@ export default function CompactView() {
               />
             )}
             {hasCompleted && (
-              <CompactCompleted groups={completedGroups} onToggleComplete={handleToggleCompleted} />
+              <CompactCompleted
+                groups={completedGroups}
+                onToggleComplete={handleToggleCompleted}
+                onDelete={handleDeleteCompleted}
+              />
             )}
           </div>
         ))}

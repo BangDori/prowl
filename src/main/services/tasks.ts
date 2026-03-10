@@ -159,8 +159,6 @@ export function toggleTaskComplete(date: string, taskId: string): void {
 /** 태스크 삭제 */
 export function deleteTask(date: string, taskId: string): void {
   const tasks = readDateFile(date);
-  const task = tasks.find((t) => t.id === taskId);
-  if (task?.completed) throw new Error("완료된 태스크는 삭제할 수 없습니다.");
   writeDateFile(
     date,
     tasks.filter((t) => t.id !== taskId),
@@ -229,7 +227,5 @@ export function toggleBacklogComplete(taskId: string): void {
 /** 백로그 태스크 삭제 */
 export function deleteBacklogTask(taskId: string): void {
   const tasks = readBacklogFile();
-  const task = tasks.find((t) => t.id === taskId);
-  if (task?.completed) throw new Error("완료된 태스크는 삭제할 수 없습니다.");
   writeBacklogFile(tasks.filter((t) => t.id !== taskId));
 }

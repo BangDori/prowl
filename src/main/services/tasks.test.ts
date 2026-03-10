@@ -164,9 +164,11 @@ describe("tasks 서비스", () => {
       expect(written).toHaveLength(0);
     });
 
-    it("완료된 태스크 삭제 시 에러", () => {
+    it("완료된 태스크도 삭제할 수 있다", () => {
       mockReadFileSync.mockReturnValue(JSON.stringify([{ ...BASE_TASK, completed: true }]));
-      expect(() => deleteTask("2025-01-15", "t1")).toThrow("완료된 태스크");
+      deleteTask("2025-01-15", "t1");
+      const written = JSON.parse(vi.mocked(mockWriteFileSync).mock.calls[0][1] as string);
+      expect(written).toHaveLength(0);
     });
 
     it("없는 태스크 삭제 시 나머지 목록만 저장 (에러 없음)", () => {
@@ -298,9 +300,11 @@ describe("tasks 서비스", () => {
         expect(written).toHaveLength(0);
       });
 
-      it("완료된 백로그 태스크 삭제 시 에러", () => {
+      it("완료된 백로그 태스크도 삭제할 수 있다", () => {
         mockReadFileSync.mockReturnValue(JSON.stringify([{ ...BASE_TASK, completed: true }]));
-        expect(() => deleteBacklogTask("t1")).toThrow("완료된 태스크");
+        deleteBacklogTask("t1");
+        const written = JSON.parse(vi.mocked(mockWriteFileSync).mock.calls[0][1] as string);
+        expect(written).toHaveLength(0);
       });
     });
   });
