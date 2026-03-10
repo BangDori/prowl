@@ -116,9 +116,16 @@ describe("tasks 서비스", () => {
       expect(() => updateTask("2025-01-15", BASE_TASK)).toThrow("Task not found");
     });
 
-    it("완료된 태스크 수정 시 에러", () => {
-      mockReadFileSync.mockReturnValue(JSON.stringify([{ ...BASE_TASK, completed: true }]));
-      expect(() => updateTask("2025-01-15", BASE_TASK)).toThrow("완료된 태스크");
+    it("완료된 태스크도 수정할 수 있다", () => {
+      const completedTask = { ...BASE_TASK, completed: true };
+      mockReadFileSync.mockReturnValue(JSON.stringify([completedTask]));
+      const updated = { ...completedTask, title: "수정된 제목" };
+
+      updateTask("2025-01-15", updated);
+
+      const written = JSON.parse(vi.mocked(mockWriteFileSync).mock.calls[0][1] as string);
+      expect(written[0].title).toBe("수정된 제목");
+      expect(written[0].completed).toBe(true);
     });
   });
 
@@ -268,9 +275,16 @@ describe("tasks 서비스", () => {
         expect(() => updateBacklogTask(BASE_TASK)).toThrow("Backlog task not found");
       });
 
-      it("완료된 태스크 수정 시 에러", () => {
-        mockReadFileSync.mockReturnValue(JSON.stringify([{ ...BASE_TASK, completed: true }]));
-        expect(() => updateBacklogTask(BASE_TASK)).toThrow("완료된 태스크");
+      it("완료된 백로그 태스크도 수정할 수 있다", () => {
+        const completedTask = { ...BASE_TASK, completed: true };
+        mockReadFileSync.mockReturnValue(JSON.stringify([completedTask]));
+        const updated = { ...completedTask, title: "수정됨" };
+
+        updateBacklogTask(updated);
+
+        const written = JSON.parse(vi.mocked(mockWriteFileSync).mock.calls[0][1] as string);
+        expect(written[0].title).toBe("수정됨");
+        expect(written[0].completed).toBe(true);
       });
     });
 

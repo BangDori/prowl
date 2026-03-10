@@ -232,24 +232,22 @@ export default function TaskItem({ task, onToggleComplete, onUpdate, onDelete }:
             </span>
           )}
         </div>
-        {!task.completed && (
-          <div className="hidden group-hover:flex flex-shrink-0 items-center gap-0.5">
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
-            >
-              <Pencil className="w-2.5 h-2.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirmPending(true)}
-              className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
-            >
-              <Trash2 className="w-2.5 h-2.5" />
-            </button>
-          </div>
-        )}
+        <div className="hidden group-hover:flex flex-shrink-0 items-center gap-0.5">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="p-0.5 rounded text-app-text-ghost hover:text-app-text-secondary transition-colors"
+          >
+            <Pencil className="w-2.5 h-2.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfirmPending(true)}
+            className="p-0.5 rounded text-app-text-ghost hover:text-red-400 transition-colors"
+          >
+            <Trash2 className="w-2.5 h-2.5" />
+          </button>
+        </div>
       </div>
       {confirmPending && (
         <ConfirmDialog

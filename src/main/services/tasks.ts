@@ -141,7 +141,6 @@ export function updateTask(date: string, task: Task): void {
   const tasks = readDateFile(date);
   const idx = tasks.findIndex((t) => t.id === task.id);
   if (idx === -1) throw new Error(`Task not found: ${task.id}`);
-  if (tasks[idx].completed) throw new Error("완료된 태스크는 수정할 수 없습니다.");
   tasks[idx] = task;
   writeDateFile(date, tasks);
 }
@@ -209,7 +208,6 @@ export function updateBacklogTask(task: Task): void {
   const tasks = readBacklogFile();
   const idx = tasks.findIndex((t) => t.id === task.id);
   if (idx === -1) throw new Error(`Backlog task not found: ${task.id}`);
-  if (tasks[idx].completed) throw new Error("완료된 태스크는 수정할 수 없습니다.");
   tasks[idx] = task;
   writeBacklogFile(tasks);
 }
