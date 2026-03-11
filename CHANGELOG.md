@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.53.0] - 2026-03-11
+- 완료된 백로그 태스크를 completedAt 날짜 기준으로 캘린더에 표시 ([@BangDori](https://github.com/BangDori))
+- Task Manager 가로 동적 사이징 — 최소 240px, 최대 전체 화면 너비까지 자유롭게 리사이징 가능, 너비 설정 재시작 후 복원 ([@BangDori](https://github.com/BangDori))
+- 완료된 태스크 삭제/수정 허용 및 Compact/Dashboard UI에 삭제 버튼 추가 ([@BangDori](https://github.com/BangDori))
+- 프로덕션 빌드에서 개발자 도구 비활성화 ([@BangDori](https://github.com/BangDori))
+
 ## [1.52.1] - 2026-03-09
 - main 콘텐츠 영역 드래그 설정으로 인한 스크롤 불가 수정 ([@BangDori](https://github.com/BangDori))
 
