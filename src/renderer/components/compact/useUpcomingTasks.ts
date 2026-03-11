@@ -2,7 +2,7 @@
 
 import { queryKeys } from "@renderer/queries/keys";
 import { toDateStr } from "@renderer/utils/calendar";
-import type { TasksByDate, UpcomingRange } from "@shared/types";
+import type { Task, TasksByDate, UpcomingRange } from "@shared/types";
 import { UPCOMING_RANGE_DAYS } from "@shared/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -37,11 +37,18 @@ export function useUpcomingTasks(range: UpcomingRange) {
     onSettled: invalidateAll,
   });
 
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ date, task }: { date: string; task: Task }) =>
+      window.electronAPI.updateTask(date, task),
+    onSettled: invalidateAll,
+  });
+
   return {
     tasksByDate,
     refreshing,
     toggleComplete: (date: string, taskId: string) =>
       toggleCompleteMutation.mutate({ date, taskId }),
     deleteTask: (date: string, taskId: string) => deleteTaskMutation.mutate({ date, taskId }),
+    updateTask: (date: string, task: Task) => updateTaskMutation.mutate({ date, task }),
   };
 }

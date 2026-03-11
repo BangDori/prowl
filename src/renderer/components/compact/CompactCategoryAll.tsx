@@ -1,7 +1,8 @@
-/** 카테고리별 전체 태스크 그룹 뷰 (날짜 구분 없이 카테고리로 묶음) */
+/** 카테고리별 전체 태스크 그룹 뷰 (날짜 구분 없이 카테고리로 묶음, DnD 카테고리 변경 지원) */
 import type { Task } from "@shared/types";
 import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
 import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import GripVertical from "lucide-react/dist/esm/icons/grip-vertical";
 import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { getCategoryColor } from "../../utils/category-utils";
@@ -13,6 +14,7 @@ export interface CategoryTaskEntry {
   dateLabel: string; // "오늘" | "내일" | "M/D(요일)" | "날짜 미정"
   onToggle: () => void;
   onDelete: () => void;
+  onCategoryChange: (newCategory: string) => void;
 }
 
 interface CategoryGroup {
@@ -32,7 +34,7 @@ function buildGroups(entries: CategoryTaskEntry[], categoryNames: string[]): Cat
   for (const entry of entries) {
     const cat = entry.task.category ?? "기타";
     if (!map.has(cat)) map.set(cat, []);
-    map.get(cat)!.push(entry);
+    map.get(cat)?.push(entry);
   }
   return [...map.entries()]
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
@@ -51,6 +53,8 @@ interface CompactCategoryAllProps {
 export default function CompactCategoryAll({ entries, categoryNames }: CompactCategoryAllProps) {
   const groups = buildGroups(entries, categoryNames);
   const [collapsedCategories, setCollapsedCategories] = useState<Set<string>>(new Set());
+  const [draggedEntry, setDraggedEntry] = useState<CategoryTaskEntry | null>(null);
+  const [dragOverCategory, setDragOverCategory] = useState<string | null>(null);
 
   if (groups.length === 0) {
     return (
@@ -72,15 +76,41 @@ export default function CompactCategoryAll({ entries, categoryNames }: CompactCa
     });
   }
 
+  function handleDrop(targetCategory: string) {
+    if (draggedEntry && (draggedEntry.task.category ?? "기타") !== targetCategory) {
+      draggedEntry.onCategoryChange(targetCategory);
+    }
+    setDragOverCategory(null);
+    setDraggedEntry(null);
+  }
+
   return (
     <div className="space-y-1.5">
       {groups.map((group) => {
         const isCollapsed = collapsedCategories.has(group.category);
+        const isDragOver =
+          dragOverCategory === group.category &&
+          draggedEntry !== null &&
+          (draggedEntry.task.category ?? "기타") !== group.category;
         const Chevron = isCollapsed ? ChevronRight : ChevronDown;
         return (
-          <div
+          <section
             key={group.category}
-            className="rounded-xl bg-prowl-card border border-prowl-border overflow-hidden"
+            aria-label={group.category}
+            className={`rounded-xl bg-prowl-card border overflow-hidden transition-colors ${
+              isDragOver ? "border-accent/60 bg-accent/5" : "border-prowl-border"
+            }`}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragOverCategory(group.category);
+            }}
+            onDragLeave={(e) => {
+              // 자식 요소로 이동 시 false positive 방지
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                setDragOverCategory(null);
+              }
+            }}
+            onDrop={() => handleDrop(group.category)}
           >
             <button
               type="button"
@@ -103,24 +133,48 @@ export default function CompactCategoryAll({ entries, categoryNames }: CompactCa
                   key={entry.task.id}
                   entry={entry}
                   hasBorder={idx < group.entries.length - 1}
+                  isDragging={draggedEntry?.task.id === entry.task.id}
+                  onDragStart={() => setDraggedEntry(entry)}
+                  onDragEnd={() => {
+                    setDraggedEntry(null);
+                    setDragOverCategory(null);
+                  }}
                 />
               ))}
-          </div>
+          </section>
         );
       })}
     </div>
   );
 }
 
-function CategoryTaskRow({ entry, hasBorder }: { entry: CategoryTaskEntry; hasBorder: boolean }) {
+function CategoryTaskRow({
+  entry,
+  hasBorder,
+  isDragging,
+  onDragStart,
+  onDragEnd,
+}: {
+  entry: CategoryTaskEntry;
+  hasBorder: boolean;
+  isDragging: boolean;
+  onDragStart: () => void;
+  onDragEnd: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [confirmPending, setConfirmPending] = useState(false);
   const Chevron = expanded ? ChevronDown : ChevronRight;
   const { task, dateLabel, onToggle, onDelete } = entry;
 
   return (
-    <div className={hasBorder ? "border-b border-prowl-border" : ""}>
+    <li
+      className={`list-none ${hasBorder ? "border-b border-prowl-border" : ""} transition-opacity ${isDragging ? "opacity-40" : ""}`}
+      draggable
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
       <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
+        <GripVertical className="w-2.5 h-2.5 text-app-text-ghost/30 group-hover:text-app-text-ghost flex-shrink-0 cursor-grab active:cursor-grabbing" />
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center border-app-input-border hover:border-prowl-border-hover transition-colors" />
         </button>
@@ -168,6 +222,6 @@ function CategoryTaskRow({ entry, hasBorder }: { entry: CategoryTaskEntry; hasBo
           }}
         />
       )}
-    </div>
+    </li>
   );
 }

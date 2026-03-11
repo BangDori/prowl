@@ -59,6 +59,11 @@ export function useBacklogData() {
     onSettled: invalidate,
   });
 
+  const updateBacklogMutation = useMutation({
+    mutationFn: (task: Task) => window.electronAPI.updateBacklogTask(task),
+    onSettled: invalidate,
+  });
+
   return {
     backlogTasks,
     isLoading,
@@ -66,6 +71,7 @@ export function useBacklogData() {
     refreshing,
     toggleComplete: (taskId: string) => toggleCompleteMutation.mutate(taskId),
     deleteBacklog: (taskId: string) => deleteBacklogMutation.mutate(taskId),
+    updateBacklog: (task: Task) => updateBacklogMutation.mutate(task),
     refetch: invalidate,
   };
 }

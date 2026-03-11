@@ -1,6 +1,6 @@
 /** Compact Sticky View: 카테고리별/날짜별 태스크 뷰 */
 
-import type { UpcomingRange } from "@shared/types";
+import type { Task, UpcomingRange } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { queryKeys } from "../../queries/keys";
@@ -46,12 +46,21 @@ export default function CompactView() {
   const year = now.getFullYear();
   const month = now.getMonth();
 
-  const { tasksByDate, toggleComplete, deleteTask, refreshing, refetch } = useTaskData(year, month);
-  const { backlogTasks, toggleComplete: toggleBacklogComplete, deleteBacklog } = useBacklogData();
+  const { tasksByDate, toggleComplete, deleteTask, updateTask, refreshing, refetch } = useTaskData(
+    year,
+    month,
+  );
+  const {
+    backlogTasks,
+    toggleComplete: toggleBacklogComplete,
+    deleteBacklog,
+    updateBacklog,
+  } = useBacklogData();
   const {
     tasksByDate: upcomingTasksByDate,
     toggleComplete: toggleUpcomingComplete,
     deleteTask: deleteUpcomingTask,
+    updateTask: updateUpcomingTask,
   } = useUpcomingTasks(upcomingRange);
 
   const incompleteBacklogTasks = useMemo(
@@ -91,6 +100,7 @@ export default function CompactView() {
           dateLabel: getLabel(date),
           onToggle: () => toggleComplete(date, task.id),
           onDelete: () => deleteTask(date, task.id),
+          onCategoryChange: (newCategory) => updateTask(date, { ...task, category: newCategory }),
         });
       }
     }
@@ -101,6 +111,7 @@ export default function CompactView() {
         dateLabel: "오늘",
         onToggle: () => toggleComplete(todayStr, task.id),
         onDelete: () => deleteTask(todayStr, task.id),
+        onCategoryChange: (newCategory) => updateTask(todayStr, { ...task, category: newCategory }),
       });
     }
 
@@ -113,6 +124,8 @@ export default function CompactView() {
           dateLabel: getLabel(date),
           onToggle: () => toggleUpcomingComplete(date, task.id),
           onDelete: () => deleteUpcomingTask(date, task.id),
+          onCategoryChange: (newCategory) =>
+            updateUpcomingTask(date, { ...task, category: newCategory }),
         });
       }
     }
@@ -123,6 +136,7 @@ export default function CompactView() {
         dateLabel: "날짜 미정",
         onToggle: () => toggleBacklogComplete(task.id),
         onDelete: () => deleteBacklog(task.id),
+        onCategoryChange: (newCategory) => updateBacklog({ ...task, category: newCategory }),
       });
     }
 
@@ -138,6 +152,9 @@ export default function CompactView() {
     deleteTask,
     deleteUpcomingTask,
     deleteBacklog,
+    updateTask,
+    updateUpcomingTask,
+    updateBacklog,
     todayStr,
     tomorrowStr,
   ]);
