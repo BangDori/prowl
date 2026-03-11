@@ -8,6 +8,7 @@ const GITHUB_RELEASES_API = "https://api.github.com/repos/BangDori/prowl/release
 interface GitHubRelease {
   tag_name: string;
   html_url: string;
+  published_at: string;
   body?: string;
 }
 
@@ -96,6 +97,7 @@ export async function checkForUpdates(): Promise<UpdateCheckResult> {
       currentVersion,
       latestVersion,
       releaseUrl: release.html_url,
+      releasePublishedAt: release.published_at,
       releaseNotes: release.body,
       brewStatus,
     };
