@@ -17,6 +17,7 @@ interface StoreSchema {
   settings: StoredSettings;
   chatConfig: ChatConfig;
   compactExpandedHeight?: number;
+  compactExpandedWidth?: number;
 }
 
 const store = new Store<StoreSchema>({
@@ -87,4 +88,13 @@ export function getCompactExpandedHeight(): number {
 
 export function saveCompactExpandedHeight(height: number): void {
   store.set("compactExpandedHeight", height);
+}
+
+// Task Manager 창 너비
+export function getCompactExpandedWidth(): number {
+  return store.get("compactExpandedWidth") ?? 280;
+}
+
+export function saveCompactExpandedWidth(width: number): void {
+  store.set("compactExpandedWidth", width);
 }

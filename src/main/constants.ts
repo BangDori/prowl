@@ -52,6 +52,7 @@ export const DASHBOARD = {
 // ============================================
 export const COMPACT = {
   WIDTH: 280,
+  MIN_WIDTH: 240,
   HEIGHT: 400,
   HEADER_HEIGHT: 28,
   MARGIN: 16,

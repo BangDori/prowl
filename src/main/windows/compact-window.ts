@@ -2,7 +2,12 @@
 import * as path from "node:path";
 import { BrowserWindow, screen } from "electron";
 import { COMPACT, DEV_SERVER_PORT } from "../constants";
-import { getCompactExpandedHeight, saveCompactExpandedHeight } from "../services/settings";
+import {
+  getCompactExpandedHeight,
+  getCompactExpandedWidth,
+  saveCompactExpandedHeight,
+  saveCompactExpandedWidth,
+} from "../services/settings";
 
 let compactWindow: BrowserWindow | null = null;
 
@@ -31,13 +36,12 @@ export function showCompactWindow(): void {
   const y = workArea.y + COMPACT.MARGIN;
 
   compactWindow = new BrowserWindow({
-    width: COMPACT.WIDTH,
+    width: getCompactExpandedWidth(),
     height: getCompactExpandedHeight(),
     x,
     y,
     resizable: true,
-    minWidth: COMPACT.WIDTH,
-    maxWidth: COMPACT.WIDTH,
+    minWidth: COMPACT.MIN_WIDTH,
     minHeight: COMPACT.HEADER_HEIGHT,
     movable: true,
     minimizable: false,
@@ -56,6 +60,7 @@ export function showCompactWindow(): void {
       preload: path.join(__dirname, "../../preload/index.js"),
       contextIsolation: true,
       nodeIntegration: false,
+      devTools: isDev(),
     },
   });
 
@@ -70,12 +75,13 @@ export function showCompactWindow(): void {
     compactWindow = null;
   });
 
-  // 사용자가 창 높이를 드래그로 변경할 때 저장 (최소화 높이 제외)
+  // 사용자가 창 크기를 드래그로 변경할 때 저장 (최소화 높이 제외)
   compactWindow.on("resize", () => {
     const win = compactWindow;
     if (!win || win.isDestroyed()) return;
-    const [, h] = win.getSize();
+    const [w, h] = win.getSize();
     if (h > 50) saveCompactExpandedHeight(h);
+    saveCompactExpandedWidth(w);
   });
 }
 

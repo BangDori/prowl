@@ -3,9 +3,11 @@
 import type { Task } from "@shared/types";
 import ChevronDown from "lucide-react/dist/esm/icons/chevron-down";
 import ChevronRight from "lucide-react/dist/esm/icons/chevron-right";
+import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import { useState } from "react";
 import { formatDateKr } from "../../utils/calendar";
 import { getCategoryColor } from "../../utils/category-utils";
+import ConfirmDialog from "../ConfirmDialog";
 import CompactTaskDetail from "./CompactTaskDetail";
 
 interface CompletedGroup {
@@ -16,9 +18,14 @@ interface CompletedGroup {
 interface CompactCompletedProps {
   groups: CompletedGroup[];
   onToggleComplete: (date: string, taskId: string) => void;
+  onDelete: (date: string, taskId: string) => void;
 }
 
-export default function CompactCompleted({ groups, onToggleComplete }: CompactCompletedProps) {
+export default function CompactCompleted({
+  groups,
+  onToggleComplete,
+  onDelete,
+}: CompactCompletedProps) {
   const [expanded, setExpanded] = useState(false);
 
   const totalCount = groups.reduce((sum, g) => sum + g.tasks.length, 0);
@@ -62,6 +69,7 @@ export default function CompactCompleted({ groups, onToggleComplete }: CompactCo
                   task={task}
                   hasBorder={idx < group.tasks.length - 1}
                   onToggle={() => onToggleComplete(group.date, task.id)}
+                  onDelete={() => onDelete(group.date, task.id)}
                 />
               ))}
             </div>
@@ -76,17 +84,20 @@ function CompletedTaskRow({
   task,
   hasBorder,
   onToggle,
+  onDelete,
 }: {
   task: Task;
   hasBorder: boolean;
   onToggle: () => void;
+  onDelete: () => void;
 }) {
   const [rowExpanded, setRowExpanded] = useState(false);
+  const [confirmPending, setConfirmPending] = useState(false);
   const Chevron = rowExpanded ? ChevronDown : ChevronRight;
 
   return (
     <div className={hasBorder ? "border-b border-prowl-border" : ""}>
-      <div className="flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
+      <div className="group flex items-center gap-2 px-2.5 py-[7px] hover:bg-prowl-surface transition-colors">
         <button type="button" onClick={onToggle} className="flex-shrink-0">
           <span className="w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center bg-emerald-500/20 border-emerald-500/30 transition-colors">
             <svg
@@ -128,9 +139,27 @@ function CompletedTaskRow({
             </span>
           )}
         </button>
+        <button
+          type="button"
+          onClick={() => setConfirmPending(true)}
+          className="hidden group-hover:flex flex-shrink-0 items-center p-0.5 rounded text-app-text-ghost hover:text-red-400"
+        >
+          <Trash2 className="w-2.5 h-2.5" />
+        </button>
       </div>
 
       {rowExpanded && <CompactTaskDetail task={task} />}
+      {confirmPending && (
+        <ConfirmDialog
+          title="태스크 삭제"
+          message={`"${task.title}" 태스크를 삭제할까요?`}
+          onCancel={() => setConfirmPending(false)}
+          onConfirm={() => {
+            onDelete();
+            setConfirmPending(false);
+          }}
+        />
+      )}
     </div>
   );
 }
