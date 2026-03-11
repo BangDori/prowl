@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.54.0] - 2026-03-11
+- Compact View 카테고리 뷰에서 DnD로 태스크 카테고리 변경 지원 ([@BangDori](https://github.com/BangDori))
+- Homebrew 기반 업데이트 확인 로직으로 전환 — GitHub API 제거, formula 버전 직접 비교 ([@BangDori](https://github.com/BangDori))
+- 릴리즈 후 1시간이 지난 경우에만 Homebrew 업데이트 허용 ([@BangDori](https://github.com/BangDori))
+
 ## [1.53.0] - 2026-03-11
 - 완료된 백로그 태스크를 completedAt 날짜 기준으로 캘린더에 표시 ([@BangDori](https://github.com/BangDori))
 - Task Manager 가로 동적 사이징 — 최소 240px, 최대 전체 화면 너비까지 자유롭게 리사이징 가능, 너비 설정 재시작 후 복원 ([@BangDori](https://github.com/BangDori))
