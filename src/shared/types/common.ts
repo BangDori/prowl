@@ -133,12 +133,10 @@ export interface UpdateCheckResult {
   hasUpdate: boolean;
   currentVersion: string;
   latestVersion: string;
-  releaseUrl: string;
-  releaseNotes?: string;
-  /** GitHub 릴리즈 게시 시각 (ISO 8601) — Homebrew formula 동기화 지연 판단에 사용 */
-  releasePublishedAt?: string;
   error?: string;
-  brewStatus?: BrewInstallStatus;
+  brewStatus: BrewInstallStatus;
+  /** Homebrew formula가 최신 버전을 반영했는지 여부 — true일 때만 brew upgrade 경로 허용 */
+  canBrewUpgrade: boolean;
 }
 
 // ~/.prowl/ 디렉터리 항목

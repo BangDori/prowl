@@ -1,14 +1,8 @@
 /** 사이드바 하단 업데이트 인디케이터 */
-import Download from "lucide-react/dist/esm/icons/download";
 import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 import X from "lucide-react/dist/esm/icons/x";
 import { useState } from "react";
-import {
-  isBrewSyncReady,
-  useInstallUpdate,
-  useRelaunchApp,
-  useUpdateCheck,
-} from "../hooks/useUpdate";
+import { useInstallUpdate, useRelaunchApp, useUpdateCheck } from "../hooks/useUpdate";
 
 type InstallPhase = "idle" | "installing" | "done" | "error";
 
@@ -16,7 +10,7 @@ type InstallPhase = "idle" | "installing" | "done" | "error";
  * 업데이트 인디케이터 컴포넌트
  *
  * 사이드바 하단에 표시.
- * 업데이트 없으면 null 렌더링.
+ * brew로 설치된 경우에만 업데이트 알림 노출.
  */
 export default function UpdateBanner() {
   const { data: updateResult } = useUpdateCheck();
@@ -26,10 +20,7 @@ export default function UpdateBanner() {
   const [phase, setPhase] = useState<InstallPhase>("idle");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  if (dismissed || !updateResult?.hasUpdate) return null;
-
-  const canBrewUpdate =
-    updateResult.brewStatus === "brew-ready" && isBrewSyncReady(updateResult.releasePublishedAt);
+  if (dismissed || !updateResult?.canBrewUpgrade) return null;
 
   const handleInstall = async () => {
     setPhase("installing");
@@ -47,13 +38,9 @@ export default function UpdateBanner() {
       {/* Header row: icon + version + dismiss */}
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-1.5">
-          {phase === "installing" ? (
-            <RefreshCw className="w-3.5 h-3.5 text-accent animate-spin" />
-          ) : phase === "done" ? (
-            <RefreshCw className="w-3.5 h-3.5 text-green-400" />
-          ) : (
-            <Download className="w-3.5 h-3.5 text-accent" />
-          )}
+          <RefreshCw
+            className={`w-3.5 h-3.5 ${phase === "installing" ? "text-accent animate-spin" : phase === "done" ? "text-green-400" : "text-accent"}`}
+          />
           <span className="text-[11px] font-medium text-app-text-secondary">
             {phase === "idle" && (
               <>
@@ -85,37 +72,17 @@ export default function UpdateBanner() {
         </div>
       )}
 
-      {/* Error message + download fallback */}
-      {phase === "error" && (
-        <>
-          <p className="text-[10px] text-red-400/80 truncate mb-1.5">{errorMsg}</p>
-          <button
-            type="button"
-            onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
-            className="w-full py-1 text-[11px] rounded-md bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium"
-          >
-            Download from GitHub
-          </button>
-        </>
-      )}
+      {/* Error message */}
+      {phase === "error" && <p className="text-[10px] text-red-400/80 truncate">{errorMsg}</p>}
 
       {/* Action button */}
-      {phase === "idle" && canBrewUpdate && (
+      {phase === "idle" && (
         <button
           type="button"
           onClick={handleInstall}
           className="w-full py-1 text-[11px] rounded-md bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium"
         >
           Update now
-        </button>
-      )}
-      {phase === "idle" && !canBrewUpdate && (
-        <button
-          type="button"
-          onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
-          className="w-full py-1 text-[11px] rounded-md bg-accent/15 text-accent hover:bg-accent/25 transition-colors font-medium"
-        >
-          Download
         </button>
       )}
       {phase === "done" && (
