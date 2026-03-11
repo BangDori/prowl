@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.54.1] - 2026-03-11
+- brew list/info/upgrade에 BangDori/prowl/prowl fully-qualified cask 이름 사용 ([@BangDori](https://github.com/BangDori))
+
 ## [1.54.0] - 2026-03-11
 - Compact View 카테고리 뷰에서 DnD로 태스크 카테고리 변경 지원 ([@BangDori](https://github.com/BangDori))
 - Homebrew 기반 업데이트 확인 로직으로 전환 — GitHub API 제거, formula 버전 직접 비교 ([@BangDori](https://github.com/BangDori))
