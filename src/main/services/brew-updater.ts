@@ -63,18 +63,20 @@ export function getBrewInstallStatus(): BrewInstallStatus {
 
 /**
  * brew update로 로컬 formula 캐시 갱신
+ *
+ * 실패 시 reject — 호출부에서 catch 후 계속 진행 여부 결정
  */
 function refreshBrewCache(brewPath: string): Promise<void> {
-  return new Promise((resolve) => {
-    execFile(brewPath, ["update"], { encoding: "utf-8", timeout: 60_000 }, () => resolve());
+  return new Promise((resolve, reject) => {
+    execFile(brewPath, ["update"], { encoding: "utf-8", timeout: 60_000 }, (error) => {
+      if (error) reject(error);
+      else resolve();
+    });
   });
 }
 
 /**
  * Cask formula 버전 조회 (brew info 텍스트 파싱)
- *
- * brew outdated --cask 이 서드파티 탭에서 불안정하므로
- * formula 버전과 설치 버전을 직접 비교한다.
  */
 function getCaskFormulaVersion(brewPath: string): Promise<string | null> {
   return new Promise((resolve) => {
@@ -95,44 +97,24 @@ function getCaskFormulaVersion(brewPath: string): Promise<string | null> {
 }
 
 /**
- * 설치된 Cask 버전 조회
+ * brew update로 캐시 갱신 후 Homebrew formula 최신 버전 반환
+ *
+ * checkForUpdates에서 업데이트 가능 여부 판단에 사용한다.
  */
-function getInstalledCaskVersion(brewPath: string): Promise<string | null> {
-  return new Promise((resolve) => {
-    execFile(
-      brewPath,
-      ["list", "--cask", "--versions", CASK_NAME],
-      { encoding: "utf-8", timeout: 10_000 },
-      (error, stdout) => {
-        if (error) {
-          resolve(null);
-          return;
-        }
-        const match = stdout.match(/(\d+\.\d+\.\d+)/);
-        resolve(match?.[1] ?? null);
-      },
-    );
+export async function getLatestFormulaVersion(): Promise<string | null> {
+  const brewPath = findBrewPath();
+  if (!brewPath) return null;
+  await refreshBrewCache(brewPath).catch(() => {
+    /* brew update 실패해도 로컬 캐시로 계속 시도 */
   });
-}
-
-/**
- * Cask formula 버전과 설치 버전을 비교하여 업그레이드 가능 여부 확인
- */
-function isCaskUpgradable(brewPath: string): Promise<boolean> {
-  return Promise.all([getCaskFormulaVersion(brewPath), getInstalledCaskVersion(brewPath)]).then(
-    ([formulaVersion, installedVersion]) => {
-      if (!formulaVersion || !installedVersion) return false;
-      return formulaVersion !== installedVersion;
-    },
-  );
+  return getCaskFormulaVersion(brewPath);
 }
 
 /**
  * brew upgrade --cask prowl 실행
  *
- * 업그레이드 전 cask가 실제로 outdated인지 확인하여
- * GitHub 릴리즈와 Homebrew formula 버전 불일치 시 빈 업그레이드를 방지한다.
- * 비동기로 실행하며 120초 타임아웃 적용.
+ * checkForUpdates에서 canBrewUpgrade가 확인된 후 호출된다.
+ * brew update로 로컬 캐시를 갱신한 뒤 brew upgrade를 실행한다.
  */
 export function runBrewUpgrade(): Promise<IpcResult> {
   const brewPath = findBrewPath();
@@ -141,29 +123,24 @@ export function runBrewUpgrade(): Promise<IpcResult> {
   }
 
   return refreshBrewCache(brewPath)
-    .then(() => isCaskUpgradable(brewPath))
-    .then((outdated) => {
-      if (!outdated) {
-        return {
-          success: false,
-          error:
-            "Homebrew Cask가 아직 최신 버전을 반영하지 않았습니다. GitHub에서 직접 다운로드해주세요.",
-        };
-      }
-
-      return new Promise<IpcResult>((resolve) => {
-        execFile(
-          brewPath,
-          ["upgrade", "--cask", CASK_NAME],
-          { encoding: "utf-8", timeout: 120_000 },
-          (error, _stdout, stderr) => {
-            if (error) {
-              resolve({ success: false, error: stderr || error.message });
-            } else {
-              resolve({ success: true });
-            }
-          },
-        );
-      });
-    });
+    .catch(() => {
+      /* brew update 실패해도 로컬 캐시로 계속 시도 */
+    })
+    .then(
+      () =>
+        new Promise<IpcResult>((resolve) => {
+          execFile(
+            brewPath,
+            ["upgrade", "--cask", CASK_NAME],
+            { encoding: "utf-8", timeout: 120_000 },
+            (error, _stdout, stderr) => {
+              if (error) {
+                resolve({ success: false, error: stderr || error.message });
+              } else {
+                resolve({ success: true });
+              }
+            },
+          );
+        }),
+    );
 }

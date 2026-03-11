@@ -17,8 +17,6 @@ export default function SettingsUpdateCard() {
   const [cooldown, setCooldown] = useState(0);
   const [installPhase, setInstallPhase] = useState<InstallPhase>("idle");
 
-  const canBrewUpdate = updateResult?.brewStatus === "brew-ready";
-
   const handleCheckForUpdates = async () => {
     const { data } = await recheckUpdate();
     if (data && !data.error && !data.hasUpdate) {
@@ -73,25 +71,15 @@ export default function SettingsUpdateCard() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {updateResult?.hasUpdate &&
-            installPhase === "idle" &&
-            (canBrewUpdate ? (
-              <button
-                type="button"
-                onClick={handleInstall}
-                className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-              >
-                Update
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => window.electronAPI.openExternal(updateResult.releaseUrl)}
-                className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
-              >
-                Download
-              </button>
-            ))}
+          {updateResult?.canBrewUpgrade && installPhase === "idle" && (
+            <button
+              type="button"
+              onClick={handleInstall}
+              className="px-2 py-1 text-[10px] rounded bg-accent/20 text-accent hover:bg-accent/30 transition-colors"
+            >
+              Update
+            </button>
+          )}
           {installPhase === "installing" && (
             <span className="text-[10px] text-app-text-muted">Installing...</span>
           )}
