@@ -135,6 +135,8 @@ export interface UpdateCheckResult {
   latestVersion: string;
   releaseUrl: string;
   releaseNotes?: string;
+  /** GitHub 릴리즈 게시 시각 (ISO 8601) — Homebrew formula 동기화 지연 판단에 사용 */
+  releasePublishedAt?: string;
   error?: string;
   brewStatus?: BrewInstallStatus;
 }

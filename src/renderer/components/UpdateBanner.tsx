@@ -3,7 +3,12 @@ import Download from "lucide-react/dist/esm/icons/download";
 import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw";
 import X from "lucide-react/dist/esm/icons/x";
 import { useState } from "react";
-import { useInstallUpdate, useRelaunchApp, useUpdateCheck } from "../hooks/useUpdate";
+import {
+  isBrewSyncReady,
+  useInstallUpdate,
+  useRelaunchApp,
+  useUpdateCheck,
+} from "../hooks/useUpdate";
 
 type InstallPhase = "idle" | "installing" | "done" | "error";
 
@@ -23,7 +28,8 @@ export default function UpdateBanner() {
 
   if (dismissed || !updateResult?.hasUpdate) return null;
 
-  const canBrewUpdate = updateResult.brewStatus === "brew-ready";
+  const canBrewUpdate =
+    updateResult.brewStatus === "brew-ready" && isBrewSyncReady(updateResult.releasePublishedAt);
 
   const handleInstall = async () => {
     setPhase("installing");
