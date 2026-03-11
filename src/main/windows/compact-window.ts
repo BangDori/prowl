@@ -42,7 +42,6 @@ export function showCompactWindow(): void {
     y,
     resizable: true,
     minWidth: COMPACT.MIN_WIDTH,
-    maxWidth: COMPACT.MAX_WIDTH,
     minHeight: COMPACT.HEADER_HEIGHT,
     movable: true,
     minimizable: false,
