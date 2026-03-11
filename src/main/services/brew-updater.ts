@@ -3,7 +3,7 @@ import { execFile, execFileSync } from "node:child_process";
 import type { BrewInstallStatus, IpcResult } from "@shared/types";
 
 const BREW_PATHS = ["/opt/homebrew/bin/brew", "/usr/local/bin/brew"];
-const CASK_NAME = "prowl";
+const CASK_NAME = "BangDori/prowl/prowl";
 
 let resolvedBrewPath: string | null = null;
 
