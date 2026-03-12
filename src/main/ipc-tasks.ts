@@ -1,6 +1,5 @@
 /** 태스크 / Backlog IPC 핸들러 */
 import { handleIpc } from "./ipc-utils";
-import { refreshReminders } from "./services/task-reminder";
 import {
   addDateTask,
   addTaskToBacklog,
@@ -39,7 +38,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:update-task", async (date, task) => {
     try {
       updateTask(date, task);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {
@@ -62,7 +60,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:delete-task", async (date, taskId) => {
     try {
       deleteTask(date, taskId);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {
@@ -74,7 +71,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:add-task", async (date, task) => {
     try {
       addDateTask(date, task);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {
@@ -96,7 +92,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:add-backlog", async (task) => {
     try {
       addTaskToBacklog(task);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {
@@ -107,7 +102,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:update-backlog", async (task) => {
     try {
       updateBacklogTask(task);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {
@@ -128,7 +122,6 @@ export function registerTaskHandlers(): void {
   handleIpc("tasks:delete-backlog", async (taskId) => {
     try {
       deleteBacklogTask(taskId);
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {

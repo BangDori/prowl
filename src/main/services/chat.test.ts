@@ -45,10 +45,6 @@ vi.mock("@ai-sdk/openai", () => ({
 }));
 
 const mockSend = vi.fn();
-vi.mock("./notification", () => ({
-  sendChatNotification: vi.fn(),
-}));
-
 vi.mock("../windows", () => ({
   getChatWindow: vi.fn().mockReturnValue({
     isDestroyed: () => false,
