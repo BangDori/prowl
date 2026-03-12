@@ -1,6 +1,5 @@
 /** 앱 설정 탭 섹션 */
 import { DEFAULT_SHORTCUTS, type ShortcutConfig, type Theme } from "@shared/types";
-import Bell from "lucide-react/dist/esm/icons/bell";
 import ExternalLink from "lucide-react/dist/esm/icons/external-link";
 import KeyRound from "lucide-react/dist/esm/icons/key-round";
 import LogOut from "lucide-react/dist/esm/icons/log-out";
@@ -12,7 +11,6 @@ import Trash2 from "lucide-react/dist/esm/icons/trash-2";
 import User from "lucide-react/dist/esm/icons/user";
 import { useEffect, useState } from "react";
 import ShortcutsPanel from "../ShortcutsPanel";
-import ToggleSwitch from "../ToggleSwitch";
 import SettingsUpdateCard from "./SettingsUpdateCard";
 import { useSettings, useUpdateSettings } from "./useSettings";
 
@@ -33,7 +31,6 @@ export default function SettingsSection() {
   const [oauthError, setOAuthError] = useState<string | null>(null);
 
   const loading = settingsLoading;
-  const notificationsEnabled = settings?.notificationsEnabled ?? true;
   const openaiCredential = settings?.openaiCredential;
 
   // OAuth 연결 상태 확인
@@ -53,11 +50,6 @@ export default function SettingsSection() {
       { ...settings, openaiApiKey: apiKeyInput.trim() },
       { onSuccess: () => setApiKeyEditing(false) },
     );
-  };
-
-  const toggleNotifications = async () => {
-    if (!settings) return;
-    updateSettings.mutate({ ...settings, notificationsEnabled: !notificationsEnabled });
   };
 
   const saveShortcuts = (updated: ShortcutConfig) => {
@@ -141,25 +133,6 @@ export default function SettingsSection() {
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-4 space-y-6">
-        {/* 알림 설정 */}
-        <div>
-          <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
-            Notifications
-          </h3>
-          <div className="glass-card-3d p-3 rounded-lg bg-prowl-card border border-prowl-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-gray-400" />
-                <div>
-                  <p className="text-sm">Enable Notifications</p>
-                  <p className="text-[10px] text-gray-500">Show alerts when jobs complete</p>
-                </div>
-              </div>
-              <ToggleSwitch isEnabled={notificationsEnabled} onChange={toggleNotifications} />
-            </div>
-          </div>
-        </div>
-
         {/* 테마 설정 */}
         <div>
           <h3 className="text-xs font-medium text-app-text-muted uppercase tracking-wider mb-3">
