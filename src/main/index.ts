@@ -6,7 +6,6 @@ import { SPLASH } from "./constants";
 import { registerIpcHandlers } from "./ipc";
 import { applyNativeTheme, getSettings } from "./services/settings";
 import { registerGlobalShortcuts } from "./services/shortcuts";
-import { startTaskReminderScheduler } from "./services/task-reminder";
 import { checkForUpdates } from "./services/update-checker";
 import {
   createSplashWindow,
@@ -32,9 +31,6 @@ if (!gotTheLock) {
 
     // IPC 핸들러 등록
     registerIpcHandlers();
-
-    // 일정 알림 스케줄러 시작
-    startTaskReminderScheduler();
 
     if (isE2E) {
       // E2E 모드: 트레이 없이 대시보드 창 직접 표시

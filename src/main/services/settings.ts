@@ -55,11 +55,6 @@ export function applyNativeTheme(theme: Theme = "system"): void {
   nativeTheme.themeSource = theme;
 }
 
-// 알림 설정
-export function isNotificationsEnabled(): boolean {
-  return getSettings().notificationsEnabled ?? true;
-}
-
 // 채팅 설정
 export function getChatConfig(): ChatConfig {
   return store.get("chatConfig") ?? DEFAULT_CHAT_CONFIG;

@@ -8,12 +8,11 @@ import type {
   OpenAICredential,
   ProviderStatus,
 } from "@shared/types";
-import { getChatWindow, isChatWindowActive } from "../windows";
+import { getChatWindow } from "../windows";
 import { updateTrayBadge } from "./chat-read-state";
 import { saveChatMessages } from "./chat-rooms";
 import { maybeGenerateTitle } from "./chat-title";
 import { getChatTools, getMemorySystemPromptSection, setCurrentRoomId } from "./chat-tools";
-import { sendChatNotification } from "./notification";
 import { isOAuthCredentialExpired, refreshAccessToken } from "./oauth";
 import { getSettings } from "./settings";
 
@@ -257,7 +256,7 @@ export async function streamChatMessage(
   }
 }
 
-/** 스트림 완료 후 메시지 저장 + 배지 갱신 + 알림 (에러 처리는 renderer가 담당) */
+/** 스트림 완료 후 메시지 저장 + 배지 갱신 (에러 처리는 renderer가 담당) */
 function persistAfterStream(
   roomId: string,
   history: ChatMessage[],
@@ -266,11 +265,6 @@ function persistAfterStream(
   const allMessages = [...history, ...aiMessages];
   saveChatMessages(roomId, allMessages);
   updateTrayBadge();
-  if (!isChatWindowActive() && aiMessages.length > 0) {
-    for (const msg of aiMessages) {
-      sendChatNotification(msg.content);
-    }
-  }
 }
 
 /** OpenAI 프로바이더의 자격 증명 상태와 사용 가능 모델 목록 반환 */

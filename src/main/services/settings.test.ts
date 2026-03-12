@@ -56,7 +56,7 @@ describe("settings 서비스", () => {
 
   describe("getSettings", () => {
     it("저장된 설정에 aiPersonalization을 파일에서 병합해 반환한다", () => {
-      const stored = { notificationsEnabled: true, favoritedRoomIds: [] };
+      const stored = { favoritedRoomIds: [] };
       mockGet.mockReturnValue(stored);
       mockReadSystemPrompt.mockReturnValue("custom prompt");
       mockReadTone.mockReturnValue("formal");
@@ -166,12 +166,11 @@ describe("settings 서비스", () => {
     });
 
     it("favoritedRoomIds 필드가 없는 기존 설정에서도 동작한다 (마이그레이션 시나리오)", () => {
-      mockGet.mockReturnValue({ notificationsEnabled: true });
+      mockGet.mockReturnValue({});
 
       toggleFavoritedRoom("roomX");
 
       expect(mockSet).toHaveBeenCalledWith("settings", {
-        notificationsEnabled: true,
         favoritedRoomIds: ["roomX"],
       });
     });
