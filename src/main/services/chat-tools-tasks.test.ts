@@ -24,7 +24,6 @@ vi.mock("./chat-tools-shared", () => ({
   sendToChat: vi.fn(),
 }));
 
-vi.mock("./task-reminder", () => ({ refreshReminders: vi.fn() }));
 vi.mock("./approval", () => ({ waitForApproval: vi.fn().mockResolvedValue(true) }));
 vi.mock("./categories", () => ({ resolveCategory: vi.fn((name: string) => name) }));
 

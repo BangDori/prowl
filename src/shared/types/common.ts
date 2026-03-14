@@ -47,7 +47,6 @@ export interface AiPersonalizationSettings {
 
 // 앱 설정
 export interface AppSettings {
-  notificationsEnabled: boolean; // 알림 활성화
   shortcuts: ShortcutConfig; // 글로벌 단축키
   theme: Theme; // 테마 설정
   openaiApiKey?: string; // OpenAI API 키 (앱 내 설정)
@@ -57,7 +56,6 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
-  notificationsEnabled: true,
   shortcuts: DEFAULT_SHORTCUTS,
   theme: DEFAULT_THEME,
   openaiApiKey: "",

@@ -5,7 +5,6 @@ import { z } from "zod";
 import { waitForApproval } from "./approval";
 import { resolveCategory } from "./categories";
 import { generateId, getCurrentRoomId, notifyTasksChanged, sendToChat } from "./chat-tools-shared";
-import { refreshReminders } from "./task-reminder";
 import {
   addDateTask,
   addTaskToBacklog,
@@ -82,7 +81,6 @@ const add_task = tool({
       } else {
         addDateTask(date, task);
       }
-      refreshReminders();
       notifyTasksChanged();
       return { success: true, task, date: date ?? "backlog" };
     } catch (error) {
@@ -193,7 +191,6 @@ const update_task = tool({
         else if (date) updateTask(date, merged);
       }
 
-      refreshReminders();
       notifyTasksChanged();
       return { success: true, task: merged };
     } catch (error) {
@@ -253,7 +250,6 @@ const delete_task = tool({
       } else {
         return { error: "Provide date or set backlog: true" };
       }
-      refreshReminders();
       notifyTasksChanged();
       return { success: true };
     } catch (error) {

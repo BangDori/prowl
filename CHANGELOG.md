@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.54.2] - 2026-03-12
+- 알림 시스템 및 태스크 리마인더 전체 제거 ([@BangDori](https://github.com/BangDori))
+
 ## [1.54.1] - 2026-03-11
 - brew list/info/upgrade에 BangDori/prowl/prowl fully-qualified cask 이름 사용 ([@BangDori](https://github.com/BangDori))
 
